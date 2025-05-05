@@ -1,4 +1,3 @@
-// src/App.tsx
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { 
@@ -8,7 +7,9 @@ import {
   PrivateRoute,
   PublicRoute,
   NotFound,
-  HomePage
+  HomePage,
+  Login
+  
 } from '@consalud/core';
 import { MenuConfigProvider } from './contex/MenuConfigContext';
 import EjemploPage from './features/ejemplo/components/EjemploPage';
@@ -37,6 +38,13 @@ const App: React.FC = () => {
               <Routes>
                 {/* Ruta raíz redirecciona a /home */}
                 <Route path="/" element={<Navigate to="/home" replace />} />
+                
+                {/* Agregar explícitamente la ruta de login */}
+                <Route path="/login" element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                } />
                 
                 {/* Ruta principal */}
                 <Route path="/home" element={
