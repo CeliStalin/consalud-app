@@ -52,3 +52,35 @@ export default tseslint.config({
   },
 })
 ```
+
+## Configuración de Ambientes
+
+Este proyecto soporta múltiples ambientes de ejecución:
+
+- **Desarrollo**: Ambiente para desarrollo diario (conecta a APIs de desarrollo)
+- **Test**: Ambiente para pruebas QA (conecta a APIs de testing)
+- **Producción**: Ambiente de producción (conecta a APIs productivas)
+- **Local**: Sobrescribe configuraciones para desarrollo local específico
+
+### Configuración de variables de entorno
+
+Los archivos de configuración para cada ambiente se encuentran en:
+
+
+### Comandos por ambiente
+
+```bash
+# Desarrollo
+npm run dev
+
+# Local (usa .env.local)
+npm run dev:local
+
+# Construir para producción
+npm run build
+
+# Construir para desarrollo
+npm run build:dev
+
+# Construir para testing
+npm run build:test

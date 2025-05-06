@@ -1,11 +1,83 @@
 // src/core/config/env.ts
-export const environment = {
-    apiUrl: import.meta.env.VITE_APP_API_ARQUITECTURA_URL || 'http://soter.arquitectura.des',
-    apiKey: import.meta.env.VITE_APP_KEY_PASS_API_ARQ || 'U2VndXJpZGFkXDgyZmYwNDNmODdjNTI4YTMwNzI2MzMwZmY3NDc5YjEyXA==',
-    clientId: import.meta.env.VITE_APP_CLIENT_ID || '8e2f9f34-29ab-4ef2-b05e-f5aaf4d2611d',
-    authority: import.meta.env.VITE_APP_AUTHORITY || 'https://login.microsoftonline.com/00f7e79d-7df9-43de-8f9e-b730ed80c0b0',
-    ambiente: import.meta.env.VITE_APP_AMBIENTE || 'Desarrollo',
-    sistema: import.meta.env.VITE_APP_SISTEMA || 'ManHerederos',
-    nombreSistema: import.meta.env.VITE_APP_NOMBRE_SISTEMA || 'Explotacion de Sistemas',
-    timeout: Number(import.meta.env.VITE_APP_TIMEOUT) || 10000,
-  };
+interface EnvVariables {
+  apiUrl: string;
+  apiKey: string;
+  clientId: string;
+  authority: string;
+  ambiente: string;
+  sistema: string;
+  nombreSistema: string;
+  timeout: number;
+  redirectUri: string;
+}
+
+class Environment {
+  private static instance: Environment;
+  public readonly env: EnvVariables;
+
+  private constructor() {
+    this.env = {
+      apiUrl: import.meta.env.VITE_API_ARQUITECTURA_URL || '',
+      apiKey: import.meta.env.VITE_KEY_PASS_API_ARQ || '',
+      clientId: import.meta.env.VITE_CLIENT_ID || '',
+      authority: import.meta.env.VITE_AUTHORITY || '',
+      ambiente: import.meta.env.VITE_AMBIENTE || 'development',
+      sistema: import.meta.env.VITE_SISTEMA || 'ManHerederos',
+      nombreSistema: import.meta.env.VITE_NOMBRE_SISTEMA || 'Administrador de Devolución a Herederos',
+      timeout: Number(import.meta.env.VITE_TIMEOUT) || 10000,
+      redirectUri: import.meta.env.VITE_REDIRECT_URI || window.location.origin + '/login',
+    };
+
+    // Validar que las variables críticas estén definidas
+    this.validateEnv();
+    
+    // Mostrar información del ambiente en consola (solo en desarrollo)
+    if (this.isDevelopment() || this.isTest()) {
+      console.info(`🌎 Ambiente: ${this.env.ambiente}`);
+      console.info(`🔌 API: ${this.env.apiUrl}`);
+    }
+  }
+
+  public static getInstance(): Environment {
+    if (!Environment.instance) {
+      Environment.instance = new Environment();
+    }
+    return Environment.instance;
+  }
+
+  private validateEnv(): void {
+    const required = ['apiUrl', 'clientId', 'authority', 'sistema'];
+    
+    for (const key of required) {
+      if (!this.env[key as keyof EnvVariables]) {
+        console.error(`Variable de entorno requerida no disponible: ${key}`);
+        // En producción, mejor lanzar un error
+        if (this.isProduction()) {
+          throw new Error(`Variable de entorno requerida: ${key}`);
+        }
+      }
+    }
+  }
+
+  public get(key: keyof EnvVariables): any {
+    return this.env[key];
+  }
+
+  public isDevelopment(): boolean {
+    return this.env.ambiente === 'development' || this.env.ambiente === 'Desarrollo';
+  }
+
+  public isProduction(): boolean {
+    return this.env.ambiente === 'production' || this.env.ambiente === 'Produccion';
+  }
+
+  public isTest(): boolean {
+    return this.env.ambiente === 'test' || this.env.ambiente === 'Testing';
+  }
+
+  public isLocal(): boolean {
+    return this.env.ambiente === 'local' || window.location.hostname === 'localhost';
+  }
+}
+
+export const env = Environment.getInstance();
