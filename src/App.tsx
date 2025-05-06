@@ -14,49 +14,6 @@ import {
 } from '@consalud/core';
 import './App.css';
 
-// Componente AuthWrapper para manejar la redirección después de la autenticación
-const AuthWrapper = ({ children }) => {
-  const location = window.location;
-  
-  useEffect(() => {
-    // Detectar si venimos de una redirección de autenticación
-    if (location.pathname === '/login' && location.hash && location.hash.includes('id_token')) {
-      console.log('Detectada redirección de autenticación, guardando estado');
-      localStorage.setItem('isLogin', 'true');
-      sessionStorage.setItem('authMethod', 'redirect');
-    }
-  }, [location]);
-
-  return <>{children}</>;
-};
-
-// Componente de depuración para rastrear el estado de autenticación
-const AuthDebugger = () => {
-  useEffect(() => {
-    // Verificar estado de autenticación periódicamente
-    const checkAuth = async () => {
-      try {
-        const authenticated = await MsalAuthProvider.isAuthenticated();
-        console.log('Estado de autenticación (AuthDebugger):', {
-          isAuthenticated: authenticated,
-          path: window.location.pathname,
-          isLoginInStorage: localStorage.getItem('isLogin') === 'true',
-          authMethod: sessionStorage.getItem('authMethod')
-        });
-      } catch (error) {
-        console.error('Error al verificar autenticación:', error);
-      }
-    };
-    
-    checkAuth();
-    const interval = setInterval(checkAuth, 2000);
-    
-    return () => clearInterval(interval);
-  }, []);
-  
-  return null; // Componente invisible
-};
-
 // Componente de error genérico
 const ErrorFallback = () => (
   <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -80,7 +37,7 @@ const ErrorFallback = () => (
 
 const App = () => {
   const [isHandlingRedirect, setIsHandlingRedirect] = useState(true);
-  const [redirectError, setRedirectError] = useState<string | null>(null); // Corregido el tipo
+  const [redirectError, setRedirectError] = useState<string | null>(null);
 
   // Este efecto maneja la redirección después de la autenticación
   useEffect(() => {
@@ -91,6 +48,18 @@ const App = () => {
         
         // Inicializar MSAL primero
         await MsalAuthProvider.initialize();
+        
+        // Detectar si venimos de una redirección de autenticación (reemplaza AuthWrapper)
+        const hasAuthRedirectParams = 
+          window.location.pathname === '/login' && 
+          window.location.hash && 
+          window.location.hash.includes('id_token');
+        
+        if (hasAuthRedirectParams) {
+          console.log('Detectada redirección de autenticación, guardando estado');
+          localStorage.setItem('isLogin', 'true');
+          sessionStorage.setItem('authMethod', 'redirect');
+        }
         
         // Manejar la redirección
         const response = await MsalAuthProvider.handleRedirectPromise();
@@ -183,35 +152,33 @@ const App = () => {
   return (
     <ErrorBoundary fallback={<ErrorFallback />}>
       <AuthProvider>
-        <AuthDebugger />
-        <AuthWrapper>
-          <MenuConfigProvider config={{ enableDynamicMenu: true }}>
-            <Router>
-              <Suspense fallback={<LoadingOverlay show message="Cargando aplicación..." />}>
-                <Routes>
-                  {/* Ruta raíz redirecciona a /home */}
-                  <Route path="/" element={<Navigate to="/home" replace />} />
-                  
-                  {/* Ruta de login - especificamos explícitamente redirectPath */}
-                  <Route path="/login" element={
-                    <PublicRoute redirectPath="/home">
-                      <Login />
-                    </PublicRoute>
-                  } />
-                  
-                  {/* Ruta principal */}
-                  <Route path="/home" element={
-                    <PrivateRoute>
-                      <HomePage  />
-                    </PrivateRoute>
-                  } />
-                  {/* Ruta 404 */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </Router>
-          </MenuConfigProvider>
-        </AuthWrapper>
+        <MenuConfigProvider config={{ enableDynamicMenu: true }}>
+          <Router>
+            <Suspense fallback={<LoadingOverlay show message="Cargando aplicación..." />}>
+              <Routes>
+                {/* Ruta raíz redirecciona a /home */}
+                <Route path="/" element={<Navigate to="/home" replace />} />
+                
+                {/* Ruta de login - especificamos explícitamente redirectPath */}
+                <Route path="/login" element={
+                  <PublicRoute redirectPath="/home">
+                    <Login />
+                  </PublicRoute>
+                } />
+                
+                {/* Ruta principal */}
+                <Route path="/home" element={
+                  <PrivateRoute>
+                    <HomePage />
+                  </PrivateRoute>
+                } />
+                
+                {/* Ruta 404 */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </Router>
+        </MenuConfigProvider>
       </AuthProvider>
     </ErrorBoundary>
   );
