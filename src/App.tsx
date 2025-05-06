@@ -9,9 +9,8 @@ import {
   NotFound,
   HomePage,
   Login,
-  MsalAuthProvider 
+  MsalAuthProvider,MenuConfigProvider 
 } from '@consalud/core';
-import { MenuConfigProvider } from './contex/MenuConfigContext';
 import './App.css';
 
 // Componente AuthWrapper para manejar la redirección después de la autenticación
