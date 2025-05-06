@@ -9,7 +9,8 @@ import {
   NotFound,
   HomePage,
   Login,
-  MsalAuthProvider,MenuConfigProvider 
+  MsalAuthProvider,
+  MenuConfigProvider
 } from '@consalud/core';
 import './App.css';
 
@@ -201,7 +202,7 @@ const App = () => {
                   {/* Ruta principal */}
                   <Route path="/home" element={
                     <PrivateRoute>
-                      <HomePage />
+                      <HomePage  />
                     </PrivateRoute>
                   } />
                   {/* Ruta 404 */}
