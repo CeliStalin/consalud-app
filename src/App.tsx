@@ -12,7 +12,6 @@ import {
   MsalAuthProvider 
 } from '@consalud/core';
 import { MenuConfigProvider } from './contex/MenuConfigContext';
-import EjemploPage from './features/ejemplo/components/EjemploPage';
 import './App.css';
 
 // Componente AuthWrapper para manejar la redirección después de la autenticación
@@ -206,14 +205,6 @@ const App = () => {
                       <HomePage />
                     </PrivateRoute>
                   } />
-                  
-                  {/* Ruta de ejemplo */}
-                  <Route path="/ejemplo" element={
-                    <PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-                      <EjemploPage />
-                    </PrivateRoute>
-                  } />
-                  
                   {/* Ruta 404 */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
