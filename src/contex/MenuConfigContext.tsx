@@ -1,4 +1,4 @@
-// src/context/MenuConfigContext.tsx
+// src/contex/MenuConfigContext.tsx
 import React, { createContext, useContext, ReactNode } from 'react';
 
 interface MenuItem {
@@ -14,14 +14,8 @@ interface MenuConfigContextType {
 
 // Valores por defecto
 const defaultConfig: MenuConfigContextType = {
-  enableDynamicMenu: true,
-  customMenuItems: [
-    {
-      path: '/ejemplo',
-      label: 'Aplicación Ejemplo',
-      icon: '🔹'
-    }
-  ]
+  enableDynamicMenu: true, // Sobreescribimos el valor por defecto aquí
+
 };
 
 // Crear el contexto
