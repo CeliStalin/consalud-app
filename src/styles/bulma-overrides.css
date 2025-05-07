@@ -1,0 +1,30 @@
+@import './variables.css';
+
+.button.is-primary {
+  background-color: var(--primary);
+}
+
+.button.is-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.card {
+  border-radius: var(--app-border-radius);
+  box-shadow: var(--app-box-shadow);
+}
+
+.notification {
+  border-radius: var(--app-border-radius);
+}
+
+.input, .textarea, .select select {
+  border-radius: var(--app-border-radius);
+}
+
+/* Personalizar el contenedor en dispositivos móviles */
+@media screen and (max-width: 768px) {
+  .container {
+    padding-left: var(--app-spacing-sm);
+    padding-right: var(--app-spacing-sm);
+  }
+}
