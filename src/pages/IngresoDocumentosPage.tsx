@@ -1,4 +1,3 @@
-// src/features/documentos/components/IngresoDocumentosPage.tsx
 import React from 'react';
 import { SecureLayout, Card } from '@consalud/core';
 
@@ -14,7 +13,7 @@ const IngresoDocumentosPage: React.FC = () => {
         >
           <div style={{ marginBottom: '20px' }}>
             <p>Aquí va el contenido del formulario de ingreso de documentos.</p>
-            {/* Aquí puedes añadir tu formulario de ingreso de documentos */}
+            {/* Aquí se añade  formularios de ingreso de documentos */}
           </div>
         </Card>
       </div>

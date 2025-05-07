@@ -13,7 +13,7 @@ const IngresoHerederosPage: React.FC = () => {
         >
           <div style={{ marginBottom: '20px' }}>
             <p>Aquí va el contenido del formulario de ingreso de herederos.</p>
-            {/* Aquí puedes añadir tu formulario de ingreso de herederos */}
+            {/* Aquí se añade  formulario de ingreso de herederos */}
           </div>
         </Card>
       </div>
