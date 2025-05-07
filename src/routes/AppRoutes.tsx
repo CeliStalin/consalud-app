@@ -13,11 +13,17 @@ import {
 import { ApiGetMenus } from '@consalud/core';
 
 // Mapeo de componentes dinámicos (según los nombres de controlador/acción de la API)
+// Formatos alternativos para incrementar las posibilidades de coincidencia
 const dynamicComponentMap: Record<string, React.ComponentType<any>> = {
-  // Formato: 'ControladorAccion': ComponenteReact
+  // Formato con slash: 'Controlador/Accion'
+  'MnHerederos/ingresoHer': React.lazy(() => import('../pages/IngresoHerederosPage')),
+  'MnHerederos/ingresoDoc': React.lazy(() => import('../pages/IngresoDocumentosPage')),
+  // Formato en minúsculas para mayor compatibilidad
+  'mnherederos/ingresoher': React.lazy(() => import('../pages/IngresoHerederosPage')),
+  'mnherederos/ingresodoc': React.lazy(() => import('../pages/IngresoDocumentosPage')),
+  // Formato sin slash para retrocompatibilidad
   'MnHerederosIngresoHer': React.lazy(() => import('../pages/IngresoHerederosPage')),
   'MnHerederosIngresoDoc': React.lazy(() => import('../pages/IngresoDocumentosPage')),
-  // Añadir más mapeos según necesidad
 };
 
 // rutas estáticas
@@ -65,21 +71,44 @@ const AppRoutes: React.FC = () => {
 
         // Transformar elementos de menú en rutas
         const routesFromMenu = menuItems.map(item => {
-          // Crear key para el mapa de componentes
-          const componentKey = `${item.Controlador}${item.Accion}`;
-          // Ruta formateada
-          const routePath = `/${item.Controlador.toLowerCase()}/${item.Accion.toLowerCase()}`;
+          // CLAVE: Probar diferentes formatos para encontrar coincidencia
+          const controlador = item.Controlador;
+          const accion = item.Accion;
+          
+          // Intentar diferentes formatos de clave
+          const componentKey1 = `${controlador}/${accion}`; // Formato con slash
+          const componentKey2 = `${controlador}${accion}`; // Formato sin slash
+          const componentKey3 = `${controlador.toLowerCase()}/${accion.toLowerCase()}`; // En minúsculas
+          
+          // Buscar componente en cualquiera de los formatos
+          let component = 
+            dynamicComponentMap[componentKey1] || 
+            dynamicComponentMap[componentKey2] || 
+            dynamicComponentMap[componentKey3];
+          
+          // Si no se encontró, mostrar en consola para debug
+          if (!component) {
+            console.warn(`No se encontró componente para: ${controlador}/${accion}. Claves probadas:`, 
+              componentKey1, componentKey2, componentKey3);
+            component = NotFound;
+          } else {
+            console.log(`Componente encontrado para ruta: ${controlador}/${accion}`);
+          }
+          
+          // Ruta formateada para la URL
+          const routePath = `/${controlador.toLowerCase()}/${accion.toLowerCase()}`;
           
           return {
             path: routePath,
-            component: dynamicComponentMap[componentKey] || NotFound, // Usar NotFound si no hay mapeo
+            component: component,
             roles: [devRole.Rol],
             menuItem: item // Guardar referencia al ítem original
           };
         });
 
         setDynamicRoutes(routesFromMenu);
-        console.log(`Cargadas ${routesFromMenu.length} rutas dinámicas`);
+        console.log(`Cargadas ${routesFromMenu.length} rutas dinámicas:`, 
+          routesFromMenu.map(r => r.path).join(', '));
       } catch (error) {
         console.error('Error al cargar rutas dinámicas:', error);
       } finally {
