@@ -20,7 +20,7 @@ const dynamicComponentMap: Record<string, React.ComponentType<any>> = {
   // Añadir más mapeos según necesidad
 };
 
-// Descomenta y ajusta las rutas estáticas
+// rutas estáticas
 const staticRoutes = [
   {
     path: '/home',
@@ -28,7 +28,7 @@ const staticRoutes = [
     roles: ['USER', 'ADMIN', 'Developers'],
     title: 'Inicio'
   }
-  // Puedes añadir más rutas estáticas aquí
+  // se puede añadir más rutas estáticas aquí
 ];
 
 const AppRoutes: React.FC = () => {
