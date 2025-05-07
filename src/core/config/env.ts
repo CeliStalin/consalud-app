@@ -1,4 +1,3 @@
-// src/core/config/env.ts
 interface EnvVariables {
   apiUrl: string;
   apiKey: string;
