@@ -8,7 +8,7 @@ import {
   useAuth,
   Login,
   Unauthorized,
-  HomePage, // Importar HomePage del core
+  HomePage
 } from '@consalud/core';
 import { ApiGetMenus } from '@consalud/core';
 

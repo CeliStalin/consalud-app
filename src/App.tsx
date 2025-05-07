@@ -1,5 +1,5 @@
 import { BrowserRouter as Router } from 'react-router-dom';
-import { AuthProvider, ErrorBoundary, MenuConfigProvider } from '@consalud/core';
+import { AuthProvider, ErrorBoundary, MenuConfigProvider ,} from '@consalud/core';
 import { AppRoutes } from './routes';
 import './styles/variables.css'; // Si existe
 import './index.css';
