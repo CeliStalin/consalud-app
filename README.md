@@ -34,7 +34,7 @@ src/
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/CeliStalin/consalud-app.git
+   git clone https://devops.consalud.net/Consalud/PlantillaReact/_git/app-herederos
    cd consalud-app
    ```
 
