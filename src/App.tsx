@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react'; // Añadimos la importación de useEffect
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider, ErrorBoundary, MenuConfigProvider } from '@consalud/core';
 import { AppRoutes } from './routes';
 import './styles/variables.css';
-import './index.css';
 
 // Componente para manejar errores
 const ErrorFallback = () => (
@@ -28,19 +26,8 @@ const ErrorFallback = () => (
 );
 
 const App = () => {
-  // Ahora useEffect está disponible
-  useEffect(() => {
-    const msalConfig = (window as any).MSAL_CONFIG;
-    if (!msalConfig || !msalConfig.clientId || !msalConfig.authority) {
-      console.error('MSAL Config no está disponible globalmente o está incompleto:', msalConfig);
-    } else {
-      console.log('MSAL Config disponible en App.tsx:', msalConfig);
-    }
-  }, []);
-
   return (
     <ErrorBoundary fallback={<ErrorFallback />}>
-      {/* Quitamos la prop config que no es aceptada */}
       <AuthProvider>
         <MenuConfigProvider config={{ enableDynamicMenu: true }}>
           <Router>
