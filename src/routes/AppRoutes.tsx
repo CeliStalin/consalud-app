@@ -12,18 +12,25 @@ import {
 } from '@consalud/core';
 import { ApiGetMenus } from '@consalud/core';
 
+// Importar páginas de la aplicación
+import IngresoHerederosPage from '../pages/IngresoHerederosPage';
+import IngresoHerederoFormPage from '../pages/IngresoHerederoFormPage';
+import IngresoDocumentosPage from '../pages/IngresoDocumentosPage';
+import SuccessPage from '../pages/SuccessPage';
+
+
 // Mapeo de componentes dinámicos (según los nombres de controlador/acción de la API)
 // Formatos alternativos para incrementar las posibilidades de coincidencia
 const dynamicComponentMap: Record<string, React.ComponentType<any>> = {
   // Formato con slash: 'Controlador/Accion'
-  'MnHerederos/ingresoHer': React.lazy(() => import('../pages/IngresoHerederosPage')),
-  'MnHerederos/ingresoDoc': React.lazy(() => import('../pages/IngresoDocumentosPage')),
+  'MnHerederos/ingresoHer': IngresoHerederosPage,
+  'MnHerederos/ingresoDoc': IngresoDocumentosPage,
   // Formato en minúsculas para mayor compatibilidad
-  'mnherederos/ingresoher': React.lazy(() => import('../pages/IngresoHerederosPage')),
-  'mnherederos/ingresodoc': React.lazy(() => import('../pages/IngresoDocumentosPage')),
+  'mnherederos/ingresoher': IngresoHerederosPage,
+  'mnherederos/ingresodoc': IngresoDocumentosPage,
   // Formato sin slash para retrocompatibilidad
-  'MnHerederosIngresoHer': React.lazy(() => import('../pages/IngresoHerederosPage')),
-  'MnHerederosIngresoDoc': React.lazy(() => import('../pages/IngresoDocumentosPage')),
+  'MnHerederosIngresoHer': IngresoHerederosPage,
+  'MnHerederosIngresoDoc': IngresoDocumentosPage,
 };
 
 // rutas estáticas
@@ -33,8 +40,21 @@ const staticRoutes = [
     component: HomePage, // Usa el HomePage del core
     roles: ['USER', 'ADMIN', 'Developers'],
     title: 'Inicio'
+  },
+  // Nueva ruta para el formulario de ingreso
+  {
+    path: '/mnherederos/ingresoher/formingreso',
+    component: IngresoHerederoFormPage,
+    roles: ['USER', 'ADMIN', 'Developers'],
+    title: 'Formulario Ingreso Heredero'
+  },
+  // Ruta para la página de éxito
+  {
+    path: '/mnherederos/ingresoher/success',
+    component: SuccessPage,
+    roles: ['USER', 'ADMIN', 'Developers'],
+    title: 'Registro Exitoso'
   }
-  // se puede añadir más rutas estáticas aquí
 ];
 
 const AppRoutes: React.FC = () => {
@@ -75,7 +95,7 @@ const AppRoutes: React.FC = () => {
           const controlador = item.Controlador;
           const accion = item.Accion;
           
-          // Intentar diferentes formatos de clave
+          // Intentar diferentes formatos para encontrar coincidencia
           const componentKey1 = `${controlador}/${accion}`; // Formato con slash
           const componentKey2 = `${controlador}${accion}`; // Formato sin slash
           const componentKey3 = `${controlador.toLowerCase()}/${accion.toLowerCase()}`; // En minúsculas
