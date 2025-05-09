@@ -1,0 +1,102 @@
+/* Estilos para la página de ingreso de herederos */
+
+.ingreso-herederos-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 20px 0;
+}
+
+.ingreso-card {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+  border-radius: 10px !important;
+}
+
+.card-content {
+  padding: 10px 0;
+}
+
+.card-description {
+  color: #555555;
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.card-info-box {
+  background-color: rgba(4, 165, 155, 0.08);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.info-icon {
+  color: #04A59B;
+  margin-right: 12px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.info-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.info-text {
+  color: #555555;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.nuevo-ingreso-btn {
+  background-color: #04A59B !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 20px !important;
+  padding: 8px 24px !important;
+  font-weight: 500 !important;
+  font-size: 15px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.nuevo-ingreso-btn:hover {
+  background-color: #038C84 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn-icon {
+  font-size: 18px;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .ingreso-card {
+    width: 95%;
+  }
+  
+  .card-info-box {
+    flex-direction: column;
+  }
+  
+  .info-icon {
+    margin-bottom: 8px;
+  }
+}
