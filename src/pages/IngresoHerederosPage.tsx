@@ -7,7 +7,7 @@ const IngresoHerederosPage: React.FC = () => {
   const navigate = useNavigate();
   
   const handleNavigateToForm = () => {
-    navigate('/mnherederos/ingresoher/formingreso');
+    navigate('/mnherederos/ingresoher/IngresoDelTitular');
   };
   
   return (

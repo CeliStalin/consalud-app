@@ -17,7 +17,10 @@ import IngresoHerederosPage from '../pages/IngresoHerederosPage';
 import IngresoHerederoFormPage from '../pages/IngresoHerederoFormPage';
 import IngresoDocumentosPage from '../pages/IngresoDocumentosPage';
 import SuccessPage from '../pages/SuccessPage';
-
+import { IngresoTitularPage } from '@/pages/IngresoTitularPage';
+import { InfoRequisitosTitularPage } from '@/pages/InfoRequisitosTitularPage';
+import { DatosTitullarPage } from '@/pages/DatosTitularPage';
+import { RegistroTitularPage } from '@/pages/RegistroHerederoPage';
 
 // Mapeo de componentes dinámicos (según los nombres de controlador/acción de la API)
 // Formatos alternativos para incrementar las posibilidades de coincidencia
@@ -41,7 +44,30 @@ const staticRoutes = [
     roles: ['USER', 'ADMIN', 'Developers'],
     title: 'Inicio'
   },
-  // Nueva ruta para el formulario de ingreso
+  // Nueva ruta para el ingreso Del Titular 
+  {
+    path: '/mnherederos/ingresoher/IngresoDelTitular',
+    component: IngresoTitularPage,
+    roles: ['USER', 'ADMIN', 'Developers'],
+    title: 'Formulario Ingreso Heredero'
+  },
+  {
+    path: '/mnherederos/ingresoher/RequisitosTitular',
+    component: InfoRequisitosTitularPage,
+    roles: ['USER', 'ADMIN', 'Developers'],
+    title: 'Formulario Ingreso Heredero'
+  },  {
+    path: '/mnherederos/ingresoher/RegistroTitular',
+    component: RegistroTitularPage,
+    roles: ['USER', 'ADMIN', 'Developers'],
+    title: 'Formulario Ingreso Heredero'
+  },
+  {
+    path: '/mnherederos/ingresoher/DatosTitular',
+    component: DatosTitullarPage,
+    roles: ['USER', 'ADMIN', 'Developers'],
+    title: 'Formulario Ingreso Heredero'
+  },
   {
     path: '/mnherederos/ingresoher/formingreso',
     component: IngresoHerederoFormPage,

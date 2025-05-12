@@ -5,6 +5,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { es } from 'date-fns/locale';
 import './styles/FormHeredero.css';
 import { DocumentsFileCheckmarkSvg,MapsSvg,} from '@consalud/core'; 
+import { Stepper } from './Stepper';
 
 // Datos para los selectores
 const SEXO_OPTIONS = [
@@ -213,7 +214,12 @@ const FormIngresoHeredero: React.FC = () => {
   };
 
   return (
+    <>
+     <div className='generalContainer'>
+      <Stepper step={2} />
+      </div>
     <div className="main-container">
+      
       <div className="form-container">
         <div className="form-card">
           <form onSubmit={handleSubmit}>
@@ -517,6 +523,7 @@ const FormIngresoHeredero: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

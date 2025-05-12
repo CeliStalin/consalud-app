@@ -1,129 +1,157 @@
-import { Stepper } from "./Stepper"
-const IngresoTitular = () =>{
-    return(
-    <>
-        <div  style={{
-            display: 'flex',
-            padding: '32px 40px',
-            justifyContent: 'center', 
-            alignItems: 'center',  
-            gap: '10px',
-            alignSelf: 'stretch', 
-        }}>
-            <span style={{
-                fontFamily: 'work Sans',
-                fontSize: '24px',
-                fontStyle: 'normal',
-                fontWeight: 700,
-                lineHeight: 'normal',
-                color: '#505050'
-            }}><b>Datos del titular</b></span>
-        </div>
-        
-        <Stepper step={1}/>
 
-        <div style={{
+import { useNavigate } from "react-router-dom";
+import {  useState } from "react";
+import { useRutChileno } from "../hooks/useRutChileno";
+import { UseAlert } from "../hooks/Alert";
+import '../components/styles/ingresoTitular.css';
+import '../components/styles/globalStyle.css'
 
-            display: 'flex',
-            padding: '31px 44px 44px 44px',
-            flexDirection: 'column',
-            justifyContent: 'center', 
-            alignItems: 'center',
-            gap: '40px',
-            borderRadius: '20px',
-            background: '#FFFFFF',
-            boxShadow: '0px 8px 20px 5px rgba(118, 118, 128, 0.10)',
-            marginTop: '50px',
-        }}>
-            <div style={{
-                display: 'flex',
-                height: '82.676px',
-                padding: '16px 0px',
-                flexDirection: 'column',
-                alignItems:  'flex-start',
-                alignSelf: 'stretch',
-            }}>
-                <div style={{
-                    display: 'flex',
-                    padding: '16px 0px',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    alignSelf: 'stretch', 
-                }}>
-                    <div style={{
-                        display:'flex',
-                        justifyContent:'center',
-                        alignItems:'center',
-                        gap:'8px',
-                    }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
-                            <path d="M17.5 17V19C17.5001 19.5303 17.2896 20.0389 16.9148 20.414C16.5399 20.7891 16.0314 20.9999 15.5011 21H6.5C5.96971 21.0001 5.46108 20.7896 5.08601 20.4148C4.71094 20.0399 4.50014 19.5314 4.5 19.0011V8C4.49985 7.46971 4.71037 6.96108 5.08523 6.58601C5.4601 6.21094 5.96861 6.00014 6.4989 6H8.5" stroke="#00CBBF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M20.5 7.5H17.5C16.6716 7.5 16 6.82843 16 6V3" stroke="#00CBBF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 15V5C8.5 3.89543 9.39543 3 10.5 3H16.5605C17.0909 3 17.5996 3.21071 17.9747 3.58579L19.9142 5.52532C20.2893 5.90039 20.5 6.4091 20.5 6.93954V15C20.5 16.1046 19.6046 17 18.5 17H10.5C9.39543 17 8.5 16.1046 8.5 15Z" stroke="#00CBBF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M12.9004 11.3L14.1015 12.5L16.1004 10.5" stroke="#00CBBF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+
+const IngresoTitular = () => {
+    const navigator = useNavigate();
+    const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
+    const [showError, setShowError] = useState(false);
+    const [touched, setTouched] = useState(false);
+    const handleBlur = () => {
+        setTouched(true);
+        setShowError(rut.length > 0 && !isValidRut);
+    };
+
+    const handleFocus = () => {
+        setShowError(false);
+    };
+    const { mostrarAlerta,
+        mostrarAlerta2,
+        mostrarAlerta3,
+        mostrarAlerta4} = UseAlert();
+   const handleFlow = () => {
+    navigator('/mnherederos/ingresoher/RequisitosTitular');
+   }
+
+    return (
+        <>
+            <div className="textoTituloComponentes">
+                <span className="titleComponent">
+                    Registrar persona titular
+                </span>
+            </div>
+
+
+            <div className="generalContainer">
+                <div className="containerIcono">
+                    <div className="iconoGenerico">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path fillRule="evenodd" clipRule="evenodd" d="M16.3346 21.0043H4.66379C3.7424 21.0043 2.99609 20.258 2.99609 19.3366V7.66574C2.99609 6.74436 3.7424 5.99805 4.66379 5.99805H16.3356C17.256 5.99805 18.0023 6.74436 18.0023 7.66574V19.3376C18.0023 20.258 17.256 21.0043 16.3346 21.0043Z" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M12.2682 10.1643C13.2446 11.1407 13.2446 12.7244 12.2682 13.7018C11.2918 14.6782 9.70813 14.6782 8.73073 13.7018C7.75332 12.7254 7.75432 11.1417 8.73073 10.1643C9.70713 9.18691 11.2908 9.18791 12.2682 10.1643" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M15.0008 18.4362C14.8698 18.107 14.6667 17.8109 14.4066 17.5698V17.5698C13.9674 17.1616 13.3922 16.9355 12.7919 16.9355C11.7915 16.9355 9.20641 16.9355 8.20599 16.9355C7.60574 16.9355 7.0315 17.1626 6.59132 17.5698V17.5698C6.33121 17.8109 6.12812 18.107 5.99707 18.4362" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M5.99707 5.99734V4.66379C5.99707 3.7424 6.74338 2.99609 7.66476 2.99609H19.3366C20.257 2.99609 21.0033 3.7424 21.0033 4.66379V16.3356C21.0033 17.256 20.257 18.0023 19.3356 18.0023H18.0021" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                        <span style={{
-                            fontFamily: 'work Sans',
-                            fontSize: '16px',
-                            fontStyle: 'normal',
-                            fontWeight: 500,
-                            lineHeight: 'normal',
-                            color: '#505050'
-                        }}> 
-                            Datos del titular
-                        </span>
+                        <p className="textoRegistro">
+                            Registrar persona titular
+                        </p>
                     </div>
-                    <span style={{
-                        fontFamily:'Source sans pro',
-                        fontSize: '14px',
-                        fontStyle: 'normal',
-                        fontWeight: 400,
-                        lineHeight: '18px'
-                    }}>
-                        Confirma que los datos del titular sean correctos.
+                    <p className="textoImportante">
+                        Ingresa los datos de la persona titular para la devolución.
+                    </p>
+                    <span className="rutText">
+                        RUT persona heredera
                     </span>
-              
-                </div>
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        alignContent: 'center',
-                        alignSelf: 'stretch',
-                        flexWrap: 'wrap',
-                    }}>
+                    <div className="divRut">
+                        <input
+                            id="RutHeredero"
+                            type="text"
+                            value={rut}
+                            onChange={handleRutChange}
+                            onBlur={handleBlur}
+                            onFocus={handleFocus}
+                            placeholder="Ej: 12345678-9"
+                           className="inputRut"
+                        />
+                        <button 
+                             className={`buttonRut ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}`}  
+                            disabled={!isValidRut} 
+                            onClick={handleFlow}
+                        > 
+                            Buscar
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
+                                <path d="M15.7138 7.3382C18.1647 9.78913 18.1647 13.7629 15.7138 16.2138C13.2629 18.6647 9.28913 18.6647 6.8382 16.2138C4.38727 13.7629 4.38727 9.78913 6.8382 7.3382C9.28913 4.88727 13.2629 4.88727 15.7138 7.3382" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M19 19.5009L15.71 16.2109" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div>
+                        <div className="field mt-2">
+                            <div className="control">
+                            <button
+                                className="button is-info"
+                                style={{
+                                borderRadius: '42px',
+                                color: 'white',
+                                }}
+                                onClick={mostrarAlerta}
+                            >
+                                Alerta 1
+                            </button>
+                            </div>
+                        </div>
+                        <div className="field mt-2">
+                            <div className="control">
+                            <button
+                                className="button is-info"
+                                style={{
+                                borderRadius: '42px',
+                                color: 'white',
+                                }}
+                                onClick={mostrarAlerta2}
+                            >
+                                Alerta 2
+                            </button>
+                            </div>
+                        </div>
 
-                        <div style={{
-                            borderRadius:'10px',
-                            border:'1px solid #EEEEEE',
-                            background:'#FFFFFF',
-                        }}>
-                            <span >
-                                <b>Carlos Manuel Torres Medina</b>
-                            </span>
-                            <br />
-                            <span>Fecha de defunción: 12/03/2024</span>
+                        <div className="field mt-2">
+                            <div className="control">
+                            <button
+                                className="button is-info"
+                                style={{
+                                borderRadius: '42px',
+                                color: 'white',
+                                }}
+                                onClick={mostrarAlerta3}
+                            >
+                                Alerta 3
+                            </button>
+                            </div>
+                        </div>
+
+                        <div className="field mt-2">
+                            <div className="control">
+                            <button
+                                className="button is-info"
+                                style={{
+                                borderRadius: '42px',
+                                color: 'white',
+                                }}
+                                onClick={mostrarAlerta4}
+                            >
+                                Alerta 4
+                            </button>
+                            </div>
                         </div>
                     </div>
-            </div>
-            <button style={{
-                borderRadius: '42px',
-                background: '#04A598',
-                boxShadow: '0px 2px 14px 4px rgba(208, 208, 208, 0.35)',
-                border: '42px',
-                padding: '13px 24px',
-                margin:'16px'
-            }}>
-                <p style={{
-                    color: '#FFFFFF',
-                }}>
-                    Continuar
-                </p>
-            </button>
-        </div>  
-       </>
-    )
-}
 
-export{
-    IngresoTitular
-}
+                    {showError && (
+                                    <span className="errorRut">
+                                        RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
+                                    </span>
+                                )}
+                </div>
+                
+            </div>
+        </>
+    );
+};
+
+
+export { IngresoTitular };
