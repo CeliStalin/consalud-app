@@ -164,9 +164,9 @@ const IngresoDocumentosPage: React.FC = () => {
         >
           <div className="documentos-content">
             <p className="instrucciones">
-              Para cargar los documentos requeridos para el proceso de devolución, 
-              haga clic en el botón "Cargar Documentos" a continuación. Se abrirá una 
-              ventana externa donde podrá seleccionar y subir los archivos necesarios.
+              Para agregar o actualizar los mandatos requeridos para el proceso de devolución, 
+              haga clic en el botón "Agregar Mandato" a continuación. Se abrirá una 
+              ventana externa donde podrá el flujo de mandatos.
             </p>
             
             {/* Mensajes de estado */}
@@ -191,7 +191,7 @@ const IngresoDocumentosPage: React.FC = () => {
                 onClick={openExternalApp}
                 className="cargar-documentos-btn"
               >
-                {isExternalAppOpen ? 'Procesando en otra ventana...' : 'Cargar Documentos'}
+                {isExternalAppOpen ? 'Procesando en otra ventana...' : 'Agregar Mandato'}
               </Button>
               
               {/* Mostrar este mensaje mientras la ventana externa está abierta */}
