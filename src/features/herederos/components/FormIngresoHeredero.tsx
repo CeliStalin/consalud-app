@@ -64,21 +64,22 @@ interface FormData {
 
 const FormIngresoHeredero: React.FC = () => {
   const navigate = useNavigate();
+  const {heredero} = useHeredero();
   const [formData, setFormData] = useState<FormData>({
-    fechaNacimiento: null,
-    nombres: '',
-    apellidoPaterno: '',
-    apellidoMaterno: '',
-    sexo: '',
+    fechaNacimiento: heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
+    nombres: heredero?.nombre || '',
+    apellidoPaterno: heredero?.apellidoPat || '',
+    apellidoMaterno: heredero?.apellidoMat || '',
+    sexo:  '',
     parentesco: '',
-    telefono: '',
-    correoElectronico: '',
+    telefono: heredero?.contactabilidad.telefono.numero || '',
+    correoElectronico:heredero?.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
     ciudad: '',
     comuna: '',
-    calle: '',
-    numero: '',
-    deptoBloqueOpcional: '',
-    villaOpcional: ''
+    calle: heredero?.contactabilidad.direccion.calle || '',
+    numero: heredero?.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
+    deptoBloqueOpcional: heredero?.contactabilidad.direccion.departamento || '',
+    villaOpcional: heredero?.contactabilidad.direccion.villa || ''
   });
 
   // Estado para manejar errores de validación
@@ -135,9 +136,7 @@ const FormIngresoHeredero: React.FC = () => {
 
   // Validar formulario
   const validateForm = (): boolean => {
-    const {heredero} = useHeredero();
-    console.log(heredero);
-    console.log('rut en contexto:'+heredero?.rut);
+    
     const newErrors: Partial<Record<keyof FormData, string>> = {};
     let isValid = true;
 
@@ -217,6 +216,8 @@ const FormIngresoHeredero: React.FC = () => {
     }
   };
 
+  console.log(heredero);
+  console.log('rut en contexto:'+heredero?.rut);
   return (
     <>
                 <div className="textoTituloComponentes">
