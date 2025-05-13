@@ -2,6 +2,8 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider, ErrorBoundary, MenuConfigProvider } from '@consalud/core';
 import { AppRoutes } from './routes';
 import './styles/variables.css';
+import TitularProvider from './features/herederos/provider/TitularProvider';
+import HerederoProvider from './features/herederos/provider/HerederoProvider';
 
 // Componente para manejar errores
 const ErrorFallback = () => (
@@ -31,7 +33,11 @@ const App = () => {
       <AuthProvider>
         <MenuConfigProvider config={{ enableDynamicMenu: true }}>
           <Router>
-            <AppRoutes />
+            <TitularProvider>
+              <HerederoProvider>
+              <AppRoutes />
+              </HerederoProvider>
+            </TitularProvider>
           </Router>
         </MenuConfigProvider>
       </AuthProvider>

@@ -92,7 +92,19 @@ const handleRutChange = useCallback((event: React.ChangeEvent<HTMLInputElement>)
     setIsValid(false);
     setFormattedRut('');
   }, []);
-
+  const formatSimpleRut = useCallback((rut: string): string => {
+    // Eliminar cualquier caracter no alfanumérico
+    const rutLimpio = rut.replace(/[^0-9kK]/g, '');
+    
+    if (rutLimpio.length <= 1) return rutLimpio;
+    
+    // Separar en cuerpo y dígito verificador
+    const cuerpo = rutLimpio.slice(0, -1);
+    const dv = rutLimpio.slice(-1);
+    
+    // Retornar con formato simple (solo guión)
+    return `${cuerpo}-${dv}`;
+  }, []);
   return {
     rut,                // Valor actual del input
     isValid,            // Indica si el RUT es válido
@@ -100,7 +112,8 @@ const handleRutChange = useCallback((event: React.ChangeEvent<HTMLInputElement>)
     handleRutChange,    // Manejador para el evento onChange
     validarRut,         // Función de validación para usar directamente
     formatearRut,       // Función de formateo para usar directamente
-    resetRut            // Función para reiniciar el estado
+    resetRut,            // Función para reiniciar el estado
+    formatSimpleRut
   };
 };
 

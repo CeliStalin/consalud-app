@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { Stepper } from "../components/Stepper";
 import '../components/styles/globalStyle.css'
+import { useTitular } from "../contexts/TitularContext";
 
 
 const DatosTitular = () =>{
     const navigator =  useNavigate();
+       const { titular } = useTitular();
     const handleClick = () => {
         navigator('/mnherederos/ingresoher/RegistroTitular');
     }
@@ -39,10 +41,10 @@ const DatosTitular = () =>{
 
                         <div className="datosTitular">
                             <span >
-                                <b>Carlos Manuel Torres Medina</b>
+                                <b>{titular?.nombre+" "+ titular?.apellidoPat+" "+ titular?.apellidoMat}</b>
                             </span>
                             <br />
-                            <span>Fecha de defunción: 12/03/2024</span>
+                            <span>Fecha de defunción:{titular?.fechaDefuncion}</span>
                         </div>
                     </div>
             </div>

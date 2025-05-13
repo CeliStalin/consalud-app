@@ -5,6 +5,9 @@ import { useRutChileno } from "../hooks/useRutChileno";
 import { UseAlert } from "../hooks/Alert";
 import '../components/styles/ingresoTitular.css';
 import '../components/styles/globalStyle.css'
+import { useTitular } from "../contexts/TitularContext";
+
+
 
 
 
@@ -13,6 +16,7 @@ const IngresoTitular = () => {
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
     const [touched, setTouched] = useState(false);
+    const { titular, buscarTitular, error } = useTitular();
     const handleBlur = () => {
         setTouched(true);
         setShowError(rut.length > 0 && !isValidRut);
@@ -25,8 +29,33 @@ const IngresoTitular = () => {
         mostrarAlerta2,
         mostrarAlerta3,
         mostrarAlerta4} = UseAlert();
-   const handleFlow = () => {
+
+   const handleFlow = async () => {
+    if (!isValidRut) {
+        mostrarAlerta;
+        return;
+    }
+    
+    try {
+        console.log(rut)
+        await buscarTitular(rut);
+        
+        if (error) {
+            mostrarAlerta();
+            return;
+        }
+        if(titular === null){
+            mostrarAlerta();
+            return;
+        }
+        if(!titular?.poseeFondos){
+            mostrarAlerta();
+            return;
+        }
     navigator('/mnherederos/ingresoher/RequisitosTitular');
+} catch (err) {
+    mostrarAlerta;
+}
    }
 
     return (

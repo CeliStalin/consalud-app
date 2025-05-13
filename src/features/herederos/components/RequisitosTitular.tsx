@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
 
+
 const RequisitosTitular = () => {
     const navigator = useNavigate();
+    
     const handleButtonClick = () => {
         navigator('/mnherederos/ingresoher/DatosTitular');
     };

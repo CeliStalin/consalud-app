@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useRutChileno } from "@/features/herederos/hooks/useRutChileno";
 import { Stepper } from "../components/Stepper";
 import '../components/styles/globalStyle.css'
+import { useHeredero } from "../contexts/HerederoContext";
 
 
 
@@ -12,9 +13,26 @@ const RegistroHeredero = () => {
     const [showError, setShowError] = useState(false);
     const [touched, setTouched] = useState(false);
     const navigator = useNavigate();
-    const handleNavigator = () => {
+    const {heredero, buscarHeredero, error} = useHeredero();
+    const handleNavigator = async() => {
+        if (!isValidRut) {
+            return;
+        }
+        
+        try {
+            console.log(rut)
+            await buscarHeredero(rut);
+            
+            if (error) {
+                return;
+            }
+            console.log("heredero: " + heredero)
         navigator('/mnherederos/ingresoher/formingreso');
+    } catch (err) {
+        console.error(err);
     }
+    }
+    
     const handleBlur = () => {
         setTouched(true);
         setShowError(rut.length > 0 && !isValidRut);
