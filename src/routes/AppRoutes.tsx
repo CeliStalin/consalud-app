@@ -21,7 +21,7 @@ import { IngresoTitularPage } from '@/pages/IngresoTitularPage';
 import { InfoRequisitosTitularPage } from '@/pages/InfoRequisitosTitularPage';
 import { DatosTitullarPage } from '@/pages/DatosTitularPage';
 import { RegistroTitularPage } from '@/pages/RegistroHerederoPage';
-
+import { CargaDocumentoPage } from '@/pages/CargaDocumentoPage'
 // Mapeo de componentes dinámicos (según los nombres de controlador/acción de la API)
 // Formatos alternativos para incrementar las posibilidades de coincidencia
 const dynamicComponentMap: Record<string, React.ComponentType<any>> = {
@@ -34,6 +34,7 @@ const dynamicComponentMap: Record<string, React.ComponentType<any>> = {
   // Formato sin slash para retrocompatibilidad
   'MnHerederosIngresoHer': IngresoHerederosPage,
   'MnHerederosIngresoDoc': IngresoDocumentosPage,
+  'MnHerederosCargaDoc' : CargaDocumentoPage,
 };
 
 // rutas estáticas
@@ -80,6 +81,13 @@ const staticRoutes = [
     component: SuccessPage,
     roles: ['USER', 'ADMIN', 'Developers'],
     title: 'Registro Exitoso'
+  },
+  // Ruta para carga de documentos
+  {
+    path: '/mnherederos/ingresoher/cargadoc',
+    component: CargaDocumentoPage,
+    roles: ['USER', 'ADMIN', 'Developers'],
+    title: 'Carga Documentos'
   }
 ];
 

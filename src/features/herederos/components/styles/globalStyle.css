@@ -255,3 +255,112 @@
     cursor: not-allowed;
     opacity: 0.7;
 }
+
+/* Carga de Documentos */
+.divCargaDocumento {
+    display: flex;
+    padding: 16px 24px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 11px;
+    align-self: stretch;
+    border-radius: 10px;
+    border: 1px dashed var(--colores-nueva-sd-secundarios-morado-lila-alternativo, #A293FF);
+}
+
+.tituloCargaDocumento {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    align-self: stretch;
+}
+.textoCargaDocumento {
+    color: var(--Colores-Nueva-SD-Medio-Gris-Medio, #656565);
+    text-align: center;
+    /* Párrafo (transversal)/P.Pequeño Bold */
+    font-family: "Source Sans Pro";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 18px; /* 150% */
+    color: var(--Colores-Nueva-SD-Medio-Gris-Medio, #656565);
+    /* Párrafo (transversal)/P. Pequeño */
+    font-family: "Source Sans Pro";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+}
+
+.labelCargaDocumento{
+    color: var(--Colores-Nueva-SD-Medio-Gris-Medio, #656565);
+    /* Párrafo (transversal)/P.Normal */
+    font-family: "Source Sans Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px; /* 128.571% */
+}
+
+.divDeclaroCargaDocumento {
+    display: flex;
+    padding-bottom: 24px;
+    align-items: flex-start;
+    align-self: stretch;
+    border-bottom: 1px solid var(--Colores-Nueva-SD-Claro-Gris-Claro, #D0D0D0);
+}
+
+.divObligatorioCargaDocumento{
+    display: flex;
+    width: 79px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+}
+
+.divTextoObligatorioCargaDocumento{
+    color: var(--Colores-Nueva-SD-Oscuro-Gris-Oscuro, #505050);
+    /* Párrafo (transversal)/P.Normal Bold */
+    font-family: "Source Sans Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 18px; /* 128.571% */
+}
+
+.divTextoObligatorioRojoCargaDocumento{
+    color: var(--colores-nueva-sd-secundarios-rojo-alternativo, #FF5252);
+    /* Párrafo (transversal)/P.Normal Bold */
+    font-family: "Source Sans Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 18px;
+}
+
+.labelCargaDocumentoCargaDocumento{
+    display: flex;
+    align-items: center;
+    gap: 35px;
+    align-self: stretch;
+}
+
+.textoEjemploCargaDocumento{
+    color: var(--Colores-Nueva-SD-Medio-Verde-Medio, #04A59B);
+    text-align: right;
+    /* Párrafo (transversal)/P.Normal Bold */
+    font-family: "Source Sans Pro";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 18px; /* 128.571% */
+}
+
+.textoEjemploIconCargaDocumento{
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}

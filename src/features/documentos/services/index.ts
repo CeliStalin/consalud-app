@@ -1,1 +1,1 @@
-export { default as ExternalAppService, externalAppService } from './ExternalAppService';
+export * from './ExternalAppService';
