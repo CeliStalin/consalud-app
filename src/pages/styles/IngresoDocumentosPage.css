@@ -1,3 +1,5 @@
+/* src/pages/styles/IngresoDocumentosPage.css */
+
 .documentos-content {
     display: flex;
     flex-direction: column;
@@ -8,7 +10,7 @@
     color: #555555;
     font-size: 15px;
     line-height: 1.5;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
   
   .documentos-actions {
@@ -21,11 +23,48 @@
   
   .cargar-documentos-btn {
     min-width: 180px;
+    background-color: #04A59B;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    font-weight: 500;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .cargar-documentos-btn:hover {
+    background-color: #038C84;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cargar-documentos-btn:disabled {
+    background-color: #B1EAEA;
+    color: #009EA6;
+    cursor: not-allowed;
+    opacity: 0.7;
   }
   
   .continuar-btn {
     min-width: 160px;
     margin-top: 24px !important;
+    background-color: #04A59B;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    font-weight: 500;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .continuar-btn:hover {
+    background-color: #038C84;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   
   /* Estilo para las notificaciones */
@@ -52,4 +91,12 @@
     background-color: rgba(255, 193, 7, 0.15);
     border: 1px solid rgba(255, 193, 7, 0.3);
     color: #856404;
+  }
+  
+  /* Responsive */
+  @media screen and (max-width: 768px) {
+    .cargar-documentos-btn,
+    .continuar-btn {
+      width: 100%;
+    }
   }
