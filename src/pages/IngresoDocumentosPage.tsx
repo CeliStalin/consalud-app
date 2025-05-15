@@ -1,40 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SecureLayout, Card, Button } from '@consalud/core';
 import { useNavigate } from 'react-router-dom';
-// Ajusta estas rutas según la estructura real de tu proyecto
 import { externalAppService } from '../features/documentos/services/ExternalAppService';
-// Comentamos temporalmente estas importaciones para evitar dependencias
-// import { useTitular } from '../features/herederos/contexts/TitularContext';
-// import { useHeredero } from '../features/herederos/contexts/HerederoContext';
 import './styles/IngresoDocumentosPage.css';
 
 const IngresoDocumentosPage: React.FC = () => {
   const navigate = useNavigate();
-  // Comentamos estas líneas para evitar errores si los contextos no están disponibles
-  // const { titular } = useTitular();
-  // const { heredero } = useHeredero();
   
   // Estados para manejar la integración con la aplicación externa
   const [isExternalAppOpen, setIsExternalAppOpen] = useState(false);
   const [externalWindow, setExternalWindow] = useState<Window | null>(null);
   const [transactionId, setTransactionId] = useState<string>('');
-  const [transactionStatus, setTransactionStatus] = useState<'pending' | 'success' | 'error' | null>(null);
+  const [transactionStatus, setTransactionStatus] = useState<'pending' | 'success' | 'error' | 'cancelled' | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Ref para el intervalo de verificación
+  const intervalRef = useRef<number | undefined>(undefined);
+  // Ref para rastrear si el usuario cerró la ventana intencionalmente
+  const userClosedRef = useRef(false);
 
   // Función para abrir la aplicación externa
   const openExternalApp = async () => {
     setLoading(true);
     setError(null);
+    userClosedRef.current = false;
     
     try {
-      // Quitamos la validación temporalmente
-      /* 
-      if (!titular || !heredero) {
-        throw new Error('No se encontraron los datos del titular o heredero');
-      }
-      */
-      
       // Usamos datos de prueba en lugar de los datos reales
       const datosEjemplo = {
         empleado: localStorage.getItem('userName') || 'SISTEMA',
@@ -55,6 +47,17 @@ const IngresoDocumentosPage: React.FC = () => {
       setIsExternalAppOpen(true);
       setTransactionStatus('pending');
       
+      // Agregar un evento beforeunload a la ventana externa para detectar cierre intencional
+      if (result.window) {
+        try {
+          result.window.addEventListener('beforeunload', () => {
+            userClosedRef.current = true;
+          });
+        } catch (e) {
+          console.warn('No se pudo agregar listener a ventana externa (restricciones de CORS)');
+        }
+      }
+      
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido al abrir la aplicación externa';
       console.error(errorMessage);
@@ -67,90 +70,108 @@ const IngresoDocumentosPage: React.FC = () => {
 
   // Verificar periódicamente si la ventana externa ha sido cerrada
   useEffect(() => {
-    let intervalId: number | undefined;
-    
-    const checkWindowStatus = async () => {
-      // Verificar si la ventana fue cerrada
-      if (externalWindow && externalWindow.closed) {
-        console.log('La ventana externa fue cerrada');
-        
-        // Verificar el estado de la transacción mediante el servicio
-        try {
-          const result = await externalAppService.checkTransactionStatus(transactionId);
+    if (isExternalAppOpen && externalWindow) {
+      // Limpiar cualquier intervalo existente
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+      }
+      
+      // Establecer nuevo intervalo
+      intervalRef.current = window.setInterval(async () => {
+        // Verificar si la ventana fue cerrada
+        if (externalWindow.closed) {
+          // Detener el intervalo
+          if (intervalRef.current) {
+            window.clearInterval(intervalRef.current);
+            intervalRef.current = undefined;
+          }
           
-          setTransactionStatus(result.status);
+          console.log('La ventana externa fue cerrada');
           setIsExternalAppOpen(false);
+          
+          // Consultar el estado real de la transacción en el servidor
+          try {
+            const result = await externalAppService.checkTransactionStatus(transactionId);
+            
+            // Si la transacción fue exitosa según el servidor
+            if (result.status === 'success') {
+              setTransactionStatus('success');
+              setError(null);
+            } 
+            // Si detectamos que el usuario cerró la ventana intencionalmente
+            else if (userClosedRef.current) {
+              setTransactionStatus('cancelled');
+              setError('La operación fue cancelada. Por favor, complete el proceso para continuar.');
+            } 
+            // Si hubo un error en la transacción según el servidor
+            else {
+              setTransactionStatus('error');
+              setError(result.error || 'La operación no se completó correctamente');
+            }
+          } catch (err) {
+            console.error('Error al verificar estado:', err);
+            setTransactionStatus('error');
+            setError('No se pudo verificar el resultado de la operación');
+          }
           
           // Limpiar tracking
           localStorage.removeItem('currentExternalTransaction');
-          
-          // Mostrar mensaje según resultado
-          if (result.status === 'success') {
-            console.log('La operación se completó con éxito');
-          } else {
-            setError(result.error || 'La operación no se completó correctamente');
-          }
-        } catch (err) {
-          console.error('Error al verificar estado:', err);
-          setError('Error al verificar el resultado de la operación');
-          setTransactionStatus('error');
         }
-        
-        // Limpiar el intervalo
-        if (intervalId) {
-          clearInterval(intervalId);
-        }
-      }
-    };
-    
-    if (isExternalAppOpen && externalWindow) {
-      // Verificar cada 1 segundo
-      intervalId = window.setInterval(checkWindowStatus, 1000);
+      }, 1000) as unknown as number;
     }
     
+    // Limpieza al desmontar
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = undefined;
       }
     };
   }, [isExternalAppOpen, externalWindow, transactionId]);
 
   // Verificar al cargar si hay una transacción pendiente
   useEffect(() => {
-    const storedTransactionId = localStorage.getItem('currentExternalTransaction');
-    
-    if (storedTransactionId) {
-      // Hay una transacción pendiente, verificar su estado
-      const checkPendingTransaction = async () => {
+    const checkPendingTransaction = async () => {
+      const storedTransactionId = localStorage.getItem('currentExternalTransaction');
+      
+      if (storedTransactionId) {
         try {
+          setLoading(true);
           const result = await externalAppService.checkTransactionStatus(storedTransactionId);
           
-          if (result.status !== 'pending') {
-            // La transacción ya ha finalizado
-            setTransactionStatus(result.status);
-            
-            if (result.status === 'error') {
-              setError(result.error || 'La operación no se completó correctamente');
-            }
-            
-            // Limpiar tracking
-            localStorage.removeItem('currentExternalTransaction');
+          if (result.status === 'success') {
+            setTransactionStatus('success');
+          } else if (result.status === 'error') {
+            setTransactionStatus('error');
+            setError(result.error || 'La operación no se completó correctamente');
+          } else {
+            // Si sigue pendiente, limpiamos para permitir un nuevo intento
+            setTransactionStatus(null);
           }
-        } catch (error) {
-          console.error('Error al verificar transacción pendiente:', error);
-          // Limpiar el tracking por si acaso
+          
+          // Limpiar tracking en cualquier caso
           localStorage.removeItem('currentExternalTransaction');
+        } catch (err) {
+          console.error('Error al verificar transacción pendiente:', err);
+          localStorage.removeItem('currentExternalTransaction');
+        } finally {
+          setLoading(false);
         }
-      };
-      
-      checkPendingTransaction();
-    }
+      }
+    };
+    
+    checkPendingTransaction();
   }, []);
 
   // Función para continuar el flujo después de una operación exitosa
   const handleContinue = () => {
-    // Redirigir a la siguiente página en tu flujo
     navigate('/mnherederos/ingresoher/success');
+  };
+
+  // Función para reintentar la operación
+  const handleRetry = () => {
+    setTransactionStatus(null);
+    setError(null);
   };
 
   return (
@@ -169,7 +190,7 @@ const IngresoDocumentosPage: React.FC = () => {
               ventana externa donde podrá seleccionar y subir los archivos necesarios.
             </p>
             
-            {/* Mensajes de estado */}
+            {/* Mensajes específicos según el estado */}
             {error && (
               <div className="notification is-danger">
                 <p>{error}</p>
@@ -179,6 +200,17 @@ const IngresoDocumentosPage: React.FC = () => {
             {transactionStatus === 'success' && (
               <div className="notification is-success">
                 <p>Los documentos se han cargado exitosamente.</p>
+              </div>
+            )}
+            
+            {transactionStatus === 'cancelled' && (
+              <div className="notification is-warning">
+                <p>
+                  <strong>La ventana fue cerrada sin completar el proceso.</strong>
+                </p>
+                <p>
+                  Para continuar, debe completar el proceso de carga de documentos.
+                </p>
               </div>
             )}
             
@@ -196,7 +228,7 @@ const IngresoDocumentosPage: React.FC = () => {
               
               {/* Mostrar este mensaje mientras la ventana externa está abierta */}
               {isExternalAppOpen && (
-                <div className="notification is-warning mt-3">
+                <div className="notification is-info mt-3">
                   <p>
                     <strong>Por favor complete el proceso en la ventana abierta.</strong>
                   </p>
@@ -215,6 +247,17 @@ const IngresoDocumentosPage: React.FC = () => {
                   className="continuar-btn mt-4"
                 >
                   Continuar
+                </Button>
+              )}
+              
+              {/* Botón para reintentar si hubo un error o cancelación */}
+              {(transactionStatus === 'error' || transactionStatus === 'cancelled') && (
+                <Button 
+                  variant="secondary"
+                  onClick={handleRetry}
+                  className="retry-btn mt-3"
+                >
+                  Intentar de nuevo
                 </Button>
               )}
             </div>
