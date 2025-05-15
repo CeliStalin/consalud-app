@@ -11,6 +11,8 @@ import {
   HomePage
 } from '@consalud/core';
 import { ApiGetMenus } from '@consalud/core';
+import DetalleMandatoPage from '../pages/DetalleMandatoPage';
+
 
 // Importar páginas de la aplicación
 import IngresoHerederosPage from '../pages/IngresoHerederosPage';
@@ -88,7 +90,13 @@ const staticRoutes = [
     component: CargaDocumentoPage,
     roles: ['USER', 'ADMIN', 'Developers'],
     title: 'Carga Documentos'
-  }
+  },
+  {
+    path: '/mnherederos/ingresoher/detallemandato',
+    component: DetalleMandatoPage,
+    roles: ['USER', 'ADMIN', 'Developers'],
+    title: 'Detalle Mandato'
+  },
 ];
 
 const AppRoutes: React.FC = () => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { SecureLayout, Card, Button } from '@consalud/core';
 import { useNavigate } from 'react-router-dom';
 import { externalAppService } from '../features/documentos/services/ExternalAppService';
+import { mandatoSoapService, MandatoResult } from '../features/documentos/services/MandatoSoapService';
 import './styles/IngresoDocumentosPage.css';
 
 const IngresoDocumentosPage: React.FC = () => {
@@ -15,6 +16,9 @@ const IngresoDocumentosPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
+  // Estado para la información del mandato
+  const [mandatoInfo, setMandatoInfo] = useState<MandatoResult | null>(null);
+  
   // Ref para el intervalo de verificación
   const intervalRef = useRef<number | undefined>(undefined);
   // Ref para rastrear si el usuario cerró la ventana intencionalmente
@@ -27,6 +31,11 @@ const IngresoDocumentosPage: React.FC = () => {
     userClosedRef.current = false;
     
     try {
+      // Primero, obtener la información actual de la cuenta bancaria
+      // Esto mostrará la información antes de que el usuario interactúe con la app externa
+      const rutCliente = '17175966'; // Idealmente esto vendría de tu contexto o props
+      await fetchMandatoData(rutCliente);
+      
       // Usamos datos de prueba en lugar de los datos reales
       const datosEjemplo = {
         empleado: localStorage.getItem('userName') || 'SISTEMA',
@@ -68,6 +77,67 @@ const IngresoDocumentosPage: React.FC = () => {
     }
   };
 
+  // Función para obtener información del mandato
+  const fetchMandatoData = async (rutCliente: string = '17175966', refreshData: boolean = false) => {
+    // Si ya tenemos datos y no se solicita actualización, no hacemos nada
+    if (mandatoInfo && !refreshData) {
+      console.log('Usando información de mandato existente (no se solicitó actualización)');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      console.log(`Consultando información del mandato para RUT: ${rutCliente}${refreshData ? ' (Actualización forzada)' : ''}`);
+      
+      // Agregar un timestamp como query parameter para evitar caché
+      const timestamp = new Date().getTime();
+      
+      // Llamar al servicio SOAP - asegurando que el timestamp se pasa como un número
+      const resultado = await mandatoSoapService.getMandatoInfo(rutCliente, '');
+      
+      console.log('Datos recibidos del servicio:', resultado);
+      
+      // Actualizar estado con la respuesta - usamos una función para asegurar actualización
+      setMandatoInfo(prevInfo => {
+        // Verificar si los datos son diferentes antes de actualizar
+        if (prevInfo && prevInfo.numeroCuenta === resultado.numeroCuenta && !refreshData) {
+          console.log('Los datos recibidos son idénticos a los actuales, no es necesario actualizar.');
+          return prevInfo;
+        }
+        
+        console.log('Actualizando información del mandato con nuevos datos.');
+        return resultado;
+      });
+      
+      // Si todo fue bien, marcar como exitoso
+      if (resultado.mensaje === 'OK') {
+        // Solo actualizamos el estado de la transacción si es una actualización
+        // o si no hay una transacción en progreso (evitamos cambiar el estado si la ventana está abierta)
+        if (refreshData || !isExternalAppOpen) {
+          setTransactionStatus('success');
+          setError(null);
+        }
+        
+        // Guardar información para uso posterior
+        localStorage.setItem('currentRutCliente', rutCliente);
+        localStorage.setItem('currentMandatoId', resultado.mandatoId);
+        localStorage.setItem('lastMandatoUpdate', timestamp.toString());
+        
+        console.log('Información del mandato recuperada exitosamente:', resultado);
+      } else {
+        setTransactionStatus('error');
+        setError(`Error en la transacción: ${resultado.mensaje}`);
+        console.error('Error en respuesta del servicio:', resultado.mensaje);
+      }
+    } catch (err) {
+      console.error('Error al obtener datos del mandato:', err);
+      setTransactionStatus('error');
+      setError('Error al obtener información actualizada del mandato');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Verificar periódicamente si la ventana externa ha sido cerrada
   useEffect(() => {
     if (isExternalAppOpen && externalWindow) {
@@ -77,44 +147,38 @@ const IngresoDocumentosPage: React.FC = () => {
       }
       
       // Establecer nuevo intervalo
-      intervalRef.current = window.setInterval(async () => {
-        // Verificar si la ventana fue cerrada
-        if (externalWindow.closed) {
-          // Detener el intervalo
+      intervalRef.current = window.setInterval(() => {
+        try {
+          // Verificar si la ventana fue cerrada
+          if (externalWindow.closed) {
+            // Detener el intervalo
+            if (intervalRef.current) {
+              window.clearInterval(intervalRef.current);
+              intervalRef.current = undefined;
+            }
+            
+            console.log('La ventana externa fue cerrada - actualizando datos de cuenta bancaria');
+            setIsExternalAppOpen(false);
+            
+            // Consumir información actualizada del mandato
+            // Usamos el mismo RUT pero marcamos refreshData como true para forzar actualización
+            // incluso si ya tenemos datos
+            fetchMandatoData('17175966', true);
+            
+            // Limpiar tracking
+            localStorage.removeItem('currentExternalTransaction');
+          }
+        } catch (e) {
+          // Si hay error al acceder, probablemente la ventana está cerrada o hay restricciones CORS
+          console.log('Error al verificar ventana - asumiendo cerrada:', e);
+          
           if (intervalRef.current) {
             window.clearInterval(intervalRef.current);
             intervalRef.current = undefined;
           }
           
-          console.log('La ventana externa fue cerrada');
           setIsExternalAppOpen(false);
-          
-          // Consultar el estado real de la transacción en el servidor
-          try {
-            const result = await externalAppService.checkTransactionStatus(transactionId);
-            
-            // Si la transacción fue exitosa según el servidor
-            if (result.status === 'success') {
-              setTransactionStatus('success');
-              setError(null);
-            } 
-            // Si detectamos que el usuario cerró la ventana intencionalmente
-            else if (userClosedRef.current) {
-              setTransactionStatus('cancelled');
-              setError('La operación fue cancelada. Por favor, complete el proceso para continuar.');
-            } 
-            // Si hubo un error en la transacción según el servidor
-            else {
-              setTransactionStatus('error');
-              setError(result.error || 'La operación no se completó correctamente');
-            }
-          } catch (err) {
-            console.error('Error al verificar estado:', err);
-            setTransactionStatus('error');
-            setError('No se pudo verificar el resultado de la operación');
-          }
-          
-          // Limpiar tracking
+          fetchMandatoData('17175966', true);
           localStorage.removeItem('currentExternalTransaction');
         }
       }, 1000) as unknown as number;
@@ -127,7 +191,7 @@ const IngresoDocumentosPage: React.FC = () => {
         intervalRef.current = undefined;
       }
     };
-  }, [isExternalAppOpen, externalWindow, transactionId]);
+  }, [isExternalAppOpen, externalWindow]);
 
   // Verificar al cargar si hay una transacción pendiente
   useEffect(() => {
@@ -137,9 +201,12 @@ const IngresoDocumentosPage: React.FC = () => {
       if (storedTransactionId) {
         try {
           setLoading(true);
+          // Verificar el estado en el servidor
           const result = await externalAppService.checkTransactionStatus(storedTransactionId);
           
           if (result.status === 'success') {
+            // Si la transacción fue exitosa, obtener datos del mandato
+            await fetchMandatoData('17175966');
             setTransactionStatus('success');
           } else if (result.status === 'error') {
             setTransactionStatus('error');
@@ -163,15 +230,71 @@ const IngresoDocumentosPage: React.FC = () => {
     checkPendingTransaction();
   }, []);
 
+  // Renderizar información del mandato
+  const renderMandatoInfo = () => {
+    if (!mandatoInfo) return null;
+    
+    return (
+      <div className="mandato-info box my-4">
+        <h3 className="title is-5">Información de la cuenta bancaria</h3>
+        <div className="content">
+          <div className="columns is-multiline">
+            <div className="column is-half">
+              <p><strong>Banco:</strong> {mandatoInfo.banco}</p>
+              <p><strong>Tipo de cuenta:</strong> {mandatoInfo.tipoCuenta}</p>
+              <p><strong>Número de cuenta:</strong> {mandatoInfo.numeroCuenta}</p>
+            </div>
+            <div className="column is-half">
+              <p><strong>Titular:</strong> {mandatoInfo.nombreCliente} {mandatoInfo.apellidoPaterno || ''} {mandatoInfo.apellido}</p>
+              <p><strong>RUT:</strong> {mandatoInfo.rutCliente}-{mandatoInfo.digitoVerificador}</p>
+              <p><strong>ID Mandato:</strong> {mandatoInfo.mandatoId}</p>
+            </div>
+          </div>
+          
+          {/* Si el servicio devolvió más campos, mostrarlos en una sección desplegable */}
+          {Object.keys(mandatoInfo).length > 9 && (
+            <details className="mt-3">
+              <summary className="has-text-info is-size-7">Ver información adicional</summary>
+              <div className="columns is-multiline mt-2 pl-3 is-size-7">
+                {Object.entries(mandatoInfo)
+                  .filter(([key]) => !['mandatoId', 'banco', 'tipoCuenta', 'numeroCuenta', 
+                                      'nombreCliente', 'apellido', 'apellidoPaterno', 'rutCliente', 
+                                      'digitoVerificador', 'mensaje'].includes(key))
+                  .map(([key, value]) => (
+                    <div className="column is-half" key={key}>
+                      <p><strong>{key}:</strong> {String(value || '-')}</p>
+                    </div>
+                  ))
+                }
+              </div>
+            </details>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   // Función para continuar el flujo después de una operación exitosa
   const handleContinue = () => {
-    navigate('/mnherederos/ingresoher/success');
+    if (mandatoInfo) {
+      // Navegar a la página de detalle pasando la información del mandato
+      navigate('/mnherederos/ingresoher/detallemandato', {
+        state: {
+          rutCliente: mandatoInfo.rutCliente,
+          mandatoId: mandatoInfo.mandatoId
+        }
+      });
+    } else {
+      // Si no hay información, continuar al siguiente paso normal
+      navigate('/mnherederos/ingresoher/success');
+    }
   };
 
   // Función para reintentar la operación
   const handleRetry = () => {
     setTransactionStatus(null);
     setError(null);
+    setMandatoInfo(null);
   };
 
   return (
@@ -197,9 +320,17 @@ const IngresoDocumentosPage: React.FC = () => {
               </div>
             )}
             
-            {transactionStatus === 'success' && (
+            {transactionStatus === 'success' && !error && (
               <div className="notification is-success">
-                <p>Los documentos se han cargado exitosamente.</p>
+                <p><strong>Información actualizada correctamente</strong></p>
+                {mandatoInfo && 
+                  <p>Se ha {isExternalAppOpen ? "obtenido" : "actualizado"} la información de la cuenta bancaria.</p>
+                }
+                {!isExternalAppOpen && 
+                  <p className="is-size-7 mt-2">
+                    Los cambios realizados en la ventana externa se han aplicado correctamente.
+                  </p>
+                }
               </div>
             )}
             
@@ -213,6 +344,27 @@ const IngresoDocumentosPage: React.FC = () => {
                 </p>
               </div>
             )}
+            
+            {/* Añadir botón para actualizar manualmente los datos cuando tenemos mandatoInfo */}
+            {mandatoInfo && (
+              <div className="has-text-right mb-3">
+                <button 
+                  className="button is-small is-info is-light is-outlined"
+                  onClick={() => fetchMandatoData('17175966', true)}
+                  disabled={loading || isExternalAppOpen}
+                >
+                  <span className="icon is-small">
+                    <i className="fas fa-sync-alt"></i>
+                    {/* Si no tienes Font Awesome, usar un texto simple */}
+                    {!document.querySelector('.fas') && '↻'}
+                  </span>
+                  <span>Actualizar datos</span>
+                </button>
+              </div>
+            )}
+            
+            {/* Mostrar la información del mandato cuando está disponible */}
+            {mandatoInfo && renderMandatoInfo()}
             
             <div className="documentos-actions">
               {/* Botón para iniciar el proceso externo */}
@@ -235,6 +387,22 @@ const IngresoDocumentosPage: React.FC = () => {
                   <p className="is-size-7 mt-2">
                     Esta aplicación permanecerá bloqueada hasta que finalice el proceso 
                     de carga de documentos o cierre la ventana externa.
+                  </p>
+                  <p className="is-size-7 mt-2">
+                    <strong>Nota:</strong> Al cerrar la ventana, se actualizará automáticamente 
+                    la información de la cuenta bancaria.
+                  </p>
+                </div>
+              )}
+              
+              {/* Mostrar mensaje cuando se está procesando con ventana externa cerrada */}
+              {!isExternalAppOpen && mandatoInfo && transactionStatus === 'pending' && (
+                <div className="notification is-warning mt-3">
+                  <p>
+                    <strong>Verificando cambios realizados...</strong>
+                  </p>
+                  <p className="is-size-7 mt-2">
+                    Estamos consultando la información actualizada de la cuenta bancaria.
                   </p>
                 </div>
               )}

@@ -136,7 +136,7 @@ class ExternalAppService {
       // const url = await this.generateUrl(paramsWithTransaction);
       
       // URL directa para pruebas -
-      const url = `http://mandatos.consalud.tes/frmmandatos.aspx?param=empleado=DMENA&rutafiliado=17175966-8&nombres=Ignacio%20Javier&appaterno=Quintana&apmaterno=Asenjo&tipo=HER`;
+      const url = `http://mandatos.consalud.tes/frmmandatos.aspx?param=0D0F4162C48B1AFC1A4D7EBE785806F42C69BE6A4774A5B6F965BB9EE11CE752E5C83CD48C1E540EBDCC8A24675365D7FE2F6543ECEDD7BF907EC9EAB993BECDB0625FA1546E934388C4EBBEE7E0DCCBB354F2CD3C780CD90A01BDF6D8055BDB68EA1CB7056C9003EE90508A30B90382`;
       
       // Guardar en localStorage para seguimiento
       localStorage.setItem('currentExternalTransaction', transactionId);
