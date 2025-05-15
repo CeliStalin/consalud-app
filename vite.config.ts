@@ -38,11 +38,9 @@ export default defineConfig({
             console.log(`Proxying request to: ${req.url}`);
             console.log('Headers:', proxyReq.getHeaders());
           });
-        },
-        // Opciones adicionales para manejar CORS correctamente
-        cors: true
+        }
+        // Removida la propiedad 'cors: true' que causa el error
       }
     }
   }
 })
-
