@@ -1,42 +1,48 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { fileURLToPath } from 'url'
-import { dirname, resolve } from 'path'
+import path from 'path'
 
-// Obtener el equivalente a __dirname en ESM
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
-// https://vite.dev/config/
-export default defineConfig(({ mode }) => {
-  // Cargar variables de entorno según el modo (desarrollo, test, producción)
-  const env = loadEnv(mode, process.cwd(), '')
-  
-  console.log(`Building for ${mode} environment`)
-  
-  return {
-    plugins: [react()],
-    envDir: '.',
-    resolve: {
-      alias: {
-        '@': resolve(__dirname, './src'),
-      },
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
     },
-    server: {
-      headers: {
-        'X-Content-Type-Options': 'nosniff',
-        'X-Frame-Options': 'DENY',
-        'X-XSS-Protection': '1; mode=block',
-        'Referrer-Policy': 'strict-origin-when-cross-origin',
-      },
-      // Configuración de proxy para evitar CORS en desarrollo
-      proxy: mode === 'development' ? {
-        '/api': {
-          target: env.VITE_API_ARQUITECTURA_URL,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')
-        }
-      } : undefined
+  },
+  server: {
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
     },
+    // Configuración del proxy para evitar problemas CORS
+    proxy: {
+      '/api/mandato': {
+        target: 'http://caja.sistemastransversales.tes/consalud.Caja.servicios/SvcMandato.svc',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/mandato/, ''),
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('Proxy error:', err);
+          });
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            // Configurar encabezados CORS en la respuesta
+            proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+            proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+            proxyRes.headers['Access-Control-Allow-Headers'] = 'Content-Type, SOAPAction';
+          });
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            // Registrar información de la solicitud para depuración
+            console.log(`Proxying request to: ${req.url}`);
+            console.log('Headers:', proxyReq.getHeaders());
+          });
+        },
+        // Opciones adicionales para manejar CORS correctamente
+        cors: true
+      }
+    }
   }
 })
+
