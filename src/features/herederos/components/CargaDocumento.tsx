@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
 import '../components/styles/globalStyle.css'
 import { Stepper } from "../components/Stepper";
+import { useNavigate } from 'react-router-dom';
 
 const CargaDocumento: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
+  const navigator = useNavigate();
   const handleDivClick = () => {
         fileInputRef.current?.click();
   };
@@ -16,6 +17,9 @@ const CargaDocumento: React.FC = () => {
         console.log("Archivo seleccionado:", file.name);
         }
     };  
+    const handlenavigate = () => {
+        navigator('/mnherederos/ingresoher/success');
+    }
 
     return(
         <>
@@ -162,7 +166,7 @@ const CargaDocumento: React.FC = () => {
                     </div>
                 </div>
                 <div className="continue-button">
-                    <button type="submit" className="button is-primary is-rounded">Continuar</button>
+                    <button type="submit" className="button is-primary is-rounded" onClick={handlenavigate}>Continuar</button>
                 </div>
             </div>            
     </>

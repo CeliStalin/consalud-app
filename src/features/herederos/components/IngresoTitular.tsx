@@ -49,8 +49,11 @@ const IngresoTitular = () => {
             return;
         }
         if(!titular?.poseeFondos){
-            mostrarAlerta();
+            mostrarAlerta2();
             return;
+        }
+        if(titular?.poseeSolicitud){
+            mostrarAlerta3();
         }
     navigator('/mnherederos/ingresoher/RequisitosTitular');
 } catch (err) {
@@ -109,66 +112,7 @@ const IngresoTitular = () => {
                             </svg>
                         </button>
                     </div>
-                    <div>
-                        <div className="field mt-2">
-                            <div className="control">
-                            <button
-                                className="button is-info"
-                                style={{
-                                borderRadius: '42px',
-                                color: 'white',
-                                }}
-                                onClick={mostrarAlerta}
-                            >
-                                Alerta 1
-                            </button>
-                            </div>
-                        </div>
-                        <div className="field mt-2">
-                            <div className="control">
-                            <button
-                                className="button is-info"
-                                style={{
-                                borderRadius: '42px',
-                                color: 'white',
-                                }}
-                                onClick={mostrarAlerta2}
-                            >
-                                Alerta 2
-                            </button>
-                            </div>
-                        </div>
-
-                        <div className="field mt-2">
-                            <div className="control">
-                            <button
-                                className="button is-info"
-                                style={{
-                                borderRadius: '42px',
-                                color: 'white',
-                                }}
-                                onClick={mostrarAlerta3}
-                            >
-                                Alerta 3
-                            </button>
-                            </div>
-                        </div>
-
-                        <div className="field mt-2">
-                            <div className="control">
-                            <button
-                                className="button is-info"
-                                style={{
-                                borderRadius: '42px',
-                                color: 'white',
-                                }}
-                                onClick={mostrarAlerta4}
-                            >
-                                Alerta 4
-                            </button>
-                            </div>
-                        </div>
-                    </div>
+           
 
                     {showError && (
                                     <span className="errorRut">

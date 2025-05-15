@@ -212,7 +212,7 @@ const FormIngresoHeredero: React.FC = () => {
       // Aquí iría la lógica para enviar los datos al backend
       
       // Redirigir a la siguiente página o mostrar mensaje de éxito
-      navigate('/mnherederos/ingresoher/success');
+      navigate('/mnherederos/ingresoher/cargadoc');
     }
   };
 
