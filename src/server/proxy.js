@@ -14,6 +14,18 @@ const useMockData = process.env.USE_MOCK === 'true';
 app.use(cors());
 app.use(express.json());
 app.use(express.text({ type: 'text/xml' }));
+app.get('/api/wsdl', async (req, res) => {
+  try {
+    // Usa la URL del WSDL del servicio
+    const response = await axios.get(
+      'http://caja.sistemastransversales.tes/consalud.Caja.servicios/SvcMandato.svc?wsdl'
+    );
+    res.header('Content-Type', 'text/xml');
+    res.send(response.data);
+  } catch (error) {
+    res.status(500).send(`Error obteniendo WSDL: ${error.message}`);
+  }
+});
 
 // Configuración avanzada para depuración
 if (DEBUG) {
@@ -130,6 +142,36 @@ function extractDataFromXml(xmlString) {
   }
 }
 
+// Función auxiliar para extraer todos los nodos
+function extractAllNodes(xmlDoc) {
+  const result = {};
+  
+  // Función recursiva para procesar todos los nodos
+  const processNode = (node) => {
+    if (node.nodeType === 1) { // Elemento
+      // Si tiene hijos texto
+      if (node.childNodes.length === 1 && node.childNodes[0].nodeType === 3) {
+        const nodeName = node.nodeName.includes(':') ? 
+                        node.nodeName.split(':')[1] : node.nodeName;
+        
+        // Solo guardar si tiene un valor y no es nil
+        if (node.textContent.trim() && 
+            node.getAttribute('nil') !== 'true') {
+          result[nodeName] = node.textContent.trim();
+        }
+      }
+      
+      // Procesar hijos
+      for (let i = 0; i < node.childNodes.length; i++) {
+        processNode(node.childNodes[i]);
+      }
+    }
+  };
+  
+  processNode(xmlDoc);
+  return result;
+}
+
 // Función para convertir código a tipo de cuenta
 function getTipoCuentaFromCodigo(codigo) {
   switch (codigo) {
@@ -178,30 +220,29 @@ async function processSoapRequest(rutCliente, nSecMandato) {
   console.log(`Consultando mandato para RUT: ${rutCliente}, Mandato: ${nSecMandato || 'No especificado'}`);
   
   // Construir el envelope SOAP
-  const soapEnvelope = `
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:con="Consalud.Caja.Servicios">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <con:TraeInfoMandato>
-          <con:pCliente>${rutCliente}</con:pCliente>
-          <con:pNSecMandato>${nSecMandato}</con:pNSecMandato>
-        </con:TraeInfoMandato>
-      </soapenv:Body>
-    </soapenv:Envelope>
-  `;
+  const soapEnvelope = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:con="Consalud.Caja.Servicios">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <con:TraeInfoMandato>
+         <con:pCliente>${rutCliente}</con:pCliente>
+         <con:pNSecMandato>${nSecMandato}</con:pNSecMandato>
+      </con:TraeInfoMandato>
+   </soapenv:Body>
+</soapenv:Envelope>`;
   
   // Guardar solicitud para depuración
   saveDebugInfo('soap_request', soapEnvelope);
   
+  
   try {
-    // Realizar petición SOAP con axios
+    // MODIFICANDO SOAPACTION BASADO EN LA RESPUESTA
     const response = await axios.post(
       'http://caja.sistemastransversales.tes/consalud.Caja.servicios/SvcMandato.svc',
       soapEnvelope,
       {
         headers: {
           'Content-Type': 'text/xml;charset=UTF-8',
-          'SOAPAction': 'Consalud.Caja.Servicios/ISvcMandato/TraeInfoMandato'
+          'SOAPAction':  'Consalud.Caja.Servicios/SvcMandato/TraeInfoMandato'
         },
         timeout: 15000 // 15 segundos de timeout
       }
@@ -215,11 +256,6 @@ async function processSoapRequest(rutCliente, nSecMandato) {
       console.log('Respuesta XML recibida (primeros 200 caracteres):', 
         typeof xmlResponse === 'string' ? xmlResponse.substring(0, 200) + '...' : 'No es string');
       
-      // Verificar que tenemos un string XML válido
-      if (typeof xmlResponse !== 'string' || !xmlResponse.includes('<')) {
-        throw new Error('Respuesta no es un XML válido');
-      }
-      
       // Extraer los datos del XML
       const processedData = extractDataFromXml(xmlResponse);
       console.log('Datos procesados:', processedData);
@@ -229,6 +265,15 @@ async function processSoapRequest(rutCliente, nSecMandato) {
       throw new Error(`Error en la respuesta del servicio: ${response.status}`);
     }
   } catch (error) {
+    // Información detallada sobre el error
+    console.error('Error completo en la petición SOAP:', error);
+    
+    if (error.response && error.response.data) {
+      console.error('Datos del error:', error.response.data);
+      console.error('Headers de respuesta:', error.response.headers);
+      saveDebugInfo('soap_error_response', error.response.data);
+    }
+    
     // Guardar error para depuración
     saveDebugInfo('soap_error', {
       message: error.message,
