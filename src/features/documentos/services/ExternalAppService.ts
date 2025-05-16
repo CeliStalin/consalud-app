@@ -23,7 +23,7 @@ class ExternalAppService {
 
   constructor(
     baseUrl: string = 'http://mandatos.consalud.tes/frmmandatos.aspx',
-    apiUrl: string = '/api'
+    apiUrl: string = 'http://localhost:3001/api'
   ) {
     this.baseUrl = baseUrl;
     this.apiUrl = apiUrl;
@@ -37,78 +37,50 @@ class ExternalAppService {
   }
 
   /**
-   * Construye la URL con parámetros directamente (sin encriptar)
-   * NOTA: Esta es una versión simplificada para pruebas
-   */
-  private buildDirectUrl(params: ExternalAppParams): string {
-    const queryParams = new URLSearchParams();
-    
-    // Añadir cada parámetro al objeto URLSearchParams
-    Object.entries(params).forEach(([key, value]) => {
-      queryParams.append(key, value);
-    });
-    
-    // Construir la URL directa - para pruebas
-    return `${this.baseUrl}?${queryParams.toString()}`;
-  }
-
-  /**
-   * Encripta los parámetros para la aplicación externa - versión para pruebas
-   * @param params Parámetros a encriptar
-   */
-  async encryptParams(params: ExternalAppParams): Promise<string> {
-    try {
-      // En un entorno real, esta llamada debería ir a tu API de encriptación
-      console.log('Parámetros a encriptar:', params);
-      
-      // Para pruebas, solo devolvemos un string fijo
-      // En producción, este valor vendría de tu API de encriptación
-      return "empleado=DMENA&rutafiliado=17175966-8&nombres=Ignacio%20Javier&appaterno=Quintana&apmaterno=Asenjo&tipo=HER";
-    } catch (error) {
-      console.error('Error al encriptar parámetros:', error);
-      throw new Error('No se pudieron encriptar los parámetros');
-    }
-  }
-
-  /**
-   * Genera la URL completa para la aplicación externa
-   * @param params Parámetros para la aplicación externa
-   */
-  async generateUrl(params: ExternalAppParams): Promise<string> {
-    try {
-      // Para pruebas, podemos usar una URL directa sin encriptar
-      // return this.buildDirectUrl(params);
-      
-      // O usar la versión encriptada (simulada)
-      const encryptedParams = await this.encryptParams(params);
-      return `${this.baseUrl}?param=${encryptedParams}`;
-    } catch (error) {
-      console.error('Error al generar URL:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Registra una nueva transacción - versión simplificada para pruebas
+   * Registra una nueva transacción a través del proxy
    */
   async registerTransaction(transactionId: string, params: ExternalAppParams): Promise<boolean> {
-    // En un entorno real, esto llamaría a una API
-    console.log('Transacción registrada:', { transactionId, params });
-    return true;
+    try {
+      console.log(`Registrando transacción ${transactionId} con el servidor proxy...`);
+      const response = await axios.post(`${this.apiUrl}/external-app/register-transaction`, {
+        transactionId,
+        params
+      });
+      
+      return response.data.success === true;
+    } catch (error) {
+      console.error('Error al registrar transacción:', error);
+      return false;
+    }
   }
 
   /**
-   * Verifica el estado de una transacción - versión simplificada para pruebas
+   * Verifica el estado de una transacción a través del proxy
    */
   async checkTransactionStatus(transactionId: string): Promise<TransactionStatus> {
-    // Simulación para desarrollo (80% probabilidad de éxito)
-    const success = Math.random() > 0.2;
-    
-    return {
-      status: success ? 'success' : 'error',
-      details: success ? { message: 'Operación completada correctamente' } : undefined,
-      error: success ? undefined : 'La operación falló o fue cancelada'
-    };
+    try {
+      console.log(`Verificando estado de transacción ${transactionId}...`);
+      const response = await axios.get(`${this.apiUrl}/external-app/transaction-status/${transactionId}`);
+      
+      if (response.data.success === true) {
+        return {
+          status: response.data.status || 'pending',
+          details: response.data.transaction || {},
+          error: response.data.error || undefined
+        };
+      }
+      
+      return {
+        status: 'error',
+        error: response.data.error || 'Error desconocido al verificar el estado'
+      };
+    } catch (error) {
+      console.error('Error al verificar estado de transacción:', error);
+      return {
+        status: 'error',
+        error: error instanceof Error ? error.message : 'Error desconocido'
+      };
+    }
   }
 
   /**
@@ -128,15 +100,23 @@ class ExternalAppService {
         transactionId
       };
 
-      // Registrar la transacción (simulado)
-      await this.registerTransaction(transactionId, paramsWithTransaction);
+      // Registrar la transacción en el servidor
+      const registered = await this.registerTransaction(transactionId, paramsWithTransaction);
       
-      // Generar la URL
-      // Para pruebas, usamos directamente la URL de la aplicación ASP.NET
-      // const url = await this.generateUrl(paramsWithTransaction);
+      if (!registered) {
+        console.warn('No se pudo registrar la transacción, pero se intentará abrir la aplicación');
+      }
       
-      // URL directa para pruebas -
-      const url = `http://mandatos.consalud.tes/frmmandatos.aspx?param=0D0F4162C48B1AFC1A4D7EBE785806F42C69BE6A4774A5B6F965BB9EE11CE752E5C83CD48C1E540EBDCC8A24675365D7FE2F6543ECEDD7BF907EC9EAB993BECDB0625FA1546E934388C4EBBEE7E0DCCBB354F2CD3C780CD90A01BDF6D8055BDB68EA1CB7056C9003EE90508A30B90382`;
+      // Obtener URL directamente del servidor
+      console.log('Obteniendo URL del servidor...');
+      const urlResponse = await axios.get(`${this.apiUrl}/external-app/url`);
+      
+      if (!urlResponse.data.success || !urlResponse.data.url) {
+        throw new Error('No se pudo obtener la URL para la aplicación externa');
+      }
+      
+      const url = urlResponse.data.url;
+      console.log(`Abriendo URL: ${url}`);
       
       // Guardar en localStorage para seguimiento
       localStorage.setItem('currentExternalTransaction', transactionId);
