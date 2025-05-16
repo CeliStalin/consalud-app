@@ -24,6 +24,11 @@ const IngresoDocumentosPage: React.FC = () => {
   // Ref para rastrear si el usuario cerró la ventana intencionalmente
   const userClosedRef = useRef(false);
 
+  // Estado para los radio buttons que aparecen después de cerrar la ventana
+  const [showRadioOptions, setShowRadioOptions] = useState(false);
+  const [documentsCompleted, setDocumentsCompleted] = useState<string | null>(null);
+  const [windowJustClosed, setWindowJustClosed] = useState(false);
+
   // Función para abrir la aplicación externa
   const openExternalApp = async () => {
     setLoading(true);
@@ -160,9 +165,11 @@ const IngresoDocumentosPage: React.FC = () => {
             console.log('La ventana externa fue cerrada - actualizando datos de cuenta bancaria');
             setIsExternalAppOpen(false);
             
-            // Consumir información actualizada del mandato
-            // Usamos el mismo RUT pero marcamos refreshData como true para forzar actualización
-            // incluso si ya tenemos datos
+            // Marcar que la ventana se acaba de cerrar para mostrar los radio buttons
+            setWindowJustClosed(true);
+            setShowRadioOptions(true);
+            
+            // Mantener la funcionalidad original: actualizar los datos automáticamente al cerrar la ventana
             fetchMandatoData('17175966', true);
             
             // Limpiar tracking
@@ -178,7 +185,12 @@ const IngresoDocumentosPage: React.FC = () => {
           }
           
           setIsExternalAppOpen(false);
+          setWindowJustClosed(true);
+          setShowRadioOptions(true);
+          
+          // Mantener la funcionalidad original: actualizar datos al cerrar la ventana
           fetchMandatoData('17175966', true);
+          
           localStorage.removeItem('currentExternalTransaction');
         }
       }, 1000) as unknown as number;
@@ -229,6 +241,20 @@ const IngresoDocumentosPage: React.FC = () => {
     
     checkPendingTransaction();
   }, []);
+
+  // Manejador para el cambio de radio buttons
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDocumentsCompleted(e.target.value);
+  };
+
+  // Efectuar la actualización de datos cuando hay una respuesta definitiva del usuario
+  useEffect(() => {
+    if (windowJustClosed && documentsCompleted !== null) {
+      // Si seleccionaron "No", reintentar la carga (botón queda habilitado) 
+      // pero no hacer nada más ya que la actualización de datos se ejecutó automáticamente al cerrar la ventana
+      setWindowJustClosed(false);
+    }
+  }, [documentsCompleted, windowJustClosed]);
 
   // Renderizar información del mandato
   const renderMandatoInfo = () => {
@@ -295,6 +321,8 @@ const IngresoDocumentosPage: React.FC = () => {
     setTransactionStatus(null);
     setError(null);
     setMandatoInfo(null);
+    setShowRadioOptions(false);
+    setDocumentsCompleted(null);
   };
 
   return (
@@ -308,9 +336,9 @@ const IngresoDocumentosPage: React.FC = () => {
         >
           <div className="documentos-content">
             <p className="instrucciones">
-              Para cargar los documentos requeridos para el proceso de devolución, 
-              haga clic en el botón "Cargar Documentos" a continuación. Se abrirá una 
-              ventana externa donde podrá seleccionar y subir los archivos necesarios.
+              Para cargar el mandato requeridos para el proceso de devolución, 
+              haga clic en el botón "Cargar Mandatos" a continuación. Se abrirá una 
+              ventana externa donde podrá seleccionar y subir su cuenta.
             </p>
             
             {/* Mensajes específicos según el estado */}
@@ -366,16 +394,48 @@ const IngresoDocumentosPage: React.FC = () => {
             {/* Mostrar la información del mandato cuando está disponible */}
             {mandatoInfo && renderMandatoInfo()}
             
+            {/* Mostrar radio buttons después de cerrar la ventana */}
+            {showRadioOptions && (
+              <div className="radio-options-container mt-4 mb-4 p-4 has-background-light has-radius is-rounded">
+                <p className="has-text-weight-medium mb-3">¿Completó la carga de documentos en la ventana anterior?</p>
+                <div className="control radio-options">
+                  <label className="radio mr-5">
+                    <input 
+                      type="radio" 
+                      name="documentsCompleted" 
+                      value="si" 
+                      checked={documentsCompleted === 'si'} 
+                      onChange={handleRadioChange}
+                      className="mr-2"
+                    />
+                    Sí, completé todos los documentos
+                  </label>
+                  <label className="radio">
+                    <input 
+                      type="radio" 
+                      name="documentsCompleted" 
+                      value="no" 
+                      checked={documentsCompleted === 'no'} 
+                      onChange={handleRadioChange}
+                      className="mr-2"
+                    />
+                    No, necesito volver a Cargar Mandatos
+                  </label>
+                </div>
+              </div>
+            )}
+            
             <div className="documentos-actions">
               {/* Botón para iniciar el proceso externo */}
               <Button 
                 variant="primary"
                 loading={loading}
-                disabled={isExternalAppOpen || loading || transactionStatus === 'success'}
+                disabled={isExternalAppOpen || loading || 
+                  (showRadioOptions && documentsCompleted === 'si')}
                 onClick={openExternalApp}
                 className="cargar-documentos-btn"
               >
-                {isExternalAppOpen ? 'Procesando en otra ventana...' : 'Cargar Documentos'}
+                {isExternalAppOpen ? 'Procesando en otra ventana...' : 'Cargar Mandatos'}
               </Button>
               
               {/* Mostrar este mensaje mientras la ventana externa está abierta */}
