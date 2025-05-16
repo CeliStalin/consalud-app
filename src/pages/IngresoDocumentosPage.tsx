@@ -23,8 +23,6 @@ const IngresoDocumentosPage: React.FC = () => {
   const intervalRef = useRef<number | undefined>(undefined);
   // Ref para rastrear si el usuario cerró la ventana intencionalmente
   const userClosedRef = useRef(false);
-  // Ref para controlar la expiración del token
-  const tokenExpiryRef = useRef<number | null>(null);
 
   // Función para abrir la aplicación externa
   const openExternalApp = async () => {
@@ -49,7 +47,7 @@ const IngresoDocumentosPage: React.FC = () => {
         transactionId: externalAppService.generateTransactionId()
       };
       
-      // Abrir la aplicación externa usando el servicio mejorado
+      // Abrir la aplicación externa usando el servicio
       const result = await externalAppService.openExternalApp(datosEjemplo);
       
       // Guardar referencias
@@ -57,12 +55,6 @@ const IngresoDocumentosPage: React.FC = () => {
       setTransactionId(result.transactionId);
       setIsExternalAppOpen(true);
       setTransactionStatus('pending');
-      
-      // Verificar si tenemos una fecha de expiración almacenada
-      const expiryTime = localStorage.getItem('currentTransactionExpiry');
-      if (expiryTime) {
-        tokenExpiryRef.current = parseInt(expiryTime, 10);
-      }
       
       // Agregar un evento beforeunload a la ventana externa para detectar cierre intencional
       if (result.window) {
@@ -175,41 +167,6 @@ const IngresoDocumentosPage: React.FC = () => {
             
             // Limpiar tracking
             localStorage.removeItem('currentExternalTransaction');
-            localStorage.removeItem('currentTransactionExpiry');
-            tokenExpiryRef.current = null;
-          } else {
-            // Si la ventana sigue abierta, verificar si el token ha expirado
-            if (tokenExpiryRef.current && Date.now() > tokenExpiryRef.current) {
-              console.warn('Token de sesión externa expirado - Cerrando ventana');
-              // Mostrar alerta en la ventana externa si es posible
-              try {
-                externalWindow.alert('La sesión ha expirado. Por favor cierre esta ventana y vuelva a intentarlo.');
-              } catch (e) {
-                // Ignorar errores de CORS
-              }
-              
-              // Intentar cerrar la ventana
-              try {
-                externalWindow.close();
-              } catch (e) {
-                // Ignorar errores de CORS
-              }
-              
-              // Detener el intervalo
-              if (intervalRef.current) {
-                window.clearInterval(intervalRef.current);
-                intervalRef.current = undefined;
-              }
-              
-              setIsExternalAppOpen(false);
-              setTransactionStatus('error');
-              setError('La sesión ha expirado. Por favor inténtelo nuevamente.');
-              
-              // Limpiar tracking
-              localStorage.removeItem('currentExternalTransaction');
-              localStorage.removeItem('currentTransactionExpiry');
-              tokenExpiryRef.current = null;
-            }
           }
         } catch (e) {
           // Si hay error al acceder, probablemente la ventana está cerrada o hay restricciones CORS
@@ -223,8 +180,6 @@ const IngresoDocumentosPage: React.FC = () => {
           setIsExternalAppOpen(false);
           fetchMandatoData('17175966', true);
           localStorage.removeItem('currentExternalTransaction');
-          localStorage.removeItem('currentTransactionExpiry');
-          tokenExpiryRef.current = null;
         }
       }, 1000) as unknown as number;
     }
@@ -263,13 +218,9 @@ const IngresoDocumentosPage: React.FC = () => {
           
           // Limpiar tracking en cualquier caso
           localStorage.removeItem('currentExternalTransaction');
-          localStorage.removeItem('currentTransactionExpiry');
-          tokenExpiryRef.current = null;
         } catch (err) {
           console.error('Error al verificar transacción pendiente:', err);
           localStorage.removeItem('currentExternalTransaction');
-          localStorage.removeItem('currentTransactionExpiry');
-          tokenExpiryRef.current = null;
         } finally {
           setLoading(false);
         }
@@ -344,9 +295,6 @@ const IngresoDocumentosPage: React.FC = () => {
     setTransactionStatus(null);
     setError(null);
     setMandatoInfo(null);
-    localStorage.removeItem('currentExternalTransaction');
-    localStorage.removeItem('currentTransactionExpiry');
-    tokenExpiryRef.current = null;
   };
 
   return (
@@ -444,11 +392,6 @@ const IngresoDocumentosPage: React.FC = () => {
                     <strong>Nota:</strong> Al cerrar la ventana, se actualizará automáticamente 
                     la información de la cuenta bancaria.
                   </p>
-                  {tokenExpiryRef.current && (
-                    <p className="is-size-7 mt-2">
-                      <strong>Aviso:</strong> La sesión expirará en {Math.max(0, Math.floor((tokenExpiryRef.current - Date.now()) / 60000))} minutos.
-                    </p>
-                  )}
                 </div>
               )}
               
