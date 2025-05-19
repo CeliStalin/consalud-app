@@ -8,8 +8,8 @@ interface ExternalAppParams {
   appaterno: string;
   apmaterno: string;
   tipo: string;
-  transactionId?: string;  // Opcional porque lo generamos si no se proporciona
-  [key: string]: string | undefined;  // Para otros parámetros adicionales
+  transactionId?: string;
+  [key: string]: string | undefined;
 }
 
 // Definición de interfaz para el estado de la transacción
@@ -22,6 +22,7 @@ interface TransactionStatus {
 class ExternalAppService {
   private baseUrl: string;
   private apiUrl: string;
+  private modalMode: boolean = true; // Configuración para usar modal en lugar de ventana
 
   constructor(
     baseUrl: string = 'http://mandatos.consalud.tes/frmmandatos.aspx',
@@ -39,35 +40,27 @@ class ExternalAppService {
   }
 
   /**
-   * Construye la URL con parámetros directamente (sin encriptar)
-   * NOTA: Esta es una versión simplificada para pruebas
+   * Construye la URL con parámetros 
    */
   private buildDirectUrl(params: ExternalAppParams): string {
     const queryParams = new URLSearchParams();
     
-    // Añadir cada parámetro al objeto URLSearchParams
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined) {
         queryParams.append(key, value);
       }
     });
     
-    // Construir la URL directa - para pruebas
     return `${this.baseUrl}?${queryParams.toString()}`;
   }
 
   /**
-   * Encripta los parámetros para la aplicación externa - versión para pruebas
-   * @param params Parámetros a encriptar
+   * Simula encriptación para pruebas - en producción llamaría a tu API real
    */
   async encryptParams(params: ExternalAppParams): Promise<string> {
     try {
-      // En un entorno real, esta llamada debería ir a tu API de encriptación
-      console.log('Parámetros a encriptar:', params);
-      
-      // Para pruebas, solo devolvemos un string fijo
-      // En producción, este valor vendría de tu API de encriptación
-      return "empleado=DMENA&rutafiliado=17175966-8&nombres=Ignacio%20Javier&appaterno=Quintana&apmaterno=Asenjo&tipo=HER";
+      // Para pruebas, simulamos una cadena encriptada
+      return 'param=0D0F4162C48B1AFC1A4D7EBE785806F42C69BE6A4774A5B6F965BB9EE11CE752E5C83CD48C1E540EBDCC8A24675365D7FE2F6543ECEDD7BF907EC9EAB993BECDB0625FA1546E934388C4EBBEE7E0DCCBB354F2CD3C780CD90A01BDF6D8055BDB68EA1CB7056C9003EE90508A30B90382';
     } catch (error) {
       console.error('Error al encriptar parámetros:', error);
       throw new Error('No se pudieron encriptar los parámetros');
@@ -76,16 +69,17 @@ class ExternalAppService {
 
   /**
    * Genera la URL completa para la aplicación externa
-   * @param params Parámetros para la aplicación externa
    */
   async generateUrl(params: ExternalAppParams): Promise<string> {
     try {
-      // Para pruebas, podemos usar una URL directa sin encriptar
-      // return this.buildDirectUrl(params);
+      // Para desarrollo, usar la url directa dada para pruebas
+      if (params.rutafiliado === '17175966-8') {
+        return 'http://mandatos.consalud.tes/frmmandatos.aspx?param=0D0F4162C48B1AFC1A4D7EBE785806F42C69BE6A4774A5B6F965BB9EE11CE752E5C83CD48C1E540EBDCC8A24675365D7FE2F6543ECEDD7BF907EC9EAB993BECDB0625FA1546E934388C4EBBEE7E0DCCBB354F2CD3C780CD90A01BDF6D8055BDB68EA1CB7056C9003EE90508A30B90382';
+      }
       
-      // O usar la versión encriptada (simulada)
+      // En otro caso, simular encriptación
       const encryptedParams = await this.encryptParams(params);
-      return `${this.baseUrl}?param=${encryptedParams}`;
+      return `${this.baseUrl}?param=${encodeURIComponent(encryptedParams)}`;
     } catch (error) {
       console.error('Error al generar URL:', error);
       throw error;
@@ -96,28 +90,48 @@ class ExternalAppService {
    * Registra una nueva transacción - versión simplificada para pruebas
    */
   async registerTransaction(transactionId: string, params: ExternalAppParams): Promise<boolean> {
-    // En un entorno real, esto llamaría a una API
-    console.log('Transacción registrada:', { transactionId, params });
+    // Simulamos registro en localStorage para desarrollo
+    localStorage.setItem(`transaction_${transactionId}`, JSON.stringify({
+      params,
+      status: 'pending',
+      timestamp: Date.now()
+    }));
     return true;
   }
 
   /**
-   * Verifica el estado de una transacción - versión simplificada para pruebas
+   * Verifica el estado de una transacción
    */
   async checkTransactionStatus(transactionId: string): Promise<TransactionStatus> {
-    // Simulación para desarrollo (80% probabilidad de éxito)
-    const success = Math.random() > 0.2;
+    // Verificar si hay datos en localStorage para esta transacción
+    const storedData = localStorage.getItem(`transaction_${transactionId}`);
     
+    if (storedData) {
+      try {
+        const data = JSON.parse(storedData);
+        
+        // Si estamos en modo desarrollo y hay datos almacenados,
+        // consideramos la transacción exitosa
+        if (data) {
+          return {
+            status: 'success',
+            details: { message: 'Operación completada correctamente' }
+          };
+        }
+      } catch (e) {
+        console.error('Error al leer datos de transacción:', e);
+      }
+    }
+    
+    // Si llegamos aquí, devolvemos error
     return {
-      status: success ? 'success' : 'error',
-      details: success ? { message: 'Operación completada correctamente' } : undefined,
-      error: success ? undefined : 'La operación falló o fue cancelada'
+      status: 'error',
+      error: 'La operación falló o fue cancelada'
     };
   }
 
   /**
-   * Método para abrir la aplicación en un modal
-   * @param params Parámetros para la aplicación externa
+   * Método para abrir la aplicación en un modal EVITANDO problemas CORS
    */
   async openExternalAppInModal(params: ExternalAppParams): Promise<{
     modalId: string;
@@ -139,7 +153,7 @@ class ExternalAppService {
       // Generar la URL
       const url = await this.generateUrl(paramsWithTransaction);
       
-      // Crear el modal con iframe
+      // Crear el modal 
       this.createModalWithIframe(modalId, url, transactionId);
       
       // Guardar en localStorage para seguimiento
@@ -156,7 +170,7 @@ class ExternalAppService {
   }
 
   /**
-   * Método para crear el modal con iframe
+   * Método para crear el modal con iframe - VERSIÓN MEJORADA SIN PROBLEMAS CORS
    */
   private createModalWithIframe(modalId: string, url: string, transactionId: string): void {
     // Remover modal existente si hay alguno
@@ -198,48 +212,24 @@ class ExternalAppService {
     iframe.style.border = 'none';
     iframe.id = `iframe-${transactionId}`;
     
-    // Cuando el iframe cargue, intentar interceptar el botón de cerrar
-    iframe.onload = () => {
-      try {
-        // Intentar acceder al contenido del iframe (podría fallar por CORS)
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-        
-        if (iframeDoc) {
-          // Buscar todos los botones y links con texto "Cerrar"
-          const cerrarElements = iframeDoc.querySelectorAll('button, input[type="button"], a');
-          
-          for (let i = 0; i < cerrarElements.length; i++) {
-            const el = cerrarElements[i] as HTMLElement;
-            
-            // Verificar si el texto del elemento o su valor tiene "Cerrar"
-            if (el.textContent?.includes('Cerrar') || 
-                (el as HTMLInputElement).value?.includes('Cerrar')) {
-              
-              // Crear un nuevo evento click que no se propague
-              el.addEventListener('click', (e) => {
-                // Detener evento original
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Cerrar el modal
-                document.body.removeChild(modal);
-                
-                // Disparar evento personalizado
-                this.triggerCloseEvent(transactionId, 'success');
-                
-                return false;
-              }, true);
-              
-              console.log('Interceptado botón cerrar en iframe');
-            }
-          }
+    // IMPORTANTE: NO intentamos acceder al contenido del iframe (evitamos CORS)
+    // En lugar de eso, usamos eventos para detectar cierre o mensajes
+    
+    // Escuchar eventos de mensaje que puedan venir del iframe
+    const messageHandler = (event: MessageEvent) => {
+      // IMPORTANTE: Verificar origen para seguridad
+      if (event.origin.includes('mandatos.consalud.tes')) {
+        if (event.data === 'closeModal' || event.data?.action === 'close') {
+          // Si recibimos mensaje de cierre, cerramos el modal
+          this.closeModal(modalId);
+          this.triggerCloseEvent(transactionId, 'success');
         }
-      } catch (e) {
-        console.warn('No se pudo acceder al contenido del iframe por restricciones CORS:', e);
       }
     };
     
-    // Botón de cierre (nuestro botón de respaldo)
+    window.addEventListener('message', messageHandler);
+    
+    // Crear un botón de respaldo para cerrar el modal
     const closeButton = document.createElement('button');
     closeButton.textContent = '✕';
     closeButton.style.position = 'absolute';
@@ -258,12 +248,20 @@ class ExternalAppService {
     closeButton.style.alignItems = 'center';
     closeButton.style.zIndex = '10';
     
-    // Manejar cierre
-    closeButton.onclick = () => {
+    // Función para cerrar y limpiar
+    const closeAndCleanup = () => {
+      window.removeEventListener('message', messageHandler);
       document.body.removeChild(modal);
-      
-      // Disparar evento personalizado
       this.triggerCloseEvent(transactionId, 'cancelled');
+    };
+    
+    closeButton.onclick = closeAndCleanup;
+    
+    // También cerramos si se hace clic fuera del iframe
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        closeAndCleanup();
+      }
     };
     
     // Ensamblar todos los elementos
@@ -271,6 +269,32 @@ class ExternalAppService {
     iframeContainer.appendChild(closeButton);
     modal.appendChild(iframeContainer);
     document.body.appendChild(modal);
+    
+    // Configurar un temporizador para verificar periódicamente el mandato
+    // Esto nos permite actualizar datos aunque no recibamos mensajes del iframe
+    const checkInterval = setInterval(() => {
+      // Verificar si el modal sigue existiendo
+      if (!document.getElementById(modalId)) {
+        clearInterval(checkInterval);
+        return;
+      }
+      
+      // Intentar obtener datos actualizados cada 10 segundos
+      // Este enfoque funciona incluso si no podemos acceder al contenido del iframe
+      console.log('Verificando mandato actualizado...');
+      this.refreshMandatoData();
+    }, 10000);
+  }
+  
+  /**
+   * Método para actualizar datos del mandato
+   */
+  private refreshMandatoData() {
+    // Disparar un evento personalizado que notifique que debe actualizarse el mandato
+    const refreshEvent = new CustomEvent('refreshMandatoRequest', {
+      detail: { timestamp: Date.now() }
+    });
+    window.dispatchEvent(refreshEvent);
   }
 
   /**
@@ -284,6 +308,9 @@ class ExternalAppService {
       }
     });
     window.dispatchEvent(closeEvent);
+    
+    // También disparamos el evento de actualización
+    this.refreshMandatoData();
   }
   
   /**
@@ -298,7 +325,7 @@ class ExternalAppService {
 
   /**
    * Abre la aplicación externa en una nueva ventana
-   * @param params Parámetros para la aplicación externa
+   * Método alternativo si no se desea usar el modal
    */
   async openExternalApp(params: ExternalAppParams): Promise<{
     window: Window | null;
@@ -313,14 +340,11 @@ class ExternalAppService {
         transactionId
       };
 
-      // Registrar la transacción (simulado)
+      // Registrar la transacción
       await this.registerTransaction(transactionId, paramsWithTransaction);
       
       // Generar la URL
       const url = await this.generateUrl(paramsWithTransaction);
-      
-      // URL directa para pruebas
-      //const url = `http://mandatos.consalud.tes/frmmandatos.aspx?param=0D0F4162C48B1AFC1A4D7EBE785806F42C69BE6A4774A5B6F965BB9EE11CE752E5C83CD48C1E540EBDCC8A24675365D7FE2F6543ECEDD7BF907EC9EAB993BECDB0625FA1546E934388C4EBBEE7E0DCCBB354F2CD3C780CD90A01BDF6D8055BDB68EA1CB7056C9003EE90508A30B90382`;
       
       // Guardar en localStorage para seguimiento
       localStorage.setItem('currentExternalTransaction', transactionId);
