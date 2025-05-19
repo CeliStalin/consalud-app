@@ -10,15 +10,17 @@ const IngresoDocumentosPage: React.FC = () => {
   
   // Estados para manejar la integración con la aplicación externa
   const [isExternalAppOpen, setIsExternalAppOpen] = useState(false);
+  const [externalWindow, setExternalWindow] = useState<Window | null>(null);
   const [transactionId, setTransactionId] = useState<string>('');
   const [transactionStatus, setTransactionStatus] = useState<'pending' | 'success' | 'error' | 'cancelled' | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [modalId, setModalId] = useState<string | null>(null);
   
   // Estado para la información del mandato
   const [mandatoInfo, setMandatoInfo] = useState<MandatoResult | null>(null);
   
+  // Ref para el intervalo de verificación
+  const intervalRef = useRef<number | undefined>(undefined);
   // Ref para rastrear si el usuario cerró la ventana intencionalmente
   const userClosedRef = useRef(false);
 
@@ -26,7 +28,6 @@ const IngresoDocumentosPage: React.FC = () => {
   const [showRadioOptions, setShowRadioOptions] = useState(false);
   const [documentsCompleted, setDocumentsCompleted] = useState<string | null>(null);
   const [windowJustClosed, setWindowJustClosed] = useState(false);
-  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
 
   // Función para abrir la aplicación externa
   const openExternalApp = async () => {
@@ -36,64 +37,40 @@ const IngresoDocumentosPage: React.FC = () => {
     
     try {
       // Primero, obtener la información actual de la cuenta bancaria
+      // Esto mostrará la información antes de que el usuario interactúe con la app externa
       const rutCliente = '17175966'; // Idealmente esto vendría de tu contexto o props
       await fetchMandatoData(rutCliente);
       
-      // Datos de ejemplo
+      // Usamos datos de prueba en lugar de los datos reales
       const datosEjemplo = {
         empleado: localStorage.getItem('userName') || 'SISTEMA',
         rutafiliado: '17175966-8',
         nombres: 'Ignacio Javier',
         appaterno: 'Quintana',
         apmaterno: 'Asenjo',
-        tipo: 'HER',
+        tipo: 'HER', // Tipo de operación (Heredero)
         transactionId: externalAppService.generateTransactionId()
       };
       
-      // Usar el método que crea un modal con iframe
-      const result = await externalAppService.openExternalAppInModal(datosEjemplo);
+      // Abrir la aplicación externa usando el servicio
+      const result = await externalAppService.openExternalApp(datosEjemplo);
       
-      // Almacenar IDs
-      setModalId(result.modalId);
+      // Guardar referencias
+      setExternalWindow(result.window);
       setTransactionId(result.transactionId);
       setIsExternalAppOpen(true);
       setTransactionStatus('pending');
       
-      // Escuchar el evento de cierre del modal
-      const handleExternalAppClosed = (event: CustomEvent) => {
-        if (event.detail.transactionId === result.transactionId) {
-          setIsExternalAppOpen(false);
-          setWindowJustClosed(true);
-          setShowRadioOptions(true);
-          
-          // Actualizar datos
-          fetchMandatoData('17175966', true);
-          
-          // Limpiar tracking
-          localStorage.removeItem('currentExternalTransaction');
-          
-          // Eliminar este listener
-          window.removeEventListener('externalAppClosed', handleExternalAppClosed as EventListener);
+      // Agregar un evento beforeunload a la ventana externa para detectar cierre intencional
+      if (result.window) {
+        try {
+          result.window.addEventListener('beforeunload', () => {
+            userClosedRef.current = true;
+          });
+        } catch (e) {
+          console.warn('No se pudo agregar listener a ventana externa (restricciones de CORS)');
         }
-      };
-      
-      // Añadir listener para el evento de cierre
-      window.addEventListener('externalAppClosed', handleExternalAppClosed as EventListener);
-      
-      // También escuchar eventos de actualización de mandato
-      const handleRefreshRequest = () => {
-        if (autoRefreshEnabled) {
-          console.log('Recibida solicitud de actualización de datos de mandato');
-          fetchMandatoData('17175966', true);
-        }
-      };
-      
-      window.addEventListener('refreshMandatoRequest', handleRefreshRequest);
-      
-      // Limpiar el listener cuando se desmonte el componente
-      return () => {
-        window.removeEventListener('refreshMandatoRequest', handleRefreshRequest);
-      };
+      }
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido al abrir la aplicación externa';
@@ -104,7 +81,7 @@ const IngresoDocumentosPage: React.FC = () => {
       setLoading(false);
     }
   };
-    
+
   // Función para obtener información del mandato
   const fetchMandatoData = async (rutCliente: string = '17175966', refreshData: boolean = false) => {
     // Si ya tenemos datos y no se solicita actualización, no hacemos nada
@@ -117,12 +94,15 @@ const IngresoDocumentosPage: React.FC = () => {
     try {
       console.log(`Consultando información del mandato para RUT: ${rutCliente}${refreshData ? ' (Actualización forzada)' : ''}`);
       
-      // Llamar al servicio SOAP
+      // Agregar un timestamp como query parameter para evitar caché
+      const timestamp = new Date().getTime();
+      
+      // Llamar al servicio SOAP - asegurando que el timestamp se pasa como un número
       const resultado = await mandatoSoapService.getMandatoInfo(rutCliente, '');
       
       console.log('Datos recibidos del servicio:', resultado);
       
-      // Actualizar estado con la respuesta
+      // Actualizar estado con la respuesta - usamos una función para asegurar actualización
       setMandatoInfo(prevInfo => {
         // Verificar si los datos son diferentes antes de actualizar
         if (prevInfo && prevInfo.numeroCuenta === resultado.numeroCuenta && !refreshData) {
@@ -137,7 +117,7 @@ const IngresoDocumentosPage: React.FC = () => {
       // Si todo fue bien, marcar como exitoso
       if (resultado.mensaje === 'OK') {
         // Solo actualizamos el estado de la transacción si es una actualización
-        // o si no hay una transacción en progreso
+        // o si no hay una transacción en progreso (evitamos cambiar el estado si la ventana está abierta)
         if (refreshData || !isExternalAppOpen) {
           setTransactionStatus('success');
           setError(null);
@@ -146,7 +126,7 @@ const IngresoDocumentosPage: React.FC = () => {
         // Guardar información para uso posterior
         localStorage.setItem('currentRutCliente', rutCliente);
         localStorage.setItem('currentMandatoId', resultado.mandatoId);
-        localStorage.setItem('lastMandatoUpdate', Date.now().toString());
+        localStorage.setItem('lastMandatoUpdate', timestamp.toString());
         
         console.log('Información del mandato recuperada exitosamente:', resultado);
       } else {
@@ -163,21 +143,67 @@ const IngresoDocumentosPage: React.FC = () => {
     }
   };
 
-  // Efecto para limpiar recursos cuando se desmonta el componente
+  // Verificar periódicamente si la ventana externa ha sido cerrada
   useEffect(() => {
-    return () => {
-      // Limpiar cualquier modal que pueda estar abierto
-      if (modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-          document.body.removeChild(modal);
-        }
+    if (isExternalAppOpen && externalWindow) {
+      // Limpiar cualquier intervalo existente
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
       }
       
-      // Desactivar actualizaciones automáticas al salir
-      setAutoRefreshEnabled(false);
+      // Establecer nuevo intervalo
+      intervalRef.current = window.setInterval(() => {
+        try {
+          // Verificar si la ventana fue cerrada
+          if (externalWindow.closed) {
+            // Detener el intervalo
+            if (intervalRef.current) {
+              window.clearInterval(intervalRef.current);
+              intervalRef.current = undefined;
+            }
+            
+            console.log('La ventana externa fue cerrada - actualizando datos de cuenta bancaria');
+            setIsExternalAppOpen(false);
+            
+            // Marcar que la ventana se acaba de cerrar para mostrar los radio buttons
+            setWindowJustClosed(true);
+            setShowRadioOptions(true);
+            
+            // Mantener la funcionalidad original: actualizar los datos automáticamente al cerrar la ventana
+            fetchMandatoData('17175966', true);
+            
+            // Limpiar tracking
+            localStorage.removeItem('currentExternalTransaction');
+          }
+        } catch (e) {
+          // Si hay error al acceder, probablemente la ventana está cerrada o hay restricciones CORS
+          console.log('Error al verificar ventana - asumiendo cerrada:', e);
+          
+          if (intervalRef.current) {
+            window.clearInterval(intervalRef.current);
+            intervalRef.current = undefined;
+          }
+          
+          setIsExternalAppOpen(false);
+          setWindowJustClosed(true);
+          setShowRadioOptions(true);
+          
+          // Mantener la funcionalidad original: actualizar datos al cerrar la ventana
+          fetchMandatoData('17175966', true);
+          
+          localStorage.removeItem('currentExternalTransaction');
+        }
+      }, 1000) as unknown as number;
+    }
+    
+    // Limpieza al desmontar
+    return () => {
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = undefined;
+      }
     };
-  }, [modalId]);
+  }, [isExternalAppOpen, externalWindow]);
 
   // Verificar al cargar si hay una transacción pendiente
   useEffect(() => {
@@ -225,7 +251,7 @@ const IngresoDocumentosPage: React.FC = () => {
   useEffect(() => {
     if (windowJustClosed && documentsCompleted !== null) {
       // Si seleccionaron "No", reintentar la carga (botón queda habilitado) 
-      // la actualización de datos se ejecutó automáticamente al cerrar la ventana
+      // pero no hacer nada más ya que la actualización de datos se ejecutó automáticamente al cerrar la ventana
       setWindowJustClosed(false);
     }
   }, [documentsCompleted, windowJustClosed]);
@@ -310,9 +336,9 @@ const IngresoDocumentosPage: React.FC = () => {
         >
           <div className="documentos-content">
             <p className="instrucciones">
-              Para cargar el mandato requerido para el proceso de devolución, 
+              Para cargar el mandato requeridos para el proceso de devolución, 
               haga clic en el botón "Cargar Mandatos" a continuación. Se abrirá una 
-              ventana donde podrá seleccionar y subir su cuenta.
+              ventana externa donde podrá seleccionar y subir su cuenta.
             </p>
             
             {/* Mensajes específicos según el estado */}
