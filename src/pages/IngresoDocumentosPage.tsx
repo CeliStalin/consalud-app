@@ -15,6 +15,8 @@ const IngresoDocumentosPage: React.FC = () => {
   const [transactionStatus, setTransactionStatus] = useState<'pending' | 'success' | 'error' | 'cancelled' | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [modalId, setModalId] = useState<string | null>(null);
+
   
   // Estado para la información del mandato
   const [mandatoInfo, setMandatoInfo] = useState<MandatoResult | null>(null);
@@ -37,40 +39,49 @@ const IngresoDocumentosPage: React.FC = () => {
     
     try {
       // Primero, obtener la información actual de la cuenta bancaria
-      // Esto mostrará la información antes de que el usuario interactúe con la app externa
       const rutCliente = '17175966'; // Idealmente esto vendría de tu contexto o props
       await fetchMandatoData(rutCliente);
       
-      // Usamos datos de prueba en lugar de los datos reales
+      // Datos de ejemplo
       const datosEjemplo = {
         empleado: localStorage.getItem('userName') || 'SISTEMA',
         rutafiliado: '17175966-8',
         nombres: 'Ignacio Javier',
         appaterno: 'Quintana',
         apmaterno: 'Asenjo',
-        tipo: 'HER', // Tipo de operación (Heredero)
+        tipo: 'HER',
         transactionId: externalAppService.generateTransactionId()
       };
       
-      // Abrir la aplicación externa usando el servicio
-      const result = await externalAppService.openExternalApp(datosEjemplo);
+      // Usar el nuevo método que crea un modal con iframe
+      const result = await externalAppService.openExternalAppInModal(datosEjemplo);
       
-      // Guardar referencias
-      setExternalWindow(result.window);
+      // Almacenar IDs
+      setModalId(result.modalId);
       setTransactionId(result.transactionId);
       setIsExternalAppOpen(true);
       setTransactionStatus('pending');
       
-      // Agregar un evento beforeunload a la ventana externa para detectar cierre intencional
-      if (result.window) {
-        try {
-          result.window.addEventListener('beforeunload', () => {
-            userClosedRef.current = true;
-          });
-        } catch (e) {
-          console.warn('No se pudo agregar listener a ventana externa (restricciones de CORS)');
+      // Escuchar el evento de cierre del modal
+      const handleExternalAppClosed = (event: CustomEvent) => {
+        if (event.detail.transactionId === result.transactionId) {
+          setIsExternalAppOpen(false);
+          setWindowJustClosed(true);
+          setShowRadioOptions(true);
+          
+          // Actualizar datos
+          fetchMandatoData('17175966', true);
+          
+          // Limpiar tracking
+          localStorage.removeItem('currentExternalTransaction');
+          
+          // Eliminar este listener
+          window.removeEventListener('externalAppClosed', handleExternalAppClosed as EventListener);
         }
-      }
+      };
+      
+      // Añadir listener para el evento de cierre
+      window.addEventListener('externalAppClosed', handleExternalAppClosed as EventListener);
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido al abrir la aplicación externa';
@@ -81,6 +92,7 @@ const IngresoDocumentosPage: React.FC = () => {
       setLoading(false);
     }
   };
+    
 
   // Función para obtener información del mandato
   const fetchMandatoData = async (rutCliente: string = '17175966', refreshData: boolean = false) => {
@@ -144,66 +156,27 @@ const IngresoDocumentosPage: React.FC = () => {
   };
 
   // Verificar periódicamente si la ventana externa ha sido cerrada
-  useEffect(() => {
-    if (isExternalAppOpen && externalWindow) {
-      // Limpiar cualquier intervalo existente
-      if (intervalRef.current) {
-        window.clearInterval(intervalRef.current);
+// Reemplazar el useEffect que verifica el cierre de ventana
+useEffect(() => {
+  // Ya no necesitamos verificar periódicamente si la ventana se cerró
+  // porque ahora estamos usando un evento personalizado
+  
+  // Sin embargo, podríamos tener una limpieza por si acaso
+  return () => {
+    if (modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        document.body.removeChild(modal);
       }
-      
-      // Establecer nuevo intervalo
-      intervalRef.current = window.setInterval(() => {
-        try {
-          // Verificar si la ventana fue cerrada
-          if (externalWindow.closed) {
-            // Detener el intervalo
-            if (intervalRef.current) {
-              window.clearInterval(intervalRef.current);
-              intervalRef.current = undefined;
-            }
-            
-            console.log('La ventana externa fue cerrada - actualizando datos de cuenta bancaria');
-            setIsExternalAppOpen(false);
-            
-            // Marcar que la ventana se acaba de cerrar para mostrar los radio buttons
-            setWindowJustClosed(true);
-            setShowRadioOptions(true);
-            
-            // Mantener la funcionalidad original: actualizar los datos automáticamente al cerrar la ventana
-            fetchMandatoData('17175966', true);
-            
-            // Limpiar tracking
-            localStorage.removeItem('currentExternalTransaction');
-          }
-        } catch (e) {
-          // Si hay error al acceder, probablemente la ventana está cerrada o hay restricciones CORS
-          console.log('Error al verificar ventana - asumiendo cerrada:', e);
-          
-          if (intervalRef.current) {
-            window.clearInterval(intervalRef.current);
-            intervalRef.current = undefined;
-          }
-          
-          setIsExternalAppOpen(false);
-          setWindowJustClosed(true);
-          setShowRadioOptions(true);
-          
-          // Mantener la funcionalidad original: actualizar datos al cerrar la ventana
-          fetchMandatoData('17175966', true);
-          
-          localStorage.removeItem('currentExternalTransaction');
-        }
-      }, 1000) as unknown as number;
     }
     
-    // Limpieza al desmontar
-    return () => {
-      if (intervalRef.current) {
-        window.clearInterval(intervalRef.current);
-        intervalRef.current = undefined;
-      }
-    };
-  }, [isExternalAppOpen, externalWindow]);
+    // Limpiar cualquier intervalo existente (por si acaso)
+    if (intervalRef.current) {
+      window.clearInterval(intervalRef.current);
+      intervalRef.current = undefined;
+    }
+  };
+}, [modalId]);
 
   // Verificar al cargar si hay una transacción pendiente
   useEffect(() => {
