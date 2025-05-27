@@ -2,6 +2,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider, ErrorBoundary, MenuConfigProvider } from '@consalud/core';
 import { AppRoutes } from './routes';
 import './styles/variables.css';
+import './styles/bulma-overrides.css'; // Agregar esta línea
 import TitularProvider from './features/herederos/provider/TitularProvider';
 import HerederoProvider from './features/herederos/provider/HerederoProvider';
 
@@ -33,11 +34,13 @@ const App = () => {
       <AuthProvider>
         <MenuConfigProvider config={{ enableDynamicMenu: true }}>
           <Router>
-            <TitularProvider>
-              <HerederoProvider>
-              <AppRoutes />
-              </HerederoProvider>
-            </TitularProvider>
+            <div className="app-layout-wrapper">
+              <TitularProvider>
+                <HerederoProvider>
+                  <AppRoutes />
+                </HerederoProvider>
+              </TitularProvider>
+            </div>
           </Router>
         </MenuConfigProvider>
       </AuthProvider>

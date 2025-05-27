@@ -5,6 +5,7 @@
   justify-content: center;
   width: 100%;
   padding: 20px 0;
+  min-height: calc(100vh - 200px); /* Asegurar altura mínima */
 }
 
 .ingreso-card {
@@ -58,6 +59,7 @@
   display: flex;
   justify-content: center;
   margin-top: 24px;
+  margin-bottom: 40px; /* Agregar margen inferior */
 }
 
 .nuevo-ingreso-btn {

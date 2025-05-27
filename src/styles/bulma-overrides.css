@@ -1,5 +1,61 @@
 @import './variables.css';
 
+/* Override de Bulma para layout completo */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Asegurar que el contenido principal tome el espacio disponible */
+.main-content {
+  flex: 1;
+  min-height: calc(100vh - 120px); /* Ajustar según altura del header/footer */
+}
+
+/* Override específico para SecureLayout del core */
+.secure-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.secure-layout .content-wrapper {
+  flex: 1;
+  min-height: calc(100vh - 60px - 80px); /* header + footer aproximado */
+}
+
+/* Asegurar que el footer esté al final */
+.footer {
+  margin-top: auto !important;
+}
+
+/* Override para containers de páginas */
+.content-container {
+  min-height: calc(100vh - 200px) !important;
+  padding-bottom: 40px !important;
+}
+
+/* Específico para páginas de herederos */
+.ingreso-herederos-wrapper,
+.main-container,
+.generalContainer {
+  min-height: calc(100vh - 300px);
+}
+
+/* Asegurar que las cards no colapsen el layout */
+.app-card,
+.ingreso-card,
+.form-container {
+  margin-bottom: 40px !important;
+}
+
 .button.is-primary {
   background-color: var(--primary);
 }
