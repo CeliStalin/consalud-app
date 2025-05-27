@@ -71,18 +71,27 @@ export const useRutChileno = () => {
 
 
 
-const handleRutChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue: string = event.target.value;
-    setRut(inputValue);
+  const handleRutChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+  
+    // Limpia el valor (deja solo números y k/K)
+    const limpio = inputValue.replace(/[^0-9kK]/g, '');
+  
+    // Aplica formateo
+    const formateado = formatearRut(limpio);
     
-    const esValido: boolean = validarRut(inputValue);
+    // Setea el valor formateado en el input
+    setRut(formateado);
+  
+    // Valida contra el limpio (sin puntos ni guión)
+    const esValido = validarRut(limpio);
     setIsValid(esValido);
-    
+  
+    // Guarda formateado sólo si es válido (opcional)
     if (esValido) {
-        const formatted: string = formatearRut(inputValue);
-        setFormattedRut(formatted);
+      setFormattedRut(formateado);
     }
-}, [validarRut, formatearRut]);
+  }, [formatearRut, validarRut]);
 
   /**
    * Limpia el RUT y reinicia los estados

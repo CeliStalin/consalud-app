@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SecureLayout } from '@consalud/core';
 import './styles/SuccessPage.css';
+import { Stepper } from '@/features/herederos/components/Stepper';
 
 const SuccessPage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,6 +22,10 @@ const SuccessPage: React.FC = () => {
   
   return (
     <SecureLayout pageTitle="Operación Exitosa" allowedRoles={['USER', 'ADMIN', 'Developers']}>
+      <div className="textoTituloComponentes" style={{ margin: '20px' }}>
+        <span className="titleComponent">¡Listo!</span>
+        </div>
+      <Stepper step={4} />
       <div className="success-container">
         <div className="success-card">
           <div className="success-icon">

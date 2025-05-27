@@ -17,6 +17,25 @@ const IngresoTitular = () => {
     const [showError, setShowError] = useState(false);
     const [touched, setTouched] = useState(false);
     const { titular, buscarTitular, error } = useTitular();
+    
+    const handleNavigator = async() => {
+        const rutLimpio = rut.replace(/[^0-9kK]/g, '');
+        if (!isValidRut) {
+            return;
+        }
+        
+        try {
+            
+            if (error) {
+                return;
+            }
+            console.log("heredero: " + titular)
+        navigator('/mnherederos/ingresoher/formingreso');
+    } catch (err) {
+        console.error(err);
+    }
+    }
+
     const handleBlur = () => {
         setTouched(true);
         setShowError(rut.length > 0 && !isValidRut);
@@ -80,24 +99,26 @@ const IngresoTitular = () => {
                             <path d="M5.99707 5.99734V4.66379C5.99707 3.7424 6.74338 2.99609 7.66476 2.99609H19.3366C20.257 2.99609 21.0033 3.7424 21.0033 4.66379V16.3356C21.0033 17.256 20.257 18.0023 19.3356 18.0023H18.0021" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                         <p className="textoRegistro">
-                            Registrar persona titular
+                            RUT del titular
                         </p>
                     </div>
                     <p className="textoImportante">
-                        Ingresa los datos de la persona titular para la devolución.
+                        Ingresa el RUT del titular que corresponda a una persona afiliada con devolución.
                     </p>
                     <span className="rutText">
                         RUT persona heredera
                     </span>
                     <div className="divRut">
                         <input
-                            id="RutHeredero"
+                            id="RutTitular"
                             type="text"
+                            inputMode="text"
+                            pattern="[0-9kK.-]*"
                             value={rut}
                             onChange={handleRutChange}
                             onBlur={handleBlur}
                             onFocus={handleFocus}
-                            placeholder="Ej: 12345678-9"
+                            placeholder="Ingresar"
                            className="inputRut"
                         />
                         <button 

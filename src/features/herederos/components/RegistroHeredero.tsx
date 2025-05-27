@@ -15,13 +15,13 @@ const RegistroHeredero = () => {
     const navigator = useNavigate();
     const {heredero, buscarHeredero, error} = useHeredero();
     const handleNavigator = async() => {
+        const rutLimpio = rut.replace(/[^0-9kK]/g, '');
         if (!isValidRut) {
             return;
         }
         
         try {
-            console.log(rut)
-            await buscarHeredero(rut);
+            await buscarHeredero(rutLimpio);
             
             if (error) {
                 return;
@@ -73,16 +73,18 @@ const RegistroHeredero = () => {
                         RUT persona heredera
                     </span>
                     <div className="divRut">
-                        <input
-                            id="RutHeredero"
-                            type="text"
-                            value={rut}
-                            onChange={handleRutChange}
-                            onBlur={handleBlur}
-                            onFocus={handleFocus}
-                            placeholder="Ej: 12345678-9"
-                            className="inputRut"
-                        />
+                    <input
+                        id="RutHeredero"
+                        type="text"
+                        inputMode="text"
+                        pattern="[0-9kK.-]*"
+                        value={rut}
+                        onChange={handleRutChange}
+                        onBlur={handleBlur}
+                        onFocus={handleFocus}
+                        placeholder="12.345.678-9"
+                        className="inputRut"
+                    />
                         <button 
                              className={`buttonRut ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}`}  
                             disabled={!isValidRut} 

@@ -1,0 +1,61 @@
+.circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+  
+  .circle.completed {
+    background-color: #00CBBF;
+  }
+  
+  .circle.incomplete {
+    background-color: #D0D0D0;
+  }
+
+  .containerStepper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 862px;
+    gap: 20px;
+    margin: 0 auto;
+  }
+  .lineStepper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+  }
+
+  .flexCenterRelative {
+    position: relative;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+  .progressLine {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    z-index: 0;
+    transform: translate(-50%, -50%);
+  }
+  
+  .progressLine.active {
+    background-color: #00CBBF;
+  }
+  
+  .progressLine.inactive {
+    background-color: #EEEEEE;
+  }
+  .stepperRow {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
