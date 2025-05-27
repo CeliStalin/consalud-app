@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SecureLayout, Card, Button } from '@consalud/core';
 import './styles/IngresoHerederosPage.css';
@@ -6,14 +6,14 @@ import './styles/IngresoHerederosPage.css';
 const IngresoHerederosPage: React.FC = () => {
   const navigate = useNavigate();
   
-  const handleNavigateToForm = () => {
+  const handleNavigateToForm = useCallback(() => {
     navigate('/mnherederos/ingresoher/IngresoDelTitular');
-  };
+  }, [navigate]);
   
   return (
     <SecureLayout pageTitle="Ingreso Herederos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
       <div className="app-content-main">
-        <div className="content-container app-container" style={{ minHeight: '400px', padding: '24px' }}>
+        <div className="app-container">
           <div className="ingreso-herederos-wrapper">
             <Card 
               title="Ingreso de Herederos" 
@@ -27,7 +27,13 @@ const IngresoHerederosPage: React.FC = () => {
                   Bienvenido al módulo de ingreso de herederos. Desde aquí podrás registrar nuevos herederos en el sistema y gestionar su documentación.
                 </p>
                 
-                <div className="card-info-box">
+                <div className="card-info-box app-card" style={{ 
+                  padding: '16px',
+                  backgroundColor: '#f8f9fa',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  margin: '16px 0'
+                }}>
                   <div className="info-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
@@ -38,11 +44,12 @@ const IngresoHerederosPage: React.FC = () => {
                   </p>
                 </div>
                 
-                <div className="button-container">
+                <div className="button-container" style={{ textAlign: 'center', marginTop: '32px' }}>
                   <Button 
                     variant="primary" 
                     onClick={handleNavigateToForm}
                     className="nuevo-ingreso-btn"
+                    style={{ backgroundColor: '#04A59B' }}
                   >
                     <span className="btn-icon">+</span>
                     Nuevo Ingreso

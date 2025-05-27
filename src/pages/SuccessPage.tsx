@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SecureLayout } from '@consalud/core';
 import './styles/SuccessPage.css';
@@ -7,50 +7,40 @@ import { Stepper } from '@/features/herederos/components/Stepper';
 const SuccessPage: React.FC = () => {
   const navigate = useNavigate();
   
-  // Redirección automática después de 5 segundos
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      navigate('/mnherederos/ingresoher');
-    }, 5000);
-    
-    return () => clearTimeout(timer);
+  const handleRedirect = useCallback(() => {
+    navigate('/mnherederos/ingresoher');
   }, [navigate]);
   
-  const handleRedirect = () => {
-    navigate('/mnherederos/ingresoher');
-  };
+  // Redirección automática después de 5 segundos
+  useEffect(() => {
+    const timer = setTimeout(handleRedirect, 5000);
+    return () => clearTimeout(timer);
+  }, [handleRedirect]);
   
   return (
     <SecureLayout pageTitle="Operación Exitosa" allowedRoles={['USER', 'ADMIN', 'Developers']}>
-      <div className="textoTituloComponentes" style={{ margin: '20px' }}>
-        <span className="titleComponent">¡Listo!</span>
-        </div>
-      <Stepper step={4} />
-      <div className="success-container">
-        <div className="success-card">
-          <div className="success-icon">
-            <div className="icon-circle">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="#04A59B">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
-              </svg>
-            </div>
+      <div className="app-content-main">
+        <div className="app-container">
+          <div className="textoTituloComponentes" style={{ margin: '24px' }}>
+            <span className="titleComponent">¡Listo!</span>
           </div>
+          <Stepper step={4} />
           
-          <h2 className="success-title">¡Registro completado exitosamente!</h2>
-          <p className="success-message">
-            Los datos del heredero se han guardado correctamente en el sistema.
-          </p>
-          
-          <button 
-            className="success-button"
-            onClick={handleRedirect}
-          >
-            Volver a Ingreso de Herederos
-          </button>
-          
-          <p className="redirect-text">
-            Serás redirigido automáticamente en unos segundos...
-          </p>
+          <div className="app-card" style={{ textAlign: 'center', marginTop: '32px' }}>
+            <h2 style={{ color: '#04A59B', marginBottom: '16px' }}>
+              Proceso completado exitosamente
+            </h2>
+            <p style={{ marginBottom: '24px' }}>
+              Serás redirigido automáticamente en 5 segundos...
+            </p>
+            <button 
+              className="button is-primary"
+              onClick={handleRedirect}
+              style={{ backgroundColor: '#04A59B' }}
+            >
+              Ir al inicio ahora
+            </button>
+          </div>
         </div>
       </div>
     </SecureLayout>

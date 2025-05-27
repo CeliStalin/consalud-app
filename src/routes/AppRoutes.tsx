@@ -13,7 +13,6 @@ import {
 import { ApiGetMenus } from '@consalud/core';
 import DetalleMandatoPage from '../pages/DetalleMandatoPage';
 
-
 // Importar páginas de la aplicación
 import IngresoHerederosPage from '../pages/IngresoHerederosPage';
 import IngresoHerederoFormPage from '../pages/IngresoHerederoFormPage';
@@ -23,7 +22,8 @@ import { IngresoTitularPage } from '@/pages/IngresoTitularPage';
 import { InfoRequisitosTitularPage } from '@/pages/InfoRequisitosTitularPage';
 import { DatosTitullarPage } from '@/pages/DatosTitularPage';
 import { RegistroTitularPage } from '@/pages/RegistroHerederoPage';
-import { CargaDocumentoPage } from '@/pages/CargaDocumentoPage'
+import { CargaDocumentoPage } from '@/pages/CargaDocumentoPage';
+
 // Mapeo de componentes dinámicos (según los nombres de controlador/acción de la API)
 // Formatos alternativos para incrementar las posibilidades de coincidencia
 const dynamicComponentMap: Record<string, React.ComponentType<any>> = {
@@ -36,7 +36,13 @@ const dynamicComponentMap: Record<string, React.ComponentType<any>> = {
   // Formato sin slash para retrocompatibilidad
   'MnHerederosIngresoHer': IngresoHerederosPage,
   'MnHerederosIngresoDoc': IngresoDocumentosPage,
-  'MnHerederosCargaDoc' : CargaDocumentoPage,
+  'MnHerederosCargaDoc': CargaDocumentoPage,
+  // Nuevas rutas agregadas
+  'MnHerederosRequisitosTitular': InfoRequisitosTitularPage,
+  'MnHerederosIngresoTitular': IngresoTitularPage,
+  'MnHerederosRegistroTitular': RegistroTitularPage,
+  'MnHerederosDetalleMandato': DetalleMandatoPage,
+  'MnHerederosSuccess': SuccessPage,
 };
 
 // rutas estáticas

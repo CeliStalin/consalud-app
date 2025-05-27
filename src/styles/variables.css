@@ -1,24 +1,21 @@
 :root {
-    /* Asegurar compatibilidad con la librería core */
-    --primary: #04A59B;
-    --primary-light: #3DBEB5;
-    --primary-dark: #038C84;
-    --secondary: #6c757d;
-    --success: #28a745;
-    --danger: #dc3545;
-    --warning: #ffc107;
-    --info: #17a2b8;
+    /* Colores principales */
+    --app-primary-color: #04A59B;
+    --app-secondary-color: #00CBBF;
+    --app-success-color: #28a745;
+    --app-danger-color: #dc3545;
+    --app-warning-color: #ffc107;
+    --app-info-color: #17a2b8;
     
-    /* Variables específicas de la aplicación */
-    --app-bg-color: #f8f9fa;
-    --app-text-color: #333333;
+    /* Colores de texto */
+    --app-text-primary: #333333;
+    --app-text-secondary: #666666;
+    --app-text-muted: #999999;
+    
+    /* Bordes y sombras */
     --app-border-radius: 8px;
-    --app-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    
-    /* Variables de layout para evitar problemas con el footer */
-    --app-header-height: 60px;
-    --app-footer-height: 80px;
-    --app-min-content-height: calc(100vh - var(--app-header-height) - var(--app-footer-height));
+    --app-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --app-border-color: #e0e0e0;
     
     /* Espaciado específico de la aplicación */
     --app-spacing-xs: 4px;
@@ -26,6 +23,21 @@
     --app-spacing-md: 16px;
     --app-spacing-lg: 24px;
     --app-spacing-xl: 32px;
+    
+    /* Layout */
+    --app-min-content-height: calc(100vh - 120px);
+    --app-max-width: 1200px;
+    
+    /* Typography */
+    --app-font-size-sm: 0.875rem;
+    --app-font-size-md: 1rem;
+    --app-font-size-lg: 1.125rem;
+    --app-font-size-xl: 1.25rem;
+    
+    /* Z-index */
+    --app-z-modal: 1000;
+    --app-z-dropdown: 100;
+    --app-z-header: 50;
 }
 
 /* Clases de utilidad que puedes usar en toda tu aplicación */
