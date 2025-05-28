@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { SecureLayout, Card, Button } from '@consalud/core';
+import * as ConsaludCore from '@consalud/core';
 import { mandatoSoapService, MandatoResult } from '../features/documentos/services/MandatoSoapService';
 import './styles/DetalleMandatoPage.css';
 
@@ -48,9 +48,9 @@ const DetalleMandatoPage: React.FC = () => {
   };
   
   return (
-    <SecureLayout pageTitle="Detalle de Mandato" allowedRoles={['USER', 'ADMIN', 'Developers']}>
+    <ConsaludCore.SecureLayout pageTitle="Detalle de Mandato" allowedRoles={['USER', 'ADMIN', 'Developers']}>
       <div className="content-container" style={{ minHeight: '400px' }}>
-        <Card 
+        <ConsaludCore.Card 
           title="Información de la Cuenta Bancaria" 
           subtitle="Detalles de la cuenta bancaria registrada para la devolución"
           variant="elevated"
@@ -66,13 +66,13 @@ const DetalleMandatoPage: React.FC = () => {
           ) : error ? (
             <div className="notification is-danger">
               <p>{error}</p>
-              <Button 
+              <ConsaludCore.Button 
                 variant="primary"
                 onClick={handleVolver}
                 className="mt-4"
               >
                 Volver al inicio
-              </Button>
+              </ConsaludCore.Button>
             </div>
           ) : mandatoInfo ? (
               <div className="mandato-detalle">
@@ -158,36 +158,36 @@ const DetalleMandatoPage: React.FC = () => {
               </div>
               
               <div className="has-text-centered buttons-container mt-5">
-                <Button 
+                <ConsaludCore.Button 
                   variant="secondary"
                   onClick={handleVolver}
                   className="mr-3"
                 >
                   Volver
-                </Button>
-                <Button 
+                </ConsaludCore.Button>
+                <ConsaludCore.Button 
                   variant="primary"
                   onClick={handleSiguiente}
                 >
                   Continuar
-                </Button>
+                </ConsaludCore.Button>
               </div>
             </div>
           ) : (
             <div className="has-text-centered p-5">
               <p>No se encontró información de la cuenta bancaria</p>
-              <Button 
+              <ConsaludCore.Button 
                 variant="primary"
                 onClick={handleVolver}
                 className="mt-4"
               >
                 Volver al inicio
-              </Button>
+              </ConsaludCore.Button>
             </div>
           )}
-        </Card>
+        </ConsaludCore.Card>
       </div>
-    </SecureLayout>
+    </ConsaludCore.SecureLayout>
   );
 };
 

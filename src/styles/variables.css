@@ -29,10 +29,11 @@
     --app-max-width: 1200px;
     
     /* Typography */
-    --app-font-size-sm: 0.875rem;
-    --app-font-size-md: 1rem;
-    --app-font-size-lg: 1.125rem;
-    --app-font-size-xl: 1.25rem;
+    /* These might be replaced by FONT_SIZES from @consalud/core */
+    /* --app-font-size-sm: 0.875rem; */
+    /* --app-font-size-md: 1rem; */
+    /* --app-font-size-lg: 1.125rem; */
+    /* --app-font-size-xl: 1.25rem; */
     
     /* Z-index */
     --app-z-modal: 1000;

@@ -1,14 +1,11 @@
-
 import { useNavigate } from "react-router-dom";
 import {  useState } from "react";
+import * as ConsaludCore from '@consalud/core'; 
 import { useRutChileno } from "../hooks/useRutChileno";
 import { UseAlert } from "../hooks/Alert";
 import '../components/styles/ingresoTitular.css';
 import '../components/styles/globalStyle.css'
 import { useTitular } from "../contexts/TitularContext";
-
-
-
 
 
 const IngresoTitular = () => {
@@ -29,7 +26,7 @@ const IngresoTitular = () => {
             if (error) {
                 return;
             }
-            console.log("heredero: " + titular)
+            console.log("heredero: " + titular) // Este console.log parece ser de debugging de la lógica de negocio, lo mantendré por si acaso.
         navigator('/mnherederos/ingresoher/formingreso');
     } catch (err) {
         console.error(err);
@@ -83,9 +80,13 @@ const IngresoTitular = () => {
     return (
         <>
             <div className="textoTituloComponentes">
-                <span className="titleComponent">
-                    Registrar persona titular
-                </span>
+                {ConsaludCore.Typography ? (
+                    <ConsaludCore.Typography variant="h5" component="span" fontWeight={ConsaludCore.FONT_WEIGHTS?.BOLD} color={ConsaludCore.theme?.textColors?.primary || "#505050"}>
+                        Registrar persona titular
+                    </ConsaludCore.Typography>
+                ) : (
+                    <span>Registrar persona titular</span> // Fallback simple si Typography aún no está disponible
+                )}
             </div>
 
 
@@ -93,21 +94,31 @@ const IngresoTitular = () => {
                 <div className="containerIcono">
                     <div className="iconoGenerico">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M16.3346 21.0043H4.66379C3.7424 21.0043 2.99609 20.258 2.99609 19.3366V7.66574C2.99609 6.74436 3.7424 5.99805 4.66379 5.99805H16.3356C17.256 5.99805 18.0023 6.74436 18.0023 7.66574V19.3376C18.0023 20.258 17.256 21.0043 16.3346 21.0043Z" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M12.2682 10.1643C13.2446 11.1407 13.2446 12.7244 12.2682 13.7018C11.2918 14.6782 9.70813 14.6782 8.73073 13.7018C7.75332 12.7254 7.75432 11.1417 8.73073 10.1643C9.70713 9.18691 11.2908 9.18791 12.2682 10.1643" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M15.0008 18.4362C14.8698 18.107 14.6667 17.8109 14.4066 17.5698V17.5698C13.9674 17.1616 13.3922 16.9355 12.7919 16.9355C11.7915 16.9355 9.20641 16.9355 8.20599 16.9355C7.60574 16.9355 7.0315 17.1626 6.59132 17.5698V17.5698C6.33121 17.8109 6.12812 18.107 5.99707 18.4362" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M5.99707 5.99734V4.66379C5.99707 3.7424 6.74338 2.99609 7.66476 2.99609H19.3366C20.257 2.99609 21.0033 3.7424 21.0033 4.66379V16.3356C21.0033 17.256 20.257 18.0023 19.3356 18.0023H18.0021" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M17 21V19C17 17.8954 16.1046 17 15 17H9C7.89543 17 7 17.8954 7 19V21" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M12 13C14.2091 13 16 11.2091 16 9C16 6.79086 14.2091 5 12 5C9.79086 5 8 6.79086 8 9C8 11.2091 9.79086 13 12 13Z" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                        <p className="textoRegistro">
-                            RUT del titular
-                        </p>
+                        {ConsaludCore.Typography ? (
+                            <ConsaludCore.Typography variant="body1" component="p" fontWeight={ConsaludCore.FONT_WEIGHTS?.MEDIUM} color={ConsaludCore.theme?.textColors?.primary || "#505050"}>
+                                RUT del titular
+                            </ConsaludCore.Typography>
+                        ) : (
+                            <p>RUT del titular</p>
+                        )}
                     </div>
-                    <p className="textoImportante">
-                        Ingresa el RUT del titular que corresponda a una persona afiliada con devolución.
-                    </p>
-                    <span className="rutText">
-                        RUT persona heredera
-                    </span>
+                    {ConsaludCore.Typography ? (
+                        <ConsaludCore.Typography variant="caption" component="p" color={ConsaludCore.theme?.textColors?.secondary || "#656565"} className="textoImportante">
+                            Ingresa el RUT del titular que corresponda a una persona afiliada con devolución.
+                        </ConsaludCore.Typography>
+                    ) : (
+                        <p className="textoImportante">Ingresa el RUT del titular que corresponda a una persona afiliada con devolución.</p>
+                    )}
+                    {ConsaludCore.Typography ? (
+                        <ConsaludCore.Typography variant="caption" component="span" fontWeight={ConsaludCore.FONT_WEIGHTS?.MEDIUM} color={ConsaludCore.theme?.textColors?.muted || "#808080"} className="rutText">
+                            RUT persona heredera
+                        </ConsaludCore.Typography>
+                    ) : (
+                        <span className="rutText">RUT persona heredera</span>
+                    )}
                     <div className="divRut">
                         <input
                             id="RutTitular"
@@ -126,20 +137,30 @@ const IngresoTitular = () => {
                             disabled={!isValidRut} 
                             onClick={handleFlow}
                         > 
-                            Buscar
+                            {ConsaludCore.Typography ? (
+                                <ConsaludCore.Typography variant="button" color={isValidRut ? (ConsaludCore.theme?.textColors?.white || "#FFFFFF") : (ConsaludCore.theme?.textColors?.white || "#FFF")}>
+                                    Buscar
+                                </ConsaludCore.Typography>
+                            ) : (
+                                "Buscar"
+                            )}
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
-                                <path d="M15.7138 7.3382C18.1647 9.78913 18.1647 13.7629 15.7138 16.2138C13.2629 18.6647 9.28913 18.6647 6.8382 16.2138C4.38727 13.7629 4.38727 9.78913 6.8382 7.3382C9.28913 4.88727 13.2629 4.88727 15.7138 7.3382" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M19 19.5009L15.71 16.2109" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M11 19.5C15.4183 19.5 19 15.9183 19 11.5C19 7.08172 15.4183 3.5 11 3.5C6.58172 3.5 3 7.08172 3 11.5C3 15.9183 6.58172 19.5 11 19.5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M21 21.5L16.65 17.15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                         </button>
                     </div>
            
 
                     {showError && (
-                                    <span className="errorRut">
-                                        RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
-                                    </span>
-                                )}
+                        ConsaludCore.Typography ? (
+                            <ConsaludCore.Typography variant="caption" color={ConsaludCore.theme?.colors?.danger || "#E11D48"} className="errorRut">
+                                RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
+                            </ConsaludCore.Typography>
+                        ) : (
+                            <span className="errorRut" style={{color: ConsaludCore.theme?.colors?.danger || "#E11D48"}}>RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)</span>
+                        )
+                    )}
                 </div>
                 
             </div>

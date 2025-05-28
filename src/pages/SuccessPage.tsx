@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SecureLayout } from '@consalud/core';
+import * as ConsaludCore from '@consalud/core';
 import './styles/SuccessPage.css';
 import { Stepper } from '@/features/herederos/components/Stepper';
 
@@ -18,11 +18,19 @@ const SuccessPage: React.FC = () => {
   }, [handleRedirect]);
   
   return (
-    <SecureLayout pageTitle="Operación Exitosa" allowedRoles={['USER', 'ADMIN', 'Developers']}>
+    <ConsaludCore.SecureLayout pageTitle="Operación Exitosa" allowedRoles={['USER', 'ADMIN', 'Developers']}>
       <div className="app-content-main">
         <div className="app-container">
           <div className="textoTituloComponentes" style={{ margin: '24px' }}>
-            <span className="titleComponent">¡Listo!</span>
+            <ConsaludCore.Typography 
+              variant="h4" 
+              component="span" 
+              fontWeight={ConsaludCore.FONT_WEIGHTS?.BOLD} 
+              color={ConsaludCore.theme?.textColors?.primary || "#505050"} 
+              className="titleComponent"
+            >
+              ¡Listo!
+            </ConsaludCore.Typography>
           </div>
           <Stepper step={4} />
           
@@ -43,7 +51,7 @@ const SuccessPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </SecureLayout>
+    </ConsaludCore.SecureLayout>
   );
 };
 

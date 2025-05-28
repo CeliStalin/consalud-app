@@ -1,4 +1,5 @@
 import { StepperProps } from "../interfaces/StepperProps";
+import * as ConsaludCore from '@consalud/core';
 import './styles/Stepper.css'
 
 const Stepper = ({ step }: StepperProps) => {
@@ -75,10 +76,22 @@ const Stepper = ({ step }: StepperProps) => {
       >
         {steps.map((s, index) => (
           <div key={index} style={{ textAlign: "center", width: "100%" }}>
-            <div style={{ fontWeight: "bold", fontSize: "14px", color: "#505050" }}>
+            <ConsaludCore.Typography 
+              variant="body2" 
+              fontWeight={ConsaludCore.FONT_WEIGHTS?.BOLD} 
+              fontSize={ConsaludCore.FONT_SIZES?.SM} 
+              color={ConsaludCore.theme?.textColors?.primary || "#505050"}
+              gutterBottom
+            >
               {s.title}
-            </div>
-            <div style={{ fontSize: "12px", color: "#909090" }}>{s.description}</div>
+            </ConsaludCore.Typography>
+            <ConsaludCore.Typography 
+              variant="caption" 
+              fontSize={ConsaludCore.FONT_SIZES?.XS} 
+              color={ConsaludCore.theme?.textColors?.muted || "#909090"}
+            >
+              {s.description}
+            </ConsaludCore.Typography>
           </div>
         ))}
       </div>

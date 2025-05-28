@@ -1,16 +1,14 @@
 import React from 'react';
-import { SecureLayout } from '@consalud/core';
+import * as ConsaludCore from '@consalud/core'; // Cambiado para usar el alias
 import { CargaDocumento } from '@/features/herederos/components/CargaDocumento'
 
 
 const CargaDocumentoPage: React.FC = () => {
   return (
-    <SecureLayout pageTitle="Carga Documentos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
+    <ConsaludCore.SecureLayout pageTitle="Carga Documentos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
       <CargaDocumento />
-    </SecureLayout>
+    </ConsaludCore.SecureLayout>
   );
 };
 
-export { 
-  CargaDocumentoPage
-};
+export default CargaDocumentoPage; // Asegurar export default si se usa con React.lazy

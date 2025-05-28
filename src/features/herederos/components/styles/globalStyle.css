@@ -1,8 +1,8 @@
 .titleComponent {
-    font-family: 'Work Sans';
-    font-size: 24px;
-    font-weight: 700;
-    color: #505050;
+    /* font-family: 'Work Sans'; */
+    /* font-size: 24px; */
+    /* font-weight: 700; */
+    /* color: #505050; */
 }
 
 .datosTitularContainer {
@@ -49,12 +49,12 @@
     gap: 8px;
 }
 .textoTitulo {
-    color: #505050;
-    font-family: "Work Sans";
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 19px;
+    /* color: #505050; */
+    /* font-family: "Work Sans"; */
+    /* font-size: 16px; */
+    /* font-style: normal; */
+    /* font-weight: 500; */
+    /* line-height: 19px; */
 }
 
 .iconCheck {
@@ -65,9 +65,9 @@
 }
 
 .textoImportante {
-    font-size: 14px;
-    color: #656565;
-    font-family: 'Source Sans Pro';
+    /* font-size: 14px; */
+    /* color: #656565; */
+    /* font-family: 'Source Sans Pro'; */
     align-self: flex-start;
 }
 
@@ -109,27 +109,27 @@
     gap: 8px;
 }
 .textToDataTitular {
-    font-family: 'Work Sans', sans-serif;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-    color: #505050;
+    /* font-family: 'Work Sans', sans-serif; */
+    /* font-size: 16px; */
+    /* font-style: normal; */
+    /* font-weight: 500; */
+    /* line-height: normal; */
+    /* color: #505050; */
 }
 
 .subTituloRitular {
-    font-family: 'Source Sans Pro';
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px;
+    /* font-family: 'Source Sans Pro'; */
+    /* font-size: 14px; */
+    /* font-style: normal; */
+    /* font-weight: 400; */
+    /* line-height: 18px; */
 }
 
 .rutText {
-    font-size: 14px;
-    font-weight: 500;
-    color: #808080;
-    font-family: 'Work Sans', sans-serif;
+    /* font-size: 14px; */
+    /* font-weight: 500; */
+    /* color: #808080; */
+    /* font-family: 'Work Sans', sans-serif; */
     align-self: flex-start;
     margin-bottom: -25px;
 }
@@ -145,10 +145,10 @@
     margin-top: 50px;
 }
 .textoRegistro {
-    font-family: 'Work Sans';
-    font-size: 16px;
-    font-weight: 500;
-    color: #505050;
+    /* font-family: 'Work Sans'; */
+    /* font-size: 16px; */
+    /* font-weight: 500; */
+    /* color: #505050; */
 
 }
 .textoTituloComponentes {
@@ -157,13 +157,13 @@
     padding-top: 32px;
 }
 .buttonRequisitos {
-    background-color: #04A59B;
-    color: #FFFFFF;
+    background-color: var(--app-primary-color); /* Use theme color if available */
+    color: #FFFFFF; /* Use theme color if available */
     border: none;
     border-radius: 24px;
     padding: 12px 24px;
-    font-weight: 600;
-    font-size: 16px;
+    /* font-weight: 600; */ /* Handled by Typography */
+    /* font-size: 16px; */ /* Handled by Typography */
     cursor: pointer;
     box-shadow: 0px 2px 14px 4px rgba(208, 208, 208, 0.35);
     opacity: 1;
@@ -191,7 +191,7 @@
     margin: 16px;
 }
 .colortextButton{
-        color: #FFFFFF
+        /* color: #FFFFFF */ /* Handled by Typography */
 }
 .datosTitular {
     border-radius: 10px;
@@ -211,11 +211,11 @@
 }
 
 .errorRut {
-    color: #E11D48;
-    font-size: 12px;
+    /* color: #E11D48; */ /* Use theme.colors.danger or similar */
+    /* font-size: 12px; */
     margin-top: -21px;
     margin-left: 16px;
-    font-family: 'Work Sans', sans-serif;
+    /* font-family: 'Work Sans', sans-serif; */
     align-self: flex-start;
 }
 .inputRut {
@@ -232,8 +232,8 @@
     border: none;
     border-radius: 24px;
     padding: 12px 24px;
-    font-weight: 600;
-    font-size: 16px;
+    /* font-weight: 600; */
+    /* font-size: 16px; */
     box-shadow: 0px 2px 14px 4px rgba(208, 208, 208, 0.35);
     display: flex;
     align-items: center;
@@ -242,16 +242,16 @@
 
 
 .buttonRut--valid {
-    background-color: #04A59B;
-    color: #FFFFFF;
+    background-color: var(--app-primary-color); /* Use theme color */
+    /* color: #FFFFFF; */ /* Handled by Typography */
     cursor: pointer;
     opacity: 1;
 }
 
 /* Estilo cuando el RUT NO es válido */
 .buttonRut--invalid {
-    background-color: #B1EAEA;
-    color: #FFF;
+    background-color: #B1EAEA; /* Use theme color */
+    /* color: #FFF; */ /* Handled by Typography */
     cursor: not-allowed;
     opacity: 0.7;
 }
@@ -277,31 +277,31 @@
     align-self: stretch;
 }
 .textoCargaDocumento {
-    color: var(--Colores-Nueva-SD-Medio-Gris-Medio, #656565);
+    /* color: var(--Colores-Nueva-SD-Medio-Gris-Medio, #656565); */ /* Use theme text color */
     text-align: center;
     /* Párrafo (transversal)/P.Pequeño Bold */
-    font-family: "Source Sans Pro";
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 18px; /* 150% */
-    color: var(--Colores-Nueva-SD-Medio-Gris-Medio, #656565);
+    /* font-family: "Source Sans Pro"; */
+    /* font-size: 12px; */
+    /* font-style: normal; */
+    /* font-weight: 700; */
+    /* line-height: 18px; */ /* 150% */
+    /* color: var(--Colores-Nueva-SD-Medio-Gris-Medio, #656565); */
     /* Párrafo (transversal)/P. Pequeño */
-    font-family: "Source Sans Pro";
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px;
+    /* font-family: "Source Sans Pro"; */
+    /* font-size: 12px; */
+    /* font-style: normal; */
+    /* font-weight: 400; */
+    /* line-height: 18px; */
 }
 
 .labelCargaDocumento{
-    color: var(--Colores-Nueva-SD-Medio-Gris-Medio, #656565);
+    /* color: var(--Colores-Nueva-SD-Medio-Gris-Medio, #656565); */ /* Use theme text color */
     /* Párrafo (transversal)/P.Normal */
-    font-family: "Source Sans Pro";
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px; /* 128.571% */
+    /* font-family: "Source Sans Pro"; */
+    /* font-size: 14px; */
+    /* font-style: normal; */
+    /* font-weight: 400; */
+    /* line-height: 18px; */ /* 128.571% */
 }
 
 .divDeclaroCargaDocumento {
@@ -322,23 +322,23 @@
 }
 
 .divTextoObligatorioCargaDocumento{
-    color: var(--Colores-Nueva-SD-Oscuro-Gris-Oscuro, #505050);
+    /* color: var(--Colores-Nueva-SD-Oscuro-Gris-Oscuro, #505050); */ /* Use theme text color */
     /* Párrafo (transversal)/P.Normal Bold */
-    font-family: "Source Sans Pro";
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 18px; /* 128.571% */
+    /* font-family: "Source Sans Pro"; */
+    /* font-size: 14px; */
+    /* font-style: normal; */
+    /* font-weight: 700; */
+    /* line-height: 18px; */ /* 128.571% */
 }
 
 .divTextoObligatorioRojoCargaDocumento{
-    color: var(--colores-nueva-sd-secundarios-rojo-alternativo, #FF5252);
+    /* color: var(--colores-nueva-sd-secundarios-rojo-alternativo, #FF5252); */ /* Use theme.colors.danger */
     /* Párrafo (transversal)/P.Normal Bold */
-    font-family: "Source Sans Pro";
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 18px;
+    /* font-family: "Source Sans Pro"; */
+    /* font-size: 14px; */
+    /* font-style: normal;
+    /* font-weight: 700; */
+    /* line-height: 18px; */
 }
 
 .divTextoObligatorio{
@@ -360,14 +360,14 @@
 }
 
 .textoEjemploCargaDocumento{
-    color: var(--Colores-Nueva-SD-Medio-Verde-Medio, #04A59B);
+    /* color: var(--Colores-Nueva-SD-Medio-Verde-Medio, #04A59B); */ /* Use theme.colors.primary */
     text-align: right;
     /* Párrafo (transversal)/P.Normal Bold */
-    font-family: "Source Sans Pro";
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 18px; /* 128.571% */
+    /* font-family: "Source Sans Pro"; */
+    /* font-size: 14px; */
+    /* font-style: normal; */
+    /* font-weight: 700; */
+    /* line-height: 18px; */ /* 128.571% */
 }
 
 .textoEjemploIconCargaDocumento{

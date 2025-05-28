@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SecureLayout, Card, Button } from '@consalud/core';
+import * as ConsaludCore from '@consalud/core';
 import { useNavigate } from 'react-router-dom';
 import { externalAppService } from '../features/documentos/services/ExternalAppService';
 import { mandatoSoapService, MandatoResult } from '../features/documentos/services/MandatoSoapService';
@@ -326,9 +326,9 @@ const IngresoDocumentosPage: React.FC = () => {
   };
 
   return (
-    <SecureLayout pageTitle="Ingreso Documentos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
+    <ConsaludCore.SecureLayout pageTitle="Ingreso Documentos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
       <div className="content-container" style={{ minHeight: '400px' }}>
-        <Card 
+        <ConsaludCore.Card 
           title="Ingreso de Documentos" 
           subtitle="Gestión de documentación"
           variant="elevated"
@@ -427,7 +427,7 @@ const IngresoDocumentosPage: React.FC = () => {
             
             <div className="documentos-actions">
               {/* Botón para iniciar el proceso externo */}
-              <Button 
+              <ConsaludCore.Button 
                 variant="primary"
                 loading={loading}
                 disabled={isExternalAppOpen || loading || 
@@ -436,7 +436,7 @@ const IngresoDocumentosPage: React.FC = () => {
                 className="cargar-documentos-btn"
               >
                 {isExternalAppOpen ? 'Procesando en otra ventana...' : 'Cargar Mandatos'}
-              </Button>
+              </ConsaludCore.Button>
               
               {/* Mostrar este mensaje mientras la ventana externa está abierta */}
               {isExternalAppOpen && (
@@ -469,30 +469,30 @@ const IngresoDocumentosPage: React.FC = () => {
               
               {/* Botón para continuar después de completar el proceso exitosamente */}
               {transactionStatus === 'success' && (
-                <Button 
+                <ConsaludCore.Button 
                   variant="primary"
                   onClick={handleContinue}
                   className="continuar-btn mt-4"
                 >
                   Continuar
-                </Button>
+                </ConsaludCore.Button>
               )}
               
               {/* Botón para reintentar si hubo un error o cancelación */}
               {(transactionStatus === 'error' || transactionStatus === 'cancelled') && (
-                <Button 
+                <ConsaludCore.Button 
                   variant="secondary"
                   onClick={handleRetry}
                   className="retry-btn mt-3"
                 >
                   Intentar de nuevo
-                </Button>
+                </ConsaludCore.Button>
               )}
             </div>
           </div>
-        </Card>
+        </ConsaludCore.Card>
       </div>
-    </SecureLayout>
+    </ConsaludCore.SecureLayout>
   );
 };
 

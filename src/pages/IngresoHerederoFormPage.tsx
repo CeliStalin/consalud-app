@@ -1,13 +1,13 @@
 import React from 'react';
-import { SecureLayout } from '@consalud/core';
+import * as ConsaludCore from '@consalud/core'; // Cambiado para usar el alias
 import FormIngresoHeredero from '../features/herederos/components/FormIngresoHeredero';
 
 
 const IngresoHerederoFormPage: React.FC = () => {
   return (
-    <SecureLayout pageTitle="Ingreso Herederos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
+    <ConsaludCore.SecureLayout pageTitle="Ingreso Herederos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
       <FormIngresoHeredero />
-    </SecureLayout>
+    </ConsaludCore.SecureLayout>
   );
 };
 

@@ -1,16 +1,20 @@
 import React from 'react';
-import { SecureLayout } from '@consalud/core';
+import * as ConsaludCore from '@consalud/core';
 import { RegistroHeredero } from '@/features/herederos/components/RegistroHeredero';
 
-
-const RegistroTitularPage: React.FC = () => {
+const RegistroHerederoPage: React.FC = () => {
   return (
-    <SecureLayout pageTitle="Ingreso Herederos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
-      <RegistroHeredero />
-    </SecureLayout>
+    <ConsaludCore.SecureLayout 
+      pageTitle="Registro de Heredero" 
+      allowedRoles={['USER', 'ADMIN', 'Developers']}
+    >
+      <div className="app-content-main">
+        <div className="app-container">
+          <RegistroHeredero />
+        </div>
+      </div>
+    </ConsaludCore.SecureLayout>
   );
 };
 
-export { 
-    RegistroTitularPage
-};
+export default RegistroHerederoPage;

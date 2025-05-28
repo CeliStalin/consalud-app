@@ -1,21 +1,21 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SecureLayout, Card, Button } from '@consalud/core';
+import * as ConsaludCore from '@consalud/core';
 import './styles/IngresoHerederosPage.css';
 
 const IngresoHerederosPage: React.FC = () => {
   const navigate = useNavigate();
-  
-  const handleNavigateToForm = useCallback(() => {
-    navigate('/mnherederos/ingresoher/IngresoDelTitular');
-  }, [navigate]);
+
+  const handleNavigateToForm = () => {
+    navigate('/mnherederos/ingresoher/ingresotitular');
+  };
   
   return (
-    <SecureLayout pageTitle="Ingreso Herederos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
+    <ConsaludCore.SecureLayout pageTitle="Ingreso Herederos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
       <div className="app-content-main">
         <div className="app-container">
           <div className="ingreso-herederos-wrapper">
-            <Card 
+            <ConsaludCore.Card 
               title="Ingreso de Herederos" 
               subtitle="Gestión de beneficiarios"
               variant="elevated"
@@ -23,14 +23,11 @@ const IngresoHerederosPage: React.FC = () => {
               className="ingreso-card"
             >
               <div className="card-content">
-                <p className="card-description">
-                  Bienvenido al módulo de ingreso de herederos. Desde aquí podrás registrar nuevos herederos en el sistema y gestionar su documentación.
-                </p>
                 
                 <div className="card-info-box app-card" style={{ 
                   padding: '16px',
-                  backgroundColor: '#f8f9fa',
-                  border: '1px solid #e0e0e0',
+                  backgroundColor: ConsaludCore.theme?.colors?.background || '#f8f9fa',
+                  border: `1px solid ${ConsaludCore.theme?.colors?.border || '#e0e0e0'}`,
                   borderRadius: '8px',
                   margin: '16px 0'
                 }}>
@@ -45,22 +42,21 @@ const IngresoHerederosPage: React.FC = () => {
                 </div>
                 
                 <div className="button-container" style={{ textAlign: 'center', marginTop: '32px' }}>
-                  <Button 
+                  <ConsaludCore.Button 
                     variant="primary" 
                     onClick={handleNavigateToForm}
                     className="nuevo-ingreso-btn"
-                    style={{ backgroundColor: '#04A59B' }}
                   >
                     <span className="btn-icon">+</span>
                     Nuevo Ingreso
-                  </Button>
+                  </ConsaludCore.Button>
                 </div>
               </div>
-            </Card>
+            </ConsaludCore.Card>
           </div>
         </div>
       </div>
-    </SecureLayout>
+    </ConsaludCore.SecureLayout>
   );
 };
 

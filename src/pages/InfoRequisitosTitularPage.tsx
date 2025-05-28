@@ -1,16 +1,14 @@
 import React from 'react';
-import { SecureLayout } from '@consalud/core';
+import * as ConsaludCore from '@consalud/core'; // Cambiado para usar el alias
 import { RequisitosTitular } from '@/features/herederos/components/RequisitosTitular';
 
 
 const InfoRequisitosTitularPage: React.FC = () => {
   return (
-    <SecureLayout pageTitle="Ingreso Herederos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
+    <ConsaludCore.SecureLayout pageTitle="Requisitos del Titular" allowedRoles={['USER', 'ADMIN', 'Developers']}>
       <RequisitosTitular />
-    </SecureLayout>
+    </ConsaludCore.SecureLayout>
   );
 };
 
-export { 
-    InfoRequisitosTitularPage
-};
+export default InfoRequisitosTitularPage; // Cambiado a export default

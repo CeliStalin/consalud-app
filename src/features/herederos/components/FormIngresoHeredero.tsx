@@ -4,7 +4,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { es, he } from 'date-fns/locale';
 import './styles/FormHeredero.css';
-import { DocumentsFileCheckmarkSvg,MapsSvg,} from '@consalud/core'; 
+import * as ConsaludCore from '@consalud/core'; 
 import { Stepper } from './Stepper';
 import { useHeredero } from '../contexts/HerederoContext';
 
@@ -237,7 +237,7 @@ const FormIngresoHeredero: React.FC = () => {
             <div className="form-section">
               <div className="section-title">
               <img 
-                src={DocumentsFileCheckmarkSvg} 
+                src={ConsaludCore.DocumentsFileCheckmarkSvg} 
                 alt="Datos personales"
                 className="section-icon"
                 style={{ width: '24px', height: '24px' }} 
@@ -406,7 +406,7 @@ const FormIngresoHeredero: React.FC = () => {
             <div className="form-section">
               <div className="section-title">
               <img 
-                src={MapsSvg} 
+                src={ConsaludCore.MapsSvg} 
                 alt="Datos personales"
                 className="section-icon"
                 style={{ width: '24px', height: '24px' }} 
