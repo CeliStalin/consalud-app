@@ -39,14 +39,14 @@ const ErrorFallback = () => {
 
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
-      <ConsaludCore.Typography variant="h2" gutterBottom>¡Ups! Algo salió mal</ConsaludCore.Typography>
-      <ConsaludCore.Typography variant="body1" gutterBottom>Ha ocurrido un error inesperado. Intente recargar la página.</ConsaludCore.Typography>
+      <ConsaludCore.Typography variant="h2" style={{ marginBottom: '16px' }}>¡Ups! Algo salió mal</ConsaludCore.Typography>
+      <ConsaludCore.Typography variant="body" style={{ marginBottom: '16px' }}>Ha ocurrido un error inesperado. Intente recargar la página.</ConsaludCore.Typography>
       <button 
         onClick={() => window.location.reload()}
         style={{
           padding: '8px 16px',
           backgroundColor: ConsaludCore.theme?.colors?.primary || '#04A59B', 
-          color: ConsaludCore.theme?.textColors?.white || 'white', 
+          color: ConsaludCore.theme?.colors?.white || 'white', 
           border: 'none',
           borderRadius: '4px',
           cursor: 'pointer',

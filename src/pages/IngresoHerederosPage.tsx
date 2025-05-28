@@ -26,8 +26,8 @@ const IngresoHerederosPage: React.FC = () => {
                 
                 <div className="card-info-box app-card" style={{ 
                   padding: '16px',
-                  backgroundColor: ConsaludCore.theme?.colors?.background || '#f8f9fa',
-                  border: `1px solid ${ConsaludCore.theme?.colors?.border || '#e0e0e0'}`,
+                  backgroundColor: ConsaludCore.theme?.colors?.gray?.light || '#f8f9fa',
+                  border: `1px solid ${ConsaludCore.theme?.colors?.gray?.medium || '#e0e0e0'}`,
                   borderRadius: '8px',
                   margin: '16px 0'
                 }}>
