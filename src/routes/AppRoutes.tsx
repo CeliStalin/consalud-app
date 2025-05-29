@@ -13,15 +13,7 @@ const IngresoDocumentosPage = React.lazy(() => import('../pages/IngresoDocumento
 const SuccessPage = React.lazy(() => import('../pages/SuccessPage'));
 const DetalleMandatoPage = React.lazy(() => import('../pages/DetalleMandatoPage'));
 
-// Define a basic interface for MenuItem. Ideally, this would come from @consalud/core
-// or be defined based on the actual structure of menu items from ApiGetMenus.
-// interface MenuItem {
-//   id: string | number; // Example property
-//   label: string;       // Example property
-//   path: string;        // Example property
-//   // Add other relevant properties like 'icon', 'children', etc.
-// }
-
+// Componente principal de rutas de la aplicación
 export const AppRoutes = () => {
   const { isSignedIn, isInitializing, loading } = ConsaludCore.useAuth();
 
@@ -83,6 +75,11 @@ export const AppRoutes = () => {
         <Route path="/mnherederos/ingresoher/DatosTitular" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <DatosTitularPage />
+          </ConsaludCore.PrivateRoute>
+        } />
+        <Route path="/mnherederos/ingresoher/RegistroTitular" element={
+          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
+            <IngresoHerederoFormPage />
           </ConsaludCore.PrivateRoute>
         } />
         <Route path="/mnherederos/ingresoher/RegistroHeredero" element={

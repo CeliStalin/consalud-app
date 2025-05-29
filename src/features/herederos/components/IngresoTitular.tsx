@@ -14,24 +14,6 @@ const IngresoTitular = () => {
     const [showError, setShowError] = useState(false);
     const [touched, setTouched] = useState(false);
     const { titular, buscarTitular, error } = useTitular();
-    
-    const handleNavigator = async() => {
-        const rutLimpio = rut.replace(/[^0-9kK]/g, '');
-        if (!isValidRut) {
-            return;
-        }
-        
-        try {
-            
-            if (error) {
-                return;
-            }
-            console.log("heredero: " + titular) // Este console.log parece ser de debugging de la lógica de negocio, lo mantendré por si acaso.
-        navigator('/mnherederos/ingresoher/formingreso');
-    } catch (err) {
-        console.error(err);
-    }
-    }
 
     const handleBlur = () => {
         setTouched(true);

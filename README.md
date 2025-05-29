@@ -74,8 +74,9 @@ La aplicación implementa un sistema de rutas dinámico basado en los permisos d
 
 - `/login` - Página de inicio de sesión
 - `/home` - Página principal tras el login
-- `/MnHerederos/ingresoHer` - Ingreso de herederos
-- `/MnHerederos/ingresoDoc` - Ingreso de documentación
+- `/mnherederos/ingresoher` - Ingreso de herederos (página principal del módulo de herederos)
+- `/mnherederos/ingresoher/ingresotitular` - Ingreso de RUT del titular (carga `IngresoTitularPage`)
+- `/mnherederos/ingresoher/cargadoc` - Ingreso de documentación (carga `IngresoDocumentosPage`)
 
 ## 📚 Librería Core
 
