@@ -21,7 +21,7 @@
     "date-fns": "^2.30.0",
     "express": "^5.1.0",
     "react": "^19.0.0",
-    "react-datepicker": "^4.21.0",
+    "react-datepicker": "^8.4.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.5.3",
     "sweetalert2": "^11.21.0",

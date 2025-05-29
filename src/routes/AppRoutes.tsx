@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
 
@@ -23,35 +23,20 @@ const DetalleMandatoPage = React.lazy(() => import('../pages/DetalleMandatoPage'
 // }
 
 export const AppRoutes = () => {
-  const { isAuthenticated, userRoles, isLoading } = ConsaludCore.useAuth();
-  const [menuItems, setMenuItems] = useState<ConsaludCore.ElementMenu[]>([]);
+  const { isSignedIn, isInitializing, loading } = ConsaludCore.useAuth();
 
-  useEffect(() => {
-    const fetchMenu = async () => {
-      if (isAuthenticated) {
-        try {
-          const data = await ConsaludCore.ApiGetMenus();
-          setMenuItems(data);
-        } catch (error) {
-          console.error("Error fetching menu:", error);
-        }
-      }
-    };
-    fetchMenu();
-  }, [isAuthenticated]);
-
-  if (isLoading) {
-    return <ConsaludCore.LoadingOverlay isActive={true} text="Cargando aplicación..." />;
+  if (isInitializing || loading) {
+    return <ConsaludCore.LoadingOverlay show={true} message="Cargando aplicación..." />;
   }
 
   return (
-    <Suspense fallback={<ConsaludCore.LoadingOverlay isActive={true} text="Cargando página..." />}>
+    <Suspense fallback={<ConsaludCore.LoadingOverlay show={true} message="Cargando página..." />}>
       <Routes>
         {/* Rutas Públicas */}
         <Route 
           path="/login" 
           element={
-            <ConsaludCore.PublicRoute isAuthenticated={isAuthenticated}>
+            <ConsaludCore.PublicRoute>
               <ConsaludCore.Login 
                 appName="Mi Aplicación Consalud" 
                 logoSrc="/path/to/your/logo.png" // Reemplaza con la ruta a tu logo
@@ -65,7 +50,7 @@ export const AppRoutes = () => {
         <Route 
           path="/" 
           element={
-            isAuthenticated ? <Navigate to="/home" /> : <Navigate to="/login" />
+            isSignedIn ? <Navigate to="/home" /> : <Navigate to="/login" />
           } 
         />
         
@@ -73,58 +58,55 @@ export const AppRoutes = () => {
         <Route 
           path="/home"
           element={
-            <ConsaludCore.PrivateRoute isAuthenticated={isAuthenticated} userRoles={userRoles} allowedRoles={['USER', 'ADMIN', 'Developers']}>
-              <ConsaludCore.HomePage 
-                userName={localStorage.getItem('userName') || 'Usuario'} 
-                menuItems={menuItems} 
-              />
+            <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
+              <ConsaludCore.HomePage />
             </ConsaludCore.PrivateRoute>
           }
         />
         
         {/* Rutas específicas de la aplicación */}
         <Route path="/mnherederos/ingresoher" element={
-          <ConsaludCore.PrivateRoute isAuthenticated={isAuthenticated} userRoles={userRoles} allowedRoles={['USER', 'ADMIN', 'Developers']}>
+          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <IngresoHerederosPage />
           </ConsaludCore.PrivateRoute>
         } />
         <Route path="/mnherederos/ingresoher/ingresotitular" element={
-          <ConsaludCore.PrivateRoute isAuthenticated={isAuthenticated} userRoles={userRoles} allowedRoles={['USER', 'ADMIN', 'Developers']}>
+          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <IngresoTitularPage />
           </ConsaludCore.PrivateRoute>
         } />
          <Route path="/mnherederos/ingresoher/RequisitosTitular" element={
-          <ConsaludCore.PrivateRoute isAuthenticated={isAuthenticated} userRoles={userRoles} allowedRoles={['USER', 'ADMIN', 'Developers']}>
+          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <InfoRequisitosTitularPage />
           </ConsaludCore.PrivateRoute>
         } />
         <Route path="/mnherederos/ingresoher/DatosTitular" element={
-          <ConsaludCore.PrivateRoute isAuthenticated={isAuthenticated} userRoles={userRoles} allowedRoles={['USER', 'ADMIN', 'Developers']}>
+          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <DatosTitularPage />
           </ConsaludCore.PrivateRoute>
         } />
         <Route path="/mnherederos/ingresoher/RegistroHeredero" element={ // Path actualizado para consistencia con el componente RegistroHerederoPage
-          <ConsaludCore.PrivateRoute isAuthenticated={isAuthenticated} userRoles={userRoles} allowedRoles={['USER', 'ADMIN', 'Developers']}>
+          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <RegistroHerederoPage />
           </ConsaludCore.PrivateRoute>
         } />
         <Route path="/mnherederos/ingresoher/formingreso" element={
-          <ConsaludCore.PrivateRoute isAuthenticated={isAuthenticated} userRoles={userRoles} allowedRoles={['USER', 'ADMIN', 'Developers']}>
+          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <IngresoHerederoFormPage />
           </ConsaludCore.PrivateRoute>
         } />
         <Route path="/mnherederos/ingresoher/cargadoc" element={
-          <ConsaludCore.PrivateRoute isAuthenticated={isAuthenticated} userRoles={userRoles} allowedRoles={['USER', 'ADMIN', 'Developers']}>
+          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <IngresoDocumentosPage />
           </ConsaludCore.PrivateRoute>
         } />
          <Route path="/mnherederos/ingresoher/detallemandato" element={
-          <ConsaludCore.PrivateRoute isAuthenticated={isAuthenticated} userRoles={userRoles} allowedRoles={['USER', 'ADMIN', 'Developers']}>
+          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <DetalleMandatoPage />
           </ConsaludCore.PrivateRoute>
         } />
         <Route path="/mnherederos/ingresoher/success" element={
-          <ConsaludCore.PrivateRoute isAuthenticated={isAuthenticated} userRoles={userRoles} allowedRoles={['USER', 'ADMIN', 'Developers']}>
+          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <SuccessPage />
           </ConsaludCore.PrivateRoute>
         } />
