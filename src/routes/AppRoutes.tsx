@@ -1,21 +1,30 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
-import DetalleMandatoPage from '../pages/DetalleMandatoPage';
 
 // Lazy load pages
 const IngresoHerederosPage = React.lazy(() => import('../pages/IngresoHerederosPage'));
 const IngresoTitularPage = React.lazy(() => import('../pages/IngresoTitularPage'));
 const InfoRequisitosTitularPage = React.lazy(() => import('../pages/InfoRequisitosTitularPage'));
-const DatosTitullarPage = React.lazy(() => import('../pages/DatosTitularPage')); // Corregir nombre si es DatosTitularPage
-const RegistroTitularPage = React.lazy(() => import('../pages/RegistroHerederoPage')); // Asumo que es RegistroHerederoPage
+const DatosTitularPage = React.lazy(() => import('../pages/DatosTitularPage')); // Corregido nombre de variable y comentario
+const RegistroHerederoPage = React.lazy(() => import('../pages/RegistroHerederoPage')); // Renombrado variable para claridad
 const IngresoHerederoFormPage = React.lazy(() => import('../pages/IngresoHerederoFormPage'));
 const IngresoDocumentosPage = React.lazy(() => import('../pages/IngresoDocumentosPage'));
 const SuccessPage = React.lazy(() => import('../pages/SuccessPage'));
+const DetalleMandatoPage = React.lazy(() => import('../pages/DetalleMandatoPage'));
+
+// Define a basic interface for MenuItem. Ideally, this would come from @consalud/core
+// or be defined based on the actual structure of menu items from ApiGetMenus.
+// interface MenuItem {
+//   id: string | number; // Example property
+//   label: string;       // Example property
+//   path: string;        // Example property
+//   // Add other relevant properties like 'icon', 'children', etc.
+// }
 
 export const AppRoutes = () => {
   const { isAuthenticated, userRoles, isLoading } = ConsaludCore.useAuth();
-  const [menuItems, setMenuItems] = useState([]);
+  const [menuItems, setMenuItems] = useState<ConsaludCore.ElementMenu[]>([]);
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -91,12 +100,12 @@ export const AppRoutes = () => {
         } />
         <Route path="/mnherederos/ingresoher/DatosTitular" element={
           <ConsaludCore.PrivateRoute isAuthenticated={isAuthenticated} userRoles={userRoles} allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <DatosTitullarPage />
+            <DatosTitularPage />
           </ConsaludCore.PrivateRoute>
         } />
-        <Route path="/mnherederos/ingresoher/RegistroTitular" element={
+        <Route path="/mnherederos/ingresoher/RegistroHeredero" element={ // Path actualizado para consistencia con el componente RegistroHerederoPage
           <ConsaludCore.PrivateRoute isAuthenticated={isAuthenticated} userRoles={userRoles} allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <RegistroTitularPage />
+            <RegistroHerederoPage />
           </ConsaludCore.PrivateRoute>
         } />
         <Route path="/mnherederos/ingresoher/formingreso" element={
