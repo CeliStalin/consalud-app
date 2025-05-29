@@ -77,8 +77,8 @@ const Stepper = ({ step }: StepperProps) => {
         {steps.map((s, index) => (
           <div key={index} style={{ textAlign: "center", width: "100%" }}>
             <ConsaludCore.Typography 
-              variant="body2" 
-              fontWeight={ConsaludCore.FONT_WEIGHTS?.BOLD} 
+              variant="bodySmall" 
+              weight={ConsaludCore.FONT_WEIGHTS?.bold} 
               fontSize={ConsaludCore.FONT_SIZES?.SM} 
               color={ConsaludCore.theme?.textColors?.primary || "#505050"}
               gutterBottom

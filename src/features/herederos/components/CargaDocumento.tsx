@@ -154,10 +154,11 @@ const CargaDocumento: React.FC = () => {
           <ConsaludCore.Typography 
             variant="body" 
             component="span" 
+            weight={ConsaludCore.FONT_WEIGHTS?.medium}
             style={{ 
-              fontWeight: ConsaludCore.FONT_WEIGHTS?.medium || 500,
+              // fontWeight: ConsaludCore.FONT_WEIGHTS?.medium || 500, // Keep in style if 'weight' prop is not enough or for fallback
               fontSize: ConsaludCore.FONT_SIZES?.md || '16px',
-              color: ConsaludCore.theme?.colors?.black || "#505050"
+              color: ConsaludCore.theme?.textColors?.primary || "#505050"
             }}
           > 
             {fileState.file ? fileState.file.name : 'Cargar Archivos'}
@@ -197,8 +198,9 @@ const CargaDocumento: React.FC = () => {
                 <ConsaludCore.Typography 
                   variant="caption" 
                   component="strong" 
+                  weight={ConsaludCore.FONT_WEIGHTS?.bold}
                   style={{ 
-                    fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700
+                    // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700 // Keep in style if 'weight' prop is not enough or for fallback
                   }}
                 >
                   Puedes adjuntar imágenes o documentos
@@ -247,15 +249,16 @@ const CargaDocumento: React.FC = () => {
           <ConsaludCore.Typography 
             variant="h5" 
             component="span" 
+            weight={ConsaludCore.FONT_WEIGHTS?.bold}
             style={{ 
-              fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700,
-              color: ConsaludCore.theme?.colors?.black || "#505050"
+              // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
+              color: ConsaludCore.theme?.textColors?.primary || "#505050"
             }}
           >
             Carga Documentos
           </ConsaludCore.Typography>
         ) : (
-          <span style={{ fontWeight: 700, color: "#505050" }}>Carga Documentos</span>
+          <span style={{ fontWeight: 700, color: ConsaludCore.theme?.textColors?.primary || "#505050" }}>Carga Documentos</span>
         )}
       </div>
       <div className="generalContainer">
@@ -273,15 +276,16 @@ const CargaDocumento: React.FC = () => {
                                 <ConsaludCore.Typography 
                                   variant="body" 
                                   component="p" 
+                                  weight={ConsaludCore.FONT_WEIGHTS?.medium}
                                   style={{ 
-                                    fontWeight: ConsaludCore.FONT_WEIGHTS?.medium || 500,
-                                    color: ConsaludCore.theme?.colors?.black || "#505050"
+                                    // fontWeight: ConsaludCore.FONT_WEIGHTS?.medium || 500, // Keep in style if 'weight' prop is not enough or for fallback
+                                    color: ConsaludCore.theme?.textColors?.primary || "#505050"
                                   }}
                                 >
                                     Carga de documentos
                                 </ConsaludCore.Typography>
                             ) : (
-                                <p style={{ fontWeight: 500, color: "#505050" }}>Carga de documentos</p>
+                                <p style={{ fontWeight: 500, color: ConsaludCore.theme?.textColors?.primary || "#505050" }}>Carga de documentos</p>
                             )}
                         </div>
                         
@@ -290,23 +294,25 @@ const CargaDocumento: React.FC = () => {
                                 {ConsaludCore.Typography ? (
                                   <ConsaludCore.Typography 
                                     component="span" 
+                                    weight={ConsaludCore.FONT_WEIGHTS?.bold}
                                     style={{ 
-                                      fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700,
+                                      // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
                                       fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
-                                      color: ConsaludCore.theme?.colors?.black || "#505050"
+                                      color: ConsaludCore.theme?.textColors?.primary || "#505050"
                                     }}
                                     className='divTextoObligatorioCargaDocumento'
                                   >
                                     Cédula de identidad 
                                   </ConsaludCore.Typography>
                                 ) : (
-                                  <span style={{ fontWeight: 700, fontSize: '14px', color: "#505050" }}>Cédula de identidad </span>
+                                  <span style={{ fontWeight: 700, fontSize: '14px', color: ConsaludCore.theme?.textColors?.primary || "#505050" }}>Cédula de identidad </span>
                                 )}
                                 {ConsaludCore.Typography ? (
                                   <ConsaludCore.Typography 
                                     component="span" 
+                                    weight={ConsaludCore.FONT_WEIGHTS?.bold}
                                     style={{ 
-                                      fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700,
+                                      // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
                                       fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
                                       color: ConsaludCore.theme?.colors?.danger || "#FF5252"
                                     }}
@@ -328,8 +334,9 @@ const CargaDocumento: React.FC = () => {
                                       {ConsaludCore.Typography ? (
                                           <ConsaludCore.Typography 
                                               component="span" 
+                                              weight={ConsaludCore.FONT_WEIGHTS?.bold}
                                               style={{ 
-                                                fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700,
+                                                // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
                                                 fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
                                                 color: ConsaludCore.theme?.colors?.primary || "#04A59B"
                                               }}
@@ -382,23 +389,25 @@ const CargaDocumento: React.FC = () => {
                                 {ConsaludCore.Typography ? (
                                   <ConsaludCore.Typography 
                                     component="span" 
+                                    weight={ConsaludCore.FONT_WEIGHTS?.bold}
                                     style={{ 
-                                      fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700,
+                                      // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
                                       fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
-                                      color: ConsaludCore.theme?.colors?.black || "#505050"
+                                      color: ConsaludCore.theme?.textColors?.primary || "#505050"
                                     }}
                                     className='divTextoObligatorioCargaDocumento'
                                   >
                                     Poder notarial
                                   </ConsaludCore.Typography>
                                 ) : (
-                                  <span style={{ fontWeight: 700, fontSize: '14px', color: "#505050" }}>Poder notarial</span>
+                                  <span style={{ fontWeight: 700, fontSize: '14px', color: ConsaludCore.theme?.textColors?.primary || "#505050" }}>Poder notarial</span>
                                 )}
                                 {ConsaludCore.Typography ? (
                                   <ConsaludCore.Typography 
                                     component="span" 
+                                    weight={ConsaludCore.FONT_WEIGHTS?.bold}
                                     style={{ 
-                                      fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700,
+                                      // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
                                       fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
                                       color: ConsaludCore.theme?.colors?.danger || "#FF5252"
                                     }}
@@ -420,8 +429,9 @@ const CargaDocumento: React.FC = () => {
                                       {ConsaludCore.Typography ? (
                                           <ConsaludCore.Typography 
                                               component="span" 
+                                              weight={ConsaludCore.FONT_WEIGHTS?.bold}
                                               style={{ 
-                                                fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700,
+                                                // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
                                                 fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
                                                 color: ConsaludCore.theme?.colors?.primary || "#04A59B"
                                               }}
@@ -473,23 +483,25 @@ const CargaDocumento: React.FC = () => {
                                 {ConsaludCore.Typography ? (
                                   <ConsaludCore.Typography 
                                     component="span" 
+                                    weight={ConsaludCore.FONT_WEIGHTS?.bold}
                                     style={{ 
-                                      fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700,
+                                      // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
                                       fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
-                                      color: ConsaludCore.theme?.colors?.black || "#505050"
+                                      color: ConsaludCore.theme?.textColors?.primary || "#505050"
                                     }}
                                     className='divTextoObligatorioCargaDocumento'
                                   >
                                     Posesión efectiva
                                   </ConsaludCore.Typography>
                                 ) : (
-                                  <span style={{ fontWeight: 700, fontSize: '14px', color: "#505050" }}>Posesión efectiva</span>
+                                  <span style={{ fontWeight: 700, fontSize: '14px', color: ConsaludCore.theme?.textColors?.primary || "#505050" }}>Posesión efectiva</span>
                                 )}
                                 {ConsaludCore.Typography ? (
                                   <ConsaludCore.Typography 
                                     component="span" 
+                                    weight={ConsaludCore.FONT_WEIGHTS?.bold}
                                     style={{ 
-                                      fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700,
+                                      // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
                                       fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
                                       color: ConsaludCore.theme?.colors?.danger || "#FF5252"
                                     }}
@@ -511,8 +523,9 @@ const CargaDocumento: React.FC = () => {
                                       {ConsaludCore.Typography ? (
                                           <ConsaludCore.Typography 
                                               component="span" 
+                                              weight={ConsaludCore.FONT_WEIGHTS?.bold}
                                               style={{ 
-                                                fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700,
+                                                // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
                                                 fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
                                                 color: ConsaludCore.theme?.colors?.primary || "#04A59B"
                                               }}
@@ -574,13 +587,13 @@ const CargaDocumento: React.FC = () => {
                       component="span" 
                       style={{ 
                         fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
-                        color: ConsaludCore.theme?.colors?.black || "#333"
+                        color: ConsaludCore.theme?.textColors?.primary || "#333"
                       }}
                     >
                       Declaro que revisé los documentos cargados, los cuales son verídicos y cumplen con los requisitos solicitados.
                     </ConsaludCore.Typography>
                   ) : (
-                    <span style={{ fontSize: '14px', color: "#333" }}>
+                    <span style={{ fontSize: '14px', color: ConsaludCore.theme?.textColors?.primary || "#333" }}>
                       Declaro que revisé los documentos cargados, los cuales son verídicos y cumplen con los requisitos solicitados.
                     </span>
                   )}

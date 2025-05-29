@@ -12,7 +12,7 @@ const RequisitosTitular = () => {
         <>
             <div className="textoTituloComponentes">
                 {ConsaludCore.Typography ? (
-                    <ConsaludCore.Typography variant="h5" component="span" fontWeight={ConsaludCore.FONT_WEIGHTS?.BOLD} color={ConsaludCore.theme?.textColors?.primary || "#505050"}>
+                    <ConsaludCore.Typography variant="h5" component="span" weight="bold" color={ConsaludCore.theme?.colors?.primary || "#505050"}>
                         Requisitos
                     </ConsaludCore.Typography>
                 ) : (
@@ -31,7 +31,7 @@ const RequisitosTitular = () => {
                             <path d="M12.4 11.3L13.6011 12.5L15.6 10.5" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>  
                         {ConsaludCore.Typography ? (
-                            <ConsaludCore.Typography variant="body1" component="p" fontWeight={ConsaludCore.FONT_WEIGHTS?.MEDIUM} color={ConsaludCore.theme?.textColors?.primary || "#505050"}>
+                            <ConsaludCore.Typography variant="body" component="p" weight="medium" color={ConsaludCore.theme?.colors?.primary || "#505050"}>
                                 <strong>Requisitos</strong>
                             </ConsaludCore.Typography>
                         ) : (
@@ -39,7 +39,7 @@ const RequisitosTitular = () => {
                         )}
                     </div>
                     {ConsaludCore.Typography ? (
-                        <ConsaludCore.Typography variant="body2" component="p" color={ConsaludCore.theme?.textColors?.secondary || "#656565"} className="textoImportante">
+                        <ConsaludCore.Typography variant="bodySmall" component="p" color={ConsaludCore.theme?.colors?.secondary || "#656565"} className="textoImportante">
                             Antes de comenzar, verifica que la persona heredera tenga lo siguiente:
                         </ConsaludCore.Typography>
                     ) : (
@@ -52,8 +52,8 @@ const RequisitosTitular = () => {
                                 <path d="M18.9307 12.1174C18.2383 16.3567 14.6449 19.5149 10.3517 19.6572C6.05854 19.7996 2.26383 16.8865 1.29206 12.7023C0.320293 8.5181 2.44271 4.23072 6.35921 2.46641C10.2757 0.702105 14.8931 1.9533 17.3831 5.45358L10.073 12.7346L6.98576 9.64533" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>  
                             {ConsaludCore.Typography ? (
-                                <ConsaludCore.Typography variant="body1" component="p" fontWeight={ConsaludCore.FONT_WEIGHTS?.MEDIUM} color={ConsaludCore.theme?.textColors?.primary || "#505050"}>
-                                    <strong>Cédula de identidad vigente.</strong>
+                                <ConsaludCore.Typography variant="body" component="p" weight="bold" color={ConsaludCore.theme?.colors?.primary || "#505050"}>
+                                    Cédula de identidad vigente.
                                 </ConsaludCore.Typography>
                             ) : (
                                 <p><strong>Cédula de identidad vigente.</strong></p>
@@ -64,7 +64,7 @@ const RequisitosTitular = () => {
                                 <path d="M18.9307 12.1174C18.2383 16.3567 14.6449 19.5149 10.3517 19.6572C6.05854 19.7996 2.26383 16.8865 1.29206 12.7023C0.320293 8.5181 2.44271 4.23072 6.35921 2.46641C10.2757 0.702105 14.8931 1.9533 17.3831 5.45358L10.073 12.7346L6.98576 9.64533" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>  
                             {ConsaludCore.Typography ? (
-                                <ConsaludCore.Typography variant="body1" component="p" fontWeight={ConsaludCore.FONT_WEIGHTS?.MEDIUM} color={ConsaludCore.theme?.textColors?.primary || "#505050"}>
+                                <ConsaludCore.Typography variant="body" component="p" weight="medium" color={ConsaludCore.theme?.colors?.primary || "#505050"}>
                                     <strong>Posesión efectiva</strong> que acredite su condición de heredero.
                                 </ConsaludCore.Typography>
                             ) : (
@@ -76,7 +76,7 @@ const RequisitosTitular = () => {
                                 <path d="M18.9307 12.1174C18.2383 16.3567 14.6449 19.5149 10.3517 19.6572C6.05854 19.7996 2.26383 16.8865 1.29206 12.7023C0.320293 8.5181 2.44271 4.23072 6.35921 2.46641C10.2757 0.702105 14.8931 1.9533 17.3831 5.45358L10.073 12.7346L6.98576 9.64533" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>  
                             {ConsaludCore.Typography ? (
-                                <ConsaludCore.Typography variant="body1" component="p" fontWeight={ConsaludCore.FONT_WEIGHTS?.MEDIUM} color={ConsaludCore.theme?.textColors?.primary || "#505050"}>
+                                <ConsaludCore.Typography variant="body" component="p" weight="medium" color={ConsaludCore.theme?.colors?.primary || "#505050"}>
                                     <strong>Poder notarial válido</strong> para actuar en representación del titular.
                                 </ConsaludCore.Typography>
                             ) : (
@@ -89,7 +89,7 @@ const RequisitosTitular = () => {
                             onClick={handleButtonClick}
                         > 
                             {ConsaludCore.Typography ? (
-                                <ConsaludCore.Typography variant="button" color={ConsaludCore.theme?.textColors?.white || "#FFFFFF"}>Entendido</ConsaludCore.Typography>
+                                <ConsaludCore.Typography variant="button" color={ConsaludCore.theme?.colors?.white || "#FFFFFF"}>Entendido</ConsaludCore.Typography>
                             ) : (
                                 "Entendido"
                             )}

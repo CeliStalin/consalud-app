@@ -30,9 +30,9 @@ const SuccessPage: React.FC = () => {
               variant="h4" 
               component="span" 
               style={{ 
-                fontWeight: FONT_WEIGHTS?.bold,
                 color: theme?.colors?.primary || "#505050" 
               }}
+              weight="bold" 
               className="titleComponent"
             >
               ¡Listo!

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import RutSearchForm from './RutSearchForm';
-import SecureLayout from '../../../core/components/SecureLayout/SecureLayout';
+// import RutSearchForm from './RutSearchForm';
+import * as ConsaludCore from '@consalud/core';
 
 const IngresoHerederos: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -25,11 +25,11 @@ const IngresoHerederos: React.FC = () => {
   };
 
   return (
-    <SecureLayout pageTitle="Ingreso Herederos">
+    <ConsaludCore.SecureLayout pageTitle="Ingreso Herederos">
       <div style={{ padding: '20px' }}>
         <div className="columns is-centered">
           <div className="column is-narrow">
-            <RutSearchForm onSearch={handleSearch} loading={loading} />
+            {/* <RutSearchForm onSearch={handleSearch} loading={loading} /> */}
             
             {searchResult && (
               <div className="box mt-5" style={{ width: '367px', margin: '20px auto' }}>
@@ -44,7 +44,7 @@ const IngresoHerederos: React.FC = () => {
           </div>
         </div>
       </div>
-    </SecureLayout>
+    </ConsaludCore.SecureLayout>
   );
 };
 

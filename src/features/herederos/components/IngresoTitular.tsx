@@ -98,7 +98,7 @@ const IngresoTitular = () => {
                             <path fillRule="evenodd" clipRule="evenodd" d="M12 13C14.2091 13 16 11.2091 16 9C16 6.79086 14.2091 5 12 5C9.79086 5 8 6.79086 8 9C8 11.2091 9.79086 13 12 13Z" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                         {ConsaludCore.Typography ? (
-                            <ConsaludCore.Typography variant="body1" component="p" fontWeight={ConsaludCore.FONT_WEIGHTS?.MEDIUM} color={ConsaludCore.theme?.textColors?.primary || "#505050"}>
+                            <ConsaludCore.Typography variant="body" component="p" fontWeight={ConsaludCore.FONT_WEIGHTS?.MEDIUM} color={ConsaludCore.theme?.textColors?.primary || "#505050"}>
                                 RUT del titular
                             </ConsaludCore.Typography>
                         ) : (
@@ -113,7 +113,7 @@ const IngresoTitular = () => {
                         <p className="textoImportante">Ingresa el RUT del titular que corresponda a una persona afiliada con devolución.</p>
                     )}
                     {ConsaludCore.Typography ? (
-                        <ConsaludCore.Typography variant="caption" component="span" fontWeight={ConsaludCore.FONT_WEIGHTS?.MEDIUM} color={ConsaludCore.theme?.textColors?.muted || "#808080"} className="rutText">
+                        <ConsaludCore.Typography variant="caption" component="span" fontWeight={ConsaludCore.FONT_WEIGHTS?.MEDIUM} color={ConsaludCore.theme?.textColors?.gray?.medium || "#808080"} className="rutText">
                             RUT persona heredera
                         </ConsaludCore.Typography>
                     ) : (
@@ -154,11 +154,11 @@ const IngresoTitular = () => {
 
                     {showError && (
                         ConsaludCore.Typography ? (
-                            <ConsaludCore.Typography variant="caption" color={ConsaludCore.theme?.colors?.danger || "#E11D48"} className="errorRut">
+                            <ConsaludCore.Typography variant="caption" color={ConsaludCore.theme?.textColors?.danger || "#E11D48"} className="errorRut">
                                 RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
                             </ConsaludCore.Typography>
                         ) : (
-                            <span className="errorRut" style={{color: ConsaludCore.theme?.colors?.danger || "#E11D48"}}>RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)</span>
+                            <span className="errorRut" style={{color: ConsaludCore.theme?.textColors?.danger || "#E11D48"}}>RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)</span>
                         )
                     )}
                 </div>
