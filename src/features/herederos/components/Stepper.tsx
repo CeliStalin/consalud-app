@@ -79,7 +79,7 @@ const Stepper = ({ step }: StepperProps) => {
             <ConsaludCore.Typography 
               variant="bodySmall" 
               weight={ConsaludCore.FONT_WEIGHTS?.bold} 
-              fontSize={ConsaludCore.FONT_SIZES?.SM} 
+              fontSize={ConsaludCore.FONT_SIZES?.sm} 
               color={ConsaludCore.theme?.textColors?.primary || "#505050"}
               gutterBottom
             >
@@ -87,7 +87,7 @@ const Stepper = ({ step }: StepperProps) => {
             </ConsaludCore.Typography>
             <ConsaludCore.Typography 
               variant="caption" 
-              fontSize={ConsaludCore.FONT_SIZES?.XS} 
+              fontSize={ConsaludCore.FONT_SIZES?.xs} 
               color={ConsaludCore.theme?.textColors?.muted || "#909090"}
             >
               {s.description}
