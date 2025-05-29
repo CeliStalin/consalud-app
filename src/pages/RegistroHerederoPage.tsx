@@ -5,14 +5,10 @@ import { RegistroHeredero } from '@/features/herederos/components/RegistroHerede
 const RegistroHerederoPage: React.FC = () => {
   return (
     <ConsaludCore.SecureLayout 
-      pageTitle="Registro de Heredero" 
+      pageTitle="Registro Heredero" 
       allowedRoles={['USER', 'ADMIN', 'Developers']}
     >
-      <div className="app-content-main">
-        <div className="app-container">
-          <RegistroHeredero />
-        </div>
-      </div>
+      <RegistroHeredero />
     </ConsaludCore.SecureLayout>
   );
 };

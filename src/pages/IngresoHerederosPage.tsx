@@ -31,24 +31,21 @@ const IngresoHerederosPage: React.FC = () => {
                   borderRadius: '8px',
                   margin: '16px 0'
                 }}>
-                  <div className="info-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-                    </svg>
-                  </div>
-                  <p className="info-text">
-                    Para ingresar un nuevo heredero, haz clic en el botón "Nuevo Ingreso" y completa el formulario con los datos solicitados.
-                  </p>
+                  <ConsaludCore.Typography variant="body" style={{ marginBottom: '12px' }}>
+                    Bienvenido al sistema de gestión de herederos
+                  </ConsaludCore.Typography>
+                  <ConsaludCore.Typography variant="bodySmall" color="secondary">
+                    Aquí podrás registrar y gestionar la información de los beneficiarios para la devolución de fondos.
+                  </ConsaludCore.Typography>
                 </div>
                 
-                <div className="button-container" style={{ textAlign: 'center', marginTop: '32px' }}>
+                <div style={{ textAlign: 'center', marginTop: '24px' }}>
                   <ConsaludCore.Button 
-                    variant="primary" 
+                    variant="primary"
                     onClick={handleNavigateToForm}
-                    className="nuevo-ingreso-btn"
+                    size="large"
                   >
-                    <span className="btn-icon">+</span>
-                    Nuevo Ingreso
+                    Comenzar proceso
                   </ConsaludCore.Button>
                 </div>
               </div>

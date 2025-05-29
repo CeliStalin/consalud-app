@@ -75,7 +75,7 @@ export const AppRoutes = () => {
             <IngresoTitularPage />
           </ConsaludCore.PrivateRoute>
         } />
-         <Route path="/mnherederos/ingresoher/RequisitosTitular" element={
+        <Route path="/mnherederos/ingresoher/RequisitosTitular" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <InfoRequisitosTitularPage />
           </ConsaludCore.PrivateRoute>
@@ -85,7 +85,7 @@ export const AppRoutes = () => {
             <DatosTitularPage />
           </ConsaludCore.PrivateRoute>
         } />
-        <Route path="/mnherederos/ingresoher/RegistroHeredero" element={ // Path actualizado para consistencia con el componente RegistroHerederoPage
+        <Route path="/mnherederos/ingresoher/RegistroHeredero" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <RegistroHerederoPage />
           </ConsaludCore.PrivateRoute>
@@ -100,7 +100,7 @@ export const AppRoutes = () => {
             <IngresoDocumentosPage />
           </ConsaludCore.PrivateRoute>
         } />
-         <Route path="/mnherederos/ingresoher/detallemandato" element={
+        <Route path="/mnherederos/ingresoher/detallemandato" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <DetalleMandatoPage />
           </ConsaludCore.PrivateRoute>
