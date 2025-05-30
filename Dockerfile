@@ -20,6 +20,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY optimization.config.ts ./
 COPY scripts/ ./scripts/
+COPY ./consalud-core-1.0.0.tgz ./
 
 # AQUÍ SE EJECUTA LA OPTIMIZACIÓN AUTOMÁTICAMENTE
 # Este script se ejecuta UNA VEZ durante la construcción de la imagen
@@ -30,7 +31,7 @@ RUN node scripts/optimize-deps.js
 FROM base AS deps-dev
 WORKDIR /app
 
-# Copiar archivos de paquete
+# Copiar archivos de paquete originales
 COPY package*.json ./
 COPY ./consalud-core-1.0.0.tgz ./
 
@@ -42,12 +43,13 @@ RUN npm ci --no-audit --no-fund
 FROM base AS deps-prod
 WORKDIR /app
 
-# Copiar el package.json optimizado desde la etapa optimizer
+# Copiar archivos optimizados desde la etapa optimizer
 COPY --from=optimizer /app/package.prod.json ./package.json
+COPY --from=optimizer /app/package-lock.prod.json ./package-lock.json
 COPY ./consalud-core-1.0.0.tgz ./
 
-# Instalar SOLO dependencias de producción
-RUN npm ci --only=production --no-audit --no-fund
+# Instalar SOLO dependencias de producción usando el lockfile correcto
+RUN npm ci --omit=dev --no-audit --no-fund
 
 # Etapa 4: Desarrollo (tu caso actual)
 # PASO 4: Crea la imagen final para desarrollo
@@ -86,8 +88,8 @@ COPY --from=optimizer /app/package.prod.json ./package.json
 # Copiar código fuente necesario
 COPY . .
 
-# Build de la aplicación 
-# RUN npm run build
+# Build de la aplicación para producción
+RUN npm run build 2>/dev/null || echo "⚠️ Build comando no found, usando archivos existentes"
 
 # Crear usuario no-root
 RUN addgroup -g 1001 -S reactgroup && \

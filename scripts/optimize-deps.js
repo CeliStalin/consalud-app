@@ -1,6 +1,7 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, copyFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -52,16 +53,63 @@ function isDevDependency(depName, patterns) {
   });
 }
 
+// Función para generar package-lock.json de producción
+function generateProductionLockfile(prodPackageJsonPath) {
+  try {
+    console.log('🔄 Generando package-lock.json para producción...');
+    
+    const originalDir = process.cwd();
+    const tempDir = join(__dirname, '../temp-prod');
+    
+    // Crear directorio temporal
+    execSync(`mkdir -p ${tempDir}`, { stdio: 'inherit' });
+    
+    // Copiar package.prod.json como package.json al directorio temporal
+    copyFileSync(prodPackageJsonPath, join(tempDir, 'package.json'));
+    
+    // Copiar el archivo .tgz si existe
+    const tgzPath = join(__dirname, '../consalud-core-1.0.0.tgz');
+    if (existsSync(tgzPath)) {
+      copyFileSync(tgzPath, join(tempDir, 'consalud-core-1.0.0.tgz'));
+    }
+    
+    // Cambiar al directorio temporal y ejecutar npm install
+    process.chdir(tempDir);
+    execSync('npm install --package-lock-only --no-audit --no-fund', { 
+      stdio: 'inherit',
+      env: { ...process.env, NODE_ENV: 'production' }
+    });
+    
+    // Copiar el package-lock.json generado de vuelta
+    const generatedLockfile = join(tempDir, 'package-lock.json');
+    const targetLockfile = join(__dirname, '../package-lock.prod.json');
+    
+    if (existsSync(generatedLockfile)) {
+      copyFileSync(generatedLockfile, targetLockfile);
+      console.log('✅ package-lock.prod.json generado exitosamente');
+    }
+    
+    // Limpiar directorio temporal
+    process.chdir(originalDir);
+    execSync(`rm -rf ${tempDir}`, { stdio: 'inherit' });
+    
+    return true;
+  } catch (error) {
+    console.error('❌ Error generando lockfile de producción:', error.message);
+    return false;
+  }
+}
+
 // Función para optimizar package.json para producción
 function optimizePackageJson() {
   const config = loadOptimizationConfig();
-  if (!config) return;
+  if (!config) return false;
 
   const packageJsonPath = join(__dirname, '../package.json');
   
   if (!existsSync(packageJsonPath)) {
     console.error('❌ package.json no encontrado');
-    return;
+    return false;
   }
 
   const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
@@ -83,7 +131,7 @@ function optimizePackageJson() {
     type: packageJson.type,
     dependencies: prodDependencies,
     scripts: {
-      start: packageJson.scripts?.start || "serve -s dist",
+      start: packageJson.scripts?.start || "vite preview --port 3000 --host 0.0.0.0",
       preview: packageJson.scripts?.preview
     }
   };
@@ -103,12 +151,24 @@ function optimizePackageJson() {
   if (removedDeps.length > 0) {
     console.log(`🗑️  Dependencies removidas: ${removedDeps.join(', ')}`);
   }
+
+  // Generar package-lock.json de producción
+  const lockfileGenerated = generateProductionLockfile(prodPath);
+  
+  return lockfileGenerated;
 }
 
 // Ejecutar si se llama directamente
 if (import.meta.url === `file://${process.argv[1]}`) {
   console.log('🚀 Iniciando optimización de dependencias...');
-  optimizePackageJson();
+  const success = optimizePackageJson();
+  
+  if (success) {
+    console.log('🎉 Optimización completada exitosamente');
+  } else {
+    console.error('❌ Error en la optimización');
+    process.exit(1);
+  }
 }
 
 // Exportar funciones (ES modules style)
