@@ -11,11 +11,11 @@ case "$1" in
     ;;
   "build-dev")
     echo "🔨 Construyendo imagen de DESARROLLO..."
-    docker build --target development -t consalud-app:dev .
+    docker build --target development -t app-herederos:dev .
     ;;
   "build-prod")
     echo "🔨 Construyendo imagen de PRODUCCIÓN..."
-    docker build --target production -t consalud-app:prod .
+    docker build --target production -t app-herederos:prod .
     ;;
   "stop")
     echo "⏹️ Deteniendo todos los servicios..."

@@ -1,88 +1,64 @@
+# Docker Compose para  Herederos de Consalud
+# Ejecutar con: docker-compose up <servicio>
+
 services:
-  # Servicio para desarrollo
-  app-dev:
+  # DESARROLLO - Para trabajar en la aplicación
+  app:
     build:
       context: .
       dockerfile: Dockerfile
       target: development
-      args:
-        BUILD_MODE: development
-    container_name: consalud-app-dev
+    container_name: app-herederos-dev
     ports:
-      - "5173:5173"
+      - "5173:5173"  # la app estará en http://localhost:5173
     volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.npm
+      - .:/app                    # Sincroniza tu código
+      - /app/node_modules         # Optimiza node_modules
     environment:
       - NODE_ENV=development
-      - VITE_HOST=0.0.0.0
-    env_file:
-      - .env.development
+      - VITE_HOST=0.0.0.0        # Permite acceso externo
     restart: unless-stopped
-    profiles:
-      - dev
-      - development
-    
-  # Servicio para testing/QA
-  app-test:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: test
-      args:
-        BUILD_MODE: test
-    container_name: consalud-app-test
-    ports:
-      - "4173:4173"
-    environment:
-      - NODE_ENV=test
-    env_file:
-      - .env.test
-    restart: unless-stopped
-    profiles:
-      - test
-      - qa
-    
-  # Servicio para producción
+    # Comando: docker-compose up app
+
+  # PRODUCCIÓN - Para deploy real
   app-prod:
     build:
       context: .
       dockerfile: Dockerfile
       target: production
-      args:
-        BUILD_MODE: production
-    container_name: consalud-app-prod
+    container_name: app-herederos-prod
     ports:
-      - "80:80"
+      - "3000:3000"              # Tu app estará en http://localhost:3000
     environment:
       - NODE_ENV=production
-    env_file:
-      - .env.production
     restart: unless-stopped
     profiles:
-      - prod
       - production
+    # Comando: docker-compose --profile production up app-prod
 
-  # Servicio para desarrollo local
-  app-local:
+  # TESTING - Para pruebas
+  app-test:
     build:
       context: .
       dockerfile: Dockerfile
-      target: development
-      args:
-        BUILD_MODE: development
-    container_name: consalud-app-local
+      target: development        # Usa desarrollo pero con configuración de test
+    container_name: app-herederos-test
     ports:
-      - "5173:5173"
-    volumes:
-      - .:/app
-      - /app/node_modules
+      - "4173:5173"             # Puerto diferente para no conflictos
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=test
       - VITE_HOST=0.0.0.0
-    env_file:
-      - .env.local
     restart: unless-stopped
     profiles:
-      - local
+      - test
+    # Comando: docker-compose --profile test up app-test
+
+# Volúmenes nombrados para optimización
+volumes:
+  node_modules:
+  npm_cache:
+
+# Red personalizada (opcional)
+networks:
+  consalud-network:
+    driver: bridge

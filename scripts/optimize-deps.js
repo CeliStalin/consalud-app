@@ -4,7 +4,7 @@ const path = require('path');
 // Función para leer la configuración de optimización 
 function loadOptimizationConfig() {
   try {
-    // Como optimization.config.ts puede no estar compilado, usamos una versión simplificada
+    
     const defaultConfig = {
       devOnlyDependencies: [
         '@types/*',

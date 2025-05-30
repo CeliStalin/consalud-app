@@ -35,7 +35,7 @@ src/
 1. Clona el repositorio:
    ```bash
    git clone https://devops.consalud.net/Consalud/PlantillaReact/_git/app-herederos
-   cd consalud-app
+   cd app-herederos
    ```
 
 2. Instala las dependencias:
@@ -145,255 +145,185 @@ Esta aplicación React con TypeScript está optimizada para ejecutarse en conten
 - 2GB de RAM disponible
 - 10GB de espacio en disco
 
+## ⚡ ORDEN DE EJECUCIÓN (MUY IMPORTANTE)
+
+### 🔄 ¿Qué sucede cuando ejecutas `docker-compose up app`?
+
+```
+1. TÚ EJECUTAS: docker-compose up app
+   ↓
+2. Docker Compose LEE: docker-compose.yml
+   ↓
+3. Docker Compose EJECUTA: Dockerfile (target: development)
+   ↓
+4. Dockerfile EJECUTA AUTOMÁTICAMENTE (en este orden):
+   ├── Etapa 1: optimizer (ejecuta optimize-deps.js)
+   ├── Etapa 2: deps-dev (instala dependencias de desarrollo)
+   ├── Etapa 3: deps-prod (instala dependencias de producción)
+   └── Etapa 4: development (crea imagen final)
+   ↓
+5. Docker CREA el contenedor
+   ↓
+6. Docker EJECUTA: npm run dev --host 0.0.0.0
+   ↓
+7. ✅ TU APP FUNCIONA en http://localhost:5173
+```
+
+### 📁 ¿Qué archivo ejecuta qué?
+
+| Archivo | Ejecutado por | Cuándo | Propósito |
+|---------|---------------|--------|-----------|
+| `docker-compose.yml` | **TÚ** (manual) | `docker-compose up app` | Orquesta todo el proceso |
+| `Dockerfile` | **Docker Compose** (automático) | Durante `docker-compose up` | Construye la imagen |
+| `optimize-deps.js` | **Dockerfile** (automático) | Durante construcción de imagen | Optimiza dependencias |
+| `package.json` | **Dockerfile** (automático) | Durante `npm ci` y `npm run dev` | Define dependencias y scripts |
+
 ## 🚀 Instalación y Ejecución
 
-### Opción 1: Desarrollo (Recomendado para desarrollo local)
+### ✅ Comando Principal
 
 ```bash
-# Clonar el repositorio
-git clone <tu-repositorio>
-cd consalud-app
+# Navegar a tu directorio
+cd c:\app-herederos
 
-# Construir y ejecutar en modo desarrollo
+# EJECUTAR TODO AUTOMÁTICAMENTE
 docker-compose up app
 
-# O en background
+# Esto hace AUTOMÁTICAMENTE:
+# ✅ Lee docker-compose.yml
+# ✅ Ejecuta Dockerfile
+# ✅ Ejecuta optimize-deps.js
+# ✅ Instala dependencias
+# ✅ Ejecuta npm run dev
+# ✅ Tu app funciona en http://localhost:5173
+```
+
+### 🔧 Otros Comandos Útiles
+
+```bash
+# En background (no bloquea la terminal)
 docker-compose up -d app
-```
 
-**Acceso**: http://localhost:5173
-
-### Opción 2: Producción Optimizada
-
-```bash
-# Construir y ejecutar en modo producción
-docker-compose --profile production up app-prod
-
-# O en background
-docker-compose --profile production up -d app-prod
-```
-
-**Acceso**: http://localhost:3000
-
-## 🔧 Comandos Útiles
-
-### Gestión de Contenedores
-
-```bash
 # Ver logs en tiempo real
 docker-compose logs -f app
 
-# Parar todos los servicios
+# Parar la aplicación
 docker-compose down
 
-# Parar y eliminar volúmenes
-docker-compose down -v
-
-# Reconstruir imagen desde cero
+# Reconstruir desde cero (si cambias dependencias)
 docker-compose build --no-cache app
-
-# Ver estado de contenedores
-docker-compose ps
+docker-compose up app
 ```
 
-### Construcción Manual
+### 🎯 Para Producción
 
 ```bash
-# Desarrollo
-docker build --target development -t consalud-app:dev .
-docker run -p 5173:5173 -v $(pwd):/app -v /app/node_modules consalud-app:dev
+# Versión optimizada para producción
+docker-compose --profile production up app-prod
 
-# Producción
-docker build --target production -t consalud-app:prod .
-docker run -p 3000:3000 consalud-app:prod
+# Acceso: http://localhost:3000
 ```
 
-### Optimización de Dependencias
+## 📊 Secuencia Detallada de Ejecución
+
+### Paso a Paso - ¿Qué sucede internamente?
 
 ```bash
-# Ejecutar optimización manual (opcional)
-node scripts/optimize-deps.js
+# 1. Ejecutas este comando:
+docker-compose up app
 
-# Ver diferencias de dependencias
-ls -la package*.json
+# 2. Docker Compose busca:
+#    ✅ docker-compose.yml (encontrado)
+#    ✅ Dockerfile (encontrado)
+
+# 3. Docker ejecuta Dockerfile con target=development:
+#    📦 Etapa 'base': Prepara Node.js 20 Alpine
+#    🔧 Etapa 'optimizer': Ejecuta node scripts/optimize-deps.js
+#    📚 Etapa 'deps-dev': Ejecuta npm ci (todas las dependencias)
+#    📚 Etapa 'deps-prod': Ejecuta npm ci --only=production
+#    🏗️ Etapa 'development': Copia código y configura usuario
+
+# 4. Docker crea el contenedor:
+#    🌐 Puerto 5173:5173
+#    📁 Volúmenes sincronizados
+#    🔧 Variables de entorno configuradas
+
+# 5. Docker ejecuta el comando final:
+#    npm run dev --host 0.0.0.0
+
+# 6. ✅ Aplicación disponible en http://localhost:5173
 ```
 
-## 📁 Estructura del Proyecto
+## 🛠️ Troubleshooting del Orden de Ejecución
 
-```
-consalud-app/
-├── Dockerfile                 # Multi-stage build optimizado
-├── docker-compose.yml         # Configuración de servicios
-├── optimization.config.ts     # Configuración de optimización
-├── scripts/
-│   └── optimize-deps.js      # Script de optimización de dependencias
-├── package.json              # Dependencias completas
-├── package.prod.json         # Dependencias de producción (auto-generado)
-└── .dockerignore             # Archivos excluidos del build
-```
-
-## 🐳 Arquitectura Docker
-
-### Multi-Stage Build
-
-1. **Base**: Node 20 Alpine + herramientas de compilación
-2. **Optimizer**: Ejecuta optimización de dependencias
-3. **Deps-dev**: Instala todas las dependencias para desarrollo
-4. **Deps-prod**: Instala solo dependencias de producción
-5. **Development**: Imagen final para desarrollo
-6. **Production**: Imagen final optimizada para producción
-
-### Optimizaciones Aplicadas
-
-- ✅ **Alpine Linux**: Reduce imagen base de 180MB a 5MB
-- ✅ **Multi-stage build**: Separa dependencias dev/prod
-- ✅ **Dependency optimization**: Elimina dependencias innecesarias
-- ✅ **Layer caching**: Optimiza rebuild de imágenes
-- ✅ **Security**: Usuario no-root
-- ✅ **Health checks**: Monitoreo de salud del contenedor
-
-## 🔍 Monitoreo y Troubleshooting
-
-### Verificar Estado de la Aplicación
-
+### ❌ Error: "No such file optimize-deps.js"
 ```bash
-# Health check manual
-curl http://localhost:5173/
-curl http://localhost:3000/
+# Verificar que tienes el archivo:
+ls scripts/optimize-deps.js
 
-# Ver logs específicos
-docker logs consalud-app-dev
-docker logs consalud-app-prod
-
-# Entrar al contenedor para debugging
-docker exec -it consalud-app-dev sh
-
-# Ver uso de recursos
-docker stats consalud-app-dev
+# Si no existe, recrear:
+mkdir -p scripts
+# (copiar el contenido del optimize-deps.js desde la documentación)
 ```
 
-### Problemas Comunes
-
-#### Error: Puerto ya en uso
+### ❌ Error: "Cannot read docker-compose.yml"
 ```bash
-# Encontrar proceso usando el puerto
+# Verificar que estás en el directorio correcto:
+pwd
+ls docker-compose.yml
+
+# Debe mostrar el archivo docker-compose.yml
+```
+
+### ❌ Error: "Port 5173 already in use"
+```bash
+# Ver qué está usando el puerto:
 sudo lsof -i :5173
-sudo lsof -i :3000
 
-# Matar proceso
-sudo kill -9 <PID>
+# Parar contenedores previos:
+docker-compose down
 ```
 
-#### Error: Sin espacio en disco
-```bash
-# Limpiar imágenes no utilizadas
-docker system prune -a
-
-# Ver uso de espacio de Docker
-docker system df
-```
-
-#### Error: Dependencias faltantes
-```bash
-# Reconstruir sin cache
-docker-compose build --no-cache app
-
-# Verificar archivo de dependencias optimizado
-cat package.prod.json
-```
-
-## 🔧 Configuración de Entorno
-
-### Variables de Entorno
-
-Crear archivo `.env` para configuración local:
+## 🎯 Comandos de Referencia Rápida
 
 ```bash
-# .env
-NODE_ENV=development
-VITE_API_URL=http://localhost:3001
-VITE_HOST=0.0.0.0
-```
+# DESARROLLO (lo que más usarás)
+docker-compose up app                    # Ejecuta todo automáticamente
+docker-compose up -d app                 # En background
+docker-compose logs -f app               # Ver logs
+docker-compose down                      # Parar todo
 
-### Configuración de Red
+# PRODUCCIÓN
+docker-compose --profile production up app-prod
 
-```bash
-# Para acceso externo en servidor
-docker run -p 0.0.0.0:5173:5173 consalud-app:dev
-
-# Con docker-compose, editar ports en docker-compose.yml:
-ports:
-  - "0.0.0.0:5173:5173"
-```
-
-## 📊 Métricas de Optimización
-
-### Tamaños de Imagen
-
-- **Antes**: ~1.5GB
-- **Desarrollo**: ~400-600MB
-- **Producción**: ~200-300MB
-
-### Dependencias Optimizadas
-
-Las siguientes dependencias se excluyen en producción:
-- `@types/*` - Tipos de TypeScript
-- `@vitejs/*` - Herramientas de Vite
-- `typescript` - Compilador TS
-- `eslint*` - Linting tools
-- `@testing-library/*` - Testing utilities
-
-## 🔄 Comandos de Mantenimiento
-
-### Actualizaciones
-
-```bash
-# Actualizar imagen base
-docker pull node:20-alpine
-
-# Reconstruir aplicación
-docker-compose build app
-
-# Reiniciar servicios
-docker-compose restart app
-```
-
-### Backup
-
-```bash
-# Backup de volúmenes
-docker run --rm -v consalud-app_node_modules:/data -v $(pwd):/backup alpine tar czf /backup/node_modules.tar.gz -C /data .
-
-# Restaurar backup
-docker run --rm -v consalud-app_node_modules:/data -v $(pwd):/backup alpine tar xzf /backup/node_modules.tar.gz -C /data
+# MANTENIMIENTO
+docker-compose build --no-cache app      # Reconstruir imagen
+docker-compose ps                        # Ver estado
+docker system prune -a                   # Limpiar Docker
 ```
 
 ## 📞 Soporte
 
-Para problemas o dudas:
+**Si algo no funciona, verificar en este orden:**
 
-1. Verificar logs: `docker-compose logs -f app`
-2. Revisar health checks: `docker ps`
-3. Consultar documentación de Docker
-4. Contactar al equipo de desarrollo
+1. ✅ **Docker instalado**: `docker --version`
+2. ✅ **Docker Compose instalado**: `docker-compose --version`
+3. ✅ **Archivos presentes**: `ls docker-compose.yml Dockerfile`
+4. ✅ **Script presente**: `ls scripts/optimize-deps.js`
+5. ✅ **Directorio correcto**: `pwd` debe mostrar `.../app-herederos`
+
+**Comando de diagnóstico completo:**
+```bash
+# Ejecutar este comando para verificar todo:
+echo "=== Verificación de archivos ===" && \
+ls -la docker-compose.yml Dockerfile package.json && \
+ls -la scripts/optimize-deps.js && \
+echo "=== Versiones de Docker ===" && \
+docker --version && \
+docker-compose --version && \
+echo "=== Todo listo para: docker-compose up app ==="
+```
 
 ---
 
-## 🎯 Comandos Rápidos de Referencia
-
-```bash
-# Inicio rápido desarrollo
-docker-compose up -d app && docker-compose logs -f app
-
-# Inicio rápido producción  
-docker-compose --profile production up -d app-prod
-
-# Parar todo
-docker-compose down
-
-# Reconstruir desde cero
-docker-compose build --no-cache && docker-compose up app
-
-# Ver estado y logs
-docker-compose ps && docker-compose logs --tail=50 app
-```
+**¡RECUERDA!** Solo necesitas ejecutar: `docker-compose up app` - todo lo demás es automático.
