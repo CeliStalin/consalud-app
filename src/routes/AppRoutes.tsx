@@ -6,8 +6,8 @@ import * as ConsaludCore from '@consalud/core';
 const IngresoHerederosPage = React.lazy(() => import('../pages/IngresoHerederosPage'));
 const IngresoTitularPage = React.lazy(() => import('../pages/IngresoTitularPage'));
 const InfoRequisitosTitularPage = React.lazy(() => import('../pages/InfoRequisitosTitularPage'));
-const DatosTitularPage = React.lazy(() => import('../pages/DatosTitularPage')); // Corregido nombre de variable y comentario
-const RegistroHerederoPage = React.lazy(() => import('../pages/RegistroHerederoPage')); // Renombrado variable para claridad
+const DatosTitularPage = React.lazy(() => import('../pages/DatosTitularPage'));
+const RegistroHerederoPage = React.lazy(() => import('../pages/RegistroHerederoPage'));
 const IngresoHerederoFormPage = React.lazy(() => import('../pages/IngresoHerederoFormPage'));
 const IngresoDocumentosPage = React.lazy(() => import('../pages/IngresoDocumentosPage'));
 const SuccessPage = React.lazy(() => import('../pages/SuccessPage'));
@@ -31,7 +31,7 @@ export const AppRoutes = () => {
             <ConsaludCore.PublicRoute>
               <ConsaludCore.Login 
                 appName="Mi Aplicación Consalud" 
-                logoSrc="/path/to/your/logo.png" // Reemplaza con la ruta a tu logo
+                logoSrc="/path/to/your/logo.png"
                 onLoginSuccess={() => { /* Lógica después del login exitoso */ }}
               />
             </ConsaludCore.PublicRoute>
@@ -56,12 +56,23 @@ export const AppRoutes = () => {
           }
         />
         
-        {/* Rutas específicas de la aplicación */}
+        {/* Rutas específicas de la aplicación - REORGANIZADAS */}
+        
+        {/* Ruta principal de Ingreso Herederos - ahora va directo al proceso */}
         <Route path="/mnherederos/ingresoher" element={
+          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
+            <IngresoTitularPage />
+          </ConsaludCore.PrivateRoute>
+        } />
+        
+        {/* Ruta para la página de bienvenida/dashboard (opcional) */}
+        <Route path="/mnherederos/dashboard" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <IngresoHerederosPage />
           </ConsaludCore.PrivateRoute>
         } />
+        
+        {/* Resto de rutas del flujo mantienen su orden lógico */}
         <Route path="/mnherederos/ingresoher/ingresotitular" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
             <IngresoTitularPage />

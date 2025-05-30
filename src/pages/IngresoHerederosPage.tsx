@@ -6,6 +6,7 @@ import './styles/IngresoHerederosPage.css';
 const IngresoHerederosPage: React.FC = () => {
   const navigate = useNavigate();
 
+  // Actualizada para dirigir al flujo principal
   const handleNavigateToForm = () => {
     navigate('/mnherederos/ingresoher/ingresotitular');
   };

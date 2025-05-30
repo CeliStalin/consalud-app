@@ -1,15 +1,15 @@
-import { useNavigate } from "react-router-dom";
-import {  useState } from "react";
+import { useState } from "react";
 import * as ConsaludCore from '@consalud/core'; 
 import { useRutChileno } from "../hooks/useRutChileno";
 import { UseAlert } from "../hooks/Alert";
+import { useHerederoNavigation } from "../hooks/useHerederoNavigation"; // Importar el nuevo hook
 import '../components/styles/ingresoTitular.css';
 import '../components/styles/globalStyle.css'
 import { useTitular } from "../contexts/TitularContext";
 
-
 const IngresoTitular = () => {
-    const navigator = useNavigate();
+    // Usar el hook de navegación personalizado en lugar de useNavigate directo
+    const { goToRequisitosTitular } = useHerederoNavigation();
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
     const [touched, setTouched] = useState(false);
@@ -23,54 +23,64 @@ const IngresoTitular = () => {
     const handleFocus = () => {
         setShowError(false);
     };
-    const { mostrarAlerta,
+    
+    const { 
+        mostrarAlerta,
         mostrarAlerta2,
         mostrarAlerta3,
-        mostrarAlerta4} = UseAlert();
+        mostrarAlerta4
+    } = UseAlert();
 
-   const handleFlow = async () => {
-    if (!isValidRut) {
-        mostrarAlerta;
-        return;
-    }
-    
-    try {
-        console.log(rut)
-        await buscarTitular(rut);
+    const handleFlow = async () => {
+        if (!isValidRut) {
+            mostrarAlerta();
+            return;
+        }
         
-        if (error) {
+        try {
+            console.log(rut);
+            await buscarTitular(rut);
+            
+            if (error) {
+                mostrarAlerta();
+                return;
+            }
+            if(titular === null){
+                mostrarAlerta();
+                return;
+            }
+            if(!titular?.poseeFondos){
+                mostrarAlerta2();
+                return;
+            }
+            if(titular?.poseeSolicitud){
+                mostrarAlerta3();
+                return;
+            }
+            
+            // Usar el método de navegación personalizado
+            goToRequisitosTitular();
+        } catch (err) {
             mostrarAlerta();
-            return;
         }
-        if(titular === null){
-            mostrarAlerta();
-            return;
-        }
-        if(!titular?.poseeFondos){
-            mostrarAlerta2();
-            return;
-        }
-        if(titular?.poseeSolicitud){
-            mostrarAlerta3();
-        }
-    navigator('/mnherederos/ingresoher/RequisitosTitular');
-} catch (err) {
-    mostrarAlerta;
-}
-   }
+    }
 
     return (
         <>
             <div className="textoTituloComponentes">
                 {ConsaludCore.Typography ? (
-                    <ConsaludCore.Typography variant="h5" component="span" fontWeight={ConsaludCore.FONT_WEIGHTS?.bold} color={ConsaludCore.theme?.textColors?.primary || "#505050"}>
+                    <ConsaludCore.Typography 
+                        variant="h5" 
+                        component="span" 
+                        weight={ConsaludCore.FONT_WEIGHTS?.bold} 
+                        color={ConsaludCore.theme?.textColors?.primary || "#505050"}
+                    >
                         Registrar persona titular
                     </ConsaludCore.Typography>
                 ) : (
-                    <span>Registrar persona titular</span> // Fallback simple si Typography aún no está disponible
+                    <span>Registrar persona titular</span>
                 )}
             </div>
-
 
             <div className="generalContainer">
                 <div className="containerIcono">
@@ -80,7 +90,12 @@ const IngresoTitular = () => {
                             <path fillRule="evenodd" clipRule="evenodd" d="M12 13C14.2091 13 16 11.2091 16 9C16 6.79086 14.2091 5 12 5C9.79086 5 8 6.79086 8 9C8 11.2091 9.79086 13 12 13Z" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                         {ConsaludCore.Typography ? (
-                            <ConsaludCore.Typography variant="body" component="p" fontWeight={ConsaludCore.FONT_WEIGHTS?.medium} color={ConsaludCore.theme?.textColors?.primary || "#505050"}>
+                            <ConsaludCore.Typography 
+                                variant="body" 
+                                component="p" 
+                                weight={ConsaludCore.FONT_WEIGHTS?.medium} 
+                                color={ConsaludCore.theme?.textColors?.primary || "#505050"}
+                            >
                                 RUT del titular
                             </ConsaludCore.Typography>
                         ) : (
@@ -88,14 +103,25 @@ const IngresoTitular = () => {
                         )}
                     </div>
                     {ConsaludCore.Typography ? (
-                        <ConsaludCore.Typography variant="caption" component="p" color={ConsaludCore.theme?.textColors?.secondary || "#656565"} className="textoImportante">
+                        <ConsaludCore.Typography 
+                            variant="caption" 
+                            component="p" 
+                            color={ConsaludCore.theme?.textColors?.secondary || "#656565"} 
+                            className="textoImportante"
+                        >
                             Ingresa el RUT del titular que corresponda a una persona afiliada con devolución.
                         </ConsaludCore.Typography>
                     ) : (
                         <p className="textoImportante">Ingresa el RUT del titular que corresponda a una persona afiliada con devolución.</p>
                     )}
                     {ConsaludCore.Typography ? (
-                        <ConsaludCore.Typography variant="caption" component="span" fontWeight={ConsaludCore.FONT_WEIGHTS?.medium} color="gray.medium" className="rutText">
+                        <ConsaludCore.Typography 
+                            variant="caption" 
+                            component="span" 
+                            weight={ConsaludCore.FONT_WEIGHTS?.medium} 
+                            color="gray.medium" 
+                            className="rutText"
+                        >
                             RUT persona heredera
                         </ConsaludCore.Typography>
                     ) : (
@@ -112,15 +138,18 @@ const IngresoTitular = () => {
                             onBlur={handleBlur}
                             onFocus={handleFocus}
                             placeholder="Ingresar"
-                           className="inputRut"
+                            className="inputRut"
                         />
                         <button 
-                             className={`buttonRut ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}`}  
+                            className={`buttonRut ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}`}  
                             disabled={!isValidRut} 
                             onClick={handleFlow}
                         > 
                             {ConsaludCore.Typography ? (
-                                <ConsaludCore.Typography variant="button" color={isValidRut ? (ConsaludCore.theme?.textColors?.white || "#FFFFFF") : (ConsaludCore.theme?.textColors?.white || "#FFF")}>
+                                <ConsaludCore.Typography 
+                                    variant="button" 
+                                    color={isValidRut ? (ConsaludCore.theme?.textColors?.white || "#FFFFFF") : (ConsaludCore.theme?.textColors?.white || "#FFF")}
+                                >
                                     Buscar
                                 </ConsaludCore.Typography>
                             ) : (
@@ -132,23 +161,26 @@ const IngresoTitular = () => {
                             </svg>
                         </button>
                     </div>
-           
 
                     {showError && (
                         ConsaludCore.Typography ? (
-                            <ConsaludCore.Typography variant="caption" color={ConsaludCore.theme?.textColors?.danger || "#E11D48"} className="errorRut">
+                            <ConsaludCore.Typography 
+                                variant="caption" 
+                                color={ConsaludCore.theme?.textColors?.danger || "#E11D48"} 
+                                className="errorRut"
+                            >
                                 RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
                             </ConsaludCore.Typography>
                         ) : (
-                            <span className="errorRut" style={{color: ConsaludCore.theme?.textColors?.danger || "#E11D48"}}>RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)</span>
+                            <span className="errorRut" style={{color: ConsaludCore.theme?.textColors?.danger || "#E11D48"}}>
+                                RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
+                            </span>
                         )
                     )}
                 </div>
-                
             </div>
         </>
     );
 };
-
 
 export { IngresoTitular };
