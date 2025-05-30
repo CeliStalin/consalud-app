@@ -132,3 +132,268 @@ Por implementar.
 ## 📄 Licencia
 
 Este proyecto es propiedad de Consalud y es de uso interno. Todos los derechos reservados.
+
+# Consalud App - Guía de Despliegue
+
+Esta aplicación React con TypeScript está optimizada para ejecutarse en contenedores Docker con Alpine Linux.
+
+## 📋 Requisitos Previos
+
+- Docker 20.10+
+- Docker Compose 2.0+
+- Servidor Unix/Linux
+- 2GB de RAM disponible
+- 10GB de espacio en disco
+
+## 🚀 Instalación y Ejecución
+
+### Opción 1: Desarrollo (Recomendado para desarrollo local)
+
+```bash
+# Clonar el repositorio
+git clone <tu-repositorio>
+cd consalud-app
+
+# Construir y ejecutar en modo desarrollo
+docker-compose up app
+
+# O en background
+docker-compose up -d app
+```
+
+**Acceso**: http://localhost:5173
+
+### Opción 2: Producción Optimizada
+
+```bash
+# Construir y ejecutar en modo producción
+docker-compose --profile production up app-prod
+
+# O en background
+docker-compose --profile production up -d app-prod
+```
+
+**Acceso**: http://localhost:3000
+
+## 🔧 Comandos Útiles
+
+### Gestión de Contenedores
+
+```bash
+# Ver logs en tiempo real
+docker-compose logs -f app
+
+# Parar todos los servicios
+docker-compose down
+
+# Parar y eliminar volúmenes
+docker-compose down -v
+
+# Reconstruir imagen desde cero
+docker-compose build --no-cache app
+
+# Ver estado de contenedores
+docker-compose ps
+```
+
+### Construcción Manual
+
+```bash
+# Desarrollo
+docker build --target development -t consalud-app:dev .
+docker run -p 5173:5173 -v $(pwd):/app -v /app/node_modules consalud-app:dev
+
+# Producción
+docker build --target production -t consalud-app:prod .
+docker run -p 3000:3000 consalud-app:prod
+```
+
+### Optimización de Dependencias
+
+```bash
+# Ejecutar optimización manual (opcional)
+node scripts/optimize-deps.js
+
+# Ver diferencias de dependencias
+ls -la package*.json
+```
+
+## 📁 Estructura del Proyecto
+
+```
+consalud-app/
+├── Dockerfile                 # Multi-stage build optimizado
+├── docker-compose.yml         # Configuración de servicios
+├── optimization.config.ts     # Configuración de optimización
+├── scripts/
+│   └── optimize-deps.js      # Script de optimización de dependencias
+├── package.json              # Dependencias completas
+├── package.prod.json         # Dependencias de producción (auto-generado)
+└── .dockerignore             # Archivos excluidos del build
+```
+
+## 🐳 Arquitectura Docker
+
+### Multi-Stage Build
+
+1. **Base**: Node 20 Alpine + herramientas de compilación
+2. **Optimizer**: Ejecuta optimización de dependencias
+3. **Deps-dev**: Instala todas las dependencias para desarrollo
+4. **Deps-prod**: Instala solo dependencias de producción
+5. **Development**: Imagen final para desarrollo
+6. **Production**: Imagen final optimizada para producción
+
+### Optimizaciones Aplicadas
+
+- ✅ **Alpine Linux**: Reduce imagen base de 180MB a 5MB
+- ✅ **Multi-stage build**: Separa dependencias dev/prod
+- ✅ **Dependency optimization**: Elimina dependencias innecesarias
+- ✅ **Layer caching**: Optimiza rebuild de imágenes
+- ✅ **Security**: Usuario no-root
+- ✅ **Health checks**: Monitoreo de salud del contenedor
+
+## 🔍 Monitoreo y Troubleshooting
+
+### Verificar Estado de la Aplicación
+
+```bash
+# Health check manual
+curl http://localhost:5173/
+curl http://localhost:3000/
+
+# Ver logs específicos
+docker logs consalud-app-dev
+docker logs consalud-app-prod
+
+# Entrar al contenedor para debugging
+docker exec -it consalud-app-dev sh
+
+# Ver uso de recursos
+docker stats consalud-app-dev
+```
+
+### Problemas Comunes
+
+#### Error: Puerto ya en uso
+```bash
+# Encontrar proceso usando el puerto
+sudo lsof -i :5173
+sudo lsof -i :3000
+
+# Matar proceso
+sudo kill -9 <PID>
+```
+
+#### Error: Sin espacio en disco
+```bash
+# Limpiar imágenes no utilizadas
+docker system prune -a
+
+# Ver uso de espacio de Docker
+docker system df
+```
+
+#### Error: Dependencias faltantes
+```bash
+# Reconstruir sin cache
+docker-compose build --no-cache app
+
+# Verificar archivo de dependencias optimizado
+cat package.prod.json
+```
+
+## 🔧 Configuración de Entorno
+
+### Variables de Entorno
+
+Crear archivo `.env` para configuración local:
+
+```bash
+# .env
+NODE_ENV=development
+VITE_API_URL=http://localhost:3001
+VITE_HOST=0.0.0.0
+```
+
+### Configuración de Red
+
+```bash
+# Para acceso externo en servidor
+docker run -p 0.0.0.0:5173:5173 consalud-app:dev
+
+# Con docker-compose, editar ports en docker-compose.yml:
+ports:
+  - "0.0.0.0:5173:5173"
+```
+
+## 📊 Métricas de Optimización
+
+### Tamaños de Imagen
+
+- **Antes**: ~1.5GB
+- **Desarrollo**: ~400-600MB
+- **Producción**: ~200-300MB
+
+### Dependencias Optimizadas
+
+Las siguientes dependencias se excluyen en producción:
+- `@types/*` - Tipos de TypeScript
+- `@vitejs/*` - Herramientas de Vite
+- `typescript` - Compilador TS
+- `eslint*` - Linting tools
+- `@testing-library/*` - Testing utilities
+
+## 🔄 Comandos de Mantenimiento
+
+### Actualizaciones
+
+```bash
+# Actualizar imagen base
+docker pull node:20-alpine
+
+# Reconstruir aplicación
+docker-compose build app
+
+# Reiniciar servicios
+docker-compose restart app
+```
+
+### Backup
+
+```bash
+# Backup de volúmenes
+docker run --rm -v consalud-app_node_modules:/data -v $(pwd):/backup alpine tar czf /backup/node_modules.tar.gz -C /data .
+
+# Restaurar backup
+docker run --rm -v consalud-app_node_modules:/data -v $(pwd):/backup alpine tar xzf /backup/node_modules.tar.gz -C /data
+```
+
+## 📞 Soporte
+
+Para problemas o dudas:
+
+1. Verificar logs: `docker-compose logs -f app`
+2. Revisar health checks: `docker ps`
+3. Consultar documentación de Docker
+4. Contactar al equipo de desarrollo
+
+---
+
+## 🎯 Comandos Rápidos de Referencia
+
+```bash
+# Inicio rápido desarrollo
+docker-compose up -d app && docker-compose logs -f app
+
+# Inicio rápido producción  
+docker-compose --profile production up -d app-prod
+
+# Parar todo
+docker-compose down
+
+# Reconstruir desde cero
+docker-compose build --no-cache && docker-compose up app
+
+# Ver estado y logs
+docker-compose ps && docker-compose logs --tail=50 app
+```

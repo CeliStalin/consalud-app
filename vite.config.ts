@@ -11,6 +11,8 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0', // Importante para Docker
+    port: 5173,
     headers: {
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
@@ -26,6 +28,23 @@ export default defineConfig({
       '/api/health': {
         target: 'http://localhost:3001',
         changeOrigin: true,
+      }
+    }
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 4173
+  },
+  build: {
+    target: 'esnext',
+    outDir: 'dist',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          ui: ['bulma', 'sweetalert2']
+        }
       }
     }
   }

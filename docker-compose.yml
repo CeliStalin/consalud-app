@@ -1,15 +1,88 @@
 services:
-  app:
+  # Servicio para desarrollo
+  app-dev:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: app-gerederos
+      target: development
+      args:
+        BUILD_MODE: development
+    container_name: consalud-app-dev
     ports:
       - "5173:5173"
-    command: ["npm", "run", "dev", "--", "--host"]
-    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.npm
+    environment:
+      - NODE_ENV=development
+      - VITE_HOST=0.0.0.0
+    env_file:
+      - .env.development
+    restart: unless-stopped
+    profiles:
+      - dev
+      - development
+    
+  # Servicio para testing/QA
+  app-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+      args:
+        BUILD_MODE: test
+    container_name: consalud-app-test
+    ports:
+      - "4173:4173"
+    environment:
+      - NODE_ENV=test
+    env_file:
+      - .env.test
+    restart: unless-stopped
+    profiles:
+      - test
+      - qa
+    
+  # Servicio para producción
+  app-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        BUILD_MODE: production
+    container_name: consalud-app-prod
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.production
+    restart: unless-stopped
+    profiles:
+      - prod
+      - production
+
+  # Servicio para desarrollo local
+  app-local:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+      args:
+        BUILD_MODE: development
+    container_name: consalud-app-local
+    ports:
+      - "5173:5173"
     volumes:
       - .:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      - VITE_HOST=0.0.0.0
+    env_file:
+      - .env.local
+    restart: unless-stopped
+    profiles:
+      - local
