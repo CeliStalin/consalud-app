@@ -10,11 +10,18 @@
     "build:dev": "tsc && vite build --mode development",
     "build:test": "tsc && vite build --mode test",
     "preview": "vite preview",
-    "start": "vite"
+    "start": "vite",
+    "docker:dev": "bash docker-scripts.sh dev",
+    "docker:prod": "bash docker-scripts.sh prod",
+    "docker:build": "bash docker-scripts.sh build-all",
+    "docker:stop": "bash docker-scripts.sh stop",
+    "docker:logs": "bash docker-scripts.sh logs",
+    "docker:clean": "bash docker-scripts.sh clean",
+    "optimize:deps": "node scripts/optimize-deps.js"
   },
   "dependencies": {
     "@azure/msal-browser": "^4.11.1",
-    "@consalud/core": "file:../plantilla-Core/consalud-core-1.0.0.tgz",
+    "@consalud/core": "file:./consalud-core-1.0.0.tgz",
     "axios": "^1.9.0",
     "bulma": "^1.0.4",
     "cors": "^2.8.5",

@@ -32,7 +32,7 @@ WORKDIR /app
 
 # Copiar archivos de paquete
 COPY package*.json ./
-COPY consalud-core-1.0.0.tgz ./
+COPY ./consalud-core-1.0.0.tgz ./
 
 # Instalar TODAS las dependencias para desarrollo
 RUN npm ci --no-audit --no-fund
@@ -44,7 +44,7 @@ WORKDIR /app
 
 # Copiar el package.json optimizado desde la etapa optimizer
 COPY --from=optimizer /app/package.prod.json ./package.json
-COPY consalud-core-1.0.0.tgz ./
+COPY ./consalud-core-1.0.0.tgz ./
 
 # Instalar SOLO dependencias de producción
 RUN npm ci --only=production --no-audit --no-fund
@@ -57,7 +57,7 @@ WORKDIR /app
 # Copiar dependencias completas para desarrollo
 COPY --from=deps-dev /app/node_modules ./node_modules
 COPY package*.json ./
-COPY consalud-core-1.0.0.tgz ./
+COPY ./consalud-core-1.0.0.tgz ./
 
 # Copiar código fuente
 COPY . .

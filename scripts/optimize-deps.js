@@ -1,10 +1,13 @@
-const fs = require('fs');
-const path = require('path');
+import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Función para leer la configuración de optimización 
 function loadOptimizationConfig() {
   try {
-    
     const defaultConfig = {
       devOnlyDependencies: [
         '@types/*',
@@ -54,14 +57,14 @@ function optimizePackageJson() {
   const config = loadOptimizationConfig();
   if (!config) return;
 
-  const packageJsonPath = path.join(__dirname, '../package.json');
+  const packageJsonPath = join(__dirname, '../package.json');
   
-  if (!fs.existsSync(packageJsonPath)) {
+  if (!existsSync(packageJsonPath)) {
     console.error('❌ package.json no encontrado');
     return;
   }
 
-  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
 
   // Filtrar dependencies de producción
   const prodDependencies = {};
@@ -86,8 +89,8 @@ function optimizePackageJson() {
   };
 
   // Guardar versión optimizada
-  const prodPath = path.join(__dirname, '../package.prod.json');
-  fs.writeFileSync(prodPath, JSON.stringify(prodPackageJson, null, 2));
+  const prodPath = join(__dirname, '../package.prod.json');
+  writeFileSync(prodPath, JSON.stringify(prodPackageJson, null, 2));
   
   console.log('✅ package.prod.json creado exitosamente');
   console.log(`📦 Dependencies originales: ${Object.keys(packageJson.dependencies || {}).length}`);
@@ -103,9 +106,10 @@ function optimizePackageJson() {
 }
 
 // Ejecutar si se llama directamente
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   console.log('🚀 Iniciando optimización de dependencias...');
   optimizePackageJson();
 }
 
-module.exports = { optimizePackageJson, loadOptimizationConfig };
+// Exportar funciones (ES modules style)
+export { optimizePackageJson, loadOptimizationConfig };

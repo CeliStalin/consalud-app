@@ -68,3 +68,6 @@ jspm_packages/
 Dockerfile*
 docker-compose*
 .dockerignore
+
+# IMPORTANTE: NO excluir el archivo .tgz que necesitamos
+# consalud-core-1.0.0.tgz debe estar disponible para Docker

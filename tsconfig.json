@@ -19,9 +19,15 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@consalud/core": ["./consalud-core-1.0.0.tgz"]
     },
-    "types": ["vite/client"]
+    "types": ["vite/client", "node"]
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "scripts/**/*",
+    "optimization.config.ts",
+    "vite.config.ts"
+  ]
 }
