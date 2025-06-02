@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import 'bulma/css/bulma.min.css';
 import './styles/variables.css'; 
+import './styles/animations.css';  // Agregar animaciones globales
 import './styles/bulma-overrides.css';
 import './index.css'; 
 

@@ -14,6 +14,7 @@
   margin: 0 auto;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
   border-radius: 10px !important;
+  animation: fadeInScale 0.5s ease-out;
 }
 
 .card-content {
@@ -28,12 +29,94 @@
 }
 
 .card-info-box {
-  background-color: rgba(4, 165, 155, 0.08);
-  border-radius: 6px;
   padding: 16px;
   margin-bottom: 30px;
   display: flex;
   align-items: flex-start;
+}
+
+/* Estilos específicos para la caja de información */
+.ingreso-info-box {
+  padding: 16px;
+  background-color: var(--app-login-bg, #f8f9fa);
+  border: 1px solid var(--app-border-color, #e0e0e0);
+  border-radius: var(--app-border-radius, 8px);
+  margin: 16px 0;
+  /* Animación de entrada suave */
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Container para el botón de acción */
+.button-action-container {
+  text-align: center;
+  margin-top: 24px;
+  /* Animación de entrada con delay */
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+/* Estilos mejorados para el botón principal */
+.proceso-button {
+  /* Transición mejorada para el botón */
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 20px !important;
+  font-weight: 500 !important;
+  padding: 12px 32px !important;
+  box-shadow: 0 2px 8px rgba(4, 165, 155, 0.2) !important;
+}
+
+.proceso-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(4, 165, 155, 0.3) !important;
+}
+
+.proceso-button:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 4px 15px rgba(4, 165, 155, 0.4) !important;
+}
+
+/* Efecto ripple para el botón */
+.proceso-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: width 0.6s, height 0.6s;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.proceso-button:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Animaciones keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .info-icon {
@@ -94,11 +177,19 @@
     width: 95%;
   }
   
-  .card-info-box {
+  .card-info-box,
+  .ingreso-info-box {
     flex-direction: column;
+    padding: 12px;
   }
   
   .info-icon {
     margin-bottom: 8px;
+  }
+  
+  .proceso-button {
+    width: 100%;
+    max-width: 280px;
+    padding: 14px 24px !important;
   }
 }

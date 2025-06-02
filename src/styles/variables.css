@@ -12,6 +12,11 @@
     --app-text-secondary: #666666;
     --app-text-muted: #999999;
     
+    /* Colores de fondo específicos para componentes del core */
+    --app-login-bg: #f8f9fa;
+    --app-login-card-bg: #ffffff;
+    --app-login-accent: var(--app-primary-color);
+    
     /* Bordes y sombras */
     --app-border-radius: 8px;
     --app-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -28,12 +33,10 @@
     --app-min-content-height: calc(100vh - 120px);
     --app-max-width: 1200px;
     
-    /* Typography */
-    /* These might be replaced by FONT_SIZES from @consalud/core */
-    /* --app-font-size-sm: 0.875rem; */
-    /* --app-font-size-md: 1rem; */
-    /* --app-font-size-lg: 1.125rem; */
-    /* --app-font-size-xl: 1.25rem; */
+    /* Variables específicas para el Login del core */
+    --login-container-max-width: 400px;
+    --login-card-padding: var(--app-spacing-xl);
+    --login-form-gap: var(--app-spacing-md);
     
     /* Z-index */
     --app-z-modal: 1000;

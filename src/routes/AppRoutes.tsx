@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
+import { useAuthWithRedirect } from '../hooks/useAuthWithRedirect';
 
 // Lazy load pages
 const IngresoHerederosPage = React.lazy(() => import('../pages/IngresoHerederosPage'));
@@ -97,11 +98,18 @@ const RouteWithTransition: React.FC<{ children: React.ReactNode }> = ({ children
 
 // Componente principal de rutas de la aplicación
 export const AppRoutes = () => {
-  const { isSignedIn, isInitializing, loading } = ConsaludCore.useAuth();
+  const { isAuthenticated, isLoading, handleLoginSuccess, getLoginCapabilities } = useAuthWithRedirect({
+    defaultRedirectPath: '/home',
+    protectedPaths: ['/mnherederos', '/home'],
+    publicPaths: ['/login']
+  });
 
-  if (isInitializing || loading) {
+  if (isLoading) {
     return <TransitionAwareLoading message="Cargando aplicación..." />;
   }
+
+  // Obtener las capacidades del componente Login
+  const loginCapabilities = getLoginCapabilities();
 
   return (
     <Suspense fallback={<TransitionAwareLoading message="Cargando página..." />}>
@@ -113,9 +121,10 @@ export const AppRoutes = () => {
             <ConsaludCore.PublicRoute>
               <RouteWithTransition>
                 <ConsaludCore.Login 
-                  appName="Mi Aplicación Consalud" 
-                  logoSrc="/path/to/your/logo.png"
-                  onLoginSuccess={() => { /* Lógica después del login exitoso */ }}
+                  appName="Sistema de Gestión de Herederos"
+                  onLoginSuccess={handleLoginSuccess}
+                  // Solo pasar propiedades que sabemos que el core acepta
+                  // El tema y estilos se manejan via CSS
                 />
               </RouteWithTransition>
             </ConsaludCore.PublicRoute>
@@ -126,7 +135,7 @@ export const AppRoutes = () => {
         <Route 
           path="/" 
           element={
-            isSignedIn ? <Navigate to="/home" /> : <Navigate to="/login" />
+            isAuthenticated ? <Navigate to="/home" /> : <Navigate to="/login" />
           } 
         />
         

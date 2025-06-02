@@ -56,12 +56,72 @@ html, body {
   margin-bottom: 40px !important;
 }
 
+/* Estilos mejorados para el Login del core - usando selectores más generales */
+/* Estos estilos se aplicarán automáticamente al componente Login del core */
+
+/* Container principal del login */
+.login-container,
+[class*="login"],
+[class*="Login"] {
+  min-height: 100vh !important;
+  background-color: var(--app-login-bg) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Card/Formulario del login */
+.login-card,
+.login-form,
+[class*="login"] .card,
+[class*="Login"] .card {
+  background-color: var(--app-login-card-bg) !important;
+  border-radius: var(--app-border-radius) !important;
+  box-shadow: var(--app-box-shadow) !important;
+  padding: var(--login-card-padding) !important;
+  max-width: var(--login-container-max-width) !important;
+  width: 100% !important;
+}
+
+/* Botones del login */
+.login-card .button.is-primary,
+.login-form .button.is-primary,
+[class*="login"] .button.is-primary,
+[class*="Login"] .button.is-primary {
+  background-color: var(--app-primary-color) !important;
+  border-color: var(--app-primary-color) !important;
+  transition: all 0.3s ease !important;
+}
+
+.login-card .button.is-primary:hover,
+.login-form .button.is-primary:hover,
+[class*="login"] .button.is-primary:hover,
+[class*="Login"] .button.is-primary:hover {
+  background-color: var(--app-secondary-color) !important;
+  border-color: var(--app-secondary-color) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Inputs del login */
+.login-card .input:focus,
+.login-card .textarea:focus,
+.login-form .input:focus,
+.login-form .textarea:focus,
+[class*="login"] .input:focus,
+[class*="login"] .textarea:focus,
+[class*="Login"] .input:focus,
+[class*="Login"] .textarea:focus {
+  border-color: var(--app-primary-color) !important;
+  box-shadow: 0 0 0 0.125em rgba(4, 165, 155, 0.25) !important;
+}
+
+/* Override general para botones primarios */
 .button.is-primary {
-  background-color: var(--primary);
+  background-color: var(--app-primary-color);
 }
 
 .button.is-primary:hover {
-  background-color: var(--primary-dark);
+  background-color: var(--app-secondary-color);
 }
 
 .card {
@@ -82,5 +142,13 @@ html, body {
   .container {
     padding-left: var(--app-spacing-sm);
     padding-right: var(--app-spacing-sm);
+  }
+  
+  .login-card,
+  .login-form,
+  [class*="login"] .card,
+  [class*="Login"] .card {
+    margin: var(--app-spacing-sm) !important;
+    padding: var(--app-spacing-md) !important;
   }
 }
