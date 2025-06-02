@@ -65,11 +65,12 @@ const App = () => {
               <TitularProvider>
                 <HerederoProvider>
                   <div className="app-sticky-footer-content">
-                    {/* AHORA SÍ usar PageTransition - el Core maneja automáticamente la detección de contexto */}
                     <ConsaludCore.PageTransition 
-                      preset="fast"
+                      preset="minimal"
                       duration={150}
-                      easing="ease-out"
+                      type="fade"
+                      respectReducedMotion={true}
+                      enableHardwareAcceleration={true}
                     >
                       <AppRoutes />
                     </ConsaludCore.PageTransition>

@@ -1,0 +1,38 @@
+/* Optimizaciones críticas para navegación SPA sin parpadeos */
+
+/* Aceleración por hardware en elementos clave */
+.app-layout-wrapper,
+.app-sticky-footer-content,
+[data-page-transition] {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: auto;
+  contain: layout style paint;
+}
+
+/* Prevenir parpadeos durante transiciones */
+.page-transitioning {
+  pointer-events: none;
+}
+
+/* Optimizar contenedores de ruta */
+.route-container {
+  position: relative;
+  width: 100%;
+  background-color: #ffffff;
+  transition: none !important;
+}
+
+/* Reducir animaciones en navegación rápida */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Override para navegación instantánea */
+.instant-nav * {
+  transition: none !important;
+  animation: none !important;
+}

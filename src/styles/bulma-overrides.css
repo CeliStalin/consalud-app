@@ -88,9 +88,9 @@ main,
   width: 100%;
   min-height: 100vh;
   /* Prevenir parpadeos durante navegación */
-  opacity: 1;
-  transition: none !important;
-  transform: none !important;
+  opacity: 1 !important;
+  will-change: auto;
+  contain: layout style paint;
 }
 
 /* Contenedor principal sin efectos */
