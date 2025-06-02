@@ -6,12 +6,17 @@ import './styles/IngresoHerederosPage.css';
 
 const IngresoHerederosPage: React.FC = () => {
   const navigate = useNavigate();
-  const { startProcess } = useHerederoNavigation();
+  const { startProcess, goToHome } = useHerederoNavigation(); // Agregar goToHome
 
   // Simplificar - el Core maneja las transiciones automáticamente
   const handleNavigateToForm = () => {
     // Navegación simple - el PageTransition del Core se encarga del resto
     startProcess();
+  };
+
+  // Opcional: Agregar método para volver al home
+  const handleBackToHome = () => {
+    goToHome();
   };
   
   return (

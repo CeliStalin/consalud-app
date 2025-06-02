@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 // Definir las rutas del flujo de herederos
 export const HEREDEROS_ROUTES = {
+  HOME: '/home', // Agregar ruta home
   DASHBOARD: '/mnherederos/dashboard',
   INICIO_PROCESO: '/mnherederos/ingresoher',
   INGRESO_TITULAR: '/mnherederos/ingresoher/ingresotitular',
@@ -87,6 +88,10 @@ export const useHerederoNavigation = () => {
     navigateToStep(HEREDEROS_ROUTES.SUCCESS, options);
   }, [navigateToStep]);
 
+  const goToHome = useCallback((options?: HerederoNavigationOptions) => {
+    navigateToStep(HEREDEROS_ROUTES.HOME, options);
+  }, [navigateToStep]);
+
   const goToStepNumber = useCallback((stepNumber: number, options?: HerederoNavigationOptions) => {
     switch (stepNumber) {
       case HEREDEROS_STEPS.TITULAR:
@@ -116,6 +121,7 @@ export const useHerederoNavigation = () => {
     steps: HEREDEROS_STEPS,
     
     // Métodos de navegación simplificados
+    goToHome, // Agregar nuevo método
     startProcess,
     goToIngresoTitular,
     goToRequisitosTitular,

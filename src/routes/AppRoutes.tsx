@@ -117,120 +117,163 @@ export const AppRoutes = () => {
           } 
         />
         
-        {/* Rutas Privadas - simplificadas */}
+        {/* Ruta Home - HomePage del Core */}
         <Route 
           path="/home"
           element={
             <ConsaludCore.ProtectedRoute>
               <StablePageWrapper>
-                <ConsaludCore.Dashboard />
+                <ConsaludCore.HomePage 
+                  //appName="Sistema de Gestión de Herederos"
+                 // welcomeMessage="Bienvenido al sistema de gestión de herederos"
+                />
               </StablePageWrapper>
             </ConsaludCore.ProtectedRoute>
           }
         />
         
-        {/* Rutas específicas de herederos - limpias y simples */}
-        <Route path="/mnherederos/ingresoher" element={
-          <ConsaludCore.ProtectedRoute>
-            <StablePageWrapper>
-              <IngresoTitularPage />
-            </StablePageWrapper>
-          </ConsaludCore.ProtectedRoute>
-        } />
+        {/* Rutas del módulo de herederos */}
+        <Route 
+          path="/mnherederos/ingresoher" 
+          element={
+            <ConsaludCore.ProtectedRoute>
+              <StablePageWrapper>
+                <IngresoHerederosPage />
+              </StablePageWrapper>
+            </ConsaludCore.ProtectedRoute>
+          } 
+        />
         
-        <Route path="/mnherederos/dashboard" element={
-          <ConsaludCore.ProtectedRoute>
-            <StablePageWrapper>
-              <ConsaludCore.Dashboard />
-            </StablePageWrapper>
-          </ConsaludCore.ProtectedRoute>
-        } />
+        <Route 
+          path="/mnherederos/dashboard" 
+          element={
+            <ConsaludCore.ProtectedRoute>
+              <StablePageWrapper>
+                <IngresoHerederosPage />
+              </StablePageWrapper>
+            </ConsaludCore.ProtectedRoute>
+          } 
+        />
         
-        <Route path="/mnherederos/ingresoher/ingresotitular" element={
-          <ConsaludCore.ProtectedRoute>
-            <StablePageWrapper>
-              <IngresoTitularPage />
-            </StablePageWrapper>
-          </ConsaludCore.ProtectedRoute>
-        } />
+        <Route 
+          path="/mnherederos/ingresoher/ingresotitular" 
+          element={
+            <ConsaludCore.ProtectedRoute>
+              <StablePageWrapper>
+                <IngresoTitularPage />
+              </StablePageWrapper>
+            </ConsaludCore.ProtectedRoute>
+          } 
+        />
         
-        <Route path="/mnherederos/ingresoher/RequisitosTitular" element={
-          <ConsaludCore.ProtectedRoute>
-            <StablePageWrapper>
-              <InfoRequisitosTitularPage />
-            </StablePageWrapper>
-          </ConsaludCore.ProtectedRoute>
-        } />
+        <Route 
+          path="/mnherederos/ingresoher/RequisitosTitular" 
+          element={
+            <ConsaludCore.ProtectedRoute>
+              <StablePageWrapper>
+                <InfoRequisitosTitularPage />
+              </StablePageWrapper>
+            </ConsaludCore.ProtectedRoute>
+          } 
+        />
         
-        <Route path="/mnherederos/ingresoher/DatosTitular" element={
-          <ConsaludCore.ProtectedRoute>
-            <StablePageWrapper>
-              <DatosTitularPage />
-            </StablePageWrapper>
-          </ConsaludCore.ProtectedRoute>
-        } />
+        <Route 
+          path="/mnherederos/ingresoher/DatosTitular" 
+          element={
+            <ConsaludCore.ProtectedRoute>
+              <StablePageWrapper>
+                <DatosTitularPage />
+              </StablePageWrapper>
+            </ConsaludCore.ProtectedRoute>
+          } 
+        />
         
-        <Route path="/mnherederos/ingresoher/RegistroTitular" element={
-          <ConsaludCore.ProtectedRoute>
-            <StablePageWrapper>
-              <RegistroHerederoPage />
-            </StablePageWrapper>
-          </ConsaludCore.ProtectedRoute>
-        } />
+        <Route 
+          path="/mnherederos/ingresoher/RegistroTitular" 
+          element={
+            <ConsaludCore.ProtectedRoute>
+              <StablePageWrapper>
+                <RegistroHerederoPage />
+              </StablePageWrapper>
+            </ConsaludCore.ProtectedRoute>
+          } 
+        />
         
-        <Route path="/mnherederos/ingresoher/RegistroHeredero" element={
-          <ConsaludCore.ProtectedRoute>
-            <StablePageWrapper>
-              <RegistroHerederoPage />
-            </StablePageWrapper>
-          </ConsaludCore.ProtectedRoute>
-        } />
+        <Route 
+          path="/mnherederos/ingresoher/RegistroHeredero" 
+          element={
+            <ConsaludCore.ProtectedRoute>
+              <StablePageWrapper>
+                <RegistroHerederoPage />
+              </StablePageWrapper>
+            </ConsaludCore.ProtectedRoute>
+          } 
+        />
         
-        <Route path="/mnherederos/ingresoher/formingreso" element={
-          <ConsaludCore.ProtectedRoute>
-            <StablePageWrapper>
-              <IngresoHerederoFormPage />
-            </StablePageWrapper>
-          </ConsaludCore.ProtectedRoute>
-        } />
+        <Route 
+          path="/mnherederos/ingresoher/formingreso" 
+          element={
+            <ConsaludCore.ProtectedRoute>
+              <StablePageWrapper>
+                <IngresoHerederoFormPage />
+              </StablePageWrapper>
+            </ConsaludCore.ProtectedRoute>
+          } 
+        />
         
-        <Route path="/mnherederos/ingresoher/cargadoc" element={
-          <ConsaludCore.ProtectedRoute>
-            <StablePageWrapper>
-              <IngresoDocumentosPage />
-            </StablePageWrapper>
-          </ConsaludCore.ProtectedRoute>
-        } />
+        <Route 
+          path="/mnherederos/ingresoher/cargadoc" 
+          element={
+            <ConsaludCore.ProtectedRoute>
+              <StablePageWrapper>
+                <IngresoDocumentosPage />
+              </StablePageWrapper>
+            </ConsaludCore.ProtectedRoute>
+          } 
+        />
         
-        <Route path="/mnherederos/ingresoher/detallemandato" element={
-          <ConsaludCore.ProtectedRoute>
-            <StablePageWrapper>
-              <DetalleMandatoPage />
-            </StablePageWrapper>
-          </ConsaludCore.ProtectedRoute>
-        } />
+        <Route 
+          path="/mnherederos/ingresoher/detallemandato" 
+          element={
+            <ConsaludCore.ProtectedRoute>
+              <StablePageWrapper>
+                <DetalleMandatoPage />
+              </StablePageWrapper>
+            </ConsaludCore.ProtectedRoute>
+          } 
+        />
         
-        <Route path="/mnherederos/ingresoher/success" element={
-          <ConsaludCore.ProtectedRoute>
-            <StablePageWrapper>
-              <SuccessPage />
-            </StablePageWrapper>
-          </ConsaludCore.ProtectedRoute>
-        } />
+        <Route 
+          path="/mnherederos/ingresoher/success" 
+          element={
+            <ConsaludCore.ProtectedRoute>
+              <StablePageWrapper>
+                <SuccessPage />
+              </StablePageWrapper>
+            </ConsaludCore.ProtectedRoute>
+          } 
+        />
 
-        <Route path="/unauthorized" element={
-          <StablePageWrapper>
-            <ConsaludCore.Unauthorized />
-          </StablePageWrapper>
-        } />
+        {/* Rutas de error */}
+        <Route 
+          path="/unauthorized" 
+          element={
+            <StablePageWrapper>
+              <ConsaludCore.Unauthorized />
+            </StablePageWrapper>
+          } 
+        />
         
-        <Route path="/not-found" element={
-          <StablePageWrapper>
-            <ConsaludCore.NotFound />
-          </StablePageWrapper>
-        } />
+        <Route 
+          path="/not-found" 
+          element={
+            <StablePageWrapper>
+              <ConsaludCore.NotFound/>
+            </StablePageWrapper>
+          } 
+        />
         
-        {/* Redirección por defecto */}
+        {/* Fallback para rutas no encontradas */}
         <Route path="*" element={<Navigate to="/not-found" replace />} />
       </Routes>
     </Suspense>
