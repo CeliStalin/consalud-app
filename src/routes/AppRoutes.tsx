@@ -14,37 +14,59 @@ const IngresoDocumentosPage = React.lazy(() => import('../pages/IngresoDocumento
 const SuccessPage = React.lazy(() => import('../pages/SuccessPage'));
 const DetalleMandatoPage = React.lazy(() => import('../pages/DetalleMandatoPage'));
 
-// Loading super simple - sin animaciones que puedan causar parpadeos
-const SimpleLoading: React.FC = React.memo(() => (
-  <div style={{ 
-    display: 'flex', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    height: '200px',
-    fontSize: '14px',
-    color: '#666'
-  }}>
-    Cargando...
+// Loading optimizado para eliminar parpadeos
+const OptimizedLoading: React.FC = React.memo(() => (
+  <div className="suspense-fallback">
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '200px',
+      fontSize: '14px',
+      color: '#666',
+      background: '#ffffff', // Fondo consistente
+      width: '100%',
+      position: 'relative'
+    }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px'
+      }}>
+        <div style={{
+          width: '16px',
+          height: '16px',
+          border: '2px solid #f3f3f3',
+          borderTop: '2px solid #04A59B',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }} />
+        Cargando...
+      </div>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
   </div>
 ));
 
-SimpleLoading.displayName = 'SimpleLoading';
+OptimizedLoading.displayName = 'OptimizedLoading';
 
-// Simplificar el wrapper - el Core maneja las transiciones automáticamente
-const PageWrapper: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
+// Wrapper optimizado para prevenir parpadeos
+const StablePageWrapper: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
   return (
-    <div className="page-wrapper" style={{ 
-      minHeight: '100vh',
-      // Estilos básicos para mejorar la experiencia visual
-      opacity: 1,
-      transition: 'opacity 0.1s ease-out'
-    }}>
-      {children}
+    <div className="route-container layout-stable">
+      <div className="page-transition-wrapper">
+        {children}
+      </div>
     </div>
   );
 });
 
-PageWrapper.displayName = 'PageWrapper';
+StablePageWrapper.displayName = 'StablePageWrapper';
 
 export const AppRoutes = () => {
   const { isAuthenticated, isLoading, handleLoginSuccess } = useAuthWithRedirect({
@@ -55,30 +77,34 @@ export const AppRoutes = () => {
 
   const location = useLocation();
 
-  // Loading state ultra simple
+  // Loading state optimizado
   const loadingComponent = useMemo(() => (
-    <SimpleLoading />
+    <OptimizedLoading />
   ), []);
 
   if (isLoading) {
-    return loadingComponent;
+    return (
+      <div className="loading-overlay">
+        {loadingComponent}
+      </div>
+    );
   }
 
   return (
-    // Simplificar Suspense - el Core maneja las transiciones
-    <Suspense fallback={<SimpleLoading />}>
+    // Suspense optimizado con fallback estable
+    <Suspense fallback={<OptimizedLoading />}>
       <Routes location={location}>
         {/* Rutas Públicas */}
         <Route 
           path="/login" 
           element={
             <ConsaludCore.PublicRoute>
-              <PageWrapper>
+              <StablePageWrapper>
                 <ConsaludCore.Login 
                   appName="Sistema de Gestión de Herederos"
                   onLoginSuccess={handleLoginSuccess}
                 />
-              </PageWrapper>
+              </StablePageWrapper>
             </ConsaludCore.PublicRoute>
           } 
         />
@@ -95,114 +121,113 @@ export const AppRoutes = () => {
         <Route 
           path="/home"
           element={
-            <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-              <PageWrapper>
-                <ConsaludCore.HomePage />
-              </PageWrapper>
-            </ConsaludCore.PrivateRoute>
+            <ConsaludCore.ProtectedRoute>
+              <StablePageWrapper>
+                <ConsaludCore.Dashboard />
+              </StablePageWrapper>
+            </ConsaludCore.ProtectedRoute>
           }
         />
         
         {/* Rutas específicas de herederos - limpias y simples */}
         <Route path="/mnherederos/ingresoher" element={
-          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <PageWrapper>
+          <ConsaludCore.ProtectedRoute>
+            <StablePageWrapper>
               <IngresoTitularPage />
-            </PageWrapper>
-          </ConsaludCore.PrivateRoute>
+            </StablePageWrapper>
+          </ConsaludCore.ProtectedRoute>
         } />
         
         <Route path="/mnherederos/dashboard" element={
-          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <PageWrapper>
-              <IngresoHerederosPage />
-            </PageWrapper>
-          </ConsaludCore.PrivateRoute>
+          <ConsaludCore.ProtectedRoute>
+            <StablePageWrapper>
+              <ConsaludCore.Dashboard />
+            </StablePageWrapper>
+          </ConsaludCore.ProtectedRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/ingresotitular" element={
-          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <PageWrapper>
+          <ConsaludCore.ProtectedRoute>
+            <StablePageWrapper>
               <IngresoTitularPage />
-            </PageWrapper>
-          </ConsaludCore.PrivateRoute>
+            </StablePageWrapper>
+          </ConsaludCore.ProtectedRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/RequisitosTitular" element={
-          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <PageWrapper>
+          <ConsaludCore.ProtectedRoute>
+            <StablePageWrapper>
               <InfoRequisitosTitularPage />
-            </PageWrapper>
-          </ConsaludCore.PrivateRoute>
+            </StablePageWrapper>
+          </ConsaludCore.ProtectedRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/DatosTitular" element={
-          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <PageWrapper>
+          <ConsaludCore.ProtectedRoute>
+            <StablePageWrapper>
               <DatosTitularPage />
-            </PageWrapper>
-          </ConsaludCore.PrivateRoute>
+            </StablePageWrapper>
+          </ConsaludCore.ProtectedRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/RegistroTitular" element={
-          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <PageWrapper>
-              <IngresoHerederoFormPage />
-            </PageWrapper>
-          </ConsaludCore.PrivateRoute>
+          <ConsaludCore.ProtectedRoute>
+            <StablePageWrapper>
+              <RegistroHerederoPage />
+            </StablePageWrapper>
+          </ConsaludCore.ProtectedRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/RegistroHeredero" element={
-          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <PageWrapper>
+          <ConsaludCore.ProtectedRoute>
+            <StablePageWrapper>
               <RegistroHerederoPage />
-            </PageWrapper>
-          </ConsaludCore.PrivateRoute>
+            </StablePageWrapper>
+          </ConsaludCore.ProtectedRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/formingreso" element={
-          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <PageWrapper>
+          <ConsaludCore.ProtectedRoute>
+            <StablePageWrapper>
               <IngresoHerederoFormPage />
-            </PageWrapper>
-          </ConsaludCore.PrivateRoute>
+            </StablePageWrapper>
+          </ConsaludCore.ProtectedRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/cargadoc" element={
-          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <PageWrapper>
+          <ConsaludCore.ProtectedRoute>
+            <StablePageWrapper>
               <IngresoDocumentosPage />
-            </PageWrapper>
-          </ConsaludCore.PrivateRoute>
+            </StablePageWrapper>
+          </ConsaludCore.ProtectedRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/detallemandato" element={
-          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <PageWrapper>
+          <ConsaludCore.ProtectedRoute>
+            <StablePageWrapper>
               <DetalleMandatoPage />
-            </PageWrapper>
-          </ConsaludCore.PrivateRoute>
+            </StablePageWrapper>
+          </ConsaludCore.ProtectedRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/success" element={
-          <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <PageWrapper>
+          <ConsaludCore.ProtectedRoute>
+            <StablePageWrapper>
               <SuccessPage />
-            </PageWrapper>
-          </ConsaludCore.PrivateRoute>
+            </StablePageWrapper>
+          </ConsaludCore.ProtectedRoute>
         } />
 
-        {/* Rutas de manejo de errores */}
         <Route path="/unauthorized" element={
-          <PageWrapper>
+          <StablePageWrapper>
             <ConsaludCore.Unauthorized />
-          </PageWrapper>
+          </StablePageWrapper>
         } />
         
         <Route path="/not-found" element={
-          <PageWrapper>
+          <StablePageWrapper>
             <ConsaludCore.NotFound />
-          </PageWrapper>
+          </StablePageWrapper>
         } />
         
         {/* Redirección por defecto */}

@@ -3,7 +3,7 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px); /* Reducido de 30px a 20px para ser más sutil */
   }
   to {
     opacity: 1;
@@ -14,7 +14,7 @@
 @keyframes fadeInScale {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.98); /* Más sutil, de 0.95 a 0.98 */
   }
   to {
     opacity: 1;
@@ -25,7 +25,7 @@
 @keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-30px);
+    transform: translateX(-20px); /* Reducido de -30px a -20px */
   }
   to {
     opacity: 1;
@@ -58,7 +58,7 @@
   }
 }
 
-/* Nuevas animaciones anti-parpadeo */
+/* Nuevas animaciones anti-parpadeo optimizadas */
 @keyframes smoothFadeIn {
   from {
     opacity: 0;
@@ -71,7 +71,7 @@
 @keyframes smoothSlideIn {
   from {
     opacity: 0;
-    transform: translateX(10px);
+    transform: translateX(8px); /* Reducido de 10px a 8px */
   }
   to {
     opacity: 1;
@@ -79,14 +79,59 @@
   }
 }
 
-/* Clases críticas para prevenir parpadeos */
+/* CRÍTICO: Nuevas animaciones ultra-suaves para prevenir parpadeos */
+@keyframes instantFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes microSlide {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Nuevas animaciones para transiciones de página ultra-suaves */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* CRÍTICO: Clases optimizadas para prevenir parpadeos */
 .transition-wrapper {
-  backface-visibility: hidden;
-  transform: translateZ(0);
-  will-change: opacity, transform;
+  /* Simplificado para mejor rendimiento */
   position: relative;
   min-height: 100vh;
   background-color: #ffffff;
+  /* Solo lo esencial para estabilidad */
+  opacity: 1;
+  visibility: visible;
 }
 
 .page-container {
@@ -94,29 +139,26 @@
   width: 100%;
   min-height: 100vh;
   background-color: #ffffff;
-  /* Forzar aceleración de hardware */
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  /* Prevenir reflows durante navegación */
-  contain: layout style paint;
-  /* Asegurar que el contenedor use el layout flexible */
+  /* CRÍTICO: Eliminamos transformaciones problemáticas */
+  opacity: 1;
+  visibility: visible;
+  /* Solo contention esencial */
+  contain: layout;
   flex: 1 0 auto;
   min-height: calc(100vh - 140px);
 }
 
-.no-flicker {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* Prevenir parpadeos en la navegación */
-  opacity: 1;
-  visibility: visible;
+/* NUEVO: Clases críticas para navegación instantánea */
+.instant-navigation {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+  background-color: #ffffff;
 }
 
-/* Loading específico para evitar parpadeos - más optimizado */
+/* OPTIMIZADO: Loading sin parpadeos */
 .smooth-loading {
   position: fixed;
   top: 0;
@@ -128,44 +170,43 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Transición ultra-rápida */
-  transition: opacity 50ms ease-out;
-  /* Acelerar con GPU */
-  transform: translateZ(0);
-  will-change: opacity;
+  /* Transición instantánea */
+  transition: opacity 30ms ease-out;
+  opacity: 1;
 }
 
-/* Optimización específica para navegación SPA con sticky footer */
-.app-layout-wrapper {
-  /* Evitar reflows */
+.smooth-loading.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* NUEVO: Container estable para SPA */
+.spa-stable-container {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background-color: #ffffff;
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+  /* Prevenir cualquier parpadeo */
+  contain: layout style;
 }
 
-/* Nuevo: Contenedor principal que respeta el sticky footer */
-.app-sticky-footer-content {
-  flex: 1 0 auto;
-  display: flex;
-  flex-direction: column;
-  min-height: calc(100vh - 140px);
-}
-
-/* Clases de utilidad para animaciones */
+/* Clases de utilidad para animaciones - duraciones optimizadas */
 .animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out;
+  animation: fadeInUp 400ms ease-out; /* Reducido de 0.6s a 400ms */
 }
 
 .animate-fade-in-scale {
-  animation: fadeInScale 0.5s ease-out;
+  animation: fadeInScale 300ms ease-out; /* Reducido de 0.5s a 300ms */
 }
 
 .animate-slide-in-left {
-  animation: slideInLeft 0.4s ease-out;
+  animation: slideInLeft 250ms ease-out; /* Reducido de 0.4s a 250ms */
 }
 
 .animate-bounce-in {
-  animation: bounceIn 0.8s ease-out;
+  animation: bounceIn 600ms ease-out; /* Reducido de 0.8s a 600ms */
 }
 
 .animate-pulse {
@@ -176,43 +217,51 @@
   animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
-/* Delays para animaciones escalonadas */
+/* Delays para animaciones escalonadas - optimizados */
+.animate-delay-50 {
+  animation-delay: 50ms;
+}
+
 .animate-delay-100 {
   animation-delay: 100ms;
+}
+
+.animate-delay-150 {
+  animation-delay: 150ms;
 }
 
 .animate-delay-200 {
   animation-delay: 200ms;
 }
 
-.animate-delay-300 {
-  animation-delay: 300ms;
+.animate-delay-250 {
+  animation-delay: 250ms;
 }
 
-.animate-delay-400 {
-  animation-delay: 400ms;
-}
-
-.animate-delay-500 {
-  animation-delay: 500ms;
-}
-
-/* Efectos de hover predefinidos */
+/* Efectos de hover predefinidos - optimizados */
 .hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 200ms ease, box-shadow 200ms ease; /* Reducido de 0.3s a 200ms */
 }
 
 .hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px); /* Reducido de -2px a -1px para ser más sutil */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); /* Sombra más sutil */
 }
 
 .hover-scale {
-  transition: transform 0.3s ease;
+  transition: transform 200ms ease; /* Reducido de 0.3s a 200ms */
 }
 
 .hover-scale:hover {
-  transform: scale(1.05);
+  transform: scale(1.02); /* Reducido de 1.05 a 1.02 para ser más sutil */
+}
+
+/* Nueva clase para elementos que necesitan estabilidad visual */
+.visual-stable {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: auto;
+  contain: layout style paint;
 }
 
 /* Reducir movimiento para usuarios que lo prefieran */
@@ -224,4 +273,39 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  
+  .page-entering,
+  .page-exiting {
+    animation: none !important;
+  }
+}
+
+/* CRÍTICO: Optimizaciones para navegación específica - MEJORADAS */
+.route-transition-enter {
+  opacity: 0;
+}
+
+.route-transition-enter-active {
+  opacity: 1;
+  /* Transición ultra-rápida */
+  transition: opacity 80ms ease-out;
+}
+
+.route-transition-exit {
+  opacity: 1;
+}
+
+.route-transition-exit-active {
+  opacity: 0;
+  /* Salida instantánea */
+  transition: opacity 30ms ease-in;
+}
+
+/* NUEVO: Clase para elementos que deben aparecer inmediatamente */
+.no-transition {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }

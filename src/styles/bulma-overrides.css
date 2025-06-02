@@ -80,56 +80,69 @@ main,
     min-height: var(--app-main-content-min-height, calc(100vh - 140px)) !important;
 }
 
-/* CRÍTICO: Estilos para navegación SPA sin recargas */
+/* CRÍTICO: Estilos para navegación SPA sin recargas - OPTIMIZADOS */
 
-/* Wrapper principal - debe mantener el layout siempre */
+/* Wrapper principal - SIMPLIFICADO para evitar parpadeos */
 .app-layout-wrapper,
 .page-wrapper {
   width: 100%;
   min-height: 100vh;
-  /* Prevenir parpadeos durante navegación */
+  /* CRÍTICO: Sin efectos que causen parpadeo */
   opacity: 1 !important;
-  will-change: auto;
-  contain: layout style paint;
+  visibility: visible !important;
+  background-color: #ffffff;
+  position: relative;
 }
 
-/* Contenedor principal sin efectos */
+/* Contenedor principal sin efectos - OPTIMIZADO */
 .content-container {
   min-height: calc(100vh - 200px) !important;
   padding-bottom: 40px !important;
-  /* Sin transiciones que puedan causar recargas */
+  /* ELIMINAMOS todas las transiciones problemáticas */
   transition: none !important;
+  animation: none !important;
+  /* Asegurar estabilidad visual */
+  background-color: #ffffff;
+  position: relative;
 }
 
-/* Específico para páginas de herederos */
+/* Específico para páginas de herederos - SIMPLIFICADO */
 .ingreso-herederos-wrapper,
 .main-container,
 .generalContainer {
   min-height: calc(100vh - 300px);
-  /* Sin animaciones complejas */
+  /* CRÍTICO: Sin animaciones que interfieran */
   animation: none !important;
   transition: none !important;
+  /* Asegurar continuidad visual */
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
-/* Asegurar que las cards no colapsen el layout */
+/* Cards estables - OPTIMIZADO */
 .app-card,
 .ingreso-card,
 .form-container {
   margin-bottom: 40px !important;
-  /* Sin animaciones que puedan interferir con navegación */
+  /* ELIMINAMOS animaciones problemáticas */
   animation: none !important;
   transition: none !important;
+  /* Estabilidad visual crítica */
+  background-color: #ffffff;
+  position: relative;
 }
 
-/* Loading states simplificados */
+/* Loading states simplificados - ULTRA-OPTIMIZADO */
 .smooth-loading {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 200px;
-  /* Sin efectos complejos */
+  /* CRÍTICO: Sin efectos complejos */
   animation: none !important;
   transition: none !important;
+  background-color: #ffffff;
+  opacity: 1 !important;
 }
 
 /* Estilos mejorados para el Login del core - usando selectores más generales */

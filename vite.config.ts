@@ -43,27 +43,45 @@ export default defineConfig({
   build: {
     target: 'esnext',
     outDir: 'dist',
-    // Optimizar chunks para funcionar mejor con PageTransition del Core
+    // Optimizar chunks para funcionar mejor con PageTransition del Core - mejorado
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           core: ['@consalud/core'],
-          // Agrupar las páginas para cargas más eficientes
-          pages: [
+          // Optimización para páginas críticas - reducir el tamaño de chunks
+          'pages-critical': [
             './src/pages/IngresoHerederosPage',
-            './src/pages/IngresoTitularPage',
+            './src/pages/IngresoTitularPage'
+          ],
+          'pages-secondary': [
             './src/pages/DatosTitularPage',
-            './src/pages/SuccessPage'
+            './src/pages/RegistroHerederoPage'
+          ],
+          'pages-forms': [
+            './src/pages/IngresoHerederoFormPage',
+            './src/pages/IngresoDocumentosPage'
+          ],
+          'pages-final': [
+            './src/pages/SuccessPage',
+            './src/pages/DetalleMandatoPage'
           ]
-        }
+        },
+        // Optimizar nombres de archivos para mejor caching
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
     },
     // Configuraciones críticas para SPA
     minify: 'terser',
     sourcemap: false,
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 1000,
+    // Nuevas optimizaciones para reducir parpadeos
+    cssCodeSplit: true,
+    // Asegurar que los estilos se carguen de forma óptima
+    assetsInlineLimit: 4096
   },
   // Optimizaciones específicas para evitar recargas
   optimizeDeps: {
@@ -72,6 +90,12 @@ export default defineConfig({
   },
   // Eliminar configuración de CSS que puede causar conflictos
   css: {
-    devSourcemap: false
+    devSourcemap: false,
+    // Optimizaciones para CSS más rápido
+    preprocessorOptions: {
+      css: {
+        charset: false
+      }
+    }
   }
 })

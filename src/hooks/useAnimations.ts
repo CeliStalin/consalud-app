@@ -8,10 +8,10 @@ interface AnimationConfig {
 }
 
 export const useAnimations = () => {
-  // Crear estilos dinámicos para animaciones
+  // OPTIMIZADO: Crear estilos más simples y rápidos
   const createAnimationStyles = useCallback((animationName: string, config: AnimationConfig = {}) => {
     const {
-      duration = 300,
+      duration = 150, // Reducido significativamente
       delay = 0,
       easing = 'ease-out',
       fillMode = 'both'
@@ -22,12 +22,35 @@ export const useAnimations = () => {
     };
   }, []);
 
-  // Animaciones predefinidas
+  // NUEVO: Animaciones ultra-optimizadas para navegación
+  const navigationAnimations = {
+    instantFade: (config?: AnimationConfig) => createAnimationStyles('instantFadeIn', { duration: 80, ...config }),
+    microSlide: (config?: AnimationConfig) => createAnimationStyles('microSlide', { duration: 100, ...config }),
+  };
+
+  // OPTIMIZADO: Animaciones predefinidas más rápidas
   const animations = {
-    fadeInUp: (config?: AnimationConfig) => createAnimationStyles('fadeInUp', config),
-    fadeInScale: (config?: AnimationConfig) => createAnimationStyles('fadeInScale', config),
-    slideInLeft: (config?: AnimationConfig) => createAnimationStyles('slideInLeft', config),
-    bounceIn: (config?: AnimationConfig) => createAnimationStyles('bounceIn', config),
+    fadeInUp: (config?: AnimationConfig) => createAnimationStyles('fadeInUp', { duration: 200, ...config }),
+    fadeInScale: (config?: AnimationConfig) => createAnimationStyles('fadeInScale', { duration: 150, ...config }),
+    slideInLeft: (config?: AnimationConfig) => createAnimationStyles('slideInLeft', { duration: 120, ...config }),
+    bounceIn: (config?: AnimationConfig) => createAnimationStyles('bounceIn', { duration: 300, ...config }),
+    // Nuevas animaciones optimizadas
+    ...navigationAnimations,
+  };
+
+  // NUEVO: Hook para navegación sin parpadeos
+  const useInstantAnimation = (element: HTMLElement | null) => {
+    useEffect(() => {
+      if (element) {
+        // Aplicar clases de estabilidad inmediatamente
+        element.classList.add('instant-stable', 'navigation-stable', 'no-flash');
+        
+        // Asegurar que el elemento sea visible inmediatamente
+        element.style.opacity = '1';
+        element.style.visibility = 'visible';
+        element.style.transform = 'none';
+      }
+    }, [element]);
   };
 
   // Hook para aplicar animación en mount
@@ -62,8 +85,10 @@ export const useAnimations = () => {
 
   return {
     animations,
+    navigationAnimations,
     createAnimationStyles,
     useAnimateOnMount,
+    useInstantAnimation, // Nueva función
     triggerAnimation
   };
 };

@@ -3,6 +3,7 @@ import * as ConsaludCore from '@consalud/core';
 import { AppRoutes } from './routes';
 import './styles/variables.css';
 import './styles/bulma-overrides.css'; 
+import './styles/navigation-optimizations.css'; // Nuevo archivo
 import TitularProvider from './features/herederos/provider/TitularProvider';
 import HerederoProvider from './features/herederos/provider/HerederoProvider';
 
@@ -61,16 +62,26 @@ const App = () => {
       <ConsaludCore.AuthProvider>
         <ConsaludCore.MenuConfigProvider config={{ enableDynamicMenu: true }}>
           <Router>
-            <div className="app-layout-wrapper app-sticky-footer-layout">
+            <div className="app-layout-wrapper app-sticky-footer-layout instant-stable navigation-stable">
               <TitularProvider>
                 <HerederoProvider>
-                  <div className="app-sticky-footer-content">
+                  <div className="app-sticky-footer-content content-stable spa-stable-container">
                     <ConsaludCore.PageTransition 
-                      preset="minimal"
-                      duration={150}
+                      preset="fade"
+                      duration={50} // Ultra-rápido para eliminar parpadeos
                       type="fade"
                       respectReducedMotion={true}
-                      enableHardwareAcceleration={true}
+                      enableHardwareAcceleration={false} // Deshabilitado para evitar conflictos
+                      // Configuraciones críticas anti-parpadeo
+                      exitBeforeEnter={false} // Cambiado para mejor fluidez
+                      mode="concurrent" // Cambiado de wait a concurrent
+                      // Nuevas props para estabilidad
+                      className="instant-navigation"
+                      style={{ 
+                        minHeight: '100vh', 
+                        backgroundColor: '#ffffff',
+                        position: 'relative'
+                      }}
                     >
                       <AppRoutes />
                     </ConsaludCore.PageTransition>

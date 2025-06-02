@@ -1,38 +1,185 @@
-/* Optimizaciones críticas para navegación SPA sin parpadeos */
+/* Optimizaciones específicas para navegación SPA sin parpadeos */
 
-/* Aceleración por hardware en elementos clave */
-.app-layout-wrapper,
-.app-sticky-footer-content,
-[data-page-transition] {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  will-change: auto;
-  contain: layout style paint;
+/* Estabilidad global del viewport - OPTIMIZADO */
+html {
+  scroll-behavior: auto; /* Cambiado de smooth a auto para evitar conflictos */
+  height: 100%;
+  background-color: #ffffff;
+  /* Nueva optimización crítica */
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Prevenir parpadeos durante transiciones */
-.page-transitioning {
-  pointer-events: none;
+body {
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
+  /* Simplificado para mejor rendimiento */
+  font-display: swap;
+  /* Eliminamos transform innecesario que causa parpadeos */
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* Optimizar contenedores de ruta */
+#root {
+  min-height: 100vh;
+  background-color: #ffffff;
+  /* Optimizaciones críticas anti-parpadeo */
+  isolation: isolate;
+  contain: layout style;
+  position: relative;
+  width: 100%;
+}
+
+/* CRÍTICO: Optimizaciones para el router - simplificadas */
 .route-container {
   position: relative;
   width: 100%;
+  min-height: 100vh;
   background-color: #ffffff;
-  transition: none !important;
+  /* Solo las optimizaciones esenciales */
+  contain: layout;
 }
 
-/* Reducir animaciones en navegación rápida */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+/* NUEVO: Container estable para páginas */
+.page-stable-container {
+  position: relative;
+  min-height: calc(100vh - 140px);
+  background-color: #ffffff;
+  width: 100%;
+  /* Prevenir cambios de layout abruptos */
+  contain: layout style;
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Optimizaciones críticas para transiciones de página */
+.page-transition-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: inherit;
+  background-color: inherit;
+  /* Solo GPU acceleration esencial */
+  will-change: opacity;
+}
+
+/* Estados de carga ultra-optimizados */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Transición instantánea */
+  transition: opacity 50ms ease-out;
+  opacity: 1;
+}
+
+.loading-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* NUEVO: Anti-flicker crítico para navegación */
+.navigation-stable {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  /* Forzar continuidad visual */
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Optimizaciones específicas para Suspense - simplificadas */
+.suspense-fallback {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  background-color: #ffffff;
+  opacity: 1;
+  /* Sin transiciones que causen parpadeo */
+}
+
+/* CRÍTICO: Eliminamos animaciones problemáticas en navegación */
+.consalud-component {
+  /* Solo estabilidad esencial */
+  contain: layout;
+  position: relative;
+}
+
+/* Optimizaciones para formularios - simplificadas */
+.form-container {
+  position: relative;
+  background-color: #ffffff;
+  contain: layout;
+  /* Asegurar estabilidad visual */
+  min-height: fit-content;
+}
+
+/* NUEVO: Clase para elementos que necesitan estabilidad inmediata */
+.instant-stable {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  opacity: 1;
+  visibility: visible;
+  position: relative;
+}
+
+/* Optimizaciones para botones de navegación - simplificadas */
+.navigation-button {
+  position: relative;
+  /* Transición más rápida y suave */
+  transition: transform 100ms ease, box-shadow 100ms ease;
+  cursor: pointer;
+}
+
+.navigation-button:hover {
+  transform: translateY(-1px);
+}
+
+.navigation-button:active {
+  transform: translateY(0);
+}
+
+/* Responsive optimizations - críticas */
+@media (max-width: 768px) {
+  .route-container {
+    -webkit-overflow-scrolling: touch;
+    /* Eliminar will-change innecesario */
+  }
+  
+  .page-transition-wrapper {
+    /* Simplificado para móvil */
+    position: relative;
   }
 }
 
-/* Override para navegación instantánea */
-.instant-nav * {
-  transition: none !important;
+/* CRÍTICO: Optimizaciones para reducir motion - mejoradas */
+@media (prefers-reduced-motion: reduce) {
+  .page-transition-wrapper,
+  .loading-overlay,
+  .navigation-button,
+  * {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* NUEVO: Clase crítica para prevenir flash inicial */
+.no-flash {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
   animation: none !important;
+  transition: none !important;
 }
