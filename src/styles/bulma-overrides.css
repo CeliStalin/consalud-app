@@ -11,6 +11,7 @@ html, body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 /* Asegurar que el contenido principal tome el espacio disponible */
@@ -21,25 +22,62 @@ html, body {
 
 /* Override específico para SecureLayout del core */
 .secure-layout {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .secure-layout .content-wrapper {
-  flex: 1;
-  min-height: calc(100vh - 60px - 80px); /* header + footer aproximado */
+    flex: 1;
+    min-height: calc(100vh - 60px - 80px); /* header + footer aproximado */
 }
 
-/* Asegurar que el footer esté al final */
-.footer {
-  margin-top: auto !important;
+/* MEJORADO: Asegurar que el footer esté al final - Sticky Footer Pattern */
+.footer,
+[class*="footer"],
+[class*="Footer"] {
+    margin-top: auto !important;
+    flex-shrink: 0 !important;
+    /* Asegurar que el footer tenga una altura mínima */
+    min-height: var(--app-footer-height, 80px) !important;
 }
 
-/* Override para containers de páginas */
+/* Asegurar que el layout principal use flexbox correctamente */
+body {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100vh !important;
+}
+
+/* Override para containers de páginas - mejorado */
 .content-container {
-  min-height: calc(100vh - 200px) !important;
-  padding-bottom: 40px !important;
+    min-height: calc(100vh - 200px) !important;
+    padding-bottom: 40px !important;
+    /* Asegurar que tome el espacio necesario */
+    flex: 1 0 auto !important;
+}
+
+/* NUEVO: Layout específico para SecureLayout con footer sticky */
+.secure-layout,
+[class*="SecureLayout"],
+[class*="secureLayout"] {
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.secure-layout > *:not(.footer):not([class*="footer"]):not([class*="Footer"]),
+[class*="SecureLayout"] > *:not(.footer):not([class*="footer"]):not([class*="Footer"]),
+[class*="secureLayout"] > *:not(.footer):not([class*="footer"]):not([class*="Footer"]) {
+    flex: 1 0 auto;
+}
+
+/* Asegurar que el main content area sea flexible */
+main,
+.main-content,
+[role="main"] {
+    flex: 1 0 auto !important;
+    min-height: var(--app-main-content-min-height, calc(100vh - 140px)) !important;
 }
 
 /* CRÍTICO: Estilos para navegación SPA sin recargas */

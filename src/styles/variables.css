@@ -32,6 +32,11 @@
     /* Layout */
     --app-min-content-height: calc(100vh - 120px);
     --app-max-width: 1200px;
+
+    /* Variables específicas para Footer Sticky Layout */
+    --app-header-height: 60px;
+    --app-footer-height: 80px;
+    --app-main-content-min-height: calc(100vh - var(--app-header-height) - var(--app-footer-height));
     
     /* Variables específicas para el Login del core */
     --login-container-max-width: 400px;
@@ -63,7 +68,7 @@
     min-height: var(--app-min-content-height);
 }
 
-/* Layout helper classes */
+/* Layout helper classes mejoradas para sticky footer */
 .app-layout-wrapper {
     min-height: 100vh;
     display: flex;
@@ -72,5 +77,25 @@
 
 .app-content-main {
     flex: 1;
-    min-height: var(--app-min-content-height);
+    min-height: var(--app-main-content-min-height);
+    /* Asegurar que el contenido principal tome todo el espacio disponible */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Nueva clase para el contenedor específico del footer sticky */
+.app-sticky-footer-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-sticky-footer-content {
+    flex: 1 0 auto;
+    min-height: var(--app-main-content-min-height);
+}
+
+.app-sticky-footer {
+    flex-shrink: 0;
+    margin-top: auto;
 }

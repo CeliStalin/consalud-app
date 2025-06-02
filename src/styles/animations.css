@@ -99,6 +99,9 @@
   backface-visibility: hidden;
   /* Prevenir reflows durante navegación */
   contain: layout style paint;
+  /* Asegurar que el contenedor use el layout flexible */
+  flex: 1 0 auto;
+  min-height: calc(100vh - 140px);
 }
 
 .no-flicker {
@@ -132,13 +135,20 @@
   will-change: opacity;
 }
 
-/* Optimización específica para navegación SPA */
+/* Optimización específica para navegación SPA con sticky footer */
 .app-layout-wrapper {
   /* Evitar reflows */
-  contain: layout;
-  /* Asegurar que el layout sea estable */
   min-height: 100vh;
-  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Nuevo: Contenedor principal que respeta el sticky footer */
+.app-sticky-footer-content {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 140px);
 }
 
 /* Clases de utilidad para animaciones */

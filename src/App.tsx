@@ -61,17 +61,19 @@ const App = () => {
       <ConsaludCore.AuthProvider>
         <ConsaludCore.MenuConfigProvider config={{ enableDynamicMenu: true }}>
           <Router>
-            <div className="app-layout-wrapper">
+            <div className="app-layout-wrapper app-sticky-footer-layout">
               <TitularProvider>
                 <HerederoProvider>
-                  {/* AHORA SÍ usar PageTransition - el Core maneja automáticamente la detección de contexto */}
-                  <ConsaludCore.PageTransition 
-                    preset="fast"
-                    duration={150}
-                    easing="ease-out"
-                  >
-                    <AppRoutes />
-                  </ConsaludCore.PageTransition>
+                  <div className="app-sticky-footer-content">
+                    {/* AHORA SÍ usar PageTransition - el Core maneja automáticamente la detección de contexto */}
+                    <ConsaludCore.PageTransition 
+                      preset="fast"
+                      duration={150}
+                      easing="ease-out"
+                    >
+                      <AppRoutes />
+                    </ConsaludCore.PageTransition>
+                  </div>
                 </HerederoProvider>
               </TitularProvider>
             </div>
