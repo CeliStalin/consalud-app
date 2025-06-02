@@ -119,17 +119,32 @@ main,
   visibility: visible !important;
 }
 
-/* Cards estables - OPTIMIZADO */
+/* MEJORADO: Asegurar que las animaciones del core no se vean afectadas */
 .app-card,
 .ingreso-card,
 .form-container {
   margin-bottom: 40px !important;
-  /* ELIMINAMOS animaciones problemáticas */
-  animation: none !important;
-  transition: none !important;
-  /* Estabilidad visual crítica */
-  background-color: #ffffff;
+  /* CRÍTICO: Solo deshabilitar animaciones problemáticas, no todas */
   position: relative;
+  /* Mantener aceleración por hardware para animaciones suaves */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* NUEVO: Soporte específico para el HomePage del core */
+.homepage-container,
+[class*="homepage"] {
+  /* Asegurar que el contenedor del HomePage no interfiera con las animaciones */
+  transform: none !important;
+  animation: none !important;
+  /* Pero permitir que los elementos hijos tengan animaciones */
+}
+
+.homepage-container .app-card,
+[class*="homepage"] .app-card {
+  /* Restaurar capacidades de animación para las cards del HomePage */
+  animation: unset !important;
+  transition: transform 0.2s ease, box-shadow 0.3s ease !important;
 }
 
 /* Loading states simplificados - ULTRA-OPTIMIZADO */

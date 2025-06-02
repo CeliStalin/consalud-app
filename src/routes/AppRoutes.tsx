@@ -121,15 +121,17 @@ export const AppRoutes = () => {
         <Route 
           path="/home"
           element={
-            <ConsaludCore.ProtectedRoute>
+            <ConsaludCore.ProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
               <StablePageWrapper>
                 <ConsaludCore.HomePage 
-                  //appName="Sistema de Gestión de Herederos"
-                 // welcomeMessage="Bienvenido al sistema de gestión de herederos"
+                  enableBounce={true}  // ✅ Asegúrate de que esté habilitado
+                  showWelcomeSection={true}
+                  showApplicationsSection={true}
+                  showDirectAccessSection={true}
                 />
               </StablePageWrapper>
             </ConsaludCore.ProtectedRoute>
-          }
+          } 
         />
         
         {/* Rutas del módulo de herederos */}

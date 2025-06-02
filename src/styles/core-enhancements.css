@@ -1,0 +1,78 @@
+/* Mejoras específicas para asegurar que el bounce effect del core funcione */
+
+/* Asegurar que las animaciones del core se apliquen correctamente */
+.app-card.bounce-enabled {
+  transform-origin: center center !important;
+  backface-visibility: hidden !important;
+  perspective: 1000px !important;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* Efecto bounce cuando se hace clic */
+.app-card.bounce-enabled.clicked,
+.app-card.bounce-enabled:active {
+  animation: coreCardBounce 0.3s ease-out !important;
+}
+
+/* Definir la animación de bounce si no está definida */
+@keyframes coreCardBounce {
+  0% { 
+    transform: scale(1); 
+  }
+  50% { 
+    transform: scale(0.95); 
+  }
+  100% { 
+    transform: scale(1); 
+  }
+}
+
+/* Asegurar que los elementos del HomePage tengan la estructura correcta */
+.homepage-container .applications-section .app-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto hover mejorado */
+.homepage-container .applications-section .app-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Asegurar que el focus sea visible para accesibilidad */
+.homepage-container .applications-section .app-card:focus {
+  outline: 2px solid #04A59B;
+  outline-offset: 2px;
+}
+
+/* Optimizaciones para mejor rendimiento */
+.homepage-container .applications-section {
+  contain: layout style;
+}
+
+.homepage-container .applications-section .app-card {
+  will-change: transform;
+  transform: translateZ(0); /* Forzar aceleración por hardware */
+}
+
+/* Responsive: Reducir efectos en móviles para mejor rendimiento */
+@media (max-width: 768px) {
+  .app-card.bounce-enabled {
+    transition: transform 0.15s ease !important;
+  }
+  
+  @keyframes coreCardBounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.98); }
+    100% { transform: scale(1); }
+  }
+}
+
+/* Asegurar compatibilidad con el tema del core */
+.homepage-container {
+  --bounce-primary-color: var(--app-primary-color, #04A59B);
+  --bounce-duration: 0.3s;
+  --bounce-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
+}

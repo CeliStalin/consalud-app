@@ -60,7 +60,10 @@ const App = () => {
   return (
     <ConsaludCore.ErrorBoundary fallback={<ErrorFallback />}>
       <ConsaludCore.AuthProvider>
-        <ConsaludCore.MenuConfigProvider config={{ enableDynamicMenu: true }}>
+        <ConsaludCore.MenuConfigProvider config={{ 
+          enableDynamicMenu: true,
+          enableBounceEffects: true // ✅ Asegurar que el bounce esté habilitado globalmente
+        }}>
           <Router>
             <div className="app-layout-wrapper app-sticky-footer-layout instant-stable navigation-stable">
               <TitularProvider>
@@ -68,14 +71,12 @@ const App = () => {
                   <div className="app-sticky-footer-content content-stable spa-stable-container">
                     <ConsaludCore.PageTransition 
                       preset="fade"
-                      duration={50} // Ultra-rápido para eliminar parpadeos
+                      duration={50}
                       type="fade"
                       respectReducedMotion={true}
-                      enableHardwareAcceleration={false} // Deshabilitado para evitar conflictos
-                      // Configuraciones críticas anti-parpadeo
-                      exitBeforeEnter={false} // Cambiado para mejor fluidez
-                      mode="concurrent" // Cambiado de wait a concurrent
-                      // Nuevas props para estabilidad
+                      enableHardwareAcceleration={true} // ✅ Habilitar para mejores animaciones
+                      exitBeforeEnter={false}
+                      mode="concurrent"
                       className="instant-navigation"
                       style={{ 
                         minHeight: '100vh', 
