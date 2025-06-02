@@ -1,6 +1,6 @@
 import { BrowserRouter as Router } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core'; 
-import { AppRoutes } from './routes'; // Correcta importación nombrada
+import { AppRoutes } from './routes';
 import './styles/variables.css';
 import './styles/bulma-overrides.css'; 
 import TitularProvider from './features/herederos/provider/TitularProvider';
@@ -9,8 +9,6 @@ import HerederoProvider from './features/herederos/provider/HerederoProvider';
 // Componente para manejar errores
 const ErrorFallback = () => {
   // Asumimos que ConsaludCore.Typography ahora está siempre disponible y es el componente correcto.
-  // Si ConsaludCore o ConsaludCore.Typography pudieran ser undefined por otras razones, 
-  // se necesitaría un chequeo más robusto aquí.
   if (!ConsaludCore || !ConsaludCore.Typography) {
     // Fallback muy simple si los componentes principales no están disponibles
     return (
@@ -68,7 +66,16 @@ const App = () => {
             <div className="app-layout-wrapper">
               <TitularProvider>
                 <HerederoProvider>
-                  <AppRoutes />
+                  {/* Usar el componente PageTransition del core en lugar de uno custom */}
+                  <ConsaludCore.PageTransition
+                    // Configuración por defecto para toda la aplicación
+                    //preset="slideLeft"
+                    preset="fast"
+                    duration={300}
+                    easing="cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+                  >
+                    <AppRoutes />
+                  </ConsaludCore.PageTransition>
                 </HerederoProvider>
               </TitularProvider>
             </div>

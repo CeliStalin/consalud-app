@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import * as ConsaludCore from '@consalud/core'; 
 import { useRutChileno } from "../hooks/useRutChileno";
 import { UseAlert } from "../hooks/Alert";
