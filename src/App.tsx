@@ -6,11 +6,9 @@ import './styles/bulma-overrides.css';
 import TitularProvider from './features/herederos/provider/TitularProvider';
 import HerederoProvider from './features/herederos/provider/HerederoProvider';
 
-// Componente para manejar errores
+// Componente para manejar errores - simplificado
 const ErrorFallback = () => {
-  // Asumimos que ConsaludCore.Typography ahora está siempre disponible y es el componente correcto.
   if (!ConsaludCore || !ConsaludCore.Typography) {
-    // Fallback muy simple si los componentes principales no están disponibles
     return (
       <div style={{ padding: '20px', textAlign: 'center', color: '#D8000C', backgroundColor: '#FFD2D2', border: '1px solid #D8000C', borderRadius: '4px' }}>
         <h2 style={{ fontSize: '1.5em', marginBottom: '10px' }}>Error Crítico</h2>
@@ -66,13 +64,11 @@ const App = () => {
             <div className="app-layout-wrapper">
               <TitularProvider>
                 <HerederoProvider>
-                  {/* Usar el componente PageTransition del core en lugar de uno custom */}
-                  <ConsaludCore.PageTransition
-                    // Configuración por defecto para toda la aplicación
-                    //preset="slideLeft"
+                  {/* AHORA SÍ usar PageTransition - el Core maneja automáticamente la detección de contexto */}
+                  <ConsaludCore.PageTransition 
                     preset="fast"
-                    duration={300}
-                    easing="cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+                    duration={150}
+                    easing="ease-out"
                   >
                     <AppRoutes />
                   </ConsaludCore.PageTransition>

@@ -58,28 +58,87 @@
   }
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
+/* Nuevas animaciones anti-parpadeo */
+@keyframes smoothFadeIn {
+  from {
+    opacity: 0;
   }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
+  to {
+    opacity: 1;
   }
 }
 
-@keyframes shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  10%, 30%, 50%, 70%, 90% {
-    transform: translateX(-10px);
-  }
-  20%, 40%, 60%, 80% {
+@keyframes smoothSlideIn {
+  from {
+    opacity: 0;
     transform: translateX(10px);
   }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Clases críticas para prevenir parpadeos */
+.transition-wrapper {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: opacity, transform;
+  position: relative;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+.page-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #ffffff;
+  /* Forzar aceleración de hardware */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Prevenir reflows durante navegación */
+  contain: layout style paint;
+}
+
+.no-flicker {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevenir parpadeos en la navegación */
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Loading específico para evitar parpadeos - más optimizado */
+.smooth-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Transición ultra-rápida */
+  transition: opacity 50ms ease-out;
+  /* Acelerar con GPU */
+  transform: translateZ(0);
+  will-change: opacity;
+}
+
+/* Optimización específica para navegación SPA */
+.app-layout-wrapper {
+  /* Evitar reflows */
+  contain: layout;
+  /* Asegurar que el layout sea estable */
+  min-height: 100vh;
+  background-color: #ffffff;
 }
 
 /* Clases de utilidad para animaciones */
@@ -144,20 +203,6 @@
 
 .hover-scale:hover {
   transform: scale(1.05);
-}
-
-/* Animaciones para loading states */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
 }
 
 /* Reducir movimiento para usuarios que lo prefieran */

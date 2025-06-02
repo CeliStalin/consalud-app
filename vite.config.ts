@@ -11,15 +11,20 @@ export default defineConfig({
     },
   },
   server: {
-    host: '0.0.0.0', // Importante para Docker
+    host: '0.0.0.0',
     port: 5173,
+    // Configuración optimizada para SPA con transiciones del Core
+    historyApiFallback: true,
     headers: {
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '1; mode=block',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
+      // Headers adicionales para mejorar las transiciones
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
     },
-    // Configuración del proxy para redireccionar al servidor proxy Node
     proxy: {
       '/api/mandato': {
         target: 'http://localhost:3001',
@@ -38,14 +43,35 @@ export default defineConfig({
   build: {
     target: 'esnext',
     outDir: 'dist',
+    // Optimizar chunks para funcionar mejor con PageTransition del Core
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          ui: ['bulma', 'sweetalert2']
+          core: ['@consalud/core'],
+          // Agrupar las páginas para cargas más eficientes
+          pages: [
+            './src/pages/IngresoHerederosPage',
+            './src/pages/IngresoTitularPage',
+            './src/pages/DatosTitularPage',
+            './src/pages/SuccessPage'
+          ]
         }
       }
-    }
+    },
+    // Configuraciones críticas para SPA
+    minify: 'terser',
+    sourcemap: false,
+    chunkSizeWarningLimit: 1000
+  },
+  // Optimizaciones específicas para evitar recargas
+  optimizeDeps: {
+    include: ['@consalud/core', 'react', 'react-dom', 'react-router-dom'],
+    exclude: ['@vite/client', '@vite/env']
+  },
+  // Eliminar configuración de CSS que puede causar conflictos
+  css: {
+    devSourcemap: false
   }
 })

@@ -42,11 +42,35 @@ html, body {
   padding-bottom: 40px !important;
 }
 
+/* CRÍTICO: Estilos para navegación SPA sin recargas */
+
+/* Wrapper principal - debe mantener el layout siempre */
+.app-layout-wrapper,
+.page-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  /* Prevenir parpadeos durante navegación */
+  opacity: 1;
+  transition: none !important;
+  transform: none !important;
+}
+
+/* Contenedor principal sin efectos */
+.content-container {
+  min-height: calc(100vh - 200px) !important;
+  padding-bottom: 40px !important;
+  /* Sin transiciones que puedan causar recargas */
+  transition: none !important;
+}
+
 /* Específico para páginas de herederos */
 .ingreso-herederos-wrapper,
 .main-container,
 .generalContainer {
   min-height: calc(100vh - 300px);
+  /* Sin animaciones complejas */
+  animation: none !important;
+  transition: none !important;
 }
 
 /* Asegurar que las cards no colapsen el layout */
@@ -54,6 +78,20 @@ html, body {
 .ingreso-card,
 .form-container {
   margin-bottom: 40px !important;
+  /* Sin animaciones que puedan interferir con navegación */
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Loading states simplificados */
+.smooth-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  /* Sin efectos complejos */
+  animation: none !important;
+  transition: none !important;
 }
 
 /* Estilos mejorados para el Login del core - usando selectores más generales */
@@ -139,16 +177,11 @@ html, body {
 
 /* Personalizar el contenedor en dispositivos móviles */
 @media screen and (max-width: 768px) {
-  .container {
-    padding-left: var(--app-spacing-sm);
-    padding-right: var(--app-spacing-sm);
+  .app-layout-wrapper {
+    padding: 0;
   }
   
-  .login-card,
-  .login-form,
-  [class*="login"] .card,
-  [class*="Login"] .card {
-    margin: var(--app-spacing-sm) !important;
-    padding: var(--app-spacing-md) !important;
+  .content-container {
+    padding: 10px;
   }
 }

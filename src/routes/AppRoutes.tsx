@@ -1,9 +1,9 @@
-import React, { Suspense } from 'react';
-import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import React, { Suspense, useMemo } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
 import { useAuthWithRedirect } from '../hooks/useAuthWithRedirect';
 
-// Lazy load pages
+// Lazy loading optimizado - SIN preloading que pueda causar conflictos
 const IngresoHerederosPage = React.lazy(() => import('../pages/IngresoHerederosPage'));
 const IngresoTitularPage = React.lazy(() => import('../pages/IngresoTitularPage'));
 const InfoRequisitosTitularPage = React.lazy(() => import('../pages/InfoRequisitosTitularPage'));
@@ -14,119 +14,71 @@ const IngresoDocumentosPage = React.lazy(() => import('../pages/IngresoDocumento
 const SuccessPage = React.lazy(() => import('../pages/SuccessPage'));
 const DetalleMandatoPage = React.lazy(() => import('../pages/DetalleMandatoPage'));
 
-// Configuraciones de transición por ruta
-const TRANSITION_CONFIGS = {
-  '/mnherederos/ingresoher': {
-    preset: 'slideLeft' as const,
-    duration: 350,
-    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-  },
-  '/home': {
-    preset: 'fadeIn' as const,
-    duration: 250,
-    easing: 'ease-in-out'
-  },
-  '/success': {
-    preset: 'scale' as const,
-    duration: 400,
-    easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
-  },
-  default: {
-    preset: 'fadeIn' as const,
-    duration: 300,
-    easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
-  }
-} as const;
+// Loading super simple - sin animaciones que puedan causar parpadeos
+const SimpleLoading: React.FC = React.memo(() => (
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    height: '200px',
+    fontSize: '14px',
+    color: '#666'
+  }}>
+    Cargando...
+  </div>
+));
 
-// Hook mejorado para configuración de transiciones
-const usePageTransitionConfig = () => {
-  const location = useLocation();
-  
-  return React.useMemo(() => {
-    // Buscar configuración específica
-    for (const [path, config] of Object.entries(TRANSITION_CONFIGS)) {
-      if (path !== 'default' && location.pathname.includes(path)) {
-        return config;
-      }
-    }
-    return TRANSITION_CONFIGS.default;
-  }, [location.pathname]);
-};
+SimpleLoading.displayName = 'SimpleLoading';
 
-// Componente de Loading personalizado
-const TransitionAwareLoading: React.FC<{ message?: string }> = ({ 
-  message = "Cargando página..." 
-}) => {
+// Simplificar el wrapper - el Core maneja las transiciones automáticamente
+const PageWrapper: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
   return (
-    <div 
-      style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '50vh',
-        transition: 'opacity 200ms ease-in-out'
-      }}
-    >
-      <ConsaludCore.LoadingOverlay show={true} message={message} />
+    <div className="page-wrapper" style={{ 
+      minHeight: '100vh',
+      // Estilos básicos para mejorar la experiencia visual
+      opacity: 1,
+      transition: 'opacity 0.1s ease-out'
+    }}>
+      {children}
     </div>
   );
-};
+});
 
-// Wrapper simplificado para rutas con transiciones
-const RouteWithTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const transitionConfig = usePageTransitionConfig();
-  
-  // Aplicar configuración de transición de manera segura
-  React.useEffect(() => {
-    // Verificar si el método existe antes de usarlo
-    if (typeof ConsaludCore.usePageTransition === 'function') {
-      try {
-        // Solo intentar actualizar si está disponible
-        const transitionHook = ConsaludCore.usePageTransition?.();
-        if (transitionHook?.updateConfig) {
-          transitionHook.updateConfig(transitionConfig);
-        }
-      } catch (error) {
-        // Fallar silenciosamente si no está disponible
-        console.debug('PageTransition no disponible:', error);
-      }
-    }
-  }, [transitionConfig]);
-  
-  return <>{children}</>;
-};
+PageWrapper.displayName = 'PageWrapper';
 
-// Componente principal de rutas de la aplicación
 export const AppRoutes = () => {
-  const { isAuthenticated, isLoading, handleLoginSuccess, getLoginCapabilities } = useAuthWithRedirect({
+  const { isAuthenticated, isLoading, handleLoginSuccess } = useAuthWithRedirect({
     defaultRedirectPath: '/home',
     protectedPaths: ['/mnherederos', '/home'],
     publicPaths: ['/login']
   });
 
+  const location = useLocation();
+
+  // Loading state ultra simple
+  const loadingComponent = useMemo(() => (
+    <SimpleLoading />
+  ), []);
+
   if (isLoading) {
-    return <TransitionAwareLoading message="Cargando aplicación..." />;
+    return loadingComponent;
   }
 
-  // Obtener las capacidades del componente Login
-  const loginCapabilities = getLoginCapabilities();
-
   return (
-    <Suspense fallback={<TransitionAwareLoading message="Cargando página..." />}>
-      <Routes>
+    // Simplificar Suspense - el Core maneja las transiciones
+    <Suspense fallback={<SimpleLoading />}>
+      <Routes location={location}>
         {/* Rutas Públicas */}
         <Route 
           path="/login" 
           element={
             <ConsaludCore.PublicRoute>
-              <RouteWithTransition>
+              <PageWrapper>
                 <ConsaludCore.Login 
                   appName="Sistema de Gestión de Herederos"
                   onLoginSuccess={handleLoginSuccess}
-                  // Solo pasar propiedades que sabemos que el core acepta
-                  // El tema y estilos se manejan via CSS
                 />
-              </RouteWithTransition>
+              </PageWrapper>
             </ConsaludCore.PublicRoute>
           } 
         />
@@ -135,128 +87,126 @@ export const AppRoutes = () => {
         <Route 
           path="/" 
           element={
-            isAuthenticated ? <Navigate to="/home" /> : <Navigate to="/login" />
+            isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />
           } 
         />
         
-        {/* Rutas Privadas */}
+        {/* Rutas Privadas - simplificadas */}
         <Route 
           path="/home"
           element={
             <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-              <RouteWithTransition>
+              <PageWrapper>
                 <ConsaludCore.HomePage />
-              </RouteWithTransition>
+              </PageWrapper>
             </ConsaludCore.PrivateRoute>
           }
         />
         
-        {/* Rutas específicas de la aplicación - Con transiciones del core */}
-        
-        {/* Ruta principal de Ingreso Herederos */}
+        {/* Rutas específicas de herederos - limpias y simples */}
         <Route path="/mnherederos/ingresoher" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <RouteWithTransition>
+            <PageWrapper>
               <IngresoTitularPage />
-            </RouteWithTransition>
+            </PageWrapper>
           </ConsaludCore.PrivateRoute>
         } />
         
-        {/* Ruta para la página de bienvenida/dashboard */}
         <Route path="/mnherederos/dashboard" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <RouteWithTransition>
+            <PageWrapper>
               <IngresoHerederosPage />
-            </RouteWithTransition>
+            </PageWrapper>
           </ConsaludCore.PrivateRoute>
         } />
         
-        {/* Resto de rutas del flujo con transiciones del core */}
         <Route path="/mnherederos/ingresoher/ingresotitular" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <RouteWithTransition>
+            <PageWrapper>
               <IngresoTitularPage />
-            </RouteWithTransition>
+            </PageWrapper>
           </ConsaludCore.PrivateRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/RequisitosTitular" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <RouteWithTransition>
+            <PageWrapper>
               <InfoRequisitosTitularPage />
-            </RouteWithTransition>
+            </PageWrapper>
           </ConsaludCore.PrivateRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/DatosTitular" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <RouteWithTransition>
+            <PageWrapper>
               <DatosTitularPage />
-            </RouteWithTransition>
+            </PageWrapper>
           </ConsaludCore.PrivateRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/RegistroTitular" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <RouteWithTransition>
+            <PageWrapper>
               <IngresoHerederoFormPage />
-            </RouteWithTransition>
+            </PageWrapper>
           </ConsaludCore.PrivateRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/RegistroHeredero" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <RouteWithTransition>
+            <PageWrapper>
               <RegistroHerederoPage />
-            </RouteWithTransition>
+            </PageWrapper>
           </ConsaludCore.PrivateRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/formingreso" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <RouteWithTransition>
+            <PageWrapper>
               <IngresoHerederoFormPage />
-            </RouteWithTransition>
+            </PageWrapper>
           </ConsaludCore.PrivateRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/cargadoc" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <RouteWithTransition>
+            <PageWrapper>
               <IngresoDocumentosPage />
-            </RouteWithTransition>
+            </PageWrapper>
           </ConsaludCore.PrivateRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/detallemandato" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <RouteWithTransition>
+            <PageWrapper>
               <DetalleMandatoPage />
-            </RouteWithTransition>
+            </PageWrapper>
           </ConsaludCore.PrivateRoute>
         } />
         
         <Route path="/mnherederos/ingresoher/success" element={
           <ConsaludCore.PrivateRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-            <RouteWithTransition>
+            <PageWrapper>
               <SuccessPage />
-            </RouteWithTransition>
+            </PageWrapper>
           </ConsaludCore.PrivateRoute>
         } />
 
         {/* Rutas de manejo de errores */}
         <Route path="/unauthorized" element={
-          <RouteWithTransition>
+          <PageWrapper>
             <ConsaludCore.Unauthorized />
-          </RouteWithTransition>
+          </PageWrapper>
         } />
-
-        {/* Ruta No Encontrado (Catch-all) */}
-        <Route path="*" element={
-          <RouteWithTransition>
+        
+        <Route path="/not-found" element={
+          <PageWrapper>
             <ConsaludCore.NotFound />
-          </RouteWithTransition>
+          </PageWrapper>
         } />
+        
+        {/* Redirección por defecto */}
+        <Route path="*" element={<Navigate to="/not-found" replace />} />
       </Routes>
     </Suspense>
   );

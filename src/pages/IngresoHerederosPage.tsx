@@ -6,27 +6,12 @@ import './styles/IngresoHerederosPage.css';
 
 const IngresoHerederosPage: React.FC = () => {
   const navigate = useNavigate();
-  const { startProcess, configureTransition } = useHerederoNavigation();
+  const { startProcess } = useHerederoNavigation();
 
-  // Configurar transición específica para esta página usando el core
-  React.useEffect(() => {
-    configureTransition({
-      preset: 'fadeIn',
-      duration: 250,
-      easing: 'ease-in-out'
-    });
-  }, [configureTransition]);
-
-  // Actualizada para dirigir al flujo principal con transición suave del core
+  // Simplificar - el Core maneja las transiciones automáticamente
   const handleNavigateToForm = () => {
-    // Usar el hook mejorado de navegación que utiliza ConsaludCore.PageTransition
-    startProcess({
-      transitionConfig: {
-        preset: 'slideLeft',
-        duration: 350,
-        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-      }
-    });
+    // Navegación simple - el PageTransition del Core se encarga del resto
+    startProcess();
   };
   
   return (
