@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 interface ExternalAppParams {
   empleado: string;
   rutafiliado: string;
@@ -8,7 +6,7 @@ interface ExternalAppParams {
   apmaterno: string;
   tipo: string;
   transactionId: string;
-  [key: string]: string; // Para otros parámetros adicionales
+  [key: string]: string;
 }
 
 interface TransactionStatus {
@@ -19,14 +17,11 @@ interface TransactionStatus {
 
 class ExternalAppService {
   private baseUrl: string;
-  private apiUrl: string;
 
   constructor(
-    baseUrl: string = 'http://mandatos.consalud.tes/frmmandatos.aspx',
-    apiUrl: string = '/api'
+    baseUrl: string = 'http://mandatos.consalud.tes/frmmandatos.aspx'
   ) {
     this.baseUrl = baseUrl;
-    this.apiUrl = apiUrl;
   }
 
   /**
@@ -34,22 +29,6 @@ class ExternalAppService {
    */
   generateTransactionId(): string {
     return `tx-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-  }
-
-  /**
-   * Construye la URL con parámetros directamente (sin encriptar)
-   * NOTA: Esta es una versión simplificada para pruebas
-   */
-  private buildDirectUrl(params: ExternalAppParams): string {
-    const queryParams = new URLSearchParams();
-    
-    // Añadir cada parámetro al objeto URLSearchParams
-    Object.entries(params).forEach(([key, value]) => {
-      queryParams.append(key, value);
-    });
-    
-    // Construir la URL directa - para pruebas
-    return `${this.baseUrl}?${queryParams.toString()}`;
   }
 
   /**
@@ -100,7 +79,7 @@ class ExternalAppService {
   /**
    * Verifica el estado de una transacción - versión simplificada para pruebas
    */
-  async checkTransactionStatus(transactionId: string): Promise<TransactionStatus> {
+  async checkTransactionStatus(_transactionId: string): Promise<TransactionStatus> {
     // Simulación para desarrollo (80% probabilidad de éxito)
     const success = Math.random() > 0.2;
     

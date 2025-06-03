@@ -1,8 +1,8 @@
-import React, { use, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { es, he } from 'date-fns/locale';
+import { es } from 'date-fns/locale';
 import './styles/FormHeredero.css';
 import * as ConsaludCore from '@consalud/core'; 
 import { Stepper } from './Stepper';

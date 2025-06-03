@@ -3,26 +3,7 @@ import React, { useState } from 'react';
 import * as ConsaludCore from '@consalud/core';
 
 const IngresoHerederos: React.FC = () => {
-  const [loading, setLoading] = useState(false);
-  const [searchResult, setSearchResult] = useState<any>(null);
-
-  const handleSearch = async (rut: string) => {
-    setLoading(true);
-    try {
-
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      setSearchResult({
-        rut,
-        nombre: 'Juan Pérez',
-        fechaNacimiento: '01/01/1980',
-      });
-    } catch (error) {
-      console.error('Error en la búsqueda:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [searchResult] = useState<any>(null);
 
   return (
     <ConsaludCore.SecureLayout pageTitle="Ingreso Herederos">

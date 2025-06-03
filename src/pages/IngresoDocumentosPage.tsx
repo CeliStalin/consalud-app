@@ -11,7 +11,6 @@ const IngresoDocumentosPage: React.FC = () => {
   // Estados para manejar la integración con la aplicación externa
   const [isExternalAppOpen, setIsExternalAppOpen] = useState(false);
   const [externalWindow, setExternalWindow] = useState<Window | null>(null);
-  const [transactionId, setTransactionId] = useState<string>('');
   const [transactionStatus, setTransactionStatus] = useState<'pending' | 'success' | 'error' | 'cancelled' | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +56,6 @@ const IngresoDocumentosPage: React.FC = () => {
       
       // Guardar referencias
       setExternalWindow(result.window);
-      setTransactionId(result.transactionId);
       setIsExternalAppOpen(true);
       setTransactionStatus('pending');
       

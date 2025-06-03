@@ -1,22 +1,19 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import * as ConsaludCore from '@consalud/core'; 
 import { useRutChileno } from "../hooks/useRutChileno";
 import { UseAlert } from "../hooks/Alert";
-import { useHerederoNavigation } from "../hooks/useHerederoNavigation"; // Importar el nuevo hook
+import { useHerederoNavigation } from "../hooks/useHerederoNavigation";
 import '../components/styles/ingresoTitular.css';
 import '../components/styles/globalStyle.css'
 import { useTitular } from "../contexts/TitularContext";
 
 const IngresoTitular = () => {
-    // Usar el hook de navegación personalizado en lugar de useNavigate directo
     const { goToRequisitosTitular } = useHerederoNavigation();
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
-    const [touched, setTouched] = useState(false);
     const { titular, buscarTitular, error } = useTitular();
 
     const handleBlur = () => {
-        setTouched(true);
         setShowError(rut.length > 0 && !isValidRut);
     };
 
@@ -27,8 +24,7 @@ const IngresoTitular = () => {
     const { 
         mostrarAlerta,
         mostrarAlerta2,
-        mostrarAlerta3,
-        mostrarAlerta4
+        mostrarAlerta3
     } = UseAlert();
 
     const handleFlow = async () => {
@@ -58,7 +54,6 @@ const IngresoTitular = () => {
                 return;
             }
             
-            // Usar el método de navegación personalizado
             goToRequisitosTitular();
         } catch (err) {
             mostrarAlerta();

@@ -9,7 +9,7 @@ const REDIRECT_TIMEOUT_MS = 5000;
 
 const SuccessPage: React.FC = () => {
   const navigate = useNavigate();
-  const { Typography, FONT_WEIGHTS, theme } = ConsaludCore;
+  const { Typography, theme } = ConsaludCore;
   
   const handleRedirect = useCallback(() => {
     navigate(REDIRECT_PATH);

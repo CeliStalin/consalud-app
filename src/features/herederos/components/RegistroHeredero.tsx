@@ -5,15 +5,12 @@ import { Stepper } from "../components/Stepper";
 import '../components/styles/globalStyle.css'
 import { useHeredero } from "../contexts/HerederoContext";
 
-
-
 const RegistroHeredero = () => {
-
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
-    const [touched, setTouched] = useState(false);
     const navigator = useNavigate();
     const {heredero, buscarHeredero, error} = useHeredero();
+
     const handleNavigator = async() => {
         const rutLimpio = rut.replace(/[^0-9kK]/g, '');
         if (!isValidRut) {
@@ -27,18 +24,16 @@ const RegistroHeredero = () => {
                 return;
             }
             console.log("heredero: " + heredero)
-        navigator('/mnherederos/ingresoher/formingreso');
-    } catch (err) {
-        console.error(err);
-    }
+            navigator('/mnherederos/ingresoher/formingreso');
+        } catch (err) {
+            console.error(err);
+        }
     }
     
     const handleBlur = () => {
-        setTouched(true);
         setShowError(rut.length > 0 && !isValidRut);
     };
 
-    // Manejador para el evento onFocus
     const handleFocus = () => {
         setShowError(false);
     };
@@ -51,9 +46,7 @@ const RegistroHeredero = () => {
                 </span>
             </div>
             <div className="generalContainer">
-            <Stepper step={2} />
-
-           
+                <Stepper step={2} />
                 <div className="containerInfoHeredero">
                     <div className="iconoGenerico">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -73,20 +66,20 @@ const RegistroHeredero = () => {
                         RUT persona heredera
                     </span>
                     <div className="divRut">
-                    <input
-                        id="RutHeredero"
-                        type="text"
-                        inputMode="text"
-                        pattern="[0-9kK.-]*"
-                        value={rut}
-                        onChange={handleRutChange}
-                        onBlur={handleBlur}
-                        onFocus={handleFocus}
-                        placeholder="12.345.678-9"
-                        className="inputRut"
-                    />
+                        <input
+                            id="RutHeredero"
+                            type="text"
+                            inputMode="text"
+                            pattern="[0-9kK.-]*"
+                            value={rut}
+                            onChange={handleRutChange}
+                            onBlur={handleBlur}
+                            onFocus={handleFocus}
+                            placeholder="12.345.678-9"
+                            className="inputRut"
+                        />
                         <button 
-                             className={`buttonRut ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}`}  
+                            className={`buttonRut ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}`}  
                             disabled={!isValidRut} 
                             onClick={handleNavigator}
                         > 
@@ -98,16 +91,14 @@ const RegistroHeredero = () => {
                         </button>
                     </div>
                     {showError && (
-                                    <span className="errorRut">
-                                        RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
-                                    </span>
-                                )}
+                        <span className="errorRut">
+                            RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
+                        </span>
+                    )}
                 </div>
-                
             </div>
         </>
     );
 };
-
 
 export { RegistroHeredero };
