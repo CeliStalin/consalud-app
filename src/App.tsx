@@ -7,7 +7,6 @@ import './styles/navigation-optimizations.css'; // Nuevo archivo
 import TitularProvider from './features/herederos/provider/TitularProvider';
 import HerederoProvider from './features/herederos/provider/HerederoProvider';
 
-// Componente para manejar errores - simplificado
 const ErrorFallback = () => {
   if (!ConsaludCore || !ConsaludCore.Typography) {
     return (
@@ -62,7 +61,7 @@ const App = () => {
       <ConsaludCore.AuthProvider>
         <ConsaludCore.MenuConfigProvider config={{ 
           enableDynamicMenu: true,
-          enableBounceEffects: true // ✅ Asegurar que el bounce esté habilitado globalmente
+          enableBounceEffects: true 
         }}>
           <Router>
             <div className="app-layout-wrapper app-sticky-footer-layout instant-stable navigation-stable">
@@ -74,7 +73,7 @@ const App = () => {
                       duration={50}
                       type="fade"
                       respectReducedMotion={true}
-                      enableHardwareAcceleration={true} // ✅ Habilitar para mejores animaciones
+                      enableHardwareAcceleration={true} 
                       exitBeforeEnter={false}
                       mode="concurrent"
                       className="instant-navigation"

@@ -14,7 +14,6 @@ main {
   min-height: calc(100vh - 140px) !important;
 }
 
-/* Asegurar que el footer sticky funcione */
 #root {
   display: flex;
   flex-direction: column;
