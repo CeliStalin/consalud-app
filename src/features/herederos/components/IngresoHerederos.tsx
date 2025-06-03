@@ -2,8 +2,14 @@ import React, { useState } from 'react';
 // import RutSearchForm from './RutSearchForm';
 import * as ConsaludCore from '@consalud/core';
 
+interface SearchResult {
+  rut: string;
+  nombre: string;
+  fechaNacimiento: string;
+}
+
 const IngresoHerederos: React.FC = () => {
-  const [searchResult] = useState<any>(null);
+  const [searchResult] = useState<SearchResult | null>(null);
 
   return (
     <ConsaludCore.SecureLayout pageTitle="Ingreso Herederos">

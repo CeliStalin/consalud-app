@@ -34,7 +34,6 @@ const IngresoTitular = () => {
         }
         
         try {
-            console.log(rut);
             await buscarTitular(rut);
             
             if (error) {

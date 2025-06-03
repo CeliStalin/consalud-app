@@ -9,7 +9,7 @@ const RegistroHeredero = () => {
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
     const navigator = useNavigate();
-    const {heredero, buscarHeredero, error} = useHeredero();
+    const { buscarHeredero, error } = useHeredero();
 
     const handleNavigator = async() => {
         const rutLimpio = rut.replace(/[^0-9kK]/g, '');
@@ -23,10 +23,9 @@ const RegistroHeredero = () => {
             if (error) {
                 return;
             }
-            console.log("heredero: " + heredero)
             navigator('/mnherederos/ingresoher/formingreso');
         } catch (err) {
-            console.error(err);
+            // Manejo silencioso del error ya que la UI ya muestra el estado
         }
     }
     
