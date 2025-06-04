@@ -1,14 +1,21 @@
 import { BrowserRouter as Router } from 'react-router-dom';
-import * as ConsaludCore from '@consalud/core'; 
+import {
+  ErrorBoundary,
+  AuthProvider,
+  MenuConfigProvider,
+  PageTransition,
+  Typography,
+  theme
+} from '@consalud/core';
 import { AppRoutes } from './routes';
 import './styles/variables.css';
-import './styles/bulma-overrides.css'; 
-import './styles/navigation-optimizations.css'; // Nuevo archivo
+import './styles/bulma-overrides.css';
+import './styles/navigation-optimizations.css';
 import TitularProvider from './features/herederos/provider/TitularProvider';
 import HerederoProvider from './features/herederos/provider/HerederoProvider';
 
 const ErrorFallback = () => {
-  if (!ConsaludCore || !ConsaludCore.Typography) {
+  if (!Typography) {
     return (
       <div style={{ padding: '20px', textAlign: 'center', color: '#D8000C', backgroundColor: '#FFD2D2', border: '1px solid #D8000C', borderRadius: '4px' }}>
         <h2 style={{ fontSize: '1.5em', marginBottom: '10px' }}>Error Crítico</h2>
@@ -35,21 +42,21 @@ const ErrorFallback = () => {
 
   return (
     <div style={{ padding: '20px', textAlign: 'center' }}>
-      <ConsaludCore.Typography variant="h2" style={{ marginBottom: '16px' }}>¡Ups! Algo salió mal</ConsaludCore.Typography>
-      <ConsaludCore.Typography variant="body" style={{ marginBottom: '16px' }}>Ha ocurrido un error inesperado. Intente recargar la página.</ConsaludCore.Typography>
-      <button 
+      <Typography variant="h2" style={{ marginBottom: '16px' }}>¡Ups! Algo salió mal</Typography>
+      <Typography variant="body" style={{ marginBottom: '16px' }}>Ha ocurrido un error inesperado. Intente recargar la página.</Typography>
+      <button
         onClick={() => window.location.reload()}
         style={{
           padding: '8px 16px',
-          backgroundColor: ConsaludCore.theme?.colors?.primary || '#04A59B', 
-          color: ConsaludCore.theme?.colors?.white || 'white', 
+          backgroundColor: theme?.colors?.primary || '#04A59B',
+          color: theme?.colors?.white || 'white',
           border: 'none',
           borderRadius: '4px',
           cursor: 'pointer',
           marginTop: '16px'
         }}
       >
-        <ConsaludCore.Typography variant="button">Recargar página</ConsaludCore.Typography>
+        <Typography variant="button">Recargar página</Typography>
       </button>
     </div>
   );
@@ -57,42 +64,42 @@ const ErrorFallback = () => {
 
 const App = () => {
   return (
-    <ConsaludCore.ErrorBoundary fallback={<ErrorFallback />}>
-      <ConsaludCore.AuthProvider>
-        <ConsaludCore.MenuConfigProvider config={{ 
+    <ErrorBoundary fallback={<ErrorFallback />}>
+      <AuthProvider>
+        <MenuConfigProvider config={{
           enableDynamicMenu: true,
-          enableBounceEffects: true 
+          enableBounceEffects: true
         }}>
           <Router>
             <div className="app-layout-wrapper app-sticky-footer-layout instant-stable navigation-stable">
               <TitularProvider>
                 <HerederoProvider>
                   <div className="app-sticky-footer-content content-stable spa-stable-container">
-                    <ConsaludCore.PageTransition 
+                    <PageTransition
                       preset="fade"
                       duration={50}
                       type="fade"
                       respectReducedMotion={true}
-                      enableHardwareAcceleration={true} 
+                      enableHardwareAcceleration={true}
                       exitBeforeEnter={false}
                       mode="concurrent"
                       className="instant-navigation"
-                      style={{ 
-                        minHeight: '100vh', 
+                      style={{
+                        minHeight: '100vh',
                         backgroundColor: '#ffffff',
                         position: 'relative'
                       }}
                     >
                       <AppRoutes />
-                    </ConsaludCore.PageTransition>
+                    </PageTransition>
                   </div>
                 </HerederoProvider>
               </TitularProvider>
             </div>
           </Router>
-        </ConsaludCore.MenuConfigProvider>
-      </ConsaludCore.AuthProvider>
-    </ConsaludCore.ErrorBoundary>
+        </MenuConfigProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 

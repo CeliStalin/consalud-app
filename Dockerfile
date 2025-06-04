@@ -22,6 +22,9 @@ COPY optimization.config.ts ./
 COPY scripts/ ./scripts/
 COPY ./consalud-core-1.0.0.tgz ./
 
+# COPIAR LOS ARCHIVOS .env*
+COPY .env* ./
+
 # AQUÍ SE EJECUTA LA OPTIMIZACIÓN AUTOMÁTICAMENTE
 # Este script se ejecuta UNA VEZ durante la construcción de la imagen
 RUN node scripts/optimize-deps.js

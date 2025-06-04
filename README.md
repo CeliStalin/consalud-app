@@ -34,8 +34,8 @@ src/
 
 1. Clona el repositorio:
    ```bash
-   git clone https://devops.consalud.net/Consalud/PlantillaReact/_git/app-herederos
-   cd app-herederos
+   git clone https://devops.consalud.net/Consalud/PlantillaReact/_git/app-solicitudes
+   cd app-solicitudes
    ```
 
 2. Instala las dependencias:
@@ -184,7 +184,7 @@ Esta aplicación React con TypeScript está optimizada para ejecutarse en conten
 
 ```bash
 # Navegar a tu directorio
-cd c:\app-herederos
+cd c:\app-solicitudes
 
 # EJECUTAR TODO AUTOMÁTICAMENTE
 docker-compose up app
@@ -310,20 +310,7 @@ docker system prune -a                   # Limpiar Docker
 2. ✅ **Docker Compose instalado**: `docker-compose --version`
 3. ✅ **Archivos presentes**: `ls docker-compose.yml Dockerfile`
 4. ✅ **Script presente**: `ls scripts/optimize-deps.js`
-5. ✅ **Directorio correcto**: `pwd` debe mostrar `.../app-herederos`
+5. ✅ **Directorio correcto**: `pwd` debe mostrar `.../app-solicitudes`
 
 **Comando de diagnóstico completo:**
-```bash
-# Ejecutar este comando para verificar todo:
-echo "=== Verificación de archivos ===" && \
-ls -la docker-compose.yml Dockerfile package.json && \
-ls -la scripts/optimize-deps.js && \
-echo "=== Versiones de Docker ===" && \
-docker --version && \
-docker-compose --version && \
-echo "=== Todo listo para: docker-compose up app ==="
 ```
-
----
-
-**¡RECUERDA!** Solo necesitas ejecutar: `docker-compose up app` - todo lo demás es automático.
