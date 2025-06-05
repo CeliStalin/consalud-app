@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mantsolicitud
+  labels:
+    app: mantsolicitud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mantsolicitud
+  template:
+    metadata:
+      labels:
+        app: mantsolicitud
+    spec:
+      containers:
+        - name: mantsolicitud
+          image: consaluddevops.azurecr.io/mantsolicitud
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80          
+      imagePullSecrets:
+        - name: acr-secret

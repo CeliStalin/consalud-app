@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mantsolicitudes-ingress
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: 
+      - solicitudes-canales-development.consalud.net
+      secretName: consalud-wildcard-net-cert
+  rules:
+    - host: solicitudes-canales-development.consalud.net
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: mantsolicitudes-service
+                port:
+                  number: 80
