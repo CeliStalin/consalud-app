@@ -350,9 +350,9 @@ Esto construye y ejecuta los tests.
 Puedes construir manualmente cada imagen:
 
 ```sh
-docker build -f Dockerfile.dev -t consalud-app-dev .
-docker build -f Dockerfile.prod -t consalud-app-prod .
-docker build -f Dockerfile.test -t consalud-app-test .
+docker build -f Dockerfile.dev -t app-solicitudes-dev .
+docker build -f Dockerfile.prod -t app-solicitudes-prod .
+docker build -f Dockerfile.test -t app-solicitudes-test .
 ```
 
 ---
@@ -406,13 +406,13 @@ Construir las imágenes manualmente:
 
 ```sh
 # Desarrollo
-docker build -f Dockerfile.dev -t consalud-app-dev .
+docker build -f Dockerfile.dev -t app-solicitudes-dev .
 
 # Producción
-docker build -f Dockerfile.prod -t consalud-app-prod .
+docker build -f Dockerfile.prod -t app-solicitudes-prod .
 
 # Testing
-docker build -f Dockerfile.test -t consalud-app-test .
+docker build -f Dockerfile.test -t app-solicitudes-test .
 ```
 
 Luego se puede correr los contenedores manualmente con `docker run` y mapear los puertos según corresponda.
