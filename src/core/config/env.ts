@@ -24,7 +24,11 @@ class Environment {
       sistema: import.meta.env.VITE_SISTEMA || 'ManHerederos',
       nombreSistema: import.meta.env.VITE_NOMBRE_SISTEMA || 'Administrador de Devolución a Herederos',
       timeout: Number(import.meta.env.VITE_TIMEOUT) || 10000,
-      redirectUri: import.meta.env.VITE_REDIRECT_URI || window.location.origin + '/login',
+      redirectUri: (() => {
+        const uri = import.meta.env.VITE_REDIRECT_URI || '/login';
+        // Si empieza con http(s), se debe usar segun el ptotocolo 
+        return uri.startsWith('https') ? uri : window.location.origin + (uri.startsWith('/') ? uri : '/' + uri);
+      })(),
     };
 
     // Validar que las variables críticas estén definidas
