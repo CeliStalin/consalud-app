@@ -402,7 +402,7 @@ Este proyecto utiliza **Dockerfiles separados** para cada ambiente, lo que permi
 
 ## 4. Build manual de imágenes (opcional)
 
-Si prefieres construir las imágenes manualmente:
+Construir las imágenes manualmente:
 
 ```sh
 # Desarrollo
@@ -415,19 +415,15 @@ docker build -f Dockerfile.prod -t consalud-app-prod .
 docker build -f Dockerfile.test -t consalud-app-test .
 ```
 
-Luego puedes correr los contenedores manualmente con `docker run` y mapear los puertos según corresponda.
+Luego se puede correr los contenedores manualmente con `docker run` y mapear los puertos según corresponda.
 
 ---
 
 ### ⚠️ Notas importantes
 - **Desarrollo:** El código fuente se sincroniza en caliente, ideal para programar.
-- **Producción:** Solo sirve archivos estáticos, no expone Node ni dependencias de desarrollo.
+- **Producción:** No expone Node ni dependencias de desarrollo.
 - **Testing:** Solo ejecuta tests, no expone la app por web.
 - **Puertos:**
   - Desarrollo: 5173
   - Producción: 3000 (puedes cambiarlo en `docker-compose.yml`)
   - Testing: no expone puerto
-
----
-
-¿Dudas? Consulta la sección de troubleshooting o abre un issue.
