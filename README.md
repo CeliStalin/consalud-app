@@ -314,3 +314,120 @@ docker system prune -a                   # Limpiar Docker
 
 **Comando de diagnóstico completo:**
 ```
+
+## Docker: Uso por ambiente
+
+Ahora el proyecto usa Dockerfiles separados por ambiente para optimizar el tamaño y la claridad:
+
+- `Dockerfile.base`: etapas comunes (no se usa directamente)
+- `Dockerfile.dev`: ambiente de desarrollo
+- `Dockerfile.prod`: ambiente de producción
+- `Dockerfile.test`: ambiente de testing
+
+### Desarrollo
+
+```sh
+docker-compose up app
+```
+Esto levanta la app en modo desarrollo en http://localhost:5173
+
+### Producción
+
+```sh
+docker-compose --profile production up app-prod
+```
+Esto construye y levanta la app optimizada en http://localhost:3000
+
+### Testing
+
+```sh
+docker-compose --profile test up app-test
+```
+Esto construye y ejecuta los tests.
+
+### Build manual (opcional)
+
+Puedes construir manualmente cada imagen:
+
+```sh
+docker build -f Dockerfile.dev -t consalud-app-dev .
+docker build -f Dockerfile.prod -t consalud-app-prod .
+docker build -f Dockerfile.test -t consalud-app-test .
+```
+
+---
+
+**Nota:** Si solo quieres servir estáticos en producción, consulta la sección de optimización avanzada para usar Nginx.
+
+# 🚢 Ejecución de la aplicación con Docker por ambiente
+
+Este proyecto utiliza **Dockerfiles separados** para cada ambiente, lo que permite imágenes más pequeñas y procesos más claros. A continuación se explica cómo levantar cada ambiente:
+
+## 1. Desarrollo (hot reload, código editable)
+
+- **Comando:**
+  ```sh
+  docker-compose up app
+  ```
+- **URL:** [http://localhost:5173](http://localhost:5173)
+- **Descripción:**
+  - Levanta la app en modo desarrollo con hot reload.
+  - Sincroniza el código fuente de tu máquina con el contenedor (volúmenes).
+  - Ideal para desarrollo diario.
+
+## 2. Producción (build optimizado, solo archivos estáticos)
+
+- **Comando:**
+  ```sh
+  docker-compose --profile production up app-prod
+  ```
+- **URL:** [http://localhost:3000](http://localhost:3000)
+- **Descripción:**
+  - Construye la imagen usando `Dockerfile.prod` (multi-stage: Node para build, Nginx para servir).
+  - Sirve solo los archivos estáticos generados por Vite.
+  - Ideal para pruebas de despliegue y producción real.
+  - **Asegúrate de que el puerto 3000 esté libre en tu máquina.**
+
+## 3. Testing (ejecución de tests, sin URL)
+
+- **Comando:**
+  ```sh
+  docker-compose --profile test up app-test
+  ```
+- **Descripción:**
+  - Construye la imagen usando `Dockerfile.test`.
+  - Ejecuta los tests y muestra el resultado en consola/logs.
+  - El contenedor se apaga automáticamente al terminar los tests.
+  - **No expone ningún puerto ni URL.**
+
+## 4. Build manual de imágenes (opcional)
+
+Si prefieres construir las imágenes manualmente:
+
+```sh
+# Desarrollo
+docker build -f Dockerfile.dev -t consalud-app-dev .
+
+# Producción
+docker build -f Dockerfile.prod -t consalud-app-prod .
+
+# Testing
+docker build -f Dockerfile.test -t consalud-app-test .
+```
+
+Luego puedes correr los contenedores manualmente con `docker run` y mapear los puertos según corresponda.
+
+---
+
+### ⚠️ Notas importantes
+- **Desarrollo:** El código fuente se sincroniza en caliente, ideal para programar.
+- **Producción:** Solo sirve archivos estáticos, no expone Node ni dependencias de desarrollo.
+- **Testing:** Solo ejecuta tests, no expone la app por web.
+- **Puertos:**
+  - Desarrollo: 5173
+  - Producción: 3000 (puedes cambiarlo en `docker-compose.yml`)
+  - Testing: no expone puerto
+
+---
+
+¿Dudas? Consulta la sección de troubleshooting o abre un issue.

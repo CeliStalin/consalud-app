@@ -6,14 +6,13 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
-      target: development
+      dockerfile: Dockerfile.dev
     container_name: app-solicitudes-dev
     ports:
       - "5173:5173"  # la app estará en http://localhost:5173
     volumes:
-      - .:/app                    # Sincroniza tu código
-      - /app/node_modules         # Optimiza node_modules
+      - .:/app                   
+      - /app/node_modules        
     environment:
       - NODE_ENV=development
       - VITE_HOST=0.0.0.0        # Permite acceso externo
@@ -24,41 +23,37 @@ services:
   app-prod:
     build:
       context: .
-      dockerfile: Dockerfile
-      target: production
+      dockerfile: Dockerfile.prod
     container_name: app-solicitudes-prod
     ports:
-      - "3000:3000"              # Tu app estará en http://localhost:3000
+      - "3000:3000"              # la app estará en http://localhost:3000
     environment:
       - NODE_ENV=production
     restart: unless-stopped
     profiles:
       - production
-    # Comando: docker-compose --profile production up app-prod
 
   # TESTING - Para pruebas
   app-test:
     build:
       context: .
-      dockerfile: Dockerfile
-      target: development        # Usa desarrollo pero con configuración de test
+      dockerfile: Dockerfile.test
     container_name: app-solicitudes-test
     ports:
-      - "4173:5173"             # Puerto diferente para no conflictos
+      - "4173:5173"             
     environment:
       - NODE_ENV=test
       - VITE_HOST=0.0.0.0
     restart: unless-stopped
     profiles:
       - test
-    # Comando: docker-compose --profile test up app-test
 
 # Volúmenes nombrados para optimización
 volumes:
   node_modules:
   npm_cache:
 
-# Red personalizada (opcional)
+# Red personalizada 
 networks:
   consalud-network:
     driver: bridge

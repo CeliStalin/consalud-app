@@ -1,0 +1,37 @@
+# Etapa base con Alpine
+FROM node:20-alpine AS base
+
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    && ln -sf python3 /usr/bin/python
+
+# Actualizar npm a la última versión globalmente
+RUN npm install -g npm@latest
+
+# Etapa 1: Optimización de dependencias
+FROM base AS optimizer
+WORKDIR /app
+COPY package*.json ./
+COPY optimization.config.ts ./
+COPY scripts/ ./scripts/
+COPY ./consalud-core-1.0.0.tgz ./
+COPY .env* ./
+RUN node scripts/optimize-deps.js
+
+# Etapa 2: Dependencias de desarrollo
+FROM base AS deps-dev
+WORKDIR /app
+COPY package*.json ./
+COPY ./consalud-core-1.0.0.tgz ./
+RUN npm ci --no-audit --no-fund && npm cache clean --force
+
+FROM base AS test
+WORKDIR /app
+COPY --from=deps-dev /app/node_modules ./node_modules
+COPY package*.json ./
+COPY ./consalud-core-1.0.0.tgz ./
+COPY . .
+RUN npm run test
+RUN npm install --save-dev @testing-library/dom 

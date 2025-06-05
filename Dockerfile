@@ -4,6 +4,7 @@
 # Etapa base con Alpine
 FROM node:20-alpine AS base
 
+
 # Instalar dependencias del sistema necesarias
 RUN apk add --no-cache \
     python3 \
