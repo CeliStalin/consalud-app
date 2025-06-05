@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mantsolicitud
+  name: mantsolicitudes
   labels:
-    app: mantsolicitud
+    app: mantsolicitudes
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mantsolicitud
+      app: mantsolicitudes
   template:
     metadata:
       labels:
-        app: mantsolicitud
+        app: mantsolicitudes
     spec:
       containers:
-        - name: mantsolicitud
-          image: consaluddevops.azurecr.io/mantsolicitud
+        - name: mantsolicitudes
+          image: consaluddevops.azurecr.io/mantsolicitudes
           imagePullPolicy: Always
           ports:
             - containerPort: 80          
