@@ -1,9 +1,9 @@
 import React from 'react';
-import * as ConsaludCore from '@consalud/core'; // Cambiado para usar el alias
+import * as ConsaludCore from '@consalud/core'; 
 import { DatosTitular } from '@/features/herederos/components/DatosTitular';
 
 
-const DatosTitularPage: React.FC = () => { // Considera renombrar a DatosTitularPage si es más preciso
+const DatosTitularPage: React.FC = () => { 
   return (
     <ConsaludCore.SecureLayout pageTitle="Datos Titular" allowedRoles={['USER', 'ADMIN', 'Developers']}>
       <DatosTitular />
@@ -11,4 +11,4 @@ const DatosTitularPage: React.FC = () => { // Considera renombrar a DatosTitular
   );
 };
 
-export default DatosTitularPage; // Cambiado a export default
+export default DatosTitularPage; 

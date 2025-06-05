@@ -5,6 +5,6 @@ vi.stubGlobal('import.meta', {
     VITE_APP_CLIENT_ID: 'dummy-client-id',
     VITE_APP_AUTHORITY: 'dummy-authority',
     VITE_APP_REDIRECT_URI: 'http://localhost',
-    // ...agrega aquí todas las app que se requiera
+    // ...agregar aquí todas las app que se requiera
   }
 }); 

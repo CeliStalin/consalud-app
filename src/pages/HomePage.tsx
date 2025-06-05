@@ -6,7 +6,6 @@ const HomePage: React.FC = () => {
   const { checkBounceSupport } = useCoreIntegration();
   
   React.useEffect(() => {
-    // Verificar que el bounce esté funcionando
     checkBounceSupport();
   }, [checkBounceSupport]);
   

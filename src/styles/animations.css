@@ -3,7 +3,7 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px); /* Reducido de 30px a 20px para ser más sutil */
+    transform: translateY(20px); 
   }
   to {
     opacity: 1;
@@ -14,7 +14,7 @@
 @keyframes fadeInScale {
   from {
     opacity: 0;
-    transform: scale(0.98); /* Más sutil, de 0.95 a 0.98 */
+    transform: scale(0.98); 
   }
   to {
     opacity: 1;
@@ -25,7 +25,7 @@
 @keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-20px); /* Reducido de -30px a -20px */
+    transform: translateX(-20px); 
   }
   to {
     opacity: 1;
@@ -58,7 +58,7 @@
   }
 }
 
-/* Nuevas animaciones anti-parpadeo optimizadas */
+/* animaciones anti-parpadeo optimizadas */
 @keyframes smoothFadeIn {
   from {
     opacity: 0;
@@ -71,7 +71,7 @@
 @keyframes smoothSlideIn {
   from {
     opacity: 0;
-    transform: translateX(8px); /* Reducido de 10px a 8px */
+    transform: translateX(8px); 
   }
   to {
     opacity: 1;
@@ -79,7 +79,7 @@
   }
 }
 
-/* CRÍTICO: Nuevas animaciones ultra-suaves para prevenir parpadeos */
+/* animaciones ultra-suaves para prevenir parpadeos */
 @keyframes instantFadeIn {
   from {
     opacity: 0;
@@ -100,7 +100,7 @@
   }
 }
 
-/* Nuevas animaciones para transiciones de página ultra-suaves */
+/*  animaciones para transiciones de página ultra-suaves */
 @keyframes pageEnter {
   from {
     opacity: 0;
@@ -123,7 +123,7 @@
   }
 }
 
-/* CRÍTICO: Clases optimizadas para prevenir parpadeos */
+/* Clases optimizadas para prevenir parpadeos */
 .transition-wrapper {
   /* Simplificado para mejor rendimiento */
   position: relative;
@@ -139,7 +139,6 @@
   width: 100%;
   min-height: 100vh;
   background-color: #ffffff;
-  /* CRÍTICO: Eliminamos transformaciones problemáticas */
   opacity: 1;
   visibility: visible;
   /* Solo contention esencial */
@@ -148,7 +147,7 @@
   min-height: calc(100vh - 140px);
 }
 
-/* NUEVO: Clases críticas para navegación instantánea */
+/* Clases  para navegación instantánea */
 .instant-navigation {
   opacity: 1 !important;
   visibility: visible !important;
@@ -158,7 +157,7 @@
   background-color: #ffffff;
 }
 
-/* OPTIMIZADO: Loading sin parpadeos */
+/*  Loading sin parpadeos */
 .smooth-loading {
   position: fixed;
   top: 0;
@@ -181,7 +180,7 @@
   visibility: hidden;
 }
 
-/* NUEVO: Container estable para SPA */
+/* Container estable para SPA */
 .spa-stable-container {
   min-height: 100vh;
   background-color: #ffffff;
@@ -194,19 +193,19 @@
 
 /* Clases de utilidad para animaciones - duraciones optimizadas */
 .animate-fade-in-up {
-  animation: fadeInUp 400ms ease-out; /* Reducido de 0.6s a 400ms */
+  animation: fadeInUp 400ms ease-out; 
 }
 
 .animate-fade-in-scale {
-  animation: fadeInScale 300ms ease-out; /* Reducido de 0.5s a 300ms */
+  animation: fadeInScale 300ms ease-out;
 }
 
 .animate-slide-in-left {
-  animation: slideInLeft 250ms ease-out; /* Reducido de 0.4s a 250ms */
+  animation: slideInLeft 250ms ease-out;
 }
 
 .animate-bounce-in {
-  animation: bounceIn 600ms ease-out; /* Reducido de 0.8s a 600ms */
+  animation: bounceIn 600ms ease-out; 
 }
 
 .animate-pulse {
@@ -240,23 +239,22 @@
 
 /* Efectos de hover predefinidos - optimizados */
 .hover-lift {
-  transition: transform 200ms ease, box-shadow 200ms ease; /* Reducido de 0.3s a 200ms */
+  transition: transform 200ms ease, box-shadow 200ms ease;
 }
 
 .hover-lift:hover {
-  transform: translateY(-1px); /* Reducido de -2px a -1px para ser más sutil */
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); /* Sombra más sutil */
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); /* Sombras */
 }
 
 .hover-scale {
-  transition: transform 200ms ease; /* Reducido de 0.3s a 200ms */
+  transition: transform 200ms ease; 
 }
 
 .hover-scale:hover {
-  transform: scale(1.02); /* Reducido de 1.05 a 1.02 para ser más sutil */
+  transform: scale(1.02); 
 }
-
-/* Nueva clase para elementos que necesitan estabilidad visual */
+/* clase para elementos que necesitan estabilidad visual */
 .visual-stable {
   backface-visibility: hidden;
   transform: translateZ(0);
@@ -280,7 +278,7 @@
   }
 }
 
-/* CRÍTICO: Optimizaciones para navegación específica - MEJORADAS */
+/* Optimizaciones para navegación específica*/
 .route-transition-enter {
   opacity: 0;
 }
@@ -301,7 +299,7 @@
   transition: opacity 30ms ease-in;
 }
 
-/* NUEVO: Clase para elementos que deben aparecer inmediatamente */
+/* Clase para elementos que deben aparecer inmediatamente */
 .no-transition {
   transition: none !important;
   animation: none !important;
@@ -310,7 +308,7 @@
   visibility: visible !important;
 }
 
-/* NUEVO: Soporte específico para bounce effect del core */
+/*  Soporte específico para bounce effect del core */
 @keyframes coreBounceClick {
   0% { 
     transform: scale(1); 
@@ -326,12 +324,12 @@
   }
 }
 
-/* NUEVO: Clase específica para el bounce del core */
+/* Clase específica para el bounce del core */
 .core-bounce-effect {
   animation: coreBounceClick 0.3s ease-out;
 }
 
-/* NUEVO: Asegurar que los elementos del HomePage del core tengan las propiedades correctas */
+/* Asegurar que los elementos del HomePage del core tengan las propiedades correctas */
 [class*="homepage-container"] .app-card,
 [class*="applications-section"] .app-card {
   transform-origin: center center;
@@ -339,7 +337,7 @@
   perspective: 1000px;
 }
 
-/* NUEVO: Soporte para el sistema de bounce del core */
+/* Soporte para el sistema de bounce del core */
 .app-card[data-bounce="enabled"] {
   cursor: pointer;
   transition: transform var(--bounce-duration, 0.2s) var(--bounce-easing, cubic-bezier(0.34, 1.56, 0.64, 1));

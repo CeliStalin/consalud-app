@@ -24,7 +24,7 @@ const OptimizedLoading: React.FC = React.memo(() => (
       height: '200px',
       fontSize: '14px',
       color: '#666',
-      background: '#ffffff', // Fondo consistente
+      background: '#ffffff', 
       width: '100%',
       position: 'relative'
     }}>

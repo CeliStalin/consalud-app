@@ -11,4 +11,4 @@ const InfoRequisitosTitularPage: React.FC = () => {
   );
 };
 
-export default InfoRequisitosTitularPage; // Cambiado a export default
+export default InfoRequisitosTitularPage;
