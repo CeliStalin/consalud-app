@@ -34,8 +34,8 @@ src/
 
 1. Clona el repositorio:
    ```bash
-   git clone https://devops.consalud.net/Consalud/PlantillaReact/_git/app-solicitudes
-   cd app-solicitudes
+   git clone https://devops.consalud.net/Consalud/PlantillaReact/_git/app-gestor-solicitudes
+   cd app-gestor-solicitudes
    ```
 
 2. Instala las dependencias:
@@ -184,7 +184,7 @@ Esta aplicación React con TypeScript está optimizada para ejecutarse en conten
 
 ```bash
 # Navegar a tu directorio
-cd c:\app-solicitudes
+cd c:\app-gestor-solicitudes
 
 # EJECUTAR TODO AUTOMÁTICAMENTE
 docker-compose up app
@@ -310,7 +310,7 @@ docker system prune -a                   # Limpiar Docker
 2. ✅ **Docker Compose instalado**: `docker-compose --version`
 3. ✅ **Archivos presentes**: `ls docker-compose.yml Dockerfile`
 4. ✅ **Script presente**: `ls scripts/optimize-deps.js`
-5. ✅ **Directorio correcto**: `pwd` debe mostrar `.../app-solicitudes`
+5. ✅ **Directorio correcto**: `pwd` debe mostrar `.../app-gestor-solicitudes`
 
 **Comando de diagnóstico completo:**
 ```
@@ -350,9 +350,9 @@ Esto construye y ejecuta los tests.
 Puedes construir manualmente cada imagen:
 
 ```sh
-docker build -f Dockerfile.dev -t app-solicitudes-dev .
-docker build -f Dockerfile.prod -t app-solicitudes-prod .
-docker build -f Dockerfile.test -t app-solicitudes-test .
+docker build -f Dockerfile.dev -t app-gestor-solicitudes-dev .
+docker build -f Dockerfile.prod -t app-gestor-solicitudes-prod .
+docker build -f Dockerfile.test -t app-gestor-solicitudes-test .
 ```
 
 ---
@@ -406,13 +406,13 @@ Construir las imágenes manualmente:
 
 ```sh
 # Desarrollo
-docker build -f Dockerfile.dev -t app-solicitudes-dev .
+docker build -f Dockerfile.dev -t app-gestor-solicitudes-dev .
 
 # Producción
-docker build -f Dockerfile.prod -t app-solicitudes-prod .
+docker build -f Dockerfile.prod -t app-gestor-solicitudes-prod .
 
 # Testing
-docker build -f Dockerfile.test -t app-solicitudes-test .
+docker build -f Dockerfile.test -t app-gestor-solicitudes-test .
 ```
 
 Luego se puede correr los contenedores manualmente con `docker run` y mapear los puertos según corresponda.

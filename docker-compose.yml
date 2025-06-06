@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    container_name: app-solicitudes-dev
+    container_name: app-gestor-solicitudes-dev
     ports:
       - "5173:5173"  # la app estará en http://localhost:5173
     volumes:
@@ -24,7 +24,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    container_name: app-solicitudes-prod
+    container_name: app-gestor-solicitudes-prod
     ports:
       - "3000:3000"              # la app estará en http://localhost:3000
     environment:
@@ -38,7 +38,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.test
-    container_name: app-solicitudes-test
+    container_name: app-gestor-solicitudes-test
     ports:
       - "4173:5173"             
     environment:
