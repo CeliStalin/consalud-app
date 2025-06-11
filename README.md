@@ -427,3 +427,63 @@ Luego se puede correr los contenedores manualmente con `docker run` y mapear los
   - Desarrollo: 5173
   - Producción: 3000 (puedes cambiarlo en `docker-compose.yml`)
   - Testing: no expone puerto
+
+# Instrucciones para desarrollo con Docker
+
+## 1. Regenerar el lockfile compatible con Docker/Linux
+
+**¿Cuándo ejecutar este paso?**
+- Solo cuando se agrege, elimine o actualice dependencias en `package.json`.
+- No es necesario si solo cambias código fuente.
+- Se hace **antes de construir la imagen Docker** para evitar errores de instalación.
+
+**¿Qué comando usar?**
+
+- **En PowerShell o CMD (Windows):**
+  ```sh
+  npm run lockfile:linux-win
+  ```
+- **En Bash/WSL/Linux:**
+  ```sh
+  npm run lockfile:linux-bash
+  ```
+
+Esto generará un `package-lock.json` compatible con Linux (el entorno de Docker Desktop).
+
+---
+
+## 2. Construir la imagen de desarrollo
+
+Una vez que el lockfile está actualizado, se construye la imagen dev normalmente:
+
+```sh
+docker build --no-cache -f Dockerfile.dev -t consalud-app:dev .
+```
+
+Esto creará la imagen lista para desarrollo en Docker.
+
+---
+
+## 3. Flujo recomendado (ejemplo completo)
+
+1. **Si cambiaste dependencias:**
+   - Abre PowerShell o CMD (Windows) o Bash/WSL (Linux).
+   - Ejecuta el script correspondiente para tu entorno:
+     - Windows:
+       ```sh
+       npm run lockfile:linux-win
+       ```
+     - Linux/WSL:
+       ```sh
+       npm run lockfile:linux-bash
+       ```
+2. **Construye la imagen Docker:**
+   ```sh
+   docker build --no-cache -f Dockerfile.dev -t consalud-app:dev .
+   ```
+
+---
+
+## 4. Notas
+- Si solo cambias código fuente, puedes construir la imagen directamente sin regenerar el lockfile.
+- Si el build falla por el lockfile, repite el paso 1 antes de volver a intentar el build.
