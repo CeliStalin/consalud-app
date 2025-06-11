@@ -448,7 +448,7 @@ Luego se puede correr los contenedores manualmente con `docker run` y mapear los
   npm run lockfile:linux-bash
   ```
 
-Esto generará un `package-lock.json` compatible con Linux (el entorno de Docker Desktop).
+Esto generará un `package-lock.json` compatible con Linux (el entorno de Docker).
 
 ---
 
