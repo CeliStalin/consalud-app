@@ -487,3 +487,12 @@ Esto creará la imagen lista para desarrollo en Docker.
 ## 4. Notas
 - Si solo cambias código fuente, puedes construir la imagen directamente sin regenerar el lockfile.
 - Si el build falla por el lockfile, repite el paso 1 antes de volver a intentar el build.
+
+## 🛡️ Vulnerabilidades conocidas
+
+Este proyecto utiliza dependencias de terceros que pueden reportar vulnerabilidades de baja severidad según los análisis de `npm audit`. Actualmente, después de aplicar las correcciones automáticas seguras, el reporte muestra:
+
+- **brace-expansion**: Vulnerabilidad de Denial of Service por expresiones regulares. Riesgo bajo, afecta principalmente herramientas de desarrollo. Se monitoreará para futuras actualizaciones.
+- **sweetalert2**: El reporte sugiere bajar a una versión anterior para evitar un comportamiento potencialmente indeseado, pero hacerlo podría romper funcionalidades actuales. Se ha decidido mantener la versión actual y monitorear futuras actualizaciones. No se han detectado problemas de seguridad en el uso actual de la librería.
+
+No existen vulnerabilidades críticas ni de alto riesgo en producción. Se recomienda revisar periódicamente el reporte de `npm audit` y actualizar dependencias cuando sea seguro hacerlo.

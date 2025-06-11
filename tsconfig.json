@@ -27,7 +27,6 @@
   "include": [
     "src",
     "scripts/**/*",
-    "optimization.config.ts",
     "vite.config.ts"
   ]
 }

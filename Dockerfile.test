@@ -7,31 +7,18 @@ RUN apk add --no-cache \
     g++ \
     && ln -sf python3 /usr/bin/python
 
-# Actualizar npm a la última versión globalmente
-RUN npm install -g npm@latest
-
-# Etapa 1: Optimización de dependencias
-FROM base AS optimizer
 WORKDIR /app
-COPY package*.json ./
-COPY optimization.config.ts ./
-COPY scripts/ ./scripts/
-COPY ./consalud-core-1.0.0.tgz ./
-COPY .env* ./
-RUN node scripts/optimize-deps.js
 
-# Etapa 2: Dependencias de desarrollo
-FROM base AS deps-dev
-WORKDIR /app
+# Copiar archivos de dependencias y el core tgz
 COPY package*.json ./
 COPY ./consalud-core-1.0.0.tgz ./
+COPY .env.test ./.env.test
+
+# Instalar dependencias de desarrollo
 RUN npm ci --no-audit --no-fund && npm cache clean --force
 
-FROM base AS test
-WORKDIR /app
-COPY --from=deps-dev /app/node_modules ./node_modules
-COPY package*.json ./
-COPY ./consalud-core-1.0.0.tgz ./
+# Copiar el resto del código fuente
 COPY . .
-RUN npm run test
-RUN npm install --save-dev @testing-library/dom 
+
+# Ejecutar los tests
+CMD ["npm", "run", "test"] 

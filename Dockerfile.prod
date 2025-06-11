@@ -1,5 +1,5 @@
-# Etapa 1: Base
-FROM node:20-alpine AS base
+# Etapa 1: Build de la app
+FROM node:20-alpine AS builder
 
 RUN apk add --no-cache \
     python3 \
@@ -7,29 +7,23 @@ RUN apk add --no-cache \
     g++ \
     && ln -sf python3 /usr/bin/python
 
-# Actualizar npm a la última versión globalmente
-RUN npm install -g npm@latest
-
-# Etapa 2: Optimización de dependencias
-FROM base AS optimizer
 WORKDIR /app
-COPY package*.json ./
-COPY optimization.config.ts ./
-COPY scripts/ ./scripts/
-COPY ./consalud-core-1.0.0.tgz ./
-COPY .env* ./
-RUN node scripts/optimize-deps.js
 
-# Etapa 3: Build de la app (usa TODAS las dependencias)
-FROM base AS builder
-WORKDIR /app
+# Copiar archivos de dependencias y el core tgz
 COPY package*.json ./
 COPY ./consalud-core-1.0.0.tgz ./
-RUN npm ci --no-audit --no-fund
+COPY .env.production ./.env.production
+
+# Instalar dependencias
+RUN npm ci --no-audit --no-fund && npm cache clean --force
+
+# Copiar el resto del código fuente
 COPY . .
+
+# Build de la aplicación para producción
 RUN npm run build
 
-# Etapa 4: Imagen final de producción (Nginx)
+# Etapa 2: Imagen final de producción (Nginx)
 FROM nginx:alpine AS production
 
 # Copia el build estático al directorio de Nginx
