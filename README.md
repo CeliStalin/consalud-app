@@ -457,7 +457,7 @@ Esto generará un `package-lock.json` compatible con Linux (el entorno de Docker
 Una vez que el lockfile está actualizado, se construye la imagen dev normalmente:
 
 ```sh
-docker build --no-cache -f Dockerfile.dev -t consalud-app:dev .
+docker build --no-cache -f Dockerfile.dev -t app-gestor-solicitudes:dev .
 ```
 
 Esto creará la imagen lista para desarrollo en Docker.
@@ -479,7 +479,7 @@ Esto creará la imagen lista para desarrollo en Docker.
        ```
 2. **Construye la imagen Docker:**
    ```sh
-   docker build --no-cache -f Dockerfile.dev -t consalud-app:dev .
+   docker build --no-cache -f Dockerfile.dev -t app-gestor-solicitudes:dev .
    ```
 
 ---
