@@ -137,13 +137,7 @@ export const AppRoutes = () => {
         {/* Rutas del módulo de herederos */}
         <Route 
           path="/mnherederos/ingresoher" 
-          element={
-            <ConsaludCore.ProtectedRoute>
-              <StablePageWrapper>
-                <IngresoHerederosPage />
-              </StablePageWrapper>
-            </ConsaludCore.ProtectedRoute>
-          } 
+          element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />} 
         />
         
         <Route 

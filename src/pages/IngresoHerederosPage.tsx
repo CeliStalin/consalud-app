@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
 import { useHerederoNavigation } from '../features/herederos/hooks/useHerederoNavigation';
 import './styles/IngresoHerederosPage.css';
 
 const IngresoHerederosPage: React.FC = () => {
+  const navigate = useNavigate();
   const { startProcess } = useHerederoNavigation();
 
-  const handleNavigateToForm = () => {
-    startProcess();
-  };
-  
+  useEffect(() => {
+    // Redirigir automáticamente al IngresoTitularPage
+    navigate('/mnherederos/ingresoher/ingresotitular', { replace: true });
+  }, [navigate]);
+
+  // Renderiza un loader o nada, ya que la redirección es instantánea
   return (
     <ConsaludCore.SecureLayout pageTitle="Ingreso Herederos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
       <div className="app-content-main">
@@ -23,7 +27,6 @@ const IngresoHerederosPage: React.FC = () => {
               className="ingreso-card"
             >
               <div className="card-content">
-                
                 <div className="card-info-box app-card ingreso-info-box">
                   <ConsaludCore.Typography variant="body" style={{ marginBottom: '12px' }}>
                     Bienvenido al sistema de gestión de herederos
@@ -32,15 +35,14 @@ const IngresoHerederosPage: React.FC = () => {
                     Aquí podrás registrar y gestionar la información de los beneficiarios para la devolución de fondos.
                   </ConsaludCore.Typography>
                 </div>
-                
                 <div className="button-action-container">
                   <ConsaludCore.Button 
                     variant="primary"
-                    onClick={handleNavigateToForm}
                     size="large"
                     className="proceso-button"
+                    disabled
                   >
-                    Comenzar proceso
+                    Redirigiendo...
                   </ConsaludCore.Button>
                 </div>
               </div>
