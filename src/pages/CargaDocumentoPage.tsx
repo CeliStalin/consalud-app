@@ -1,5 +1,4 @@
 import React from 'react';
-import * as ConsaludCore from '@consalud/core'; // Cambiado para usar el alias
 import { CargaDocumento } from '@/features/herederos/components/CargaDocumento'
 
 

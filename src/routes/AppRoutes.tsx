@@ -6,7 +6,7 @@ import { useMenuCollapse } from '@consalud/core';
 import CargaDocumentoPage from '../pages/CargaDocumentoPage';
 
 // Lazy loading optimizado - SIN preloading que pueda causar conflictos
-const IngresoHerederosPage = React.lazy(() => import('../pages/IngresoHerederosPage'));
+//const IngresoHerederosPage = React.lazy(() => import('../pages/IngresoHerederosPage'));
 const IngresoTitularPage = React.lazy(() => import('../pages/IngresoTitularPage'));
 const InfoRequisitosTitularPage = React.lazy(() => import('../pages/InfoRequisitosTitularPage'));
 const DatosTitularPage = React.lazy(() => import('../pages/DatosTitularPage'));
