@@ -2,6 +2,9 @@ import React, { Suspense, useMemo } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
 import { useAuthWithRedirect } from '../hooks/useAuthWithRedirect';
+import { useMenuCollapse } from '@consalud/core';
+
+
 
 // Lazy loading optimizado - SIN preloading que pueda causar conflictos
 const IngresoHerederosPage = React.lazy(() => import('../pages/IngresoHerederosPage'));
@@ -68,6 +71,31 @@ const StablePageWrapper: React.FC<{ children: React.ReactNode }> = React.memo(({
 
 StablePageWrapper.displayName = 'StablePageWrapper';
 
+// Wrapper para HomePage que colapsa el menú al hacer clic en una app
+const HomePageWithCollapse = (props) => {
+  const { collapseMenu } = useMenuCollapse();
+  
+  const handleApplicationClick = (...args) => {
+    collapseMenu();
+    // Si HomePage espera argumentos en onApplicationClick, los puedes pasar aquí
+    if (props.onApplicationClick) props.onApplicationClick(...args);
+  };
+
+  return (
+    <ConsaludCore.HomePage
+      {...props}
+      onApplicationClick={handleApplicationClick}
+      withLayout={false}
+      enableBounce={true}
+      showWelcomeSection={true}
+      showApplicationsSection={true}
+      showDirectAccessSection={true}
+      bounceIntensity="medium"
+      animationDuration={300}
+    />
+  );
+};
+
 export const AppRoutes = () => {
   const { isAuthenticated, isLoading, handleLoginSuccess } = useAuthWithRedirect({
     defaultRedirectPath: '/home',
@@ -91,7 +119,6 @@ export const AppRoutes = () => {
   }
 
   return (
-    // Suspense optimizado con fallback estable
     <Suspense fallback={<OptimizedLoading />}>
       <Routes location={location}>
         {/* Rutas Públicas */}
@@ -122,14 +149,9 @@ export const AppRoutes = () => {
           path="/home"
           element={
             <ConsaludCore.ProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-              <StablePageWrapper>
-                <ConsaludCore.HomePage 
-                  enableBounce={true}  // ✅ Asegúrate de que esté habilitado
-                  showWelcomeSection={true}
-                  showApplicationsSection={true}
-                  showDirectAccessSection={true}
-                />
-              </StablePageWrapper>
+              <ConsaludCore.SecureLayout pageTitle="Home" allowedRoles={['USER', 'ADMIN', 'Developers']}>
+                <HomePageWithCollapse />
+              </ConsaludCore.SecureLayout>
             </ConsaludCore.ProtectedRoute>
           } 
         />
