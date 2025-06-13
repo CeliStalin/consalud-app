@@ -5,9 +5,7 @@ import { CargaDocumento } from '@/features/herederos/components/CargaDocumento'
 
 const CargaDocumentoPage: React.FC = () => {
   return (
-    <ConsaludCore.SecureLayout pageTitle="Carga Documentos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
-      <CargaDocumento />
-    </ConsaludCore.SecureLayout>
+    <CargaDocumento />
   );
 };
 

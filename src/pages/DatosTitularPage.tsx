@@ -5,9 +5,7 @@ import { DatosTitular } from '@/features/herederos/components/DatosTitular';
 
 const DatosTitularPage: React.FC = () => { 
   return (
-    <ConsaludCore.SecureLayout pageTitle="Datos Titular" allowedRoles={['USER', 'ADMIN', 'Developers']}>
-      <DatosTitular />
-    </ConsaludCore.SecureLayout>
+    <DatosTitular />
   );
 };
 

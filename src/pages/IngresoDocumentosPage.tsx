@@ -324,173 +324,171 @@ const IngresoDocumentosPage: React.FC = () => {
   };
 
   return (
-    <ConsaludCore.SecureLayout pageTitle="Ingreso Documentos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
-      <div className="content-container" style={{ minHeight: '400px' }}>
-        <ConsaludCore.Card 
-          title="Ingreso de Documentos" 
-          subtitle="Gestión de documentación"
-          variant="elevated"
-          padding="large"
-        >
-          <div className="documentos-content">
-            <p className="instrucciones">
-              Para cargar el mandato requeridos para el proceso de devolución, 
-              haga clic en el botón "Cargar Mandatos" a continuación. Se abrirá una 
-              ventana externa donde podrá seleccionar y subir su cuenta.
-            </p>
-            
-            {/* Mensajes específicos según el estado */}
-            {error && (
-              <div className="notification is-danger">
-                <p>{error}</p>
-              </div>
-            )}
-            
-            {transactionStatus === 'success' && !error && (
-              <div className="notification is-success">
-                <p><strong>Información actualizada correctamente</strong></p>
-                {mandatoInfo && 
-                  <p>Se ha {isExternalAppOpen ? "obtenido" : "actualizado"} la información de la cuenta bancaria.</p>
-                }
-                {!isExternalAppOpen && 
-                  <p className="is-size-7 mt-2">
-                    Los cambios realizados en la ventana externa se han aplicado correctamente.
-                  </p>
-                }
-              </div>
-            )}
-            
-            {transactionStatus === 'cancelled' && (
-              <div className="notification is-warning">
-                <p>
-                  <strong>La ventana fue cerrada sin completar el proceso.</strong>
+    <div className="content-container" style={{ minHeight: '400px' }}>
+      <ConsaludCore.Card 
+        title="Ingreso de Documentos" 
+        subtitle="Gestión de documentación"
+        variant="elevated"
+        padding="large"
+      >
+        <div className="documentos-content">
+          <p className="instrucciones">
+            Para cargar el mandato requeridos para el proceso de devolución, 
+            haga clic en el botón "Cargar Mandatos" a continuación. Se abrirá una 
+            ventana externa donde podrá seleccionar y subir su cuenta.
+          </p>
+          
+          {/* Mensajes específicos según el estado */}
+          {error && (
+            <div className="notification is-danger">
+              <p>{error}</p>
+            </div>
+          )}
+          
+          {transactionStatus === 'success' && !error && (
+            <div className="notification is-success">
+              <p><strong>Información actualizada correctamente</strong></p>
+              {mandatoInfo && 
+                <p>Se ha {isExternalAppOpen ? "obtenido" : "actualizado"} la información de la cuenta bancaria.</p>
+              }
+              {!isExternalAppOpen && 
+                <p className="is-size-7 mt-2">
+                  Los cambios realizados en la ventana externa se han aplicado correctamente.
                 </p>
+              }
+            </div>
+          )}
+          
+          {transactionStatus === 'cancelled' && (
+            <div className="notification is-warning">
+              <p>
+                <strong>La ventana fue cerrada sin completar el proceso.</strong>
+              </p>
+              <p>
+                Para continuar, debe completar el proceso de carga de documentos.
+              </p>
+            </div>
+          )}
+          
+          {/* Añadir botón para actualizar manualmente los datos cuando tenemos mandatoInfo */}
+          {mandatoInfo && (
+            <div className="has-text-right mb-3">
+              <button 
+                className="button is-small is-info is-light is-outlined"
+                onClick={() => fetchMandatoData('17175966', true)}
+                disabled={loading || isExternalAppOpen}
+              >
+                <span className="icon is-small">
+                  <i className="fas fa-sync-alt"></i>
+                  {/* Si no tienes Font Awesome, usar un texto simple */}
+                  {!document.querySelector('.fas') && '↻'}
+                </span>
+                <span>Actualizar datos</span>
+              </button>
+            </div>
+          )}
+          
+          {/* Mostrar la información del mandato cuando está disponible */}
+          {mandatoInfo && renderMandatoInfo()}
+          
+          {/* Mostrar radio buttons después de cerrar la ventana */}
+          {showRadioOptions && (
+            <div className="radio-options-container mt-4 mb-4 p-4 has-background-light has-radius is-rounded">
+              <p className="has-text-weight-medium mb-3">¿Completó la carga de documentos en la ventana anterior?</p>
+              <div className="control radio-options">
+                <label className="radio mr-5">
+                  <input 
+                    type="radio" 
+                    name="documentsCompleted" 
+                    value="si" 
+                    checked={documentsCompleted === 'si'} 
+                    onChange={handleRadioChange}
+                    className="mr-2"
+                  />
+                  Sí, completé todos los documentos
+                </label>
+                <label className="radio">
+                  <input 
+                    type="radio" 
+                    name="documentsCompleted" 
+                    value="no" 
+                    checked={documentsCompleted === 'no'} 
+                    onChange={handleRadioChange}
+                    className="mr-2"
+                  />
+                  No, necesito volver a Cargar Mandatos
+                </label>
+              </div>
+            </div>
+          )}
+          
+          <div className="documentos-actions">
+            {/* Botón para iniciar el proceso externo */}
+            <ConsaludCore.Button 
+              variant="primary"
+              loading={loading}
+              disabled={isExternalAppOpen || loading || 
+                (showRadioOptions && documentsCompleted === 'si')}
+              onClick={openExternalApp}
+              className="cargar-documentos-btn"
+            >
+              {isExternalAppOpen ? 'Procesando en otra ventana...' : 'Cargar Mandatos'}
+            </ConsaludCore.Button>
+            
+            {/* Mostrar este mensaje mientras la ventana externa está abierta */}
+            {isExternalAppOpen && (
+              <div className="notification is-info mt-3">
                 <p>
-                  Para continuar, debe completar el proceso de carga de documentos.
+                  <strong>Por favor complete el proceso en la ventana abierta.</strong>
+                </p>
+                <p className="is-size-7 mt-2">
+                  Esta aplicación permanecerá bloqueada hasta que finalice el proceso 
+                  de carga de documentos o cierre la ventana externa.
+                </p>
+                <p className="is-size-7 mt-2">
+                  <strong>Nota:</strong> Al cerrar la ventana, se actualizará automáticamente 
+                  la información de la cuenta bancaria.
                 </p>
               </div>
             )}
             
-            {/* Añadir botón para actualizar manualmente los datos cuando tenemos mandatoInfo */}
-            {mandatoInfo && (
-              <div className="has-text-right mb-3">
-                <button 
-                  className="button is-small is-info is-light is-outlined"
-                  onClick={() => fetchMandatoData('17175966', true)}
-                  disabled={loading || isExternalAppOpen}
-                >
-                  <span className="icon is-small">
-                    <i className="fas fa-sync-alt"></i>
-                    {/* Si no tienes Font Awesome, usar un texto simple */}
-                    {!document.querySelector('.fas') && '↻'}
-                  </span>
-                  <span>Actualizar datos</span>
-                </button>
+            {/* Mostrar mensaje cuando se está procesando con ventana externa cerrada */}
+            {!isExternalAppOpen && mandatoInfo && transactionStatus === 'pending' && (
+              <div className="notification is-warning mt-3">
+                <p>
+                  <strong>Verificando cambios realizados...</strong>
+                </p>
+                <p className="is-size-7 mt-2">
+                  Estamos consultando la información actualizada de la cuenta bancaria.
+                </p>
               </div>
             )}
             
-            {/* Mostrar la información del mandato cuando está disponible */}
-            {mandatoInfo && renderMandatoInfo()}
-            
-            {/* Mostrar radio buttons después de cerrar la ventana */}
-            {showRadioOptions && (
-              <div className="radio-options-container mt-4 mb-4 p-4 has-background-light has-radius is-rounded">
-                <p className="has-text-weight-medium mb-3">¿Completó la carga de documentos en la ventana anterior?</p>
-                <div className="control radio-options">
-                  <label className="radio mr-5">
-                    <input 
-                      type="radio" 
-                      name="documentsCompleted" 
-                      value="si" 
-                      checked={documentsCompleted === 'si'} 
-                      onChange={handleRadioChange}
-                      className="mr-2"
-                    />
-                    Sí, completé todos los documentos
-                  </label>
-                  <label className="radio">
-                    <input 
-                      type="radio" 
-                      name="documentsCompleted" 
-                      value="no" 
-                      checked={documentsCompleted === 'no'} 
-                      onChange={handleRadioChange}
-                      className="mr-2"
-                    />
-                    No, necesito volver a Cargar Mandatos
-                  </label>
-                </div>
-              </div>
-            )}
-            
-            <div className="documentos-actions">
-              {/* Botón para iniciar el proceso externo */}
+            {/* Botón para continuar después de completar el proceso exitosamente */}
+            {transactionStatus === 'success' && (
               <ConsaludCore.Button 
                 variant="primary"
-                loading={loading}
-                disabled={isExternalAppOpen || loading || 
-                  (showRadioOptions && documentsCompleted === 'si')}
-                onClick={openExternalApp}
-                className="cargar-documentos-btn"
+                onClick={handleContinue}
+                className="continuar-btn mt-4"
               >
-                {isExternalAppOpen ? 'Procesando en otra ventana...' : 'Cargar Mandatos'}
+                Continuar
               </ConsaludCore.Button>
-              
-              {/* Mostrar este mensaje mientras la ventana externa está abierta */}
-              {isExternalAppOpen && (
-                <div className="notification is-info mt-3">
-                  <p>
-                    <strong>Por favor complete el proceso en la ventana abierta.</strong>
-                  </p>
-                  <p className="is-size-7 mt-2">
-                    Esta aplicación permanecerá bloqueada hasta que finalice el proceso 
-                    de carga de documentos o cierre la ventana externa.
-                  </p>
-                  <p className="is-size-7 mt-2">
-                    <strong>Nota:</strong> Al cerrar la ventana, se actualizará automáticamente 
-                    la información de la cuenta bancaria.
-                  </p>
-                </div>
-              )}
-              
-              {/* Mostrar mensaje cuando se está procesando con ventana externa cerrada */}
-              {!isExternalAppOpen && mandatoInfo && transactionStatus === 'pending' && (
-                <div className="notification is-warning mt-3">
-                  <p>
-                    <strong>Verificando cambios realizados...</strong>
-                  </p>
-                  <p className="is-size-7 mt-2">
-                    Estamos consultando la información actualizada de la cuenta bancaria.
-                  </p>
-                </div>
-              )}
-              
-              {/* Botón para continuar después de completar el proceso exitosamente */}
-              {transactionStatus === 'success' && (
-                <ConsaludCore.Button 
-                  variant="primary"
-                  onClick={handleContinue}
-                  className="continuar-btn mt-4"
-                >
-                  Continuar
-                </ConsaludCore.Button>
-              )}
-              
-              {/* Botón para reintentar si hubo un error o cancelación */}
-              {(transactionStatus === 'error' || transactionStatus === 'cancelled') && (
-                <ConsaludCore.Button 
-                  variant="secondary"
-                  onClick={handleRetry}
-                  className="retry-btn mt-3"
-                >
-                  Intentar de nuevo
-                </ConsaludCore.Button>
-              )}
-            </div>
+            )}
+            
+            {/* Botón para reintentar si hubo un error o cancelación */}
+            {(transactionStatus === 'error' || transactionStatus === 'cancelled') && (
+              <ConsaludCore.Button 
+                variant="secondary"
+                onClick={handleRetry}
+                className="retry-btn mt-3"
+              >
+                Intentar de nuevo
+              </ConsaludCore.Button>
+            )}
           </div>
-        </ConsaludCore.Card>
-      </div>
-    </ConsaludCore.SecureLayout>
+        </div>
+      </ConsaludCore.Card>
+    </div>
   );
 };
 

@@ -5,9 +5,7 @@ import { RequisitosTitular } from '@/features/herederos/components/RequisitosTit
 
 const InfoRequisitosTitularPage: React.FC = () => {
   return (
-    <ConsaludCore.SecureLayout pageTitle="Requisitos del Titular" allowedRoles={['USER', 'ADMIN', 'Developers']}>
-      <RequisitosTitular />
-    </ConsaludCore.SecureLayout>
+    <RequisitosTitular />
   );
 };
 

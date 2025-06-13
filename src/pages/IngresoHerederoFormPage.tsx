@@ -5,9 +5,7 @@ import FormIngresoHeredero from '../features/herederos/components/FormIngresoHer
 
 const IngresoHerederoFormPage: React.FC = () => {
   return (
-    <ConsaludCore.SecureLayout pageTitle="Ingreso Herederos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
-      <FormIngresoHeredero />
-    </ConsaludCore.SecureLayout>
+    <FormIngresoHeredero />
   );
 };
 

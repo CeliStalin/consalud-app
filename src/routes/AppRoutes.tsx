@@ -1,10 +1,9 @@
 import React, { Suspense, useMemo } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
 import { useAuthWithRedirect } from '../hooks/useAuthWithRedirect';
 import { useMenuCollapse } from '@consalud/core';
-
-
+import CargaDocumentoPage from '../pages/CargaDocumentoPage';
 
 // Lazy loading optimizado - SIN preloading que pueda causar conflictos
 const IngresoHerederosPage = React.lazy(() => import('../pages/IngresoHerederosPage'));
@@ -96,6 +95,15 @@ const HomePageWithCollapse = (props) => {
   );
 };
 
+// Layout wrapper para las subrutas de herederos
+const HerederosLayout = () => (
+  <ConsaludCore.ProtectedRoute>
+    <ConsaludCore.SecureLayout pageTitle="Herederos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
+      <Outlet />
+    </ConsaludCore.SecureLayout>
+  </ConsaludCore.ProtectedRoute>
+);
+
 export const AppRoutes = () => {
   const { isAuthenticated, isLoading, handleLoginSuccess } = useAuthWithRedirect({
     defaultRedirectPath: '/home',
@@ -156,120 +164,30 @@ export const AppRoutes = () => {
           } 
         />
         
-        {/* Rutas del módulo de herederos */}
+        {/* Rutas del módulo de herederos - refactorizadas */}
+        <Route path="/mnherederos/*" element={<HerederosLayout />}>
+          <Route index element={<Navigate to="ingresoher/ingresotitular" replace />} />
+          <Route path="ingresoher" element={<Navigate to="ingresoher/ingresotitular" replace />} />
+          <Route path="ingresoher/ingresotitular" element={<IngresoTitularPage />} />
+          <Route path="ingresoher/RequisitosTitular" element={<InfoRequisitosTitularPage />} />
+          <Route path="ingresoher/DatosTitular" element={<DatosTitularPage />} />
+          <Route path="ingresoher/RegistroTitular" element={<RegistroHerederoPage />} />
+          <Route path="ingresoher/RegistroHeredero" element={<RegistroHerederoPage />} />
+          <Route path="ingresoher/formingreso" element={<IngresoHerederoFormPage />} />
+          <Route path="ingresoher/cargadoc" element={<CargaDocumentoPage />} />
+          <Route path="ingresoher/detallemandato" element={<DetalleMandatoPage />} />
+          <Route path="ingresoher/success" element={<SuccessPage />} />
+          <Route path="ingresoher/IngresoDocumentos" element={<IngresoDocumentosPage />} />
+        </Route>
+
+        {/* Redirección para rutas con mayúsculas (compatibilidad) */}
         <Route 
-          path="/mnherederos/ingresoher" 
+          path="/mnHerederos/*"
           element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />} 
         />
-        
         <Route 
-          path="/mnherederos/dashboard" 
-          element={
-            <ConsaludCore.ProtectedRoute>
-              <StablePageWrapper>
-                <IngresoHerederosPage />
-              </StablePageWrapper>
-            </ConsaludCore.ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/mnherederos/ingresoher/ingresotitular" 
-          element={
-            <ConsaludCore.ProtectedRoute>
-              <StablePageWrapper>
-                <IngresoTitularPage />
-              </StablePageWrapper>
-            </ConsaludCore.ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/mnherederos/ingresoher/RequisitosTitular" 
-          element={
-            <ConsaludCore.ProtectedRoute>
-              <StablePageWrapper>
-                <InfoRequisitosTitularPage />
-              </StablePageWrapper>
-            </ConsaludCore.ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/mnherederos/ingresoher/DatosTitular" 
-          element={
-            <ConsaludCore.ProtectedRoute>
-              <StablePageWrapper>
-                <DatosTitularPage />
-              </StablePageWrapper>
-            </ConsaludCore.ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/mnherederos/ingresoher/RegistroTitular" 
-          element={
-            <ConsaludCore.ProtectedRoute>
-              <StablePageWrapper>
-                <RegistroHerederoPage />
-              </StablePageWrapper>
-            </ConsaludCore.ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/mnherederos/ingresoher/RegistroHeredero" 
-          element={
-            <ConsaludCore.ProtectedRoute>
-              <StablePageWrapper>
-                <RegistroHerederoPage />
-              </StablePageWrapper>
-            </ConsaludCore.ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/mnherederos/ingresoher/formingreso" 
-          element={
-            <ConsaludCore.ProtectedRoute>
-              <StablePageWrapper>
-                <IngresoHerederoFormPage />
-              </StablePageWrapper>
-            </ConsaludCore.ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/mnherederos/ingresoher/cargadoc" 
-          element={
-            <ConsaludCore.ProtectedRoute>
-              <StablePageWrapper>
-                <IngresoDocumentosPage />
-              </StablePageWrapper>
-            </ConsaludCore.ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/mnherederos/ingresoher/detallemandato" 
-          element={
-            <ConsaludCore.ProtectedRoute>
-              <StablePageWrapper>
-                <DetalleMandatoPage />
-              </StablePageWrapper>
-            </ConsaludCore.ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/mnherederos/ingresoher/success" 
-          element={
-            <ConsaludCore.ProtectedRoute>
-              <StablePageWrapper>
-                <SuccessPage />
-              </StablePageWrapper>
-            </ConsaludCore.ProtectedRoute>
-          } 
+          path="/mnHerederos/IngresoHer/*"
+          element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />} 
         />
 
         {/* Rutas de error */}
