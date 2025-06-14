@@ -61,131 +61,92 @@ const IngresoTitular = () => {
     }
 
     return (
-        <div className="app-content-main animate-fade-in-scale" style={{ minHeight: 'calc(100vh - 200px)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div className="ingreso-herederos-wrapper animate-fade-in-up" style={{ width: '100%', maxWidth: 720, margin: '0 auto' }}>
-                <ConsaludCore.Card 
-                    title="Ingreso de Titular" 
-                    subtitle="Validación de RUT del titular para iniciar el proceso"
-                    variant="elevated"
-                    padding="large"
-                    className="ingreso-card"
+        <div style={{ minHeight: '60vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'transparent', width: '100%' }}>
+            <ConsaludCore.Card
+                title={undefined}
+                subtitle={undefined}
+                variant="elevated"
+                padding="large"
+                className="ingreso-card"
+            >
+                <form
+                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 8 }}
+                    onSubmit={e => { e.preventDefault(); handleFlow(); }}
+                    autoComplete="off"
+                    aria-labelledby="rut-titular-label"
                 >
-                    <div className="card-content">
-                        <div className="card-info-box app-card ingreso-info-box">
-                            <div style={{ width: '100%' }}>
-                                <div className="textoTituloComponentes" style={{ marginBottom: 12 }}>
-                                    {ConsaludCore.Typography ? (
-                                        <ConsaludCore.Typography 
-                                            variant="h5" 
-                                            component="span" 
-                                            weight={ConsaludCore.FONT_WEIGHTS?.bold} 
-                                            color={ConsaludCore.theme?.textColors?.primary || "#505050"}
-                                        >
-                                            Registrar persona titular
-                                        </ConsaludCore.Typography>
-                                    ) : (
-                                        <span>Registrar persona titular</span>
-                                    )}
-                                </div>
-                                <div className="iconoGenerico" style={{ marginBottom: 8 }}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                        <path d="M17 21V19C17 17.8954 16.1046 17 15 17H9C7.89543 17 7 17.8954 7 19V21" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path fillRule="evenodd" clipRule="evenodd" d="M12 13C14.2091 13 16 11.2091 16 9C16 6.79086 14.2091 5 12 5C9.79086 5 8 6.79086 8 9C8 11.2091 9.79086 13 12 13Z" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                    {ConsaludCore.Typography ? (
-                                        <ConsaludCore.Typography 
-                                            variant="body" 
-                                            component="p" 
-                                            weight={ConsaludCore.FONT_WEIGHTS?.medium} 
-                                            color={ConsaludCore.theme?.textColors?.primary || "#505050"}
-                                        >
-                                            RUT del titular
-                                        </ConsaludCore.Typography>
-                                    ) : (
-                                        <p>RUT del titular</p>
-                                    )}
-                                </div>
-                                {ConsaludCore.Typography ? (
-                                    <ConsaludCore.Typography 
-                                        variant="caption" 
-                                        component="p" 
-                                        color={ConsaludCore.theme?.textColors?.secondary || "#656565"} 
-                                        className="textoImportante"
-                                    >
-                                        Ingresa el RUT del titular que corresponda a una persona afiliada con devolución.
-                                    </ConsaludCore.Typography>
-                                ) : (
-                                    <p className="textoImportante">Ingresa el RUT del titular que corresponda a una persona afiliada con devolución.</p>
-                                )}
-                                {ConsaludCore.Typography ? (
-                                    <ConsaludCore.Typography 
-                                        variant="caption" 
-                                        component="span" 
-                                        weight={ConsaludCore.FONT_WEIGHTS?.medium} 
-                                        color="gray.medium" 
-                                        className="rutText"
-                                    >
-                                        RUT persona heredera
-                                    </ConsaludCore.Typography>
-                                ) : (
-                                    <span className="rutText">RUT persona heredera</span>
-                                )}
-                                <div className="divRut" style={{ marginTop: 16 }}>
-                                    <input
-                                        id="RutTitular"
-                                        type="text"
-                                        inputMode="text"
-                                        pattern="[0-9kK.-]*"
-                                        value={rut}
-                                        onChange={handleRutChange}
-                                        onBlur={handleBlur}
-                                        onFocus={handleFocus}
-                                        placeholder="Ingresar"
-                                        className="inputRut"
-                                    />
-                                    <button 
-                                        className={`proceso-button animate-fade-in-up ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}`}
-                                        disabled={!isValidRut} 
-                                        onClick={handleFlow}
-                                        type="button"
-                                        style={{ minWidth: 120, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                    > 
-                                        {ConsaludCore.Typography ? (
-                                            <ConsaludCore.Typography 
-                                                variant="button" 
-                                                color={isValidRut ? (ConsaludCore.theme?.textColors?.white || "#FFFFFF") : (ConsaludCore.theme?.textColors?.white || "#FFF")}
-                                            >
-                                                Buscar
-                                            </ConsaludCore.Typography>
-                                        ) : (
-                                            "Buscar"
-                                        )}
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none" style={{ marginLeft: 8 }}>
-                                            <path d="M11 19.5C15.4183 19.5 19 15.9183 19 11.5C19 7.08172 15.4183 3.5 11 3.5C6.58172 3.5 3 7.08172 3 11.5C3 15.9183 6.58172 19.5 11 19.5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                            <path d="M21 21.5L16.65 17.15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                                {showError && (
-                                    ConsaludCore.Typography ? (
-                                        <ConsaludCore.Typography 
-                                            variant="caption" 
-                                            color={ConsaludCore.theme?.textColors?.danger || "#E11D48"} 
-                                            className="errorRut"
-                                        >
-                                            RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
-                                        </ConsaludCore.Typography>
-                                    ) : (
-                                        <span className="errorRut" style={{color: ConsaludCore.theme?.textColors?.danger || "#E11D48"}}>
-                                            RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
-                                        </span>
-                                    )
-                                )}
+                    <div style={{ width: '100%', maxWidth: 1000, margin: '0 auto' }}>
+                        <div style={{ marginBottom: 32 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                    <rect x="3" y="3" width="18" height="18" rx="4" fill="#04A59B" fillOpacity="0.12"/>
+                                    <path d="M12 8V12" stroke="#04A59B" strokeWidth="2" strokeLinecap="round"/>
+                                    <circle cx="12" cy="16" r="1" fill="#04A59B"/>
+                                </svg>
+                                <ConsaludCore.Typography
+                                    variant="subtitle1"
+                                    style={{ fontWeight: 700, color: '#505050', fontSize: 18 }}
+                                >
+                                    RUT del titular
+                                </ConsaludCore.Typography>
                             </div>
+                            <ConsaludCore.Typography
+                                variant="body2"
+                                style={{ color: '#656565', fontSize: 15 }}
+                            >
+                                Ingresa el RUT del titular que corresponda a una persona afiliada con devolución.
+                            </ConsaludCore.Typography>
                         </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
+                            <input
+                                id="RutTitular"
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9kK]*"
+                                value={rut}
+                                onChange={handleRutChange}
+                                onBlur={handleBlur}
+                                onFocus={handleFocus}
+                                placeholder="Ingresar"
+                                className="inputRut"
+                                aria-invalid={showError}
+                                aria-describedby={showError ? 'rut-error' : undefined}
+                                style={{ width: 378, height: 42, flexShrink: 0, border: showError ? '1.5px solid #E11D48' : '1.5px solid #e0e0e0', borderRadius: 24, fontSize: 16, paddingLeft: 18, background: '#f8f9fa', boxShadow: '0 2px 8px rgba(4, 165, 155, 0.07)', outline: 'none', transition: 'border 0.2s' }}
+                            />
+                            <button
+                                className={`proceso-button animate-fade-in-up ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}`}
+                                disabled={!isValidRut}
+                                onClick={handleFlow}
+                                type="submit"
+                                style={{ display: 'flex', padding: '10px 24px', justifyContent: 'center', alignItems: 'center', gap: 8, minWidth: 120, borderRadius: 24, height: 42, fontSize: 16, background: isValidRut ? '#04A59B' : '#E0F7F6', color: '#fff', border: 'none', boxShadow: 'none', fontWeight: 600, transition: 'background 0.2s' }}
+                                aria-label="Buscar titular"
+                            >
+                                <ConsaludCore.Typography
+                                    variant="button"
+                                    color={isValidRut ? '#fff' : '#bdbdbd'}
+                                    style={{ fontWeight: 600 }}
+                                >
+                                    Buscar
+                                </ConsaludCore.Typography>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ marginLeft: 8 }}>
+                                    <circle cx="11" cy="11" r="8" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" />
+                                    <path d="M21 21L16.65 16.65" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" strokeLinecap="round" />
+                                </svg>
+                            </button>
+                        </div>
+                        {showError && (
+                            <ConsaludCore.Typography
+                                variant="caption"
+                                color={ConsaludCore.theme?.textColors?.danger || "#E11D48"}
+                                className="errorRut"
+                                style={{ marginTop: 4, display: 'block', fontSize: 13 }}
+                            >
+                                RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
+                            </ConsaludCore.Typography>
+                        )}
                     </div>
-                </ConsaludCore.Card>
-            </div>
+                </form>
+            </ConsaludCore.Card>
         </div>
     );
 };
