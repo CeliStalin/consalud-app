@@ -20,20 +20,6 @@ const IngresoTitularPage: React.FC = () => {
   // Log para depuración
   console.log('Breadcrumb items:', cleanedBreadcrumbItems);
 
-  // Separador más elegante y consistente
-  const separator = (
-    <span style={{ 
-      color: '#bdbdbd', 
-      fontSize: 14, 
-      fontWeight: 400, 
-      margin: '0 8px', 
-      verticalAlign: 'middle', 
-      userSelect: 'none' 
-    }}>
-      /
-    </span>
-  );
-
   return (
     <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
       {/* Container principal con padding lateral para alinearse con el menú */}

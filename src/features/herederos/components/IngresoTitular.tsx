@@ -7,6 +7,7 @@ import '../components/styles/ingresoTitular.css';
 import '../components/styles/globalStyle.css'
 import '../../../pages/styles/IngresoHerederosPage.css';
 import { useTitular } from "../contexts/TitularContext";
+import UserProfileIcon from '@/assets/user-profile.svg';
 
 const IngresoTitular = () => {
     const { goToRequisitosTitular } = useHerederoNavigation();
@@ -78,11 +79,13 @@ const IngresoTitular = () => {
                     <div style={{ width: '100%', maxWidth: 1000, margin: '0 auto' }}>
                         <div style={{ marginBottom: 32 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none">
-                                    <rect x="3" y="3" width="18" height="18" rx="4" fill="#04A59B" fillOpacity="0.12"/>
-                                    <path d="M12 8V12" stroke="#04A59B" strokeWidth="2" strokeLinecap="round"/>
-                                    <circle cx="12" cy="16" r="1" fill="#04A59B"/>
-                                </svg>
+                                <img
+                                  src={UserProfileIcon}
+                                  width={22}
+                                  height={22}
+                                  alt="Ícono usuario titular"
+                                  style={{ display: 'inline', verticalAlign: 'middle' }}
+                                />
                                 <ConsaludCore.Typography
                                     variant="subtitle1"
                                     style={{ fontWeight: 700, color: '#505050', fontSize: 18 }}
