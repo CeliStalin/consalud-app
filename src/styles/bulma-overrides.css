@@ -251,3 +251,15 @@ main,
     padding: 10px;
   }
 }
+
+/*
+  OVERRIDE CRÍTICO PARA BREADCRUMB:
+  --------------------------------------------------
+  Bulma agrega por defecto un separador visual (/) a los breadcrumbs usando CSS (::before).
+  Como el core maneja el separador desde React, eliminamos el de Bulma aquí para evitar duplicidad o conflictos visuales.
+  Este override debe estar en la app, NO en el core, para mantener el core desacoplado de frameworks externos.
+  Si dejas de usar Bulma, puedes eliminar este bloque.
+*/
+.breadcrumb li+li:before {
+  content: none !important;
+}

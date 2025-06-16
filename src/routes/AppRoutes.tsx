@@ -97,10 +97,8 @@ const HomePageWithCollapse = (props) => {
 
 // Layout wrapper para las subrutas de herederos
 const HerederosLayout = () => (
-  <ConsaludCore.ProtectedRoute>
-    <ConsaludCore.SecureLayout pageTitle="Herederos" allowedRoles={['USER', 'ADMIN', 'Developers']}>
-      <Outlet />
-    </ConsaludCore.SecureLayout>
+  <ConsaludCore.ProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
+    <Outlet />
   </ConsaludCore.ProtectedRoute>
 );
 
@@ -127,7 +125,7 @@ export const AppRoutes = () => {
   }
 
   return (
-    <Suspense fallback={<OptimizedLoading />}>
+    <Suspense fallback={<div style={{ display: 'none' }} />}>
       <Routes location={location}>
         {/* Rutas Públicas */}
         <Route 
@@ -157,17 +155,15 @@ export const AppRoutes = () => {
           path="/home"
           element={
             <ConsaludCore.ProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-              <ConsaludCore.SecureLayout pageTitle="Home" allowedRoles={['USER', 'ADMIN', 'Developers']}>
-                <HomePageWithCollapse />
-              </ConsaludCore.SecureLayout>
+              <HomePageWithCollapse />
             </ConsaludCore.ProtectedRoute>
           } 
         />
         
         {/* Rutas del módulo de herederos - refactorizadas */}
         <Route path="/mnherederos/*" element={<HerederosLayout />}>
-          <Route index element={<Navigate to="ingresoher/ingresotitular" replace />} />
-          <Route path="ingresoher" element={<Navigate to="ingresoher/ingresotitular" replace />} />
+          <Route index element={<IngresoTitularPage />} />
+          <Route path="ingresoher" element={<IngresoTitularPage />} />
           <Route path="ingresoher/ingresotitular" element={<IngresoTitularPage />} />
           <Route path="ingresoher/RequisitosTitular" element={<InfoRequisitosTitularPage />} />
           <Route path="ingresoher/DatosTitular" element={<DatosTitularPage />} />

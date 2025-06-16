@@ -5,7 +5,9 @@ import {
   MenuConfigProvider,
   PageTransition,
   Typography,
-  theme
+  theme,
+  Layout,
+  MenuCollapseProvider
 } from '@consalud/core';
 import { AppRoutes } from './routes';
 import './styles/variables.css';
@@ -71,31 +73,33 @@ const App = () => {
           enableBounceEffects: true
         }}>
           <Router>
-            <div className="app-layout-wrapper app-sticky-footer-layout instant-stable navigation-stable">
-              <TitularProvider>
-                <HerederoProvider>
-                  <div className="app-sticky-footer-content content-stable spa-stable-container">
-                    <PageTransition
-                      preset="fade"
-                      duration={50}
-                      type="fade"
-                      respectReducedMotion={true}
-                      enableHardwareAcceleration={true}
-                      exitBeforeEnter={false}
-                      mode="concurrent"
-                      className="instant-navigation"
-                      style={{
-                        minHeight: '100vh',
-                        backgroundColor: '#ffffff',
-                        position: 'relative'
-                      }}
-                    >
-                      <AppRoutes />
-                    </PageTransition>
-                  </div>
-                </HerederoProvider>
-              </TitularProvider>
-            </div>
+            <MenuCollapseProvider>
+              <Layout>
+                <TitularProvider>
+                  <HerederoProvider>
+                    <div className="app-sticky-footer-content content-stable spa-stable-container">
+                      <PageTransition
+                        preset="fade"
+                        duration={50}
+                        type="fade"
+                        respectReducedMotion={true}
+                        enableHardwareAcceleration={true}
+                        exitBeforeEnter={false}
+                        mode="concurrent"
+                        className="instant-navigation"
+                        style={{
+                          minHeight: '100vh',
+                          backgroundColor: '#ffffff',
+                          position: 'relative'
+                        }}
+                      >
+                        <AppRoutes />
+                      </PageTransition>
+                    </div>
+                  </HerederoProvider>
+                </TitularProvider>
+              </Layout>
+            </MenuCollapseProvider>
           </Router>
         </MenuConfigProvider>
       </AuthProvider>
