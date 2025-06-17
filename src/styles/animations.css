@@ -193,7 +193,11 @@
 
 /* Clases de utilidad para animaciones - duraciones optimizadas */
 .animate-fade-in-up {
-  animation: fadeInUp 400ms ease-out; 
+  animation: fadeInUp 400ms ease-out !important;
+}
+
+.app-card.animate-fade-in-up {
+  animation: fadeInUp 400ms ease-out !important;
 }
 
 .animate-fade-in-scale {
@@ -346,4 +350,32 @@
 .app-card[data-bounce="enabled"]:active,
 .app-card[data-bounce="enabled"].bounce-active {
   animation: coreBounceClick 0.3s ease-out;
+}
+
+/*
+  Mejores prácticas:
+  - Evita usar animation: none !important; de forma global.
+  - Si necesitas desactivar animaciones, hazlo solo en los elementos estrictamente necesarios.
+  - Permite excepciones para los elementos que sí deben animarse.
+*/
+
+/* Fix: Permitir animación en Card aunque esté dentro de instant-navigation o no-flash */
+.instant-navigation .app-card.animate-fade-in-up,
+.no-flash .app-card.animate-fade-in-up {
+  animation: fadeInUp 400ms ease-out !important;
+  animation-name: fadeInUp !important;
+  animation-duration: 400ms !important;
+  animation-timing-function: ease-out !important;
+  animation-fill-mode: both !important;
+}
+
+.card-elevated.animate-fade-in-up,
+.card-default.animate-fade-in-up,
+.card-bordered.animate-fade-in-up,
+.ingreso-card.animate-fade-in-up {
+  animation: fadeInUp 400ms ease-out !important;
+  animation-name: fadeInUp !important;
+  animation-duration: 400ms !important;
+  animation-timing-function: ease-out !important;
+  animation-fill-mode: both !important;
 }

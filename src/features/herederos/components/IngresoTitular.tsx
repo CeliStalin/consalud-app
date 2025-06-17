@@ -68,7 +68,7 @@ const IngresoTitular = () => {
                 subtitle={undefined}
                 variant="elevated"
                 padding="large"
-                className="ingreso-card"
+                className="ingreso-card animate-fade-in-up"
             >
                 <form
                     style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 8 }}

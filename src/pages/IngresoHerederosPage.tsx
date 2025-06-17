@@ -27,7 +27,7 @@ const IngresoHerederosPage: React.FC = () => {
               className="ingreso-card"
             >
               <div className="card-content">
-                <div className="card-info-box app-card ingreso-info-box">
+                <div className="card-info-box app-card ingreso-info-box animate-fade-in-up">
                   <ConsaludCore.Typography variant="body" style={{ marginBottom: '12px' }}>
                     Bienvenido al sistema de gestión de herederos
                   </ConsaludCore.Typography>

@@ -37,7 +37,7 @@ const SuccessPage: React.FC = () => {
         </Typography>
       </div>
       <Stepper step={4} />
-      <div className="app-card" style={{ textAlign: 'center', marginTop: '32px' }}>
+      <div className="app-card animate-fade-in-up" style={{ textAlign: 'center', marginTop: '32px' }}>
         <h2 style={{ color: '#04A59B', marginBottom: '16px' }}>
           Proceso completado exitosamente
         </h2>
