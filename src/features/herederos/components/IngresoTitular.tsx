@@ -14,6 +14,7 @@ const IngresoTitular = () => {
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
     const { titular, buscarTitular, error } = useTitular();
+    const [showStepperError, setShowStepperError] = useState(false);
 
     const handleBlur = () => {
         setShowError(rut.length > 0 && !isValidRut);
@@ -38,6 +39,10 @@ const IngresoTitular = () => {
         try {
             await buscarTitular(rut);
             
+            if (error === 'BFF_ERROR_500') {
+                setShowStepperError(true);
+                return;
+            }
             if (error) {
                 mostrarAlerta();
                 return;
@@ -62,7 +67,55 @@ const IngresoTitular = () => {
     }
 
     return (
-        <div style={{ minHeight: '60vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'transparent', width: '100%' }}>
+        <div style={{ minHeight: '60vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'transparent', width: '100%', position: 'relative' }}>
+            {showStepperError && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        background: 'rgba(0,0,0,0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999,
+                    }}
+                >
+                    <ConsaludCore.Card
+                        variant="elevated"
+                        padding="large"
+                    >
+                        <div style={{
+                            minWidth: 320,
+                            textAlign: 'center',
+                            borderRadius: 16,
+                            boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
+                        }}>
+                            <ConsaludCore.Typography variant="h6" color="#E11D48">
+                                Ocurrió un error inesperado al consultar el BFF.<br />
+                                Intenta nuevamente más tarde.
+                            </ConsaludCore.Typography>
+                            <button
+                                style={{
+                                    marginTop: 24,
+                                    padding: '8px 24px',
+                                    borderRadius: 8,
+                                    background: '#04A59B',
+                                    color: '#fff',
+                                    border: 'none',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                }}
+                                onClick={() => setShowStepperError(false)}
+                            >
+                                Cerrar
+                            </button>
+                        </div>
+                    </ConsaludCore.Card>
+                </div>
+            )}
             <ConsaludCore.Card
                 title={undefined}
                 subtitle={undefined}

@@ -25,6 +25,9 @@ interface ImportMetaEnv {
     readonly VITE_CLIENT_ID: string;
     readonly VITE_AUTHORITY: string;
     readonly VITE_REDIRECT_URI: string;
+    readonly VITE_BFF_HEREDEROS_DNS: string;
+    readonly VITE_BFF_HEREDEROS_API_KEY_HEADER: string;
+    readonly VITE_BFF_HEREDEROS_API_KEY_VALUE: string;
   }
   
   interface ImportMeta {
