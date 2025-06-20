@@ -20,12 +20,12 @@ export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) =>
     try {
       const bffDns = import.meta.env.VITE_BFF_HEREDEROS_DNS;
       if (bffDns) {
-        // Llamada al BFF real
         try {
-          const result = await fetchTitularByRut(Number(rut.replace(/[^0-9]/g, '')));
-          // Aquí deberías parsear el resultado si es necesario
-          // setTitular(result); // Descomentar y adaptar según la respuesta real
-          setTitular(null); // Por ahora, para no romper el flujo
+          const titularData = await fetchTitularByRut(Number(rut.replace(/[^0-9]/g, '')));
+          if (!titularData) {
+            throw new Error('Titular no encontrado');
+          }
+          setTitular(titularData);
         } catch (err: any) {
           if (err.message === '500') {
             setError('BFF_ERROR_500');
@@ -36,7 +36,7 @@ export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) =>
           return;
         }
       } else {
-        // Mock local
+        // Mock local - mantener para desarrollo local
         const { data } = await axios.get('http://localhost:3001/Titular');
         const formattedRut = formatSimpleRut(rut);
         const titularEncontrado = data.find((t: Titular) => t.rut === formattedRut);

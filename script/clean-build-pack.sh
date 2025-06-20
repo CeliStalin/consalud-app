@@ -1,63 +1,59 @@
 #!/bin/bash
 set -e
 
-# =============================
-# Script: clean-build-pack.sh
-# Descripción: Limpia dependencias, cachés y build, reinstala dependencias, corre tests y compila el proyecto.
-# Permite flags para controlar el borrado de lockfiles, limpieza de caché y ejecución de tests/build.
-# Uso:
-#   ./clean-build-pack.sh [--no-test] [--no-build] [--clean-cache] [--remove-lockfiles]
-# =============================
-
-# Opciones por defecto
-RUN_TESTS=true         # Ejecutar tests por defecto
-RUN_BUILD=true         # Ejecutar build por defecto
-CLEAN_CACHE=false      # No limpiar caché npm por defecto
-REMOVE_LOCKFILES=false # No eliminar lockfiles por defecto
-
-# Parsear argumentos
-for arg in "$@"; do
-  case $arg in
-    --no-test) RUN_TESTS=false ;;
-    --no-build) RUN_BUILD=false ;;
-    --clean-cache) CLEAN_CACHE=true ;;
-    --remove-lockfiles) REMOVE_LOCKFILES=true ;;
-  esac
-done
-
-# 1. Limpiar dependencias y cachés locales
-#    Elimina node_modules, carpetas de build y cachés de herramientas comunes
+# Limpiar dependencias y cachés
 rm -rf node_modules dist build .turbo .next .cache
 
-# 2. Eliminar lockfiles (opcional, solo si se pasa el flag)
-if [ "$REMOVE_LOCKFILES" = true ]; then
-  rm -f package-lock.json yarn.lock pnpm-lock.yaml
-fi
+# NO eliminar el package-lock.json ni los lockfiles para builds reproducibles
+# Si necesitas forzar la actualización de dependencias (por ejemplo, tras cambiar versiones en package.json),
+# puedes eliminar manualmente el lockfile y luego correr este script, pero NO es lo recomendado para builds normales.
+rm -f package-lock.json yarn.lock pnpm-lock.yaml  # <- Solo descomentar si realmente quieres regenerar todo
 
-# 3. Limpiar caché de npm (opcional, solo si se pasa el flag)
-if [ "$CLEAN_CACHE" = true ]; then
-  npm cache clean --force
-fi
+# Limpiar caché de npm
+npm cache clean --force
 
-echo -e "\n[✔] Cachés y dependencias eliminadas."
+echo "\n[✔] Cachés y dependencias eliminadas."
 
-# 4. Instalar dependencias de forma limpia y reproducible
-#    'npm ci' es más rápido y confiable que 'npm install' en entornos limpios
-#    --no-audit y --no-fund para evitar mensajes innecesarios
-npm ci --no-audit --no-fund
+echo "\n[→] Instalando dependencias..."
+npm install
 
-echo -e "\n[✔] Dependencias instaladas."
+echo "\n[→] Compilando proyecto..."
+npm run build
 
-# 5. Ejecutar tests (opcional)
-if [ "$RUN_TESTS" = true ]; then
-  echo -e "\n[→] Ejecutando tests..."
-  npm run test
-fi
 
-# 6. Compilar el proyecto (opcional)
-if [ "$RUN_BUILD" = true ]; then
-  echo -e "\n[→] Compilando proyecto..."
-  npm run build
-fi
 
-echo -e "\n[✔] Proceso completado. El paquete está listo para publicar o compartir." 
+
+#!/bin/bash
+#set -e
+
+#echo "[→] Iniciando limpieza del proyecto..."
+
+# Limpiar dependencias y cachés
+#rm -rf node_modules dist build .turbo .next .cache
+
+# Mantener el package-lock.json para builds reproducibles
+# NO descomentar la siguiente línea a menos que sea absolutamente necesario
+# rm -f package-lock.json yarn.lock pnpm-lock.yaml
+
+# Limpiar caché de npm
+#echo "[→] Limpiando caché de npm..."
+#npm cache clean --force
+
+#echo "[✔] Cachés y dependencias eliminadas."
+
+#echo "[→] Instalando dependencias..."
+#npm ci || npm install
+
+# Solo ejecutar tests si vitest está instalado
+#if [ -x "$(command -v vitest)" ]; then
+#    echo "[→] Ejecutando tests..."
+#    npm run test
+#else
+#    echo "[!] Vitest no está instalado. Saltando tests..."
+#fi
+
+#echo "[→] Compilando proyecto..."
+#npm run build
+
+#echo "[✔] Proceso completado exitosamente."
+

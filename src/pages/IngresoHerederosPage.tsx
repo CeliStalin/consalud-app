@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
-import { useHerederoNavigation } from '../features/herederos/hooks/useHerederoNavigation';
 import './styles/IngresoHerederosPage.css';
 
 const IngresoHerederosPage: React.FC = () => {
   const navigate = useNavigate();
-  const { startProcess } = useHerederoNavigation();
 
   useEffect(() => {
     // Redirigir automáticamente al IngresoTitularPage

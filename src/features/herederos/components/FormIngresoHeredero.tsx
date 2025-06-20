@@ -4,7 +4,6 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { es } from 'date-fns/locale';
 import './styles/FormHeredero.css';
-import * as ConsaludCore from '@consalud/core'; 
 import { Stepper } from './Stepper';
 import { useHeredero } from '../contexts/HerederoContext';
 
@@ -236,12 +235,12 @@ const FormIngresoHeredero: React.FC = () => {
             {/* Sección de Datos Personales */}
             <div className="form-section">
               <div className="section-title">
-              <img 
-                src={ConsaludCore.DocumentsFileCheckmarkSvg} 
+              {/* <img
+                // src={ConsaludCore.DocumentsFileCheckmarkSvg} 
                 alt="Datos personales"
                 className="section-icon"
                 style={{ width: '24px', height: '24px' }} 
-              />
+              /> */}
                 <span>Datos personales</span>
               </div>
               <p className="description">
@@ -405,14 +404,17 @@ const FormIngresoHeredero: React.FC = () => {
             {/* Sección de Dirección */}
             <div className="form-section">
               <div className="section-title">
-              <img 
-                src={ConsaludCore.MapsSvg} 
-                alt="Datos personales"
+              {/* <img
+                // src={ConsaludCore.MapsSvg}
+                alt="Dirección"
                 className="section-icon"
-                style={{ width: '24px', height: '24px' }} 
-              />
+                style={{ width: '24px', height: '24px' }}
+              /> */}
                 <span>Dirección</span>
               </div>
+              <p className="description">
+                Verifica que los datos de la dirección de la persona heredera sean correctos, de lo contrario actualízalos.
+              </p>
 
               <div className="form-row">
                 {/* Ciudad */}

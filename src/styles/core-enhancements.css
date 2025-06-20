@@ -1,73 +1,78 @@
-/* Mejoras específicas para asegurar que el bounce effect del core funcione */
-
-/* Asegurar que las animaciones del core se apliquen correctamente */
-.app-card.bounce-enabled {
-  transform-origin: center center !important;
-  backface-visibility: hidden !important;
-  perspective: 1000px !important;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+/* Core Component Enhancements */
+:root {
+  /* Core theme variables */
+  --core-primary-color: #04A59B;
+  --core-secondary-color: #038C84;
+  --core-text-color: #333333;
+  --core-background-color: #FFFFFF;
+  --core-border-radius: 8px;
+  --core-transition-duration: 0.3s;
+  --core-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Efecto bounce cuando se hace clic */
+/* Optimized card animations */
+.app-card.bounce-enabled {
+  transform-origin: center center;
+  backface-visibility: hidden;
+  will-change: transform;
+  transition: transform var(--core-transition-duration) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
 .app-card.bounce-enabled.clicked,
 .app-card.bounce-enabled:active {
-  animation: coreCardBounce 1s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  animation: coreCardBounce 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
-/* Definir la animación de bounce si no está definida */
+/* Performance optimized animation */
 @keyframes coreCardBounce {
-  0% { transform: scale(1); }
-  30% { transform: scale(0.85); }
-  60% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(0.95); }
+  60% { transform: scale(1.02); }
 }
 
-/* Asegurar que los elementos del HomePage tengan la estructura correcta */
+/* Enhanced HomePage layout */
+.homepage-container .applications-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 24px;
+}
+
 .homepage-container .applications-section .app-card {
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  will-change: transform, box-shadow;
 }
 
-/* Efecto hover mejorado */
+/* Optimized hover effects */
 .homepage-container .applications-section .app-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--core-box-shadow);
 }
 
-/* Asegurar que el focus sea visible para accesibilidad */
 .homepage-container .applications-section .app-card:focus {
-  outline: 2px solid #04A59B;
+  outline: 2px solid var(--core-primary-color);
   outline-offset: 2px;
 }
 
-/* Optimizaciones para mejor rendimiento */
-.homepage-container .applications-section {
-  contain: layout style;
-}
-
-.homepage-container .applications-section .app-card {
-  will-change: transform;
-  transform: translateZ(0); /* Forzar aceleración por hardware */
-}
-
-/* Responsive: Reducir efectos en móviles para mejor rendimiento */
+/* Mobile optimizations */
 @media (max-width: 768px) {
   .app-card.bounce-enabled {
-    transition: transform 0.15s ease !important;
+    /* Disable animations on mobile for better performance */
+    animation: none !important;
+    transform: none !important;
   }
-  
+
   @keyframes coreCardBounce {
-    0% { transform: scale(1); }
+    /* Simplified animation for mobile */
+    0%, 100% { transform: scale(1); }
     50% { transform: scale(0.98); }
-    100% { transform: scale(1); }
   }
 }
 
-/* Asegurar compatibilidad con el tema del core */
+/* Content container optimizations */
 .homepage-container {
-  --bounce-primary-color: var(--app-primary-color, #04A59B);
-  --bounce-duration: 0.3s;
-  --bounce-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
+  contain: content;
+  content-visibility: auto;
+  contain-intrinsic-size: 1000px;
 }

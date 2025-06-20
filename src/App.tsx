@@ -15,6 +15,7 @@ import './styles/bulma-overrides.css';
 import './styles/navigation-optimizations.css';
 import TitularProvider from './features/herederos/provider/TitularProvider';
 import HerederoProvider from './features/herederos/provider/HerederoProvider';
+import logo from './assets/react.svg';
 
 const ErrorFallback = () => {
   if (!Typography) {
@@ -74,7 +75,7 @@ const App = () => {
         }}>
           <Router>
             <MenuCollapseProvider>
-              <Layout>
+              <Layout logoSrc={logo}>
                 <TitularProvider>
                   <HerederoProvider>
                     <div className="app-sticky-footer-content content-stable spa-stable-container">

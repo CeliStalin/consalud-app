@@ -154,10 +154,9 @@ const CargaDocumento: React.FC = () => {
           <ConsaludCore.Typography 
             variant="body" 
             component="span" 
-            weight={ConsaludCore.FONT_WEIGHTS?.medium}
+            weight="medium"
             style={{ 
-              // fontWeight: ConsaludCore.FONT_WEIGHTS?.medium || 500, // Keep in style if 'weight' prop is not enough or for fallback
-              fontSize: ConsaludCore.FONT_SIZES?.md || '16px',
+              fontSize: '1rem',
               color: ConsaludCore.theme?.textColors?.primary || "#505050"
             }}
           > 
@@ -190,7 +189,7 @@ const CargaDocumento: React.FC = () => {
                 variant="caption" 
                 component="p" 
                 style={{ 
-                  fontSize: ConsaludCore.FONT_SIZES?.xs || '12px',
+                  fontSize: '0.75rem',
                   color: ConsaludCore.theme?.colors?.gray?.medium || "#656565",
                   margin: 0
                 }}
@@ -198,10 +197,7 @@ const CargaDocumento: React.FC = () => {
                 <ConsaludCore.Typography 
                   variant="caption" 
                   component="strong" 
-                  weight={ConsaludCore.FONT_WEIGHTS?.bold}
-                  style={{ 
-                    // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700 // Keep in style if 'weight' prop is not enough or for fallback
-                  }}
+                  weight="bold"
                 >
                   Puedes adjuntar imágenes o documentos
                 </ConsaludCore.Typography> en formato
@@ -220,7 +216,7 @@ const CargaDocumento: React.FC = () => {
                 variant="caption" 
                 component="p" 
                 style={{ 
-                  fontSize: ConsaludCore.FONT_SIZES?.xs || '12px',
+                  fontSize: '0.75rem',
                   color: ConsaludCore.theme?.colors?.gray?.medium || "#656565",
                   margin: 0
                 }}
@@ -248,12 +244,8 @@ const CargaDocumento: React.FC = () => {
         {ConsaludCore.Typography ? (
           <ConsaludCore.Typography 
             variant="h5" 
-            component="span" 
-            weight={ConsaludCore.FONT_WEIGHTS?.bold}
-            style={{ 
-              // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
-              color: ConsaludCore.theme?.textColors?.primary || "#505050"
-            }}
+            weight="bold"
+            style={{ marginBottom: '20px' }}
           >
             Carga Documentos
           </ConsaludCore.Typography>
@@ -276,9 +268,9 @@ const CargaDocumento: React.FC = () => {
                                 <ConsaludCore.Typography 
                                   variant="body" 
                                   component="p" 
-                                  weight={ConsaludCore.FONT_WEIGHTS?.medium}
+                                  weight="medium"
                                   style={{ 
-                                    // fontWeight: ConsaludCore.FONT_WEIGHTS?.medium || 500, // Keep in style if 'weight' prop is not enough or for fallback
+                                    fontSize: '1rem',
                                     color: ConsaludCore.theme?.textColors?.primary || "#505050"
                                   }}
                                 >
@@ -294,10 +286,9 @@ const CargaDocumento: React.FC = () => {
                                 {ConsaludCore.Typography ? (
                                   <ConsaludCore.Typography 
                                     component="span" 
-                                    weight={ConsaludCore.FONT_WEIGHTS?.bold}
+                                    weight="bold"
                                     style={{ 
-                                      // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
-                                      fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                                      fontSize: '0.875rem',
                                       color: ConsaludCore.theme?.textColors?.primary || "#505050"
                                     }}
                                     className='divTextoObligatorioCargaDocumento'
@@ -310,10 +301,9 @@ const CargaDocumento: React.FC = () => {
                                 {ConsaludCore.Typography ? (
                                   <ConsaludCore.Typography 
                                     component="span" 
-                                    weight={ConsaludCore.FONT_WEIGHTS?.bold}
+                                    weight="bold"
                                     style={{ 
-                                      // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
-                                      fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                                      fontSize: '0.875rem',
                                       color: ConsaludCore.theme?.colors?.danger || "#FF5252"
                                     }}
                                     className='divTextoObligatorioRojoCargaDocumento'
@@ -334,10 +324,9 @@ const CargaDocumento: React.FC = () => {
                                       {ConsaludCore.Typography ? (
                                           <ConsaludCore.Typography 
                                               component="span" 
-                                              weight={ConsaludCore.FONT_WEIGHTS?.bold}
+                                              weight="bold"
                                               style={{ 
-                                                // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
-                                                fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                                                fontSize: '0.875rem',
                                                 color: ConsaludCore.theme?.colors?.primary || "#04A59B"
                                               }}
                                           >
@@ -369,7 +358,7 @@ const CargaDocumento: React.FC = () => {
                           <ConsaludCore.Typography 
                             component="p" 
                             style={{ 
-                              fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                              fontSize: '0.75rem',
                               color: ConsaludCore.theme?.colors?.gray?.medium || "#656565"
                             }}
                             className="labelCargaDocumento"
@@ -389,10 +378,9 @@ const CargaDocumento: React.FC = () => {
                                 {ConsaludCore.Typography ? (
                                   <ConsaludCore.Typography 
                                     component="span" 
-                                    weight={ConsaludCore.FONT_WEIGHTS?.bold}
+                                    weight="bold"
                                     style={{ 
-                                      // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
-                                      fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                                      fontSize: '0.875rem',
                                       color: ConsaludCore.theme?.textColors?.primary || "#505050"
                                     }}
                                     className='divTextoObligatorioCargaDocumento'
@@ -405,10 +393,9 @@ const CargaDocumento: React.FC = () => {
                                 {ConsaludCore.Typography ? (
                                   <ConsaludCore.Typography 
                                     component="span" 
-                                    weight={ConsaludCore.FONT_WEIGHTS?.bold}
+                                    weight="bold"
                                     style={{ 
-                                      // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
-                                      fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                                      fontSize: '0.875rem',
                                       color: ConsaludCore.theme?.colors?.danger || "#FF5252"
                                     }}
                                     className='divTextoObligatorioRojoCargaDocumento'
@@ -429,10 +416,9 @@ const CargaDocumento: React.FC = () => {
                                       {ConsaludCore.Typography ? (
                                           <ConsaludCore.Typography 
                                               component="span" 
-                                              weight={ConsaludCore.FONT_WEIGHTS?.bold}
+                                              weight="bold"
                                               style={{ 
-                                                // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
-                                                fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                                                fontSize: '0.875rem',
                                                 color: ConsaludCore.theme?.colors?.primary || "#04A59B"
                                               }}
                                           >
@@ -463,7 +449,7 @@ const CargaDocumento: React.FC = () => {
                           <ConsaludCore.Typography 
                             component="p" 
                             style={{ 
-                              fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                              fontSize: '0.75rem',
                               color: ConsaludCore.theme?.colors?.gray?.medium || "#656565"
                             }}
                             className="labelCargaDocumento"
@@ -483,10 +469,9 @@ const CargaDocumento: React.FC = () => {
                                 {ConsaludCore.Typography ? (
                                   <ConsaludCore.Typography 
                                     component="span" 
-                                    weight={ConsaludCore.FONT_WEIGHTS?.bold}
+                                    weight="bold"
                                     style={{ 
-                                      // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
-                                      fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                                      fontSize: '0.875rem',
                                       color: ConsaludCore.theme?.textColors?.primary || "#505050"
                                     }}
                                     className='divTextoObligatorioCargaDocumento'
@@ -499,10 +484,9 @@ const CargaDocumento: React.FC = () => {
                                 {ConsaludCore.Typography ? (
                                   <ConsaludCore.Typography 
                                     component="span" 
-                                    weight={ConsaludCore.FONT_WEIGHTS?.bold}
+                                    weight="bold"
                                     style={{ 
-                                      // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
-                                      fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                                      fontSize: '0.875rem',
                                       color: ConsaludCore.theme?.colors?.danger || "#FF5252"
                                     }}
                                     className='divTextoObligatorioRojoCargaDocumento'
@@ -523,10 +507,9 @@ const CargaDocumento: React.FC = () => {
                                       {ConsaludCore.Typography ? (
                                           <ConsaludCore.Typography 
                                               component="span" 
-                                              weight={ConsaludCore.FONT_WEIGHTS?.bold}
+                                              weight="bold"
                                               style={{ 
-                                                // fontWeight: ConsaludCore.FONT_WEIGHTS?.bold || 700, // Keep in style if 'weight' prop is not enough or for fallback
-                                                fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                                                fontSize: '0.875rem',
                                                 color: ConsaludCore.theme?.colors?.primary || "#04A59B"
                                               }}
                                           >
@@ -557,7 +540,7 @@ const CargaDocumento: React.FC = () => {
                           <ConsaludCore.Typography 
                             component="p" 
                             style={{ 
-                              fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                              fontSize: '0.75rem',
                               color: ConsaludCore.theme?.colors?.gray?.medium || "#656565"
                             }}
                             className="labelCargaDocumento"
@@ -586,7 +569,7 @@ const CargaDocumento: React.FC = () => {
                     <ConsaludCore.Typography 
                       component="span" 
                       style={{ 
-                        fontSize: ConsaludCore.FONT_SIZES?.sm || '14px',
+                        fontSize: '0.875rem',
                         color: ConsaludCore.theme?.textColors?.primary || "#333"
                       }}
                     >

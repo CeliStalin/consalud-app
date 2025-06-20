@@ -7,6 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@consalud/core': path.resolve(__dirname, './node_modules/@consalud/core/dist/index.js')
     },
   },
   server: {
@@ -40,11 +41,11 @@ export default defineConfig({
     target: 'esnext',
     outDir: 'dist',
     rollupOptions: {
+      external: ['@consalud/core'],
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          core: ['@consalud/core'],
           'pages-critical': [
             './src/pages/IngresoHerederosPage',
             './src/pages/IngresoTitularPage'
@@ -68,13 +69,13 @@ export default defineConfig({
       }
     },
     minify: 'terser',
-    sourcemap: false,
+    sourcemap: true,
     chunkSizeWarningLimit: 1000,
     cssCodeSplit: true,
     assetsInlineLimit: 4096
   },
   optimizeDeps: {
-    include: ['@consalud/core', 'react', 'react-dom', 'react-router-dom'],
-    exclude: ['@vite/client', '@vite/env']
+    include: ['react', 'react-dom', 'react-router-dom'],
+    exclude: ['@vite/client', '@vite/env', '@consalud/core']
   }
 })

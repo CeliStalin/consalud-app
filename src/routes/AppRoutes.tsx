@@ -1,9 +1,17 @@
 import React, { Suspense, useMemo } from 'react';
 import { Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
-import * as ConsaludCore from '@consalud/core';
+import { 
+  HomePage,
+  Login,
+  ProtectedRoute,
+  Unauthorized,
+  NotFound,
+  MenuCollapseProvider,
+  useMenuCollapse
+} from '@consalud/core';
 import { useAuthWithRedirect } from '../hooks/useAuthWithRedirect';
-import { useMenuCollapse } from '@consalud/core';
 import CargaDocumentoPage from '../pages/CargaDocumentoPage';
+import logo from '../assets/react.svg';
 
 // Lazy loading optimizado - SIN preloading que pueda causar conflictos
 //const IngresoHerederosPage = React.lazy(() => import('../pages/IngresoHerederosPage'));
@@ -70,20 +78,19 @@ const StablePageWrapper: React.FC<{ children: React.ReactNode }> = React.memo(({
 
 StablePageWrapper.displayName = 'StablePageWrapper';
 
-// Wrapper para HomePage que colapsa el menú al hacer clic en una app
-const HomePageWithCollapse = (props) => {
+// Optimized HomePage wrapper
+const HomePageWithCollapse: React.FC<{ onCardClick?: (...args: any[]) => void }> = (props) => {
   const { collapseMenu } = useMenuCollapse();
   
-  const handleApplicationClick = (...args) => {
+  const handleApplicationClick = (...args: any[]) => {
     collapseMenu();
-    // Si HomePage espera argumentos en onApplicationClick, los puedes pasar aquí
-    if (props.onApplicationClick) props.onApplicationClick(...args);
+    if (props.onCardClick) props.onCardClick(...args);
   };
 
   return (
-    <ConsaludCore.HomePage
+    <HomePage
       {...props}
-      onApplicationClick={handleApplicationClick}
+      onCardClick={handleApplicationClick}
       withLayout={false}
       enableBounce={true}
       showWelcomeSection={true}
@@ -97,9 +104,9 @@ const HomePageWithCollapse = (props) => {
 
 // Layout wrapper para las subrutas de herederos
 const HerederosLayout = () => (
-  <ConsaludCore.ProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
+  <ProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
     <Outlet />
-  </ConsaludCore.ProtectedRoute>
+  </ProtectedRoute>
 );
 
 export const AppRoutes = () => {
@@ -125,89 +132,92 @@ export const AppRoutes = () => {
   }
 
   return (
-    <Suspense fallback={<div style={{ display: 'none' }} />}>
-      <Routes location={location}>
-        {/* Rutas Públicas */}
-        <Route 
-          path="/login" 
-          element={
-            <ConsaludCore.PublicRoute>
+    <MenuCollapseProvider>
+      <Suspense fallback={<div style={{ display: 'none' }} />}>
+        <Routes location={location}>
+          {/* Rutas Públicas */}
+          <Route 
+            path="/login" 
+            element={
+              <ProtectedRoute isPublic={true}>
+                <StablePageWrapper>
+                  <Login 
+                    appName="Sistema de Gestión de Herederos"
+                    onLoginSuccess={handleLoginSuccess}
+                    logoSrc={logo}
+                  />
+                </StablePageWrapper>
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* Ruta Raíz */}
+          <Route 
+            path="/" 
+            element={
+              isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />
+            } 
+          />
+          
+          {/* Ruta Home - HomePage del Core */}
+          <Route 
+            path="/home"
+            element={
+              <ProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
+                <HomePageWithCollapse />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Rutas del módulo de herederos - refactorizadas */}
+          <Route path="/mnherederos/*" element={<HerederosLayout />}>
+            <Route index element={<IngresoTitularPage />} />
+            <Route path="ingresoher" element={<IngresoTitularPage />} />
+            <Route path="ingresoher/ingresotitular" element={<IngresoTitularPage />} />
+            <Route path="ingresoher/RequisitosTitular" element={<InfoRequisitosTitularPage />} />
+            <Route path="ingresoher/DatosTitular" element={<DatosTitularPage />} />
+            <Route path="ingresoher/RegistroTitular" element={<RegistroHerederoPage />} />
+            <Route path="ingresoher/RegistroHeredero" element={<RegistroHerederoPage />} />
+            <Route path="ingresoher/formingreso" element={<IngresoHerederoFormPage />} />
+            <Route path="ingresoher/cargadoc" element={<CargaDocumentoPage />} />
+            <Route path="ingresoher/detallemandato" element={<DetalleMandatoPage />} />
+            <Route path="ingresoher/success" element={<SuccessPage />} />
+            <Route path="ingresoher/IngresoDocumentos" element={<IngresoDocumentosPage />} />
+          </Route>
+
+          {/* Redirección para rutas con mayúsculas (compatibilidad) */}
+          <Route 
+            path="/mnHerederos/*"
+            element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />} 
+          />
+          <Route 
+            path="/mnHerederos/IngresoHer/*"
+            element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />} 
+          />
+
+          {/* Rutas de error */}
+          <Route 
+            path="/unauthorized" 
+            element={
               <StablePageWrapper>
-                <ConsaludCore.Login 
-                  appName="Sistema de Gestión de Herederos"
-                  onLoginSuccess={handleLoginSuccess}
-                />
+                <Unauthorized />
               </StablePageWrapper>
-            </ConsaludCore.PublicRoute>
-          } 
-        />
-
-        {/* Ruta Raíz */}
-        <Route 
-          path="/" 
-          element={
-            isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />
-          } 
-        />
-        
-        {/* Ruta Home - HomePage del Core */}
-        <Route 
-          path="/home"
-          element={
-            <ConsaludCore.ProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-              <HomePageWithCollapse />
-            </ConsaludCore.ProtectedRoute>
-          } 
-        />
-        
-        {/* Rutas del módulo de herederos - refactorizadas */}
-        <Route path="/mnherederos/*" element={<HerederosLayout />}>
-          <Route index element={<IngresoTitularPage />} />
-          <Route path="ingresoher" element={<IngresoTitularPage />} />
-          <Route path="ingresoher/ingresotitular" element={<IngresoTitularPage />} />
-          <Route path="ingresoher/RequisitosTitular" element={<InfoRequisitosTitularPage />} />
-          <Route path="ingresoher/DatosTitular" element={<DatosTitularPage />} />
-          <Route path="ingresoher/RegistroTitular" element={<RegistroHerederoPage />} />
-          <Route path="ingresoher/RegistroHeredero" element={<RegistroHerederoPage />} />
-          <Route path="ingresoher/formingreso" element={<IngresoHerederoFormPage />} />
-          <Route path="ingresoher/cargadoc" element={<CargaDocumentoPage />} />
-          <Route path="ingresoher/detallemandato" element={<DetalleMandatoPage />} />
-          <Route path="ingresoher/success" element={<SuccessPage />} />
-          <Route path="ingresoher/IngresoDocumentos" element={<IngresoDocumentosPage />} />
-        </Route>
-
-        {/* Redirección para rutas con mayúsculas (compatibilidad) */}
-        <Route 
-          path="/mnHerederos/*"
-          element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />} 
-        />
-        <Route 
-          path="/mnHerederos/IngresoHer/*"
-          element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />} 
-        />
-
-        {/* Rutas de error */}
-        <Route 
-          path="/unauthorized" 
-          element={
-            <StablePageWrapper>
-              <ConsaludCore.Unauthorized />
-            </StablePageWrapper>
-          } 
-        />
-        
-        <Route 
-          path="/not-found" 
-          element={
-            <StablePageWrapper>
-              <ConsaludCore.NotFound/>
-            </StablePageWrapper>
-          } 
-        />
-        
-        {/* Fallback para rutas no encontradas */}
-        <Route path="*" element={<Navigate to="/not-found" replace />} />
-      </Routes>
-    </Suspense>
+            } 
+          />
+          
+          <Route 
+            path="/not-found" 
+            element={
+              <StablePageWrapper>
+                <NotFound/>
+              </StablePageWrapper>
+            } 
+          />
+          
+          {/* Fallback para rutas no encontradas */}
+          <Route path="*" element={<Navigate to="/not-found" replace />} />
+        </Routes>
+      </Suspense>
+    </MenuCollapseProvider>
   );
 };
