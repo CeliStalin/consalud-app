@@ -21,7 +21,7 @@ const IngresoTitularPage: React.FC = () => {
   console.log('Breadcrumb items:', cleanedBreadcrumbItems);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
+    <div style={{ minHeight: '100vh' }}>
       {/* Container principal con padding lateral para alinearse con el menú */}
       <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 20 }}>
         {/* Breadcrumb y botón volver reorganizados */}
@@ -53,9 +53,6 @@ const IngresoTitularPage: React.FC = () => {
         
         {/* Contenido principal centrado */}
         <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'flex-start', 
           minHeight: '70vh', 
           maxWidth: 1200, 
           margin: '0 auto' 
