@@ -4,7 +4,7 @@ interface TitularContextType {
     titular: Titular | null;
     loading: boolean;
     error: string | null;
-    buscarTitular: (rut: string) => Promise<void>;
+    buscarTitular: (rut: string) => Promise<Titular | null>;
     limpiarTitular: () => void;
 }
 

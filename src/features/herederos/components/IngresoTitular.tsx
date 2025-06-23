@@ -13,7 +13,7 @@ const IngresoTitular = () => {
     const { goToRequisitosTitular } = useHerederoNavigation();
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
-    const { titular, buscarTitular, error } = useTitular();
+    const { titular, buscarTitular, error, loading } = useTitular();
     const [showStepperError, setShowStepperError] = useState(false);
 
     const handleBlur = () => {
@@ -37,8 +37,7 @@ const IngresoTitular = () => {
         }
         
         try {
-            await buscarTitular(rut);
-            
+            const titularResult = await buscarTitular(rut);
             if (error === 'BFF_ERROR_500') {
                 setShowStepperError(true);
                 return;
@@ -47,19 +46,22 @@ const IngresoTitular = () => {
                 mostrarAlerta();
                 return;
             }
-            if(titular === null){
+            if(titularResult === null){
                 mostrarAlerta();
                 return;
             }
-            if(!titular?.poseeFondos){
+            if(titularResult.indFallecido !== 'S'){
+                mostrarAlerta();
+                return;
+            }
+            if(!titularResult.poseeFondos){
                 mostrarAlerta2();
                 return;
             }
-            if(titular?.poseeSolicitud){
+            if(titularResult.poseeSolicitud){
                 mostrarAlerta3();
                 return;
             }
-            
             goToRequisitosTitular();
         } catch (err) {
             mostrarAlerta();
@@ -171,23 +173,38 @@ const IngresoTitular = () => {
                             />
                             <button
                                 className={`proceso-button animate-fade-in-up ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}`}
-                                disabled={!isValidRut}
+                                disabled={!isValidRut || loading}
                                 onClick={handleFlow}
                                 type="submit"
-                                style={{ display: 'flex', padding: '10px 24px', justifyContent: 'center', alignItems: 'center', gap: 8, minWidth: 120, borderRadius: 24, height: 42, fontSize: 16, background: isValidRut ? '#04A59B' : '#E0F7F6', color: '#fff', border: 'none', boxShadow: 'none', fontWeight: 600, transition: 'background 0.2s' }}
+                                style={{ display: 'flex', padding: '10px 24px', justifyContent: 'center', alignItems: 'center', gap: 8, minWidth: 120, borderRadius: 24, height: 42, fontSize: 16, background: isValidRut ? '#04A59B' : '#E0F7F6', color: '#fff', border: 'none', boxShadow: 'none', fontWeight: 600, transition: 'background 0.2s', opacity: loading ? 0.7 : 1 }}
                                 aria-label="Buscar titular"
                             >
-                                <ConsaludCore.Typography
-                                    variant="button"
-                                    color={isValidRut ? '#fff' : '#bdbdbd'}
-                                    style={{ fontWeight: 600 }}
-                                >
-                                    Buscar
-                                </ConsaludCore.Typography>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ marginLeft: 8 }}>
-                                    <circle cx="11" cy="11" r="8" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" />
-                                    <path d="M21 21L16.65 16.65" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" strokeLinecap="round" />
-                                </svg>
+                                {loading ? (
+                                  <>
+                                    <span className="loader" style={{ marginRight: 8, width: 18, height: 18, border: '2px solid #fff', borderTop: '2px solid #04A59B', borderRadius: '50%', display: 'inline-block', animation: 'spin 1s linear infinite' }} />
+                                    <ConsaludCore.Typography
+                                        variant="button"
+                                        color={isValidRut ? '#fff' : '#bdbdbd'}
+                                        style={{ fontWeight: 600 }}
+                                    >
+                                        Buscando...
+                                    </ConsaludCore.Typography>
+                                  </>
+                                ) : (
+                                  <>
+                                    <ConsaludCore.Typography
+                                        variant="button"
+                                        color={isValidRut ? '#fff' : '#bdbdbd'}
+                                        style={{ fontWeight: 600 }}
+                                    >
+                                        Buscar
+                                    </ConsaludCore.Typography>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ marginLeft: 8 }}>
+                                        <circle cx="11" cy="11" r="8" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" />
+                                        <path d="M21 21L16.65 16.65" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                  </>
+                                )}
                             </button>
                         </div>
                         {showError && (
@@ -199,6 +216,16 @@ const IngresoTitular = () => {
                             >
                                 RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
                             </ConsaludCore.Typography>
+                        )}
+                        {error && !showError && (
+                          <ConsaludCore.Typography
+                            variant="caption"
+                            color={ConsaludCore.theme?.textColors?.danger || "#E11D48"}
+                            className="errorRut"
+                            style={{ marginTop: 4, display: 'block', fontSize: 13 }}
+                          >
+                            {error === 'BFF_ERROR_500' ? 'Error del servidor. Intente más tarde.' : error}
+                          </ConsaludCore.Typography>
                         )}
                     </div>
                 </form>
