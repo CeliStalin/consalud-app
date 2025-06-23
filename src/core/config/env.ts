@@ -26,7 +26,7 @@ class Environment {
       timeout: Number(import.meta.env.VITE_TIMEOUT) || 10000,
       redirectUri: (() => {
         const uri = import.meta.env.VITE_REDIRECT_URI || '/login';
-        // Si empieza con http(s), se debe usar segun el ptotocolo 
+        // Si empieza con http o https, se debe usar tal cual
         return uri.startsWith('https') ? uri : window.location.origin + (uri.startsWith('/') ? uri : '/' + uri);
       })(),
     };
