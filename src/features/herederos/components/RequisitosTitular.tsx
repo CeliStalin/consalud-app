@@ -84,7 +84,6 @@ const RequisitosTitular = () => {
                 variant="elevated"
                 padding={undefined} // Usamos padding por clase
                 className="card-elevated ingreso-card animate-fade-in-up"
-                style={{ boxShadow: 'none', background: 'transparent' }} // Card sin fondo ni sombra extra
               >
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
                   {/* Icono y subtítulo */}

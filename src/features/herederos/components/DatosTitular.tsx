@@ -45,15 +45,6 @@ const DatosTitular = () => {
                     <ConsaludCore.Card
                         variant="elevated"
                         className="card-elevated ingreso-card animate-fade-in-up"
-                        style={{
-                            background: '#fff',
-                            borderRadius: 16,
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
-                            padding: 32,
-                            minWidth: 400,
-                            maxWidth: 500,
-                            width: '100%',
-                        }}
                     >
                         <div className="containerTitular">
                             <div className="guiaStilos">
