@@ -8,7 +8,7 @@
     "npm": ">=8.0.0"
   },
   "scripts": {
-    "dev": "vite --mode development",
+    "dev": "vite",
     "dev:local": "vite --mode local",
     "build": "tsc && vite build --mode production",
     "build:dev": "tsc && vite build --mode development",

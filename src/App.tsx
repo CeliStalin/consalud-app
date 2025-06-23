@@ -15,7 +15,7 @@ import './styles/bulma-overrides.css';
 import './styles/navigation-optimizations.css';
 import TitularProvider from './features/herederos/provider/TitularProvider';
 import HerederoProvider from './features/herederos/provider/HerederoProvider';
-import logo from './assets/react.svg';
+const logo = '/Logo.png';
 
 const ErrorFallback = () => {
   if (!Typography) {
@@ -75,31 +75,11 @@ const App = () => {
         }}>
           <Router>
             <MenuCollapseProvider>
-              <Layout logoSrc={logo}>
-                <TitularProvider>
-                  <HerederoProvider>
-                    <div className="app-sticky-footer-content content-stable spa-stable-container">
-                      <PageTransition
-                        preset="fade"
-                        duration={50}
-                        type="fade"
-                        respectReducedMotion={true}
-                        enableHardwareAcceleration={true}
-                        exitBeforeEnter={false}
-                        mode="concurrent"
-                        className="instant-navigation"
-                        style={{
-                          minHeight: '100vh',
-                          backgroundColor: '#ffffff',
-                          position: 'relative'
-                        }}
-                      >
-                        <AppRoutes />
-                      </PageTransition>
-                    </div>
-                  </HerederoProvider>
-                </TitularProvider>
-              </Layout>
+              <TitularProvider>
+                <HerederoProvider>
+                  <AppRoutes logo={logo} />
+                </HerederoProvider>
+              </TitularProvider>
             </MenuCollapseProvider>
           </Router>
         </MenuConfigProvider>
