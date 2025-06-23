@@ -4,7 +4,6 @@ import { useRutChileno } from "../hooks/useRutChileno";
 import { UseAlert } from "../hooks/Alert";
 import { useHerederoNavigation } from "../hooks/useHerederoNavigation";
 import '../components/styles/ingresoTitular.css';
-import '../components/styles/globalStyle.css'
 import '../../../pages/styles/IngresoHerederosPage.css';
 import { useTitular } from "../contexts/TitularContext";
 import UserProfileIcon from '@/assets/user-profile.svg';
@@ -69,7 +68,7 @@ const IngresoTitular = () => {
     }
 
     return (
-        <div style={{ minHeight: '60vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'transparent', width: '100%', position: 'relative' }}>
+        <div className="route-container layout-stable">
             {showStepperError && (
                 <div
                     style={{

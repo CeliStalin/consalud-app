@@ -1,7 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
-import '../components/styles/globalStyle.css'
 import { Stepper } from "../components/Stepper";
 import { UseAlert } from "../hooks/Alert";
 
@@ -239,7 +238,7 @@ const CargaDocumento: React.FC = () => {
   ), [handleDivClick]);
 
   return(
-    <>
+    <div className="route-container layout-stable">
       <div className="textoTituloComponentes">
         {ConsaludCore.Typography ? (
           <ConsaludCore.Typography 
@@ -605,7 +604,7 @@ const CargaDocumento: React.FC = () => {
           </div>
         </form>
       </div>            
-    </>
+    </div>
   );
 };
 

@@ -1,13 +1,34 @@
 import { useNavigate } from "react-router-dom";
 import * as ConsaludCore from '@consalud/core'; 
+import { useTitular } from "../contexts/TitularContext";
 
 const RequisitosTitular = () => {
     const navigator = useNavigate();
-    
+    const { titular, loading } = useTitular();
+
+    if (loading) {
+        return (
+            <div className="route-container layout-stable" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ConsaludCore.LoadingSpinner  size="large" />
+                <span style={{ marginLeft: 16 }}>Cargando datos del titular...</span>
+            </div>
+        );
+    }
+
+    if (!titular || !titular.nombre || !titular.apellidoPat) {
+        return (
+            <div className="route-container layout-stable">
+                <p>No se encontraron datos del titular. Por favor, inicia el proceso desde el inicio.</p>
+                <button onClick={() => navigator('/mnherederos/ingresoher/ingresotitular', { replace: true })}>
+                    Ir al inicio del flujo
+                </button>
+            </div>
+        );
+    }
+
     const handleButtonClick = () => {
         navigator('/mnherederos/ingresoher/DatosTitular');
     };
-    // Breadcrumb items
     const breadcrumbItems = [
       { label: 'Administración devolución herederos' }
     ];
@@ -16,7 +37,7 @@ const RequisitosTitular = () => {
       label: typeof item.label === 'string' ? item.label.replace(/^\/+/,'') : item.label
     }));
     return (
-        <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
+        <div className="route-container layout-stable">
           <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 20 }}>
             <div style={{ maxWidth: 1200, marginBottom: 24 }}>
               {/* Breadcrumb */}
@@ -39,22 +60,28 @@ const RequisitosTitular = () => {
                 </button>
               </div>
             </div>
+            {/* Título fuera de la Card */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+              <ConsaludCore.Typography
+                variant="h5"
+                component="h2"
+                weight="bold"
+                style={{ textAlign: 'center', fontWeight: 700 }}
+                className="titleComponent"
+              >
+                Requisitos
+              </ConsaludCore.Typography>
+            </div>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', minHeight: '70vh', maxWidth: 1200, margin: '0 auto' }}>
-              <div style={{ maxWidth: 650, width: '100%' }}>
+              <div className="requitosTitularBox">
                 <ConsaludCore.Card
                   variant="elevated"
-                  padding="large"
+                  padding={undefined} // Usamos padding por clase
                   className="card-elevated ingreso-card animate-fade-in-up"
+                  style={{ boxShadow: 'none', background: 'transparent' }} // Card sin fondo ni sombra extra
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                    <ConsaludCore.Typography
-                      variant="h5"
-                      component="h2"
-                      weight="bold"
-                      style={{ textAlign: 'center', marginBottom: 24, marginTop: 8 }}
-                    >
-                      Requisitos
-                    </ConsaludCore.Typography>
+                    {/* Icono y subtítulo */}
                     <div style={{ width: '100%' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                         {/* SVG de documento */}

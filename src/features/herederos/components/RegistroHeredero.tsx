@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRutChileno } from "@/features/herederos/hooks/useRutChileno";
 import { Stepper } from "../components/Stepper";
-import '../components/styles/globalStyle.css'
 import { useHeredero } from "../contexts/HerederoContext";
 
 const RegistroHeredero = () => {
@@ -38,7 +37,7 @@ const RegistroHeredero = () => {
     };
 
     return (
-        <>
+        <div className="route-container layout-stable">
             <div className="textoTituloComponentes">
                 <span className="titleComponent">
                     Registrar persona heredera
@@ -96,7 +95,7 @@ const RegistroHeredero = () => {
                     )}
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

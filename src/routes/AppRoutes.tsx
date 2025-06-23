@@ -201,6 +201,10 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
                     path="/mnHerederos/IngresoHer/*"
                     element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />} 
                   />
+                  <Route 
+                    path="/mnHerederos/IngresoHer"
+                    element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />} 
+                  />
                   {/* Rutas de error */}
                   <Route 
                     path="/unauthorized" 
