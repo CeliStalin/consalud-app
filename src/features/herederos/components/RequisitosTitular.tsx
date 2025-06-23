@@ -1,104 +1,130 @@
 import { useNavigate } from "react-router-dom";
 import * as ConsaludCore from '@consalud/core'; 
 
-
 const RequisitosTitular = () => {
     const navigator = useNavigate();
     
     const handleButtonClick = () => {
         navigator('/mnherederos/ingresoher/DatosTitular');
     };
+    // Breadcrumb items
+    const breadcrumbItems = [
+      { label: 'Administración devolución herederos' }
+    ];
+    const cleanedBreadcrumbItems = breadcrumbItems.map(item => ({
+      ...item,
+      label: typeof item.label === 'string' ? item.label.replace(/^\/+/,'') : item.label
+    }));
     return (
-        <>
-            <div className="textoTituloComponentes">
-                {ConsaludCore.Typography ? (
-                    <ConsaludCore.Typography variant="h5" component="span" weight="bold" color={ConsaludCore.theme?.colors?.primary || "#505050"}>
-                        Requisitos
+        <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
+          <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 20 }}>
+            <div style={{ maxWidth: 1200, marginBottom: 24 }}>
+              {/* Breadcrumb */}
+              <div style={{ marginBottom: 8 }}>
+                <ConsaludCore.Breadcrumb 
+                  items={cleanedBreadcrumbItems} 
+                  separator={<span>{'>'}</span>}
+                  showHome={true}
+                  className="breadcrumb-custom"
+                />
+              </div>
+              {/* Botón volver */}
+              <div>
+                <button
+                  className="back-button"
+                  onClick={() => navigator(-1)}
+                  aria-label="Volver a la página anterior"
+                >
+                  <span className="back-button-icon">←</span> Volver
+                </button>
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', minHeight: '70vh', maxWidth: 1200, margin: '0 auto' }}>
+              <div style={{ maxWidth: 650, width: '100%' }}>
+                <ConsaludCore.Card
+                  variant="elevated"
+                  padding="large"
+                  className="card-elevated ingreso-card animate-fade-in-up"
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                    <ConsaludCore.Typography
+                      variant="h5"
+                      component="h2"
+                      weight="bold"
+                      style={{ textAlign: 'center', marginBottom: 24, marginTop: 8 }}
+                    >
+                      Requisitos
                     </ConsaludCore.Typography>
-                ) : (
-                    <span>Requisitos</span>
-                )}
-            </div>
-
-            <div className="generalContainer">
-            <div className="requitosTitularBox">
-                 <div className="requisitosTitularContainerInfo">
-                    <div className="iconoGenerico">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M17 17V19C17.0001 19.5303 16.7896 20.0389 16.4148 20.414C16.0399 20.7891 15.5314 20.9999 15.0011 21H6C5.46971 21.0001 4.96108 20.7896 4.58601 20.4148C4.21094 20.0399 4.00014 19.5314 4 19.0011V8C3.99985 7.46971 4.21037 6.96108 4.58523 6.58601C4.9601 6.21094 5.46861 6.00014 5.9989 6H8" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M20 7.5H17C16.1716 7.5 15.5 6.82843 15.5 6V3" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path fillRule="evenodd" clipRule="evenodd" d="M8 15V5C8 3.89543 8.89543 3 10 3H16.0605C16.5909 3 17.0996 3.21071 17.4747 3.58579L19.4142 5.52532C19.7893 5.90039 20 6.4091 20 6.93954V15C20 16.1046 19.1046 17 18 17H10C8.89543 17 8 16.1046 8 15Z" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M12.4 11.3L13.6011 12.5L15.6 10.5" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>  
-                        {ConsaludCore.Typography ? (
-                            <ConsaludCore.Typography variant="body" component="p" weight="medium" color={ConsaludCore.theme?.colors?.primary || "#505050"}>
-                                <strong>Requisitos</strong>
-                            </ConsaludCore.Typography>
-                        ) : (
-                            <p><strong>Requisitos</strong></p>
-                        )}
-                    </div>
-                    {ConsaludCore.Typography ? (
-                        <ConsaludCore.Typography variant="bodySmall" component="p" color={ConsaludCore.theme?.colors?.secondary || "#656565"} className="textoImportante">
-                            Antes de comenzar, verifica que la persona heredera tenga lo siguiente:
+                    <div style={{ width: '100%' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                        {/* SVG de documento */}
+                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                          <rect x="4" y="3" width="16" height="18" rx="2" fill="#04A59B" fillOpacity="0.1"/>
+                          <rect x="4" y="3" width="16" height="18" rx="2" stroke="#04A59B" strokeWidth="1.5"/>
+                          <path d="M8 7H16M8 11H16M8 15H12" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round"/>
+                        </svg>
+                        <ConsaludCore.Typography variant="body" weight="bold" style={{ color: '#04A59B' }}>
+                          Requisitos
                         </ConsaludCore.Typography>
-                    ) : (
-                        <p className="textoImportante">Antes de comenzar, verifica que la persona heredera tenga lo siguiente:</p>
-                    )}
-
-                   
-                        <div className="iconCheck">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
-                                <path d="M18.9307 12.1174C18.2383 16.3567 14.6449 19.5149 10.3517 19.6572C6.05854 19.7996 2.26383 16.8865 1.29206 12.7023C0.320293 8.5181 2.44271 4.23072 6.35921 2.46641C10.2757 0.702105 14.8931 1.9533 17.3831 5.45358L10.073 12.7346L6.98576 9.64533" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>  
-                            {ConsaludCore.Typography ? (
-                                <ConsaludCore.Typography variant="body" component="p" weight="bold" color={ConsaludCore.theme?.colors?.primary || "#505050"}>
-                                    Cédula de identidad vigente.
-                                </ConsaludCore.Typography>
-                            ) : (
-                                <p><strong>Cédula de identidad vigente.</strong></p>
-                            )}
-                        </div>    
-                        <div className="iconCheck">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
-                                <path d="M18.9307 12.1174C18.2383 16.3567 14.6449 19.5149 10.3517 19.6572C6.05854 19.7996 2.26383 16.8865 1.29206 12.7023C0.320293 8.5181 2.44271 4.23072 6.35921 2.46641C10.2757 0.702105 14.8931 1.9533 17.3831 5.45358L10.073 12.7346L6.98576 9.64533" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>  
-                            {ConsaludCore.Typography ? (
-                                <ConsaludCore.Typography variant="body" component="p" weight="medium" color={ConsaludCore.theme?.colors?.primary || "#505050"}>
-                                    <strong>Posesión efectiva</strong> que acredite su condición de heredero.
-                                </ConsaludCore.Typography>
-                            ) : (
-                                <p><strong>Posesión efectiva</strong> que acredite su condición de heredero.</p>
-                            )}
-                        </div>
-                        <div className="iconCheck">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
-                                <path d="M18.9307 12.1174C18.2383 16.3567 14.6449 19.5149 10.3517 19.6572C6.05854 19.7996 2.26383 16.8865 1.29206 12.7023C0.320293 8.5181 2.44271 4.23072 6.35921 2.46641C10.2757 0.702105 14.8931 1.9533 17.3831 5.45358L10.073 12.7346L6.98576 9.64533" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>  
-                            {ConsaludCore.Typography ? (
-                                <ConsaludCore.Typography variant="body" component="p" weight="medium" color={ConsaludCore.theme?.colors?.primary || "#505050"}>
-                                    <strong>Poder notarial válido</strong> para actuar en representación del titular.
-                                </ConsaludCore.Typography>
-                            ) : (
-                                <p><strong>Poder notarial válido</strong> para actuar en representación del titular.</p>
-                            )}
-                        </div>
-                </div>                    
-                <button 
-                           className="buttonRequisitos"
-                            onClick={handleButtonClick}
-                        > 
-                            {ConsaludCore.Typography ? (
-                                <ConsaludCore.Typography variant="button" color={ConsaludCore.theme?.colors?.white || "#FFFFFF"}>Entendido</ConsaludCore.Typography>
-                            ) : (
-                                "Entendido"
-                            )}
-                        </button>
+                      </div>
+                      <ConsaludCore.Typography variant="bodySmall" style={{ color: '#656565', marginBottom: 18 }}>
+                        Antes de comenzar, verifica que la persona heredera tenga lo siguiente:
+                      </ConsaludCore.Typography>
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, width: '100%' }}>
+                        <li style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                          {/* SVG check */}
+                          <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+                            <circle cx="10" cy="10" r="10" fill="#E6FAF8"/>
+                            <path d="M6 10.5L9 13.5L14 8.5" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <ConsaludCore.Typography variant="body" weight="bold">
+                            Cédula de identidad vigente.
+                          </ConsaludCore.Typography>
+                        </li>
+                        <li style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                          <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+                            <circle cx="10" cy="10" r="10" fill="#E6FAF8"/>
+                            <path d="M6 10.5L9 13.5L14 8.5" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <ConsaludCore.Typography variant="body" weight="bold">
+                            Posesión efectiva
+                          </ConsaludCore.Typography>
+                          <ConsaludCore.Typography variant="body" style={{ marginLeft: 4 }}>
+                            que acredite su condición de heredero.
+                          </ConsaludCore.Typography>
+                        </li>
+                        <li style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+                            <circle cx="10" cy="10" r="10" fill="#E6FAF8"/>
+                            <path d="M6 10.5L9 13.5L14 8.5" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <ConsaludCore.Typography variant="body" weight="bold">
+                            Poder notarial válido
+                          </ConsaludCore.Typography>
+                          <ConsaludCore.Typography variant="body" style={{ marginLeft: 4 }}>
+                            para actuar en representación del titular.
+                          </ConsaludCore.Typography>
+                        </li>
+                      </ul>
+                    </div>
+                    <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: 32 }}>
+                      <ConsaludCore.Button
+                        variant="primary"
+                        size="large"
+                        className="buttonRequisitos"
+                        style={{ minWidth: 160, borderRadius: 24 }}
+                        onClick={handleButtonClick}
+                      >
+                        Continuar
+                      </ConsaludCore.Button>
+                    </div>
+                  </div>
+                </ConsaludCore.Card>
+              </div>
             </div>
-            </div>
-        </>
+          </div>
+        </div>
     );
-
 }
 
 export { RequisitosTitular };
