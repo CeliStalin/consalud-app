@@ -10,16 +10,6 @@ const DatosTitular = () => {
     const [redirecting, setRedirecting] = useState(false);
     const hasRedirected = useRef(false);
 
-    useEffect(() => {
-        if (!titular || !titular.nombre || !titular.apellidoPat) {
-            if (!hasRedirected.current) {
-                setRedirecting(true);
-                hasRedirected.current = true;
-                navigator('/mnherederos/ingresoher/ingresotitular', { replace: true });
-            }
-        }
-    }, [titular, navigator]);
-
     if (loading) {
         return (
             <div className="route-container layout-stable" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -30,14 +20,14 @@ const DatosTitular = () => {
     }
 
     if (!titular || !titular.nombre || !titular.apellidoPat) {
-        return (
-            <div className="route-container layout-stable">
-                <p>No se encontraron datos del titular. Por favor, inicia el proceso desde el inicio.</p>
-                <button onClick={() => navigator('/mnherederos/ingresoher/ingresotitular', { replace: true })}>
-                    Ir al inicio del flujo
-                </button>
-            </div>
-        );
+        useEffect(() => {
+            if (!hasRedirected.current) {
+                setRedirecting(true);
+                hasRedirected.current = true;
+                navigator('/mnherederos/ingresoher/ingresotitular', { replace: true });
+            }
+        }, [navigator]);
+        return null;
     }
 
     const handleClick = () => {
@@ -46,7 +36,7 @@ const DatosTitular = () => {
 
     return (
         <div className="route-container layout-stable">
-            <div className="datosTitularContainer">
+            <div className="datosTitularContainer" style={{ maxWidth: 1200, margin: '0 auto' }}>
                 <span className="titleComponent"><b>Datos del titular</b></span>
             </div>
             <div className="generalContainer">

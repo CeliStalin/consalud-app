@@ -22,8 +22,8 @@ const IngresoTitularPage: React.FC = () => {
 
   return (
     <div style={{ minHeight: '100vh' }}>
-      {/* Container principal con padding lateral para alinearse con el menú */}
-      <div style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 20 }}>
+      {/* Container principal sin padding lateral, solo paddingTop y paddingRight */}
+      <div style={{ paddingTop: 20, paddingRight: 24 }}>
         {/* Breadcrumb y botón volver reorganizados */}
         <div style={{ maxWidth: 1200, marginBottom: 24 }}>
           {/* Breadcrumb */}

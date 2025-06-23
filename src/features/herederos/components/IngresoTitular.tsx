@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as ConsaludCore from '@consalud/core'; 
 import { useRutChileno } from "../hooks/useRutChileno";
 import { UseAlert } from "../hooks/Alert";
@@ -12,8 +12,10 @@ const IngresoTitular = () => {
     const { goToRequisitosTitular } = useHerederoNavigation();
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
-    const { buscarTitular, error, loading } = useTitular();
+    const { buscarTitular, error, loading, titular } = useTitular();
     const [showStepperError, setShowStepperError] = useState(false);
+    const [shouldNavigate, setShouldNavigate] = useState(false);
+    const hasNavigated = useRef(false);
 
     const handleBlur = () => {
         setShowError(rut.length > 0 && !isValidRut);
@@ -61,11 +63,25 @@ const IngresoTitular = () => {
                 mostrarAlerta3();
                 return;
             }
-            goToRequisitosTitular();
+            setShouldNavigate(true);
         } catch (err) {
             mostrarAlerta();
         }
     }
+
+    useEffect(() => {
+        if (
+            shouldNavigate &&
+            titular &&
+            titular.indFallecido === 'S' &&
+            titular.poseeFondos &&
+            !titular.poseeSolicitud &&
+            !hasNavigated.current
+        ) {
+            hasNavigated.current = true;
+            goToRequisitosTitular();
+        }
+    }, [shouldNavigate, titular, goToRequisitosTitular]);
 
     return (
         <div className="route-container layout-stable" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
