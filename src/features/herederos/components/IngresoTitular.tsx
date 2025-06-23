@@ -13,7 +13,7 @@ const IngresoTitular = () => {
     const { goToRequisitosTitular } = useHerederoNavigation();
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
-    const { titular, buscarTitular, error, loading } = useTitular();
+    const { buscarTitular, error, loading } = useTitular();
     const [showStepperError, setShowStepperError] = useState(false);
 
     const handleBlur = () => {
