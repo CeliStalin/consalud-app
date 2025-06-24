@@ -430,3 +430,12 @@
     height: 48px;
   }
 }
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(4, 165, 155, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(4, 165, 155, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(4, 165, 155, 0); }
+}
+.button--pulse {
+  animation: pulse 1.2s infinite;
+}

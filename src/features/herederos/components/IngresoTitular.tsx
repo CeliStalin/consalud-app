@@ -12,7 +12,7 @@ const IngresoTitular = () => {
     const { goToRequisitosTitular } = useHerederoNavigation();
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
-    const { buscarTitular, error, loading, titular } = useTitular();
+    const { buscarTitular, error, loading, titular, limpiarTitular } = useTitular();
     const [showStepperError, setShowStepperError] = useState(false);
     const [shouldNavigate, setShouldNavigate] = useState(false);
     const hasNavigated = useRef(false);
@@ -31,43 +31,38 @@ const IngresoTitular = () => {
         mostrarAlerta3
     } = UseAlert();
 
+    useEffect(() => {
+        limpiarTitular();
+    }, [limpiarTitular]);
+
     const handleFlow = async () => {
         if (!isValidRut) {
             mostrarAlerta();
             return;
         }
-        
         try {
             const titularResult = await buscarTitular(rut);
-            if (error === 'BFF_ERROR_500') {
-                setShowStepperError(true);
-                return;
-            }
-            if (error) {
+            if (!titularResult) {
                 mostrarAlerta();
                 return;
             }
-            if(titularResult === null){
+            if (titularResult.indFallecido !== 'S') {
                 mostrarAlerta();
                 return;
             }
-            if(titularResult.indFallecido !== 'S'){
-                mostrarAlerta();
-                return;
-            }
-            if(!titularResult.poseeFondos){
+            if (!titularResult.poseeFondos) {
                 mostrarAlerta2();
                 return;
             }
-            if(titularResult.poseeSolicitud){
+            if (titularResult.poseeSolicitud) {
                 mostrarAlerta3();
                 return;
             }
-            setShouldNavigate(true);
+            goToRequisitosTitular();
         } catch (err) {
             mostrarAlerta();
         }
-    }
+    };
 
     useEffect(() => {
         if (
@@ -190,7 +185,7 @@ const IngresoTitular = () => {
                                 style={{ width: 378, height: 42, flexShrink: 0, border: showError ? '1.5px solid #E11D48' : '1.5px solid #e0e0e0', borderRadius: 24, fontSize: 16, paddingLeft: 18, background: '#f8f9fa', boxShadow: '0 2px 8px rgba(4, 165, 155, 0.07)', outline: 'none', transition: 'border 0.2s' }}
                             />
                             <button
-                                className={`proceso-button animate-fade-in-up ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}`}
+                                className={`proceso-button animate-fade-in-up ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}${loading ? ' button--pulse' : ''}`}
                                 disabled={!isValidRut || loading}
                                 onClick={handleFlow}
                                 type="submit"

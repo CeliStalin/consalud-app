@@ -9,15 +9,15 @@ const RequisitosTitular = () => {
     const [waiting, setWaiting] = useState(true);
 
     useEffect(() => {
-        if (!titular || !titular.nombre || !titular.apellidoPat) {
-            const timeout = setTimeout(() => setWaiting(false), 500);
+        if (!loading && (!titular || !titular.nombre || !titular.apellidoPat)) {
+            const timeout = setTimeout(() => {
+                navigator('/mnherederos/ingresoher/ingresotitular', { replace: true });
+            }, 500);
             return () => clearTimeout(timeout);
-        } else {
-            setWaiting(true); // Si titular aparece, resetea waiting
         }
-    }, [titular]);
+    }, [titular, loading, navigator]);
 
-    if (loading || (!titular || !titular.nombre || !titular.apellidoPat) && waiting) {
+    if (loading) {
         return (
             <div className="route-container layout-stable" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ConsaludCore.LoadingSpinner  size="large" />
@@ -27,10 +27,7 @@ const RequisitosTitular = () => {
     }
 
     if (!titular || !titular.nombre || !titular.apellidoPat) {
-        useEffect(() => {
-            navigator('/mnherederos/ingresoher/ingresotitular', { replace: true });
-        }, [navigator]);
-        return null;
+        return <span style={{ display: 'block', textAlign: 'center', marginTop: 40 }}>Redirigiendo...</span>;
     }
 
     const handleButtonClick = () => {
@@ -140,15 +137,22 @@ const RequisitosTitular = () => {
                     </ul>
                   </div>
                   <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: 32 }}>
-                    <ConsaludCore.Button
-                      variant="primary"
-                      size="large"
-                      className="buttonRequisitos"
-                      style={{ minWidth: 160, borderRadius: 24 }}
+                    <button
+                      className={`proceso-button animate-fade-in-up buttonRut--valid${loading ? ' button--pulse' : ''}`}
+                      style={{ display: 'flex', padding: '10px 24px', justifyContent: 'center', alignItems: 'center', gap: 8, minWidth: 120, borderRadius: 24, height: 42, fontSize: 16, background: '#04A59B', color: '#fff', border: 'none', boxShadow: 'none', fontWeight: 600, transition: 'background 0.2s', opacity: loading ? 0.7 : 1 }}
                       onClick={handleButtonClick}
+                      type="button"
+                      aria-label="Continuar"
+                      disabled={loading}
                     >
-                      Continuar
-                    </ConsaludCore.Button>
+                      <ConsaludCore.Typography
+                        variant="button"
+                        color="#fff"
+                        style={{ fontWeight: 600 }}
+                      >
+                        Continuar
+                      </ConsaludCore.Typography>
+                    </button>
                   </div>
                 </div>
               </ConsaludCore.Card>
