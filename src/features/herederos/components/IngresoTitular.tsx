@@ -12,9 +12,8 @@ const IngresoTitular = () => {
     const { goToRequisitosTitular } = useHerederoNavigation();
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
-    const { buscarTitular, error, loading, titular, limpiarTitular } = useTitular();
+    const { buscarTitular, error, loading, titular } = useTitular();
     const [showStepperError, setShowStepperError] = useState(false);
-    const [shouldNavigate, setShouldNavigate] = useState(false);
     const hasNavigated = useRef(false);
 
     const handleBlur = () => {
@@ -31,9 +30,8 @@ const IngresoTitular = () => {
         mostrarAlerta3
     } = UseAlert();
 
-    useEffect(() => {
-        limpiarTitular();
-    }, [limpiarTitular]);
+    const [pendingValidation, setPendingValidation] = useState<null | 'ok' | 'noFondos' | 'noFallecido' | 'conSolicitud'>(null);
+    const lastRut = useRef<string | null>(null);
 
     const handleFlow = async () => {
         if (!isValidRut) {
@@ -41,33 +39,44 @@ const IngresoTitular = () => {
             return;
         }
         try {
+            setPendingValidation(null);
+            lastRut.current = rut;
             const titularResult = await buscarTitular(rut);
             if (!titularResult) {
                 mostrarAlerta();
                 return;
             }
             if (titularResult.indFallecido !== 'S') {
+                setPendingValidation('noFallecido');
                 mostrarAlerta();
                 return;
             }
             if (!titularResult.poseeFondos) {
+                setPendingValidation('noFondos');
                 mostrarAlerta2();
                 return;
             }
             if (titularResult.poseeSolicitud) {
+                setPendingValidation('conSolicitud');
                 mostrarAlerta3();
                 return;
             }
-            goToRequisitosTitular();
+            setPendingValidation('ok');
+            // No navegamos aquí, lo hará el useEffect
         } catch (err) {
             mostrarAlerta();
         }
     };
 
     useEffect(() => {
+        // Solo navegar si la validación fue exitosa, loading terminó, y el titular corresponde al rut buscado
         if (
-            shouldNavigate &&
+            pendingValidation === 'ok' &&
+            !loading &&
             titular &&
+            titular.rut &&
+            lastRut.current &&
+            titular.rut.replace(/\./g, '').toLowerCase() === lastRut.current.replace(/\./g, '').toLowerCase() &&
             titular.indFallecido === 'S' &&
             titular.poseeFondos &&
             !titular.poseeSolicitud &&
@@ -76,7 +85,11 @@ const IngresoTitular = () => {
             hasNavigated.current = true;
             goToRequisitosTitular();
         }
-    }, [shouldNavigate, titular, goToRequisitosTitular]);
+        // Si cambia el rut, resetea la navegación
+        if (rut !== lastRut.current) {
+            hasNavigated.current = false;
+        }
+    }, [pendingValidation, loading, titular, goToRequisitosTitular, rut]);
 
     return (
         <div className="route-container layout-stable" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>

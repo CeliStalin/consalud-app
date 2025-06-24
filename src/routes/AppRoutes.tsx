@@ -12,6 +12,8 @@ import {
 } from '@consalud/core';
 import { useAuthWithRedirect } from '../hooks/useAuthWithRedirect';
 import CargaDocumentoPage from '../pages/CargaDocumentoPage';
+import { CollapseOnRoute } from '@/features/herederos/components/CollapseOnRoute';
+import { SyncedLayout } from './SyncedLayout';
 
 // Lazy loading optimizado - SIN preloading que pueda causar conflictos
 //const IngresoHerederosPage = React.lazy(() => import('../pages/IngresoHerederosPage'));
@@ -65,14 +67,26 @@ const OptimizedLoading: React.FC = React.memo(() => (
 
 OptimizedLoading.displayName = 'OptimizedLoading';
 
+const PageTransitionWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isMenuCollapsed } = useMenuCollapse();
+  return (
+    <div className={`page-transition page-transition--minimal${isMenuCollapsed ? ' sidebar-collapsed' : ' sidebar-expanded'}`}>{children}</div>
+  );
+};
+
 // Wrapper optimizado para prevenir parpadeos
 const StablePageWrapper: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
+  const { isMenuCollapsed } = useMenuCollapse();
+  const location = useLocation();
+  // Detecta si la ruta es una de las que NO debe mostrar menú
+  const hideSidebar = location.pathname.startsWith('/mnherederos/ingresoher/ingresotitular');
+  const transitionClass = `page-transition page-transition--minimal${!hideSidebar ? (isMenuCollapsed ? ' sidebar-collapsed' : ' sidebar-expanded') : ''}`;
   return (
-    <div className="route-container layout-stable">
-      <div className="page-transition-wrapper">
+    <main className={`instant-stable navigation-stable no-flash${!hideSidebar ? (isMenuCollapsed ? ' sidebar-collapsed' : ' sidebar-expanded') : ''}`}>
+      <div className={transitionClass}>
         {children}
       </div>
-    </div>
+    </main>
   );
 });
 
@@ -103,9 +117,11 @@ const HomePageWithCollapse: React.FC<{ onCardClick?: (...args: any[]) => void }>
 };
 
 // Layout wrapper para las subrutas de herederos
-const HerederosLayout = () => (
+const HerederosLayout: React.FC = () => (
   <ProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-    <Outlet />
+    <CollapseOnRoute>
+      <Outlet />
+    </CollapseOnRoute>
   </ProtectedRoute>
 );
 
@@ -155,11 +171,11 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
             } 
           />
 
-          {/* Resto de la app con Layout */}
+          {/* Resto de la app con SyncedLayout */}
           <Route
             path="*"
             element={
-              <Layout logoSrc={logo}>
+              <SyncedLayout logo={logo}>
                 <Routes>
                   {/* Ruta Raíz */}
                   <Route 
@@ -178,7 +194,10 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
                     }
                   />
                   {/* Rutas del módulo de herederos - refactorizadas */}
-                  <Route path="/mnherederos/*" element={<HerederosLayout />}> 
+                  <Route
+                    path="/mnherederos/*"
+                    element={<HerederosLayout />}
+                  >
                     <Route index element={<IngresoTitularPage />} />
                     <Route path="ingresoher" element={<IngresoTitularPage />} />
                     <Route path="ingresoher/ingresotitular" element={<IngresoTitularPage />} />
@@ -224,7 +243,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
                   />
                   <Route path="*" element={<Navigate to="/not-found" replace />} />
                 </Routes>
-              </Layout>
+              </SyncedLayout>
             }
           />
         </Routes>

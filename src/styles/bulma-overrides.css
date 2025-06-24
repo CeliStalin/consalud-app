@@ -262,3 +262,61 @@ main,
 .breadcrumb li+li:before {
   content: none !important;
 }
+
+/*
+.main-content.sidebar-expanded {
+  padding-left: 240px;
+  transition: padding-left 0.3s;
+}
+.main-content.sidebar-collapsed {
+  padding-left: 60px;
+  transition: padding-left 0.3s;
+}
+*/
+
+main.sidebar-expanded {
+  margin-left: 240px !important;
+  transition: margin-left 0.3s;
+}
+main.sidebar-collapsed {
+  margin-left: 60px !important;
+  transition: margin-left 0.3s;
+}
+
+/* FIX TEMPORAL: Eliminar cualquier padding/margin extra en los hijos de <main> y wrappers comunes */
+main > * {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+.main-content,
+.content-container,
+.ingreso-herederos-wrapper,
+.main-container,
+.generalContainer {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* OVERRIDE: Forzar alineación a la izquierda del contenido principal cuando el menú está colapsado */
+main > *,
+.main-content,
+.content-container,
+.route-container,
+.layout-stable {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+/* SOLO para la página de ingreso titular: forzar alineación a la izquierda */
+main.no-margin-left > *,
+main.no-margin-left .main-content,
+main.no-margin-left .content-container,
+main.no-margin-left .route-container,
+main.no-margin-left .layout-stable {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
