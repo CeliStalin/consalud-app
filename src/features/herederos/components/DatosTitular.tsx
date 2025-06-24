@@ -6,9 +6,19 @@ import * as ConsaludCore from '@consalud/core';
 
 const DatosTitular = () => {
     const navigator = useNavigate();
-    const { titular, loading } = useTitular();
+    const { titular, loading, buscarTitular } = useTitular();
     const [redirecting, setRedirecting] = useState(false);
     const hasRedirected = useRef(false);
+
+    // Si no hay titular pero hay rut en sessionStorage, re-buscar
+    useEffect(() => {
+        if (!titular && !loading) {
+            const rutSession = sessionStorage.getItem('rutTitular');
+            if (rutSession) {
+                buscarTitular(rutSession);
+            }
+        }
+    }, [titular, loading, buscarTitular]);
 
     if (loading) {
         return (

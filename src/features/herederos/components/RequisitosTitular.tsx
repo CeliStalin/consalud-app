@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import * as ConsaludCore from '@consalud/core'; 
 import { useTitular } from "../contexts/TitularContext";
 import { useMenuCollapse } from '@consalud/core';
+import RequisitosIcon from '@/assets/requisitos.svg';
+import CheckIcon from '@/assets/check-requisitos.svg';
 
 const RequisitosTitular = () => {
     const navigator = useNavigate();
@@ -87,12 +89,7 @@ const RequisitosTitular = () => {
                             {/* Icono y subtítulo */}
                             <div style={{ width: '100%' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                                    {/* SVG de documento */}
-                                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                        <rect x="4" y="3" width="16" height="18" rx="2" fill="#04A59B" fillOpacity="0.1"/>
-                                        <rect x="4" y="3" width="16" height="18" rx="2" stroke="#04A59B" strokeWidth="1.5"/>
-                                        <path d="M8 7H16M8 11H16M8 15H12" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round"/>
-                                    </svg>
+                                    <img src={RequisitosIcon} width={24} height={24} alt="Ícono requisitos" style={{ display: 'inline', verticalAlign: 'middle' }} />
                                     <ConsaludCore.Typography variant="body" weight="bold" style={{ color: '#04A59B' }}>
                                         Requisitos
                                     </ConsaludCore.Typography>
@@ -102,20 +99,13 @@ const RequisitosTitular = () => {
                                 </ConsaludCore.Typography>
                                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, width: '100%' }}>
                                     <li style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                                        {/* SVG check */}
-                                        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
-                                            <circle cx="10" cy="10" r="10" fill="#E6FAF8"/>
-                                            <path d="M6 10.5L9 13.5L14 8.5" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
+                                        <img src={CheckIcon} width={20} height={20} alt="Check" style={{ display: 'inline', verticalAlign: 'middle' }} />
                                         <ConsaludCore.Typography variant="body" weight="bold">
                                             Cédula de identidad vigente.
                                         </ConsaludCore.Typography>
                                     </li>
                                     <li style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                                        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
-                                            <circle cx="10" cy="10" r="10" fill="#E6FAF8"/>
-                                            <path d="M6 10.5L9 13.5L14 8.5" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
+                                        <img src={CheckIcon} width={20} height={20} alt="Check" style={{ display: 'inline', verticalAlign: 'middle' }} />
                                         <ConsaludCore.Typography variant="body" weight="bold">
                                             Posesión efectiva
                                         </ConsaludCore.Typography>
@@ -124,10 +114,7 @@ const RequisitosTitular = () => {
                                         </ConsaludCore.Typography>
                                     </li>
                                     <li style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                        <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
-                                            <circle cx="10" cy="10" r="10" fill="#E6FAF8"/>
-                                            <path d="M6 10.5L9 13.5L14 8.5" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
+                                        <img src={CheckIcon} width={20} height={20} alt="Check" style={{ display: 'inline', verticalAlign: 'middle' }} />
                                         <ConsaludCore.Typography variant="body" weight="bold">
                                             Poder notarial válido
                                         </ConsaludCore.Typography>
