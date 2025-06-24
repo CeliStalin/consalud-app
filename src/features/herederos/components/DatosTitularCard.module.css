@@ -1,0 +1,92 @@
+.cardContainer {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0px 8px 20px 5px rgba(118, 118, 128, 0.10);
+  padding: 31px 44px 44px 44px;
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.icono {
+  display: flex;
+  align-items: center;
+  color: #00CBBF;
+}
+
+.titulo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #222;
+}
+
+.subtitulo {
+  color: #656565;
+  font-size: 15px;
+  margin-bottom: 24px;
+  width: 100%;
+  text-align: center;
+}
+
+.datosBox {
+  background: #fff;
+  border: 1px solid #E0E0E0;
+  border-radius: 10px;
+  padding: 18px 32px;
+  width: 100%;
+  margin: 0 auto 32px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.nombreTitular {
+  font-size: 16px;
+  font-weight: 700;
+  color: #222;
+}
+
+.fechaDefuncion {
+  font-size: 15px;
+  color: #656565;
+}
+
+.btnContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btnContinuar {
+  background: #04A59B;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  min-width: 120px;
+  height: 42px;
+  margin-top: 8px;
+}
+
+.btnContinuar:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+} 
