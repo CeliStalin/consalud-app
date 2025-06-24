@@ -39,15 +39,29 @@
 }
 
 .homepage-container .applications-section .app-card {
-  height: 100%;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  will-change: transform, box-shadow;
+  min-width: 340px;
+  max-width: 600px;
+  width: 100%;
+  min-height: 56px;
+  height: auto;
+  padding: 12px 32px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1.5px solid #04A59B1A; /* Borde sutil, puedes ajustar el color */
+  border-radius: 12px;
+  background: #fff;
+  font-size: 1.05rem;
+  font-weight: 500;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 /* Optimized hover effects */
 .homepage-container .applications-section .app-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--core-box-shadow);
+  box-shadow: 0 4px 16px rgba(4, 165, 155, 0.10);
+  border-color: #04A59B55;
 }
 
 .homepage-container .applications-section .app-card:focus {
@@ -67,6 +81,13 @@
     /* Simplified animation for mobile */
     0%, 100% { transform: scale(1); }
     50% { transform: scale(0.98); }
+  }
+
+  .homepage-container .applications-section .app-card {
+    min-width: 90vw;
+    max-width: 98vw;
+    padding: 10px 12px;
+    font-size: 0.98rem;
   }
 }
 
