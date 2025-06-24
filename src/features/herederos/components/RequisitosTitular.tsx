@@ -69,7 +69,7 @@ const RequisitosTitular = () => {
               variant="h5"
               component="h2"
               weight="bold"
-              style={{ textAlign: 'center', fontWeight: 700 }}
+              style={{ textAlign: 'center', fontWeight: 700, color: '#000', width: '200px', height: '23px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '50px' }}
               className="titleComponent"
             >
               Requisitos

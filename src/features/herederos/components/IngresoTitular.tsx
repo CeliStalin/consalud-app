@@ -81,7 +81,7 @@ const IngresoTitular = () => {
     return (
         <div className="route-container layout-stable" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
             <ConsaludCore.Typography variant="h5" style={{ fontWeight: 700, color: '#222', marginBottom: 24, textAlign: 'center' }}>
-                RUT del titular
+                Rut del titular
             </ConsaludCore.Typography>
             {showStepperError && (
                 <div
@@ -156,9 +156,9 @@ const IngresoTitular = () => {
                                 />
                                 <ConsaludCore.Typography
                                     variant="subtitle1"
-                                    style={{ fontWeight: 700, color: '#505050', fontSize: 18 }}
+                                    style={{ fontWeight: 700, color: '#505050', fontSize: 18 ,width: '100%'}}
                                 >
-                                    RUT del titular
+                                    Rut del titular 
                                 </ConsaludCore.Typography>
                             </div>
                             <ConsaludCore.Typography
