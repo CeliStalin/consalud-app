@@ -67,8 +67,8 @@ const RequisitosTitular = () => {
                 </div>
             </div>
             {/* Título fuera de la Card */}
-            <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 24 }}>
-              <div style={{ marginLeft: 48 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+              <div>
                 <ConsaludCore.Typography
                     variant="h5"
                     component="h2"
@@ -80,7 +80,7 @@ const RequisitosTitular = () => {
                 </ConsaludCore.Typography>
               </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', minHeight: '70vh', width: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', minHeight: '70vh', width: '100%' }}>
                 <div className="requitosTitularBox">
                     <ConsaludCore.Card
                         variant="elevated"

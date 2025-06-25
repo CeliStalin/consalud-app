@@ -1,6 +1,7 @@
 import { StepperProps } from "../interfaces/StepperProps";
 import * as ConsaludCore from '@consalud/core';
 import './styles/Stepper.css'
+import { useEffect, useRef, useState } from 'react';
 
 const Stepper = ({ step }: StepperProps) => {
   const steps = [
@@ -10,14 +11,29 @@ const Stepper = ({ step }: StepperProps) => {
     { title: "Paso 4", description: "Cuenta bancaria" },
   ];
 
+  // Estado para animar el círculo activo
+  const [animateStep, setAnimateStep] = useState<number | null>(null);
+  const prevStep = useRef(step);
+
+  useEffect(() => {
+    if (step !== prevStep.current) {
+      setAnimateStep(step - 1); // El índice del círculo activo
+      const timeout = setTimeout(() => setAnimateStep(null), 500); // Duración de la animación
+      prevStep.current = step;
+      return () => clearTimeout(timeout);
+    }
+  }, [step]);
+
   const renderCircle = (index: number) => {
     const isCompleted = index < step;
+    const isActive = index === step - 1;
     return (
       <div
-      className={`circle ${isCompleted ? 'completed' : 'incomplete'}`}
+        className={`circle ${isCompleted ? 'completed' : 'incomplete'}${isActive ? ' circle-animate animate-pulse animate-ping' : ''}${isCompleted && !isActive ? ' animate-bounce' : ''}`}
       >
         {isCompleted && (
           <svg
+            className={isActive ? 'animate-spin' : ''}
             xmlns="http://www.w3.org/2000/svg"
             width="12"
             height="12"
@@ -55,14 +71,17 @@ const Stepper = ({ step }: StepperProps) => {
             {/* Línea conectando al siguiente círculo */}
             {index < steps.length - 1 && (
               <div
+                className={`progressLine duration-500${index < step - 1 ? ' active scale-110 opacity-100' : ' inactive opacity-0'}`}
                 style={{
                   position: "absolute",
                   top: "50%",
                   left: "50%",
-                  width: "100%",
+                  width: index < step - 1 ? '100%' : '100%',
                   height: "2px",
-                  backgroundColor: index < step - 1 ? "#00CBBF" : "#EEEEEE",
                   zIndex: 0,
+                  transform: "translate(-50%, -50%)",
+                  backgroundColor: index < step - 1 ? "#00CBBF" : "#EEEEEE",
+                  transition: 'background-color 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)'
                 }}
               />
             )}

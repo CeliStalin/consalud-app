@@ -237,8 +237,39 @@ const CargaDocumento: React.FC = () => {
     </div>
   ), [handleDivClick]);
 
+  const breadcrumbItems = [
+    { label: 'Administración devolución herederos' }
+  ];
+  const cleanedBreadcrumbItems = breadcrumbItems.map(item => ({
+    ...item,
+    label: typeof item.label === 'string' ? item.label.replace(/^\/+/,'') : item.label
+  }));
+
   return(
     <div className="route-container layout-stable">
+      <div style={{ width: '100%', marginBottom: 24 }}>
+        <div style={{ marginLeft: 48 }}>
+          {/* Breadcrumb */}
+          <div style={{ marginBottom: 8 }}>
+            <ConsaludCore.Breadcrumb 
+              items={cleanedBreadcrumbItems} 
+              separator={<span>{'>'}</span>}
+              showHome={true}
+              className="breadcrumb-custom"
+            />
+          </div>
+          {/* Botón volver */}
+          <div>
+            <button
+              className="back-button"
+              onClick={() => navigate(-1)}
+              aria-label="Volver a la página anterior"
+            >
+              <span className="back-button-icon">←</span> Volver
+            </button>
+          </div>
+        </div>
+      </div>
       <div className="textoTituloComponentes">
         {ConsaludCore.Typography ? (
           <ConsaludCore.Typography 
