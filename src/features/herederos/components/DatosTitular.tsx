@@ -54,38 +54,42 @@ const DatosTitular = () => {
     }));
     return (
         <div className="route-container layout-stable" style={{ paddingTop: 20 }}>
-          <div style={{ maxWidth: 1200, margin: '0 auto', marginBottom: 24 }}>
-            {/* Breadcrumb */}
-            <div style={{ marginBottom: 8 }}>
-              <ConsaludCore.Breadcrumb 
-                items={cleanedBreadcrumbItems} 
-                separator={<span>{'>'}</span>}
-                showHome={true}
-                className="breadcrumb-custom"
-              />
-            </div>
-            {/* Botón volver */}
-            <div>
-              <button
-                className="back-button"
-                onClick={() => navigator(-1)}
-                aria-label="Volver a la página anterior"
-              >
-                <span className="back-button-icon">←</span> Volver
-              </button>
+          <div style={{ width: '100%', marginBottom: 24 }}>
+            <div style={{ marginLeft: 48 }}>
+              {/* Breadcrumb */}
+              <div style={{ marginBottom: 8 }}>
+                <ConsaludCore.Breadcrumb 
+                  items={cleanedBreadcrumbItems} 
+                  separator={<span>{'>'}</span>}
+                  showHome={true}
+                  className="breadcrumb-custom"
+                />
+              </div>
+              {/* Botón volver */}
+              <div>
+                <button
+                  className="back-button"
+                  onClick={() => navigator(-1)}
+                  aria-label="Volver a la página anterior"
+                >
+                  <span className="back-button-icon">←</span> Volver
+                </button>
+              </div>
             </div>
           </div>
-          <div className="generalContainer">
-            <Stepper step={1}/>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-              <DatosTitularCard
-                nombre={titular?.nombre || ''}
-                apellidoPat={titular?.apellidoPat || ''}
-                apellidoMat={titular?.apellidoMat || ''}
-                fechaDefuncion={titular?.fechaDefuncion || ''}
-                onContinuar={handleClick}
-                loading={loading}
-              />
+          <div className="generalContainer" style={{ alignItems: 'center', paddingLeft: 0 }}>
+            <div style={{ width: 1000, marginLeft: 48 }}>
+              <Stepper step={1}/>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', minHeight: '60vh', width: '100%' }}>
+                <DatosTitularCard
+                  nombre={titular?.nombre || ''}
+                  apellidoPat={titular?.apellidoPat || ''}
+                  apellidoMat={titular?.apellidoMat || ''}
+                  fechaDefuncion={titular?.fechaDefuncion || ''}
+                  onContinuar={handleClick}
+                  loading={loading}
+                />
+              </div>
             </div>
           </div>
         </div>

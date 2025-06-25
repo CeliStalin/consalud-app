@@ -19,15 +19,15 @@
   .containerStepper {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 862px;
+    align-items: flex-start;
+    width: 1000px;
     gap: 20px;
-    margin: 0 auto;
+    margin-left: 48px;
   }
   .lineStepper {
     display: flex;
     justify-content: space-between;
-    width: 100%;
+    width: 1000px;
     position: relative;
   }
 

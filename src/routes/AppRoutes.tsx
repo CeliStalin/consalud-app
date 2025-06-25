@@ -78,8 +78,8 @@ const PageTransitionWrapper: React.FC<{ children: React.ReactNode }> = ({ childr
 const StablePageWrapper: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
   const { isMenuCollapsed } = useMenuCollapse();
   const location = useLocation();
-  // Detecta si la ruta es una de las que NO debe mostrar menú
-  const hideSidebar = location.pathname.startsWith('/mnherederos/ingresoher/ingresotitular');
+  // Todas las rutas sin margen lateral
+  const hideSidebar = true;
   const transitionClass = `page-transition page-transition--minimal${!hideSidebar ? (isMenuCollapsed ? ' sidebar-collapsed' : ' sidebar-expanded') : ''}`;
   return (
     <main className={`instant-stable navigation-stable no-flash${!hideSidebar ? (isMenuCollapsed ? ' sidebar-collapsed' : ' sidebar-expanded') : ''}`}>

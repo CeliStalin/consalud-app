@@ -30,7 +30,7 @@ export const DatosTitularCard: React.FC<DatosTitularCardProps> = ({
   };
 
   return (
-    <div className={styles.cardContainer}>
+    <div className={`${styles.cardContainer} card-elevated ingreso-card animate-fade-in-up`}>
       <div className={styles.header}>
         <span className={styles.icono}>
           {/* Icono SVG */}
