@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import * as ConsaludCore from '@consalud/core'; 
 import { useRutChileno } from "../hooks/useRutChileno";
-import { UseAlert } from "../hooks/Alert";
 import { useHerederoNavigation } from "../hooks/useHerederoNavigation";
 import '../components/styles/ingresoTitular.css';
 import '../../../pages/styles/IngresoHerederosPage.css';
@@ -25,9 +24,6 @@ const IngresoTitular = () => {
         setShowError(false);
     };
     
-    const [pendingValidation, setPendingValidation] = useState<null | 'ok' | 'noFondos' | 'noFallecido' | 'conSolicitud'>(null);
-    const lastRut = useRef<string | null>(null);
-
     const handleFlow = async () => {
         setShowStepperError(false);
         if (!isValidRut) {

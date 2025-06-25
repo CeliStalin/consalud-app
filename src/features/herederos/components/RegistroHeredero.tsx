@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRutChileno } from "@/features/herederos/hooks/useRutChileno";
 import { Stepper } from "../components/Stepper";
@@ -7,36 +6,9 @@ import * as ConsaludCore from '@consalud/core';
 import { RegistroTitularCard } from "./RegistroTitularCard";
 
 const RegistroHeredero = () => {
-    const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
-    const [showError, setShowError] = useState(false);
+    useRutChileno();
     const navigator = useNavigate();
     const { buscarHeredero, error } = useHeredero();
-
-    const handleNavigator = async() => {
-        const rutLimpio = rut.replace(/[^0-9kK]/g, '');
-        if (!isValidRut) {
-            return;
-        }
-        
-        try {
-            await buscarHeredero(rutLimpio);
-            
-            if (error) {
-                return;
-            }
-            navigator('/mnherederos/ingresoher/formingreso');
-        } catch (err) {
-            // Manejo silencioso del error ya que la UI ya muestra el estado
-        }
-    }
-    
-    const handleBlur = () => {
-        setShowError(rut.length > 0 && !isValidRut);
-    };
-
-    const handleFocus = () => {
-        setShowError(false);
-    };
 
     const breadcrumbItems = [
       { label: 'Administración devolución herederos' }

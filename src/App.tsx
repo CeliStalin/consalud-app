@@ -3,10 +3,8 @@ import {
   ErrorBoundary,
   AuthProvider,
   MenuConfigProvider,
-  PageTransition,
   Typography,
   theme,
-  Layout,
   MenuCollapseProvider
 } from '@consalud/core';
 import { AppRoutes } from './routes';

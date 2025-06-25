@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Stepper } from "../components/Stepper";
 import { useTitular } from "../contexts/TitularContext";
 import * as ConsaludCore from '@consalud/core';
@@ -8,7 +8,6 @@ import { DatosTitularCard } from "./DatosTitularCard";
 const DatosTitular = () => {
     const navigator = useNavigate();
     const { titular, loading, buscarTitular } = useTitular();
-    const [redirecting, setRedirecting] = useState(false);
     const hasRedirected = useRef(false);
 
     // Si no hay titular pero hay rut en sessionStorage, re-buscar
@@ -33,8 +32,6 @@ const DatosTitular = () => {
     if (!titular || !titular.nombre || !titular.apellidoPat) {
         useEffect(() => {
             if (!hasRedirected.current) {
-                setRedirecting(true);
-                hasRedirected.current = true;
                 navigator('/mnherederos/ingresoher/ingresotitular', { replace: true });
             }
         }, [navigator]);

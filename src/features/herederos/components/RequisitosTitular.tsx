@@ -1,15 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import * as ConsaludCore from '@consalud/core'; 
 import { useTitular } from "../contexts/TitularContext";
-import { useMenuCollapse } from '@consalud/core';
 import RequisitosIcon from '@/assets/requisitos.svg';
 import CheckIcon from '@/assets/check-requisitos.svg';
 
 const RequisitosTitular = () => {
     const navigator = useNavigate();
     const { titular, loading } = useTitular();
-    const [waiting, setWaiting] = useState(true);
 
     useEffect(() => {
         if (!loading && (!titular || !titular.nombre || !titular.apellidoPat)) {

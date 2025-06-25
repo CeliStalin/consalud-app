@@ -1,5 +1,5 @@
 import React, { Suspense, useMemo } from 'react';
-import { Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { 
   HomePage,
   Login,
@@ -8,7 +8,6 @@ import {
   NotFound,
   MenuCollapseProvider,
   useMenuCollapse,
-  Layout
 } from '@consalud/core';
 import { useAuthWithRedirect } from '../hooks/useAuthWithRedirect';
 import CargaDocumentoPage from '../pages/CargaDocumentoPage';
@@ -67,17 +66,9 @@ const OptimizedLoading: React.FC = React.memo(() => (
 
 OptimizedLoading.displayName = 'OptimizedLoading';
 
-const PageTransitionWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isMenuCollapsed } = useMenuCollapse();
-  return (
-    <div className={`page-transition page-transition--minimal${isMenuCollapsed ? ' sidebar-collapsed' : ' sidebar-expanded'}`}>{children}</div>
-  );
-};
-
 // Wrapper optimizado para prevenir parpadeos
 const StablePageWrapper: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
   const { isMenuCollapsed } = useMenuCollapse();
-  const location = useLocation();
   // Todas las rutas sin margen lateral
   const hideSidebar = true;
   const transitionClass = `page-transition page-transition--minimal${!hideSidebar ? (isMenuCollapsed ? ' sidebar-collapsed' : ' sidebar-expanded') : ''}`;
@@ -136,8 +127,6 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
     publicPaths: ['/login']
   });
 
-  const location = useLocation();
-
   // Loading state optimizado
   const loadingComponent = useMemo(() => (
     <OptimizedLoading />
@@ -154,7 +143,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
   return (
     <MenuCollapseProvider>
       <Suspense fallback={<div style={{ display: 'none' }} />}>
-        <Routes location={location}>
+        <Routes>
           {/* Rutas Públicas */}
           <Route 
             path="/login" 

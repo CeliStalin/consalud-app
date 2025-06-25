@@ -1,7 +1,6 @@
 import { StepperProps } from "../interfaces/StepperProps";
 import * as ConsaludCore from '@consalud/core';
 import './styles/Stepper.css'
-import { useEffect, useRef, useState } from 'react';
 
 const Stepper = ({ step }: StepperProps) => {
   const steps = [
@@ -10,19 +9,6 @@ const Stepper = ({ step }: StepperProps) => {
     { title: "Paso 3", description: "Carga de documentos" },
     { title: "Paso 4", description: "Cuenta bancaria" },
   ];
-
-  // Estado para animar el círculo activo
-  const [animateStep, setAnimateStep] = useState<number | null>(null);
-  const prevStep = useRef(step);
-
-  useEffect(() => {
-    if (step !== prevStep.current) {
-      setAnimateStep(step - 1); // El índice del círculo activo
-      const timeout = setTimeout(() => setAnimateStep(null), 500); // Duración de la animación
-      prevStep.current = step;
-      return () => clearTimeout(timeout);
-    }
-  }, [step]);
 
   const renderCircle = (index: number) => {
     const isCompleted = index < step;

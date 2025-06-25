@@ -1,10 +1,9 @@
 import * as ConsaludCore from '@consalud/core';
 import { IngresoTitular } from '@/features/herederos/components/IngresoTitular';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const IngresoTitularPage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const breadcrumbItems = [
     { label: 'Administración devolución herederos' }
