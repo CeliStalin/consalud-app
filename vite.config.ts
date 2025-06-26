@@ -41,7 +41,6 @@ export default defineConfig({
     target: 'esnext',
     outDir: 'dist',
     rollupOptions: {
-      external: ['@consalud/core'],
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],

@@ -135,231 +135,90 @@ Este proyecto es propiedad de Consalud y es de uso interno. Todos los derechos r
 
 # Consalud App - Guía de Despliegue
 
+> **Actualización importante:**
+> Ahora puedes construir la imagen Docker para cualquier ambiente (desarrollo, producción, test) usando un único Dockerfile y los argumentos de build `ENV_FILE` y `MODE`. Ya no es necesario mantener Dockerfiles separados por ambiente.
+
 Esta aplicación React con TypeScript está optimizada para ejecutarse en contenedores Docker con Alpine Linux.
 
-## 📋 Requisitos Previos
+## 🚢 Uso de Dockerfile Unificado
 
-- Docker 20.10+
-- Docker Compose 2.0+
-- Servidor Unix/Linux
-- 2GB de RAM disponible
-- 10GB de espacio en disco
+### 📝 ¿Cómo funciona el Dockerfile actual?
 
-## ⚡ ORDEN DE EJECUCIÓN (MUY IMPORTANTE)
+El Dockerfile principal ahora permite construir imágenes para **cualquier ambiente** (desarrollo, producción, test) usando dos argumentos de build:
 
-### 🔄 ¿Qué sucede cuando ejecutas `docker-compose up app`?
+- `ENV_FILE`: El archivo de variables de entorno que quieres usar (`.env.production`, `.env.development`, `.env.test`).
+- `MODE`: El modo de build de Vite (`production`, `development`, `test`).
 
-```
-1. TÚ EJECUTAS: docker-compose up app
-   ↓
-2. Docker Compose LEE: docker-compose.yml
-   ↓
-3. Docker Compose EJECUTA: Dockerfile (target: development)
-   ↓
-4. Dockerfile EJECUTA AUTOMÁTICAMENTE (en este orden):
-   ├── Etapa 1: optimizer (ejecuta optimize-deps.js)
-   ├── Etapa 2: deps-dev (instala dependencias de desarrollo)
-   ├── Etapa 3: deps-prod (instala dependencias de producción)
-   └── Etapa 4: development (crea imagen final)
-   ↓
-5. Docker CREA el contenedor
-   ↓
-6. Docker EJECUTA: npm run dev --host 0.0.0.0
-   ↓
-7. ✅ TU APP FUNCIONA en http://localhost:5173
-```
+**Por defecto:**  
+Si no especificas los argumentos, se usará `.env.production` y `production`.
 
-### 📁 ¿Qué archivo ejecuta qué?
+---
 
-| Archivo | Ejecutado por | Cuándo | Propósito |
-|---------|---------------|--------|-----------|
-| `docker-compose.yml` | **TÚ** (manual) | `docker-compose up app` | Orquesta todo el proceso |
-| `Dockerfile` | **Docker Compose** (automático) | Durante `docker-compose up` | Construye la imagen |
-| `optimize-deps.js` | **Dockerfile** (automático) | Durante construcción de imagen | Optimiza dependencias |
-| `package.json` | **Dockerfile** (automático) | Durante `npm ci` y `npm run dev` | Define dependencias y scripts |
-
-## 🚀 Instalación y Ejecución
-
-### ✅ Comando Principal
-
-```bash
-# Navegar a tu directorio
-cd c:\app-gestor-solicitudes
-
-# EJECUTAR TODO AUTOMÁTICAMENTE
-docker-compose up app
-
-# Esto hace AUTOMÁTICAMENTE:
-# ✅ Lee docker-compose.yml
-# ✅ Ejecuta Dockerfile
-# ✅ Ejecuta optimize-deps.js
-# ✅ Instala dependencias
-# ✅ Ejecuta npm run dev
-# ✅ Tu app funciona en http://localhost:5173
-```
-
-### 🔧 Otros Comandos Útiles
-
-```bash
-# En background (no bloquea la terminal)
-docker-compose up -d app
-
-# Ver logs en tiempo real
-docker-compose logs -f app
-
-# Parar la aplicación
-docker-compose down
-
-# Reconstruir desde cero (si cambias dependencias)
-docker-compose build --no-cache app
-docker-compose up app
-```
-
-### 🎯 Para Producción
-
-```bash
-# Versión optimizada para producción
-docker-compose --profile production up app-prod
-
-# Acceso: http://localhost:3000
-```
-
-## 📊 Secuencia Detallada de Ejecución
-
-### Paso a Paso - ¿Qué sucede internamente?
-
-```bash
-# 1. Ejecutas este comando:
-docker-compose up app
-
-# 2. Docker Compose busca:
-#    ✅ docker-compose.yml (encontrado)
-#    ✅ Dockerfile (encontrado)
-
-# 3. Docker ejecuta Dockerfile con target=development:
-#    📦 Etapa 'base': Prepara Node.js 20 Alpine
-#    🔧 Etapa 'optimizer': Ejecuta node scripts/optimize-deps.js
-#    📚 Etapa 'deps-dev': Ejecuta npm ci (todas las dependencias)
-#    📚 Etapa 'deps-prod': Ejecuta npm ci --only=production
-#    🏗️ Etapa 'development': Copia código y configura usuario
-
-# 4. Docker crea el contenedor:
-#    🌐 Puerto 5173:5173
-#    📁 Volúmenes sincronizados
-#    🔧 Variables de entorno configuradas
-
-# 5. Docker ejecuta el comando final:
-#    npm run dev --host 0.0.0.0
-
-# 6. ✅ Aplicación disponible en http://localhost:5173
-```
-
-## 🛠️ Troubleshooting del Orden de Ejecución
-
-### ❌ Error: "No such file optimize-deps.js"
-```bash
-# Verificar que tienes el archivo:
-ls scripts/optimize-deps.js
-
-# Si no existe, recrear:
-mkdir -p scripts
-# (copiar el contenido del optimize-deps.js desde la documentación)
-```
-
-### ❌ Error: "Cannot read docker-compose.yml"
-```bash
-# Verificar que estás en el directorio correcto:
-pwd
-ls docker-compose.yml
-
-# Debe mostrar el archivo docker-compose.yml
-```
-
-### ❌ Error: "Port 5173 already in use"
-```bash
-# Ver qué está usando el puerto:
-sudo lsof -i :5173
-
-# Parar contenedores previos:
-docker-compose down
-```
-
-## 🎯 Comandos de Referencia Rápida
-
-```bash
-# DESARROLLO (lo que más usarás)
-docker-compose up app                    # Ejecuta todo automáticamente
-docker-compose up -d app                 # En background
-docker-compose logs -f app               # Ver logs
-docker-compose down                      # Parar todo
-
-# PRODUCCIÓN
-docker-compose --profile production up app-prod
-
-# MANTENIMIENTO
-docker-compose build --no-cache app      # Reconstruir imagen
-docker-compose ps                        # Ver estado
-docker system prune -a                   # Limpiar Docker
-```
-
-## 📞 Soporte
-
-**Si algo no funciona, verificar en este orden:**
-
-1. ✅ **Docker instalado**: `docker --version`
-2. ✅ **Docker Compose instalado**: `docker-compose --version`
-3. ✅ **Archivos presentes**: `ls docker-compose.yml Dockerfile`
-4. ✅ **Script presente**: `ls scripts/optimize-deps.js`
-5. ✅ **Directorio correcto**: `pwd` debe mostrar `.../app-gestor-solicitudes`
-
-**Comando de diagnóstico completo:**
-```
-
-## Docker: Uso por ambiente
-
-Ahora el proyecto usa Dockerfiles separados por ambiente para optimizar el tamaño y la claridad:
-
-- `Dockerfile.base`: etapas comunes (no se usa directamente)
-- `Dockerfile.dev`: ambiente de desarrollo
-- `Dockerfile.prod`: ambiente de producción
-- `Dockerfile.test`: ambiente de testing
-
-### Desarrollo
+### 🔨 Comandos de build recomendados
 
 ```sh
-docker-compose up app
-```
-Esto levanta la app en modo desarrollo en http://localhost:5173
+# Build para desarrollo
+docker build --build-arg ENV_FILE=.env.development --build-arg MODE=development -t app-gestor-solicitudes:dev .
 
-### Producción
+# Build para producción (por defecto)
+docker build --build-arg ENV_FILE=.env.production --build-arg MODE=production -t app-gestor-solicitudes:prod .
 
-```sh
-docker-compose --profile production up app-prod
-```
-Esto construye y levanta la app optimizada en http://localhost:3000
-
-### Testing
-
-```sh
-docker-compose --profile test up app-test
-```
-Esto construye y ejecuta los tests.
-
-### Build manual (opcional)
-
-Puedes construir manualmente cada imagen:
-
-```sh
-docker build -f Dockerfile.dev -t app-gestor-solicitudes-dev .
-docker build -f Dockerfile.prod -t app-gestor-solicitudes-prod .
-docker build -f Dockerfile.test -t app-gestor-solicitudes-test .
+# Build para testing
+docker build --build-arg ENV_FILE=.env.test --build-arg MODE=test -t app-gestor-solicitudes:test .
 ```
 
 ---
 
-**Nota:** Si solo quieres servir estáticos en producción, consulta la sección de optimización avanzada para usar Nginx.
+### ⚙️ ¿Qué hace el Dockerfile?
+
+1. **Copia el archivo de entorno** que elijas como `.env` dentro de la imagen.
+2. **Instala dependencias** usando `npm ci`.
+3. **Ejecuta el build** de Vite usando el modo que elijas (`--mode $MODE`).
+4. **Copia el resultado** al contenedor final de Nginx (solo archivos estáticos).
+5. **Expone el puerto 80** (Nginx) para servir la app.
+
+---
+
+### 🚀 Ejecutar la imagen
+
+```sh
+# Ejemplo: correr la imagen de producción
+docker run -p 8080:80 app-gestor-solicitudes:prod
+
+
+# Ejemplo: correr la imagen de desarrollo (build con modo development)
+docker run -p 5173:80 app-gestor-solicitudes:dev
+# Accede en http://localhost:5173
+```
+
+> **Nota:** El puerto de la izquierda (`8080`, `5173`, etc.) puede ser **cualquier puerto disponible** en tu máquina local. Si el puerto está ocupado, puedes cambiarlo por otro que esté libre, por ejemplo `-p 3000:80` o `-p 9000:80`.
+
+---
+
+### ⚠️ Notas importantes
+
+- El build de Vite **inyecta las variables de entorno en tiempo de build**. Si cambias el archivo `.env`, debes reconstruir la imagen.
+- El contenedor final **solo sirve archivos estáticos** (no ejecuta Node.js en producción).
+- Puedes crear tantos archivos `.env.*` como ambientes necesites y usarlos con el argumento `ENV_FILE`.
+- El puerto expuesto por defecto es el 80 (Nginx). Puedes mapearlo al que quieras en tu máquina con `-p`.
+
+---
+
+### 🧩 Ejemplo avanzado: build y run custom
+
+```sh
+# Build para un ambiente custom
+docker build --build-arg ENV_FILE=.env.staging --build-arg MODE=staging -t app-gestor-solicitudes:staging .
+
+# Run en puerto 9000
+docker run -p 9000:80 app-gestor-solicitudes:staging
+```
+
+---
 
 # 🚢 Ejecución de la aplicación con Docker por ambiente
+
+> **Nota:** El método recomendado ahora es usar los argumentos de build en el Dockerfile principal. Los ejemplos anteriores con Dockerfiles separados pueden considerarse obsoletos si usas el método unificado.
 
 Este proyecto utiliza **Dockerfiles separados** para cada ambiente, lo que permite imágenes más pequeñas y procesos más claros. A continuación se explica cómo levantar cada ambiente:
 
