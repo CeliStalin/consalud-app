@@ -13,6 +13,7 @@ import './styles/bulma-overrides.css';
 import './styles/navigation-optimizations.css';
 import TitularProvider from './features/herederos/provider/TitularProvider';
 import HerederoProvider from './features/herederos/provider/HerederoProvider';
+import { useEffect } from 'react';
 const logo = '/Logo.png';
 
 const ErrorFallback = () => {
@@ -64,6 +65,10 @@ const ErrorFallback = () => {
 };
 
 const App = () => {
+  useEffect(() => {
+    document.title = import.meta.env.VITE_NOMBRE_SISTEMA || 'Consalud App';
+  }, []);
+
   return (
     <ErrorBoundary fallback={<ErrorFallback />}>
       <AuthProvider>
