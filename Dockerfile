@@ -3,8 +3,8 @@ FROM node:22.17.0-alpine AS builder
 
 WORKDIR /app
 
-# Permite elegir el archivo de entorno y el modo de build
-ARG ENV_FILE=.env.production
+# Permite elegir el ambiente y el modo de build
+ARG AMBIENTE=produccion
 ARG MODE=production
 
 # Copia dependencias y core tgz
@@ -17,8 +17,15 @@ RUN npm ci --no-audit --no-fund
 # Copia el resto del código fuente
 COPY . .
 
-# Copia el archivo de entorno seleccionado como .env para el build del frontend
-COPY ${ENV_FILE} .env
+# Selecciona el archivo de entorno según el ambiente
+RUN if [ "$AMBIENTE" = "desarrollo" ]; then \
+      cp .env.development .env ; \
+    elif [ "$AMBIENTE" = "test" ]; then \
+      cp .env.test .env ; \
+    else \
+      cp .env.production .env ; \
+    fi
+
 RUN echo "=== CONTENIDO DE .env ===" && cat .env
 
 # Verifica que el paquete está instalado

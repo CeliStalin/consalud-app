@@ -144,13 +144,16 @@ Esta aplicación React con TypeScript está optimizada para ejecutarse en conten
 
 ### 📝 ¿Cómo funciona el Dockerfile actual?
 
-El Dockerfile principal ahora permite construir imágenes para **cualquier ambiente** (desarrollo, producción, test) usando dos argumentos de build:
+El Dockerfile principal ahora permite construir imágenes para **cualquier ambiente** (desarrollo, test, produccion) usando dos argumentos de build:
 
-- `ENV_FILE`: El archivo de variables de entorno que quieres usar (`.env.production`, `.env.development`, `.env.test`).
-- `MODE`: El modo de build de Vite (`production`, `development`, `test`).
+- `AMBIENTE`: El ambiente deseado (`desarrollo`, `test`, `produccion`). El Dockerfile selecciona automáticamente el archivo de entorno correcto:
+  - `desarrollo` → `.env.development`
+  - `test` → `.env.test`
+  - `produccion` (o cualquier otro valor) → `.env.production`
+- `MODE`: El modo de build de Vite (`development`, `test`, `production`).
 
 **Por defecto:**  
-Si no especificas los argumentos, se usará `.env.production` y `production`.
+Si no especificas los argumentos, se usará `produccion` y `production`.
 
 ---
 
@@ -158,20 +161,20 @@ Si no especificas los argumentos, se usará `.env.production` y `production`.
 
 ```sh
 # Build para desarrollo
-docker build --build-arg ENV_FILE=.env.development --build-arg MODE=development -t app-gestor-solicitudes:dev .
+docker build --build-arg AMBIENTE=desarrollo --build-arg MODE=development -t app-gestor-solicitudes:dev .
+
+# Build para test
+docker build --build-arg AMBIENTE=test --build-arg MODE=test -t app-gestor-solicitudes:test .
 
 # Build para producción (por defecto)
-docker build --build-arg ENV_FILE=.env.production --build-arg MODE=production -t app-gestor-solicitudes:prod .
-
-# Build para testing
-docker build --build-arg ENV_FILE=.env.test --build-arg MODE=test -t app-gestor-solicitudes:test .
+docker build --build-arg AMBIENTE=produccion --build-arg MODE=production -t app-gestor-solicitudes:prod .
 ```
 
 ---
 
 ### ⚙️ ¿Qué hace el Dockerfile?
 
-1. **Copia el archivo de entorno** que elijas como `.env` dentro de la imagen.
+1. **Selecciona el archivo de entorno** según el valor de `AMBIENTE` y lo copia como `.env` dentro de la imagen.
 2. **Instala dependencias** usando `npm ci`.
 3. **Ejecuta el build** de Vite usando el modo que elijas (`--mode $MODE`).
 4. **Copia el resultado** al contenedor final de Nginx (solo archivos estáticos).
@@ -185,10 +188,8 @@ docker build --build-arg ENV_FILE=.env.test --build-arg MODE=test -t app-gestor-
 # Ejemplo: correr la imagen de producción
 docker run -p 8080:80 app-gestor-solicitudes:prod
 
-
 # Ejemplo: correr la imagen de desarrollo (build con modo development)
 docker run -p 5173:80 app-gestor-solicitudes:dev
-# Accede en http://localhost:5173
 ```
 
 > **Nota:** El puerto de la izquierda (`8080`, `5173`, etc.) puede ser **cualquier puerto disponible** en tu máquina local. Si el puerto está ocupado, puedes cambiarlo por otro que esté libre, por ejemplo `-p 3000:80` o `-p 9000:80`.
@@ -199,7 +200,7 @@ docker run -p 5173:80 app-gestor-solicitudes:dev
 
 - El build de Vite **inyecta las variables de entorno en tiempo de build**. Si cambias el archivo `.env`, debes reconstruir la imagen.
 - El contenedor final **solo sirve archivos estáticos** (no ejecuta Node.js en producción).
-- Puedes crear tantos archivos `.env.*` como ambientes necesites y usarlos con el argumento `ENV_FILE`.
+- Puedes crear tantos archivos `.env.*` como ambientes necesites y usarlos con el argumento `AMBIENTE`.
 - El puerto expuesto por defecto es el 80 (Nginx). Puedes mapearlo al que quieras en tu máquina con `-p`.
 
 ---
@@ -207,8 +208,8 @@ docker run -p 5173:80 app-gestor-solicitudes:dev
 ### 🧩 Ejemplo avanzado: build y run custom
 
 ```sh
-# Build para un ambiente custom
-docker build --build-arg ENV_FILE=.env.staging --build-arg MODE=staging -t app-gestor-solicitudes:staging .
+# Build para un ambiente custom (por ejemplo, staging)
+docker build --build-arg AMBIENTE=staging --build-arg MODE=staging -t app-gestor-solicitudes:staging .
 
 # Run en puerto 9000
 docker run -p 9000:80 app-gestor-solicitudes:staging
