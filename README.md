@@ -203,94 +203,7 @@ docker run -p 5173:80 app-gestor-solicitudes:dev
 - Puedes crear tantos archivos `.env.*` como ambientes necesites y usarlos con el argumento `AMBIENTE`.
 - El puerto expuesto por defecto es el 80 (Nginx). Puedes mapearlo al que quieras en tu máquina con `-p`.
 
----
-
-### 🧩 Ejemplo avanzado: build y run custom
-
-```sh
-# Build para un ambiente custom (por ejemplo, staging)
-docker build --build-arg AMBIENTE=staging --build-arg MODE=staging -t app-gestor-solicitudes:staging .
-
-# Run en puerto 9000
-docker run -p 9000:80 app-gestor-solicitudes:staging
-```
-
----
-
-# 🚢 Ejecución de la aplicación con Docker por ambiente
-
-> **Nota:** El método recomendado ahora es usar los argumentos de build en el Dockerfile principal. Los ejemplos anteriores con Dockerfiles separados pueden considerarse obsoletos si usas el método unificado.
-
-Este proyecto utiliza **Dockerfiles separados** para cada ambiente, lo que permite imágenes más pequeñas y procesos más claros. A continuación se explica cómo levantar cada ambiente:
-
-## 1. Desarrollo (hot reload, código editable)
-
-- **Comando:**
-  ```sh
-  docker-compose up app
-  ```
-- **URL:** [http://localhost:5173](http://localhost:5173)
-- **Descripción:**
-  - Levanta la app en modo desarrollo con hot reload.
-  - Sincroniza el código fuente de tu máquina con el contenedor (volúmenes).
-  - Ideal para desarrollo diario.
-
-## 2. Producción (build optimizado, solo archivos estáticos)
-
-- **Comando:**
-  ```sh
-  docker-compose --profile production up app-prod
-  ```
-- **URL:** [http://localhost:3000](http://localhost:3000)
-- **Descripción:**
-  - Construye la imagen usando `Dockerfile.prod` (multi-stage: Node para build, Nginx para servir).
-  - Sirve solo los archivos estáticos generados por Vite.
-  - Ideal para pruebas de despliegue y producción real.
-  - **Asegúrate de que el puerto 3000 esté libre en tu máquina.**
-
-## 3. Testing (ejecución de tests, sin URL)
-
-- **Comando:**
-  ```sh
-  docker-compose --profile test up app-test
-  ```
-- **Descripción:**
-  - Construye la imagen usando `Dockerfile.test`.
-  - Ejecuta los tests y muestra el resultado en consola/logs.
-  - El contenedor se apaga automáticamente al terminar los tests.
-  - **No expone ningún puerto ni URL.**
-
-## 4. Build manual de imágenes (opcional)
-
-Construir las imágenes manualmente:
-
-```sh
-# Desarrollo
-docker build -f Dockerfile.dev -t app-gestor-solicitudes-dev .
-
-# Producción
-docker build -f Dockerfile.prod -t app-gestor-solicitudes-prod .
-
-# Testing
-docker build -f Dockerfile.test -t app-gestor-solicitudes-test .
-```
-
-Luego se puede correr los contenedores manualmente con `docker run` y mapear los puertos según corresponda.
-
----
-
-### ⚠️ Notas importantes
-- **Desarrollo:** El código fuente se sincroniza en caliente, ideal para programar.
-- **Producción:** No expone Node ni dependencias de desarrollo.
-- **Testing:** Solo ejecuta tests, no expone la app por web.
-- **Puertos:**
-  - Desarrollo: 5173
-  - Producción: 3000 (puedes cambiarlo en `docker-compose.yml`)
-  - Testing: no expone puerto
-
-# Instrucciones para desarrollo con Docker
-
-## 1. Regenerar el lockfile compatible con Docker/Linux
+- Regenerar el lockfile compatible con Docker/Linux
 
 **¿Cuándo ejecutar este paso?**
 - Solo cuando se agrege, elimine o actualice dependencias en `package.json`.
@@ -312,8 +225,6 @@ Esto generará un `package-lock.json` compatible con Linux (el entorno de Docker
 
 ---
 
-## 2. Construir la imagen de desarrollo
-
 Una vez que el lockfile está actualizado, se construye la imagen dev normalmente:
 
 ```sh
@@ -324,25 +235,6 @@ Esto creará la imagen lista para desarrollo en Docker.
 
 ---
 
-## 3. Flujo recomendado (ejemplo completo)
-
-1. **Si cambiaste dependencias:**
-   - Abre PowerShell o CMD (Windows) o Bash/WSL (Linux).
-   - Ejecuta el script correspondiente para tu entorno:
-     - Windows:
-       ```sh
-       npm run lockfile:linux-win
-       ```
-     - Linux/WSL:
-       ```sh
-       npm run lockfile:linux-bash
-       ```
-2. **Construye la imagen Docker:**
-   ```sh
-   docker build --no-cache -f Dockerfile.dev -t app-gestor-solicitudes:dev .
-   ```
-
----
 
 ## 4. Notas
 - Si solo cambias código fuente, puedes construir la imagen directamente sin regenerar el lockfile.
