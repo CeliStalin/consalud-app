@@ -151,7 +151,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
               <ProtectedRoute isPublic={true}>
                 <StablePageWrapper>
                   <Login 
-                    appName="Sistema de Gestión de Herederos"
+                    appName="sistema gestión de solicitudes"
                     onLoginSuccess={handleLoginSuccess}
                     logoSrc={logo}
                   />
