@@ -350,9 +350,85 @@ Esto creará la imagen lista para desarrollo en Docker.
 
 ## 🛡️ Vulnerabilidades conocidas
 
-Este proyecto utiliza dependencias de terceros que pueden reportar vulnerabilidades de baja severidad según los análisis de `npm audit`. Actualmente, después de aplicar las correcciones automáticas seguras, el reporte muestra:
-
-- **brace-expansion**: Vulnerabilidad de Denial of Service por expresiones regulares. Riesgo bajo, afecta principalmente herramientas de desarrollo. Se monitoreará para futuras actualizaciones.
-- **sweetalert2**: El reporte sugiere bajar a una versión anterior para evitar un comportamiento potencialmente indeseado, pero hacerlo podría romper funcionalidades actuales. Se ha decidido mantener la versión actual y monitorear futuras actualizaciones. No se han detectado problemas de seguridad en el uso actual de la librería.
-
 No existen vulnerabilidades críticas ni de alto riesgo en producción. Se recomienda revisar periódicamente el reporte de `npm audit` y actualizar dependencias cuando sea seguro hacerlo.
+
+## 🌐 Configuración de nginx.conf para dominios personalizados
+
+Cuando se despliegue la aplicación en un servidor real con un dominio (por ejemplo, www.app.des,www.app.tes), se debe ajustar la directiva `server_name` en el archivo `nginx.conf`.
+
+### Ejemplo para un dominio específico:
+
+```nginx
+server {
+  listen 80;
+  server_name www.miapp.des;
+  root /usr/share/nginx/html;
+  index index.html;
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+
+  location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+    try_files $uri =404;
+    expires 1y;
+    access_log off;
+    add_header Cache-Control "public";
+  }
+}
+```
+
+### Para aceptar varios dominios o subdominios:
+
+```nginx
+server_name www.miapp.des miapp.des;
+```
+
+### Para aceptar cualquier dominio :
+
+```nginx
+server_name _;
+```
+
+> **Recordar:**
+> - se cambia el valor de `server_name` según el dominio real de la aplicación.
+> - Si usas HTTPS, deberás agregar configuración SSL adicional.
+> - Después de modificar `nginx.conf`, reconstruye la imagen Docker o reemplaza el archivo en el servidor según corresponda.
+
+### Ejemplo para HTTPS (con certificado SSL):
+
+```nginx
+server {
+  listen 443 ssl;
+  server_name www.miapp.des;
+
+  ssl_certificate     /etc/nginx/ssl/miapp.crt;
+  ssl_certificate_key /etc/nginx/ssl/miapp.key;
+
+  root /usr/share/nginx/html;
+  index index.html;
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+
+  location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+    try_files $uri =404;
+    expires 1y;
+    access_log off;
+    add_header Cache-Control "public";
+  }
+}
+```
+
+> **Importante:**
+> - Cambia las rutas de los certificados (`ssl_certificate` y `ssl_certificate_key`) por las del servidor.
+> - Si quieres redirigir todo el tráfico HTTP a HTTPS, se puede agregar un bloque adicional:
+>
+> ```nginx
+> server {
+>   listen 80;
+>   server_name www.miapp.des;
+>   return 301 https://$host$request_uri;
+> }
+> ```
