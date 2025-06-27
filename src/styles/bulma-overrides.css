@@ -320,3 +320,61 @@ main.no-margin-left .layout-stable {
   justify-content: flex-start !important;
   text-align: left !important;
 }
+
+/* --- LIMPIEZA DE OVERRIDES PARA HOMEPAGE DEL CORE --- */
+
+/* Elimina padding/margin forzados globalmente en .content-container, .main-content, .app-layout-wrapper */
+/* Deja que el HomePage del CORE maneje su propio layout y espaciado */
+
+/* .content-container {
+  min-height: calc(100vh - 200px) !important;
+  padding-bottom: 40px !important;
+  flex: 1 0 auto !important;
+  transition: none !important;
+  animation: none !important;
+  background-color: #ffffff;
+  position: relative;
+} */
+
+/* .main-content {
+  flex: 1;
+  min-height: calc(100vh - 120px); 
+} */
+
+/* .app-layout-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+} */
+
+/* Elimina los overrides de margin-left/padding-left globales */
+/* .main-content,
+.content-container,
+.ingreso-herederos-wrapper,
+.main-container,
+.generalContainer {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+} */
+
+/* .main-content,
+.content-container,
+.route-container,
+.layout-stable {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+} */
+
+/* SOLO para la página de ingreso titular: forzar alineación a la izquierda */
+/* main.no-margin-left > *,
+main.no-margin-left .main-content,
+main.no-margin-left .content-container,
+main.no-margin-left .route-container,
+main.no-margin-left .layout-stable {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+} */
+
+/* Mantén los overrides solo para casos específicos fuera del HomePage. */
