@@ -1,13 +1,13 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
+import '@consalud/core';
 import 'bulma/css/bulma.min.css'
 import './styles/bulma-overrides.css'
-import './styles/core-enhancements.css'
+//import './styles/core-enhancements.css'
 import './styles/navigation-optimizations.css'
 import './styles/animations.css'
 import { setCoreEnvConfig, initializeMsalConfig } from '@consalud/core';
-
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
 // Agregado para depuración de variables de entorno
 console.log('Variables de entorno import.meta.env:', import.meta.env);
 
