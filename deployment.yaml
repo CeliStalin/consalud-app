@@ -1,24 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mantsolicitudes
+  name: app-gestor-solicitudes
   labels:
-    app: mantsolicitudes
+    app: app-gestor-solicitudes
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mantsolicitudes
+      app: app-gestor-solicitudes
   template:
     metadata:
       labels:
-        app: mantsolicitudes
+        app: app-gestor-solicitudes
     spec:
       containers:
-        - name: mantsolicitudes
-          image: consaluddevops.azurecr.io/mantsolicitudes
+        - name: app-gestor-solicitudes
+          image: consaluddevops.azurecr.io/app-gestor-solicitudes
           imagePullPolicy: Always
           ports:
-            - containerPort: 80          
+            - containerPort: 80   
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "128Mi"
+        limits:
+          cpu: "500m"
+          memory: "256Mi"
       imagePullSecrets:
         - name: acr-secret

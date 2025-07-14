@@ -33,18 +33,18 @@ src/
 ## 🚀 Instalación
 
 1. Clona el repositorio:
-   ```bash
+   ```ps
    git clone https://devops.consalud.net/Consalud/PlantillaReact/_git/app-gestor-solicitudes
    cd app-gestor-solicitudes
    ```
 
 2. Instala las dependencias:
-   ```bash
+   ```ps
    npm install
    ```
 
 3. Ejecuta la aplicación en modo desarrollo:
-   ```bash
+   ```ps
    npm run dev
    ```
 
@@ -159,15 +159,15 @@ Si no especificas los argumentos, se usará `produccion` y `production`.
 
 ### 🔨 Comandos de build recomendados
 
-```sh
+```ps
 # Build para desarrollo
-docker build --build-arg AMBIENTE=desarrollo --build-arg MODE=development -t app-gestor-solicitudes:dev .
+docker build --build-arg AMBIENTE=desarrollo --build-arg MODE=development -t consaluddevops.azurecr.io/app-gestor-solicitudes:dev .
 
 # Build para test
-docker build --build-arg AMBIENTE=test --build-arg MODE=test -t app-gestor-solicitudes:test .
+docker build --build-arg AMBIENTE=test --build-arg MODE=test -t consaluddevops.azurecr.io/app-gestor-solicitudes:test .
 
 # Build para producción (por defecto)
-docker build --build-arg AMBIENTE=produccion --build-arg MODE=production -t app-gestor-solicitudes:prod .
+docker build --build-arg AMBIENTE=produccion --build-arg MODE=production -t consaluddevops.azurecr.io/app-gestor-solicitudes:prod .
 ```
 
 ---
@@ -184,15 +184,19 @@ docker build --build-arg AMBIENTE=produccion --build-arg MODE=production -t app-
 
 ### 🚀 Ejecutar la imagen
 
-```sh
+```ps
 # Ejemplo: correr la imagen de producción
-docker run -p 8080:80 app-gestor-solicitudes:prod
+docker run -p 8080:80 --name app-gestor-solicitudes-prod -d consaluddevops.azurecr.io/app-gestor-solicitudes:prod
 
 # Ejemplo: correr la imagen de desarrollo (build con modo development)
-docker run -p 5173:80 app-gestor-solicitudes:dev
+docker run -p 8080:80 --name app-gestor-solicitudes-dev -d consaluddevops.azurecr.io/app-gestor-solicitudes:dev
 ```
 
 > **Nota:** El puerto de la izquierda (`8080`, `5173`, etc.) puede ser **cualquier puerto disponible** en tu máquina local. Si el puerto está ocupado, puedes cambiarlo por otro que esté libre, por ejemplo `-p 3000:80` o `-p 9000:80`.
+
+> El parámetro --name le especifica un nombre al contenedor, de manera de encontrarlo más facilmente, o lo asignará automáticamente. Esto permite identificar más facilmente los contenedores a la hora de realizar gestiones.
+
+> El parámetro -d indica que se ejecute como demonio en segundo plano y no quede tomada la consola con la ejecución.
 
 ---
 
@@ -227,7 +231,7 @@ Esto generará un `package-lock.json` compatible con Linux (el entorno de Docker
 
 Una vez que el lockfile está actualizado, se construye la imagen dev normalmente:
 
-```sh
+```ps
 docker build --no-cache -f Dockerfile.dev -t app-gestor-solicitudes:dev .
 ```
 
