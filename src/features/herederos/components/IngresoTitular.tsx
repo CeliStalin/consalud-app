@@ -118,16 +118,6 @@ const IngresoTitular: React.FC = () => {
     );
 
     // --- RETURNS CONDICIONALES DESPUÉS DE LOS HOOKS ---
-    // Feedback visual para loading global
-    if (loading) {
-        return (
-            <div className="route-container layout-stable" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ConsaludCore.LoadingSpinner size="large" />
-                <span style={{ marginLeft: 16 }}>Buscando titular...</span>
-            </div>
-        );
-    }
-
     // Feedback visual para error global
     if (error && !showStepperError) {
         return (
@@ -208,6 +198,7 @@ const IngresoTitular: React.FC = () => {
                                 aria-invalid={showError}
                                 aria-describedby={showError ? 'rut-error' : undefined}
                                 style={{ width: 378, height: 42, flexShrink: 0, border: showError ? '1.5px solid #E11D48' : '1.5px solid #e0e0e0', borderRadius: 24, fontSize: 16, paddingLeft: 18, background: '#f8f9fa', boxShadow: '0 2px 8px rgba(4, 165, 155, 0.07)', outline: 'none', transition: 'border 0.2s' }}
+                                disabled={loading}
                             />
                             <button
                                 className={`proceso-button animate-fade-in-up ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}${loading ? ' button--pulse' : ''}`}
@@ -218,28 +209,30 @@ const IngresoTitular: React.FC = () => {
                                 aria-label="Buscar titular"
                             >
                                 {loading ? (
-                                  <>
-                                    <span className="loader" style={{ marginRight: 8, width: 18, height: 18, border: '2px solid #fff', borderTop: '2px solid #04A59B', borderRadius: '50%', display: 'inline-block', animation: 'spin 1s linear infinite' }} />
+                                  <span style={{ display: 'flex', alignItems: 'center', background: 'transparent', minWidth: 120, justifyContent: 'center' }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', background: 'transparent', marginRight: 8 }}>
+                                      <ConsaludCore.LoadingSpinner size="medium" style={{ color: '#fff' }} />
+                                    </span>
                                     <ConsaludCore.Typography
-                                        variant="button"
-                                        color={isValidRut ? '#fff' : '#bdbdbd'}
-                                        style={{ fontWeight: 600 }}
+                                      variant="button"
+                                      color="#fff"
+                                      style={{ fontWeight: 600 }}
                                     >
-                                        Buscando...
+                                      Buscar
                                     </ConsaludCore.Typography>
-                                  </>
+                                  </span>
                                 ) : (
                                   <>
                                     <ConsaludCore.Typography
-                                        variant="button"
-                                        color={isValidRut ? '#fff' : '#bdbdbd'}
-                                        style={{ fontWeight: 600 }}
+                                      variant="button"
+                                      color={isValidRut ? '#fff' : '#bdbdbd'}
+                                      style={{ fontWeight: 600 }}
                                     >
-                                        Buscar
+                                      Buscar
                                     </ConsaludCore.Typography>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ marginLeft: 8 }}>
-                                        <circle cx="11" cy="11" r="8" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" />
-                                        <path d="M21 21L16.65 16.65" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" strokeLinecap="round" />
+                                      <circle cx="11" cy="11" r="8" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" />
+                                      <path d="M21 21L16.65 16.65" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" strokeLinecap="round" />
                                     </svg>
                                   </>
                                 )}
