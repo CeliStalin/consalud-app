@@ -187,3 +187,24 @@ body {
   animation: none !important;
   transition: none !important;
 }
+
+/* NUEVO: Clases de transición de página para StablePageWrapper */
+.page-transition {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.page-transition--minimal {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.page-transition--active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}

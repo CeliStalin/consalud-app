@@ -1,9 +1,9 @@
 import React, { Suspense, useMemo } from 'react';
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { 
   HomePage,
   Login,
-  ProtectedRoute,
+  ProtectedRoute as CoreProtectedRoute,
   Unauthorized,
   NotFound,
   MenuCollapseProvider,
@@ -12,7 +12,9 @@ import {
 import { useAuthWithRedirect } from '../hooks/useAuthWithRedirect';
 import CargaDocumentoPage from '../pages/CargaDocumentoPage';
 import { CollapseOnRoute } from '@/features/herederos/components/CollapseOnRoute';
-import { SyncedLayout } from './SyncedLayout';
+import { SyncedLayout as CoreSyncedLayout } from './SyncedLayout';
+import TitularProvider from '../features/herederos/provider/TitularProvider';
+import HerederoProvider from '../features/herederos/provider/HerederoProvider';
 
 // Lazy loading optimizado - SIN preloading que pueda causar conflictos
 //const IngresoHerederosPage = React.lazy(() => import('../pages/IngresoHerederosPage'));
@@ -109,12 +111,28 @@ const HomePageWithCollapse: React.FC<{ onCardClick?: (...args: any[]) => void }>
 
 // Layout wrapper para las subrutas de herederos
 const HerederosLayout: React.FC = () => (
-  <ProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
-    <CollapseOnRoute>
-      <Outlet />
-    </CollapseOnRoute>
-  </ProtectedRoute>
+  <CoreProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
+    <TitularProvider>
+      <HerederoProvider>
+        <CollapseOnRoute>
+          <Outlet />
+        </CollapseOnRoute>
+      </HerederoProvider>
+    </TitularProvider>
+  </CoreProtectedRoute>
 );
+
+// Debug SyncedLayout
+const SyncedLayout = (props) => {
+  const location = useLocation();
+  return <CoreSyncedLayout {...props} />;
+};
+
+// Debug ProtectedRoute
+const ProtectedRoute = (props) => {
+  const location = useLocation();
+  return <CoreProtectedRoute {...props} />;
+};
 
 interface AppRoutesProps {
   logo: string;
@@ -148,7 +166,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
           <Route 
             path="/login" 
             element={
-              <ProtectedRoute isPublic={true}>
+              <CoreProtectedRoute isPublic={true}>
                 <StablePageWrapper>
                   <Login 
                     appName="sistema gestión de solicitudes"
@@ -156,7 +174,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
                     logoSrc={logo}
                   />
                 </StablePageWrapper>
-              </ProtectedRoute>
+              </CoreProtectedRoute>
             } 
           />
 
@@ -177,9 +195,9 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
                   <Route 
                     path="/home"
                     element={
-                      <ProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
+                      <CoreProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
                         <HomePageWithCollapse />
-                      </ProtectedRoute>
+                      </CoreProtectedRoute>
                     }
                   />
                   {/* Rutas del módulo de herederos - refactorizadas */}

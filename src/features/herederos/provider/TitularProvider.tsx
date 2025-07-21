@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Titular } from "../interfaces/Titular";
 import { TitularProviderProps } from "../interfaces/TitularProviderProps";
 import axios from "axios";
@@ -8,8 +8,17 @@ import { useRutChileno } from "../hooks/useRutChileno";
 import { fetchTitularByRut } from '../services/bffHerederosService';
 
 export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) => {
-  // Estado para el titular
-  const [titular, setTitular] = useState<Titular | null>(null);
+  const [titular, setTitular] = useState<Titular | null>(() => {
+    const stored = sessionStorage.getItem('titularContext');
+    if (stored) {
+      try {
+        return JSON.parse(stored) as Titular;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { formatSimpleRut } = useRutChileno();
@@ -21,15 +30,14 @@ export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) =>
       const bffDns = import.meta.env.VITE_BFF_HEREDEROS_DNS;
       if (bffDns) {
         try {
-          // Extraer solo los números del rut (sin DV)
           const rutNumeros = rut.replace(/[^0-9]/g, '');
-          // Eliminar el último dígito (DV)
           const rutSinDV = rutNumeros.slice(0, -1);
           const titularData = await fetchTitularByRut(Number(rutSinDV));
           if (!titularData || !titularData.id) {
             throw new Error('Titular no encontrado');
           }
           setTitular(titularData);
+          sessionStorage.setItem('titularContext', JSON.stringify(titularData));
           return titularData;
         } catch (err: any) {
           if (err.message === '500') {
@@ -38,10 +46,10 @@ export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) =>
             setError('Error al buscar el titular en BFF');
           }
           setTitular(null);
+          sessionStorage.removeItem('titularContext');
           return null;
         }
       } else {
-        // Mock local - mantener para desarrollo local
         const { data } = await axios.get('http://localhost:3001/Titular');
         const formattedRut = formatSimpleRut(rut);
         const titularEncontrado = data.find((t: Titular) => t.rut === formattedRut);
@@ -49,13 +57,14 @@ export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) =>
           throw new Error('Titular no encontrado');
         }
         setTitular(titularEncontrado);
+        sessionStorage.setItem('titularContext', JSON.stringify(titularEncontrado));
         return titularEncontrado;
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al buscar el titular';
       setError(errorMessage);
       setTitular(null);
-      console.error('Error en buscarTitular:', err);
+      sessionStorage.removeItem('titularContext');
       return null;
     } finally {
       setLoading(false);
@@ -65,9 +74,26 @@ export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) =>
   const limpiarTitular = useCallback(() => {
     setTitular(null);
     setError(null);
+    sessionStorage.removeItem('titularContext');
   }, []);
 
-  // Valor del contexto
+  useEffect(() => {
+    const handleStorage = () => {
+      const stored = sessionStorage.getItem('titularContext');
+      if (stored) {
+        try {
+          setTitular(JSON.parse(stored));
+        } catch {
+          setTitular(null);
+        }
+      } else {
+        setTitular(null);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
   const value: TitularContextType = {
     titular,
     loading,

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import * as ConsaludCore from '@consalud/core'; 
 import { useRutChileno } from "../hooks/useRutChileno";
 import { useHerederoNavigation } from "../hooks/useHerederoNavigation";
@@ -7,24 +7,39 @@ import '../../../pages/styles/IngresoHerederosPage.css';
 import { useTitular } from "../contexts/TitularContext";
 import UserProfileIcon from '@/assets/user-profile.svg';
 
-const IngresoTitular = () => {
+/**
+ * Componente robusto para el ingreso de RUT del titular.
+ * Muestra feedback visual para todos los estados y previene estados inconsistentes.
+ */
+const IngresoTitular: React.FC = () => {
+    // HOOKS SIEMPRE AL INICIO
     const { goToRequisitosTitular } = useHerederoNavigation();
-    const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
+    const { rut, isValid: isValidRut, handleRutChange, resetRut } = useRutChileno();
     const [showError, setShowError] = useState(false);
-    const { buscarTitular, error, loading, titular } = useTitular();
+    const { buscarTitular, error, loading, titular, limpiarTitular } = useTitular();
     const [showStepperError, setShowStepperError] = useState(false);
-    const hasNavigated = useRef(false);
     const [busquedaIniciada, setBusquedaIniciada] = useState(false);
+    const [rutBuscado, setRutBuscado] = useState<string | null>(null);
 
-    const handleBlur = () => {
-        setShowError(rut.length > 0 && !isValidRut);
-    };
-
-    const handleFocus = () => {
+    // Resetear navegación y errores al cambiar el RUT
+    useEffect(() => {
+        setBusquedaIniciada(false);
         setShowError(false);
-    };
-    
-    const handleFlow = async () => {
+        setShowStepperError(false);
+        setRutBuscado(null);
+    }, [rut]);
+
+    // Lógica de validación y envío
+    const handleBlur = useCallback(() => {
+        setShowError(rut.length > 0 && !isValidRut);
+    }, [rut, isValidRut]);
+
+    const handleFocus = useCallback(() => {
+        setShowError(false);
+    }, []);
+
+    // Solo botón Buscar navega si el titular está listo
+    const handleFlow = useCallback(async () => {
         setShowStepperError(false);
         if (!isValidRut) {
             setShowError(true);
@@ -37,77 +52,110 @@ const IngresoTitular = () => {
         setShowError(false);
         setShowStepperError(false);
         setBusquedaIniciada(true);
-        await buscarTitular(rut);
-        // NO navegar aquí, esperar a que el contexto esté listo
-    };
-
-    // Resetear busquedaIniciada si cambia el rut
-    useEffect(() => {
-        setBusquedaIniciada(false);
-    }, [rut]);
-
-    useEffect(() => {
-        if (busquedaIniciada && titular && !loading && !hasNavigated.current) {
-            hasNavigated.current = true;
-            // Guardar el RUT en sessionStorage para persistencia temporal
-            sessionStorage.setItem('rutTitular', rut);
-            goToRequisitosTitular();
+        setRutBuscado(rut);
+        try {
+            await buscarTitular(rut);
+        } catch (e) {
+            setShowStepperError(true);
+            return;
         }
-    }, [busquedaIniciada, titular, loading, rut, goToRequisitosTitular]);
+        // Navega solo si el contexto se setea correctamente
+        setTimeout(() => {
+            const stored = sessionStorage.getItem('titularContext');
+            const titularContext = stored ? JSON.parse(stored) : null;
+            const titularOk = titularContext && titularContext.rut && titularContext.rut.replace(/\./g, '').toLowerCase() === rut.replace(/\./g, '').toLowerCase();
+            if (titularOk) {
+                goToRequisitosTitular();
+            } else {
+                console.log('NO NAVEGA: titular en contexto/sessionStorage no coincide');
+            }
+        }, 0);
+    }, [isValidRut, rut, buscarTitular, goToRequisitosTitular]);
 
+    // Feedback visual para error de validación de RUT
+    const renderRutError = () => (
+        <ConsaludCore.Typography
+            variant="caption"
+            color={ConsaludCore.theme?.textColors?.danger || "#E11D48"}
+            className="errorRut"
+            style={{ marginTop: 4, display: 'block', fontSize: 13 }}
+        >
+            RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
+        </ConsaludCore.Typography>
+    );
+
+    // Feedback visual para error inesperado (modal)
+    const renderStepperError = () => (
+        <div
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                background: 'rgba(0,0,0,0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 9999,
+            }}
+        >
+            <ConsaludCore.Card variant="elevated" padding="large">
+                <div style={{ minWidth: 320, textAlign: 'center', borderRadius: 16, boxShadow: '0 4px 24px rgba(0,0,0,0.15)' }}>
+                    <ConsaludCore.Typography variant="h6" color="#E11D48">
+                        Ocurrió un error inesperado al consultar el BFF.<br />
+                        Intenta nuevamente más tarde.
+                    </ConsaludCore.Typography>
+                    <button
+                        style={{ marginTop: 24, padding: '8px 24px', borderRadius: 8, background: '#04A59B', color: '#fff', border: 'none', fontWeight: 600, cursor: 'pointer' }}
+                        onClick={() => setShowStepperError(false)}
+                    >
+                        Cerrar
+                    </button>
+                </div>
+            </ConsaludCore.Card>
+        </div>
+    );
+
+    // --- RETURNS CONDICIONALES DESPUÉS DE LOS HOOKS ---
+    // Feedback visual para loading global
+    if (loading) {
+        return (
+            <div className="route-container layout-stable" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ConsaludCore.LoadingSpinner size="large" />
+                <span style={{ marginLeft: 16 }}>Buscando titular...</span>
+            </div>
+        );
+    }
+
+    // Feedback visual para error global
+    if (error && !showStepperError) {
+        return (
+            <div className="route-container layout-stable" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ConsaludCore.Card variant="elevated" padding="large">
+                    <div style={{ minWidth: 320, textAlign: 'center', borderRadius: 16, boxShadow: '0 4px 24px rgba(0,0,0,0.15)' }}>
+                        <ConsaludCore.Typography variant="h6" color="#E11D48">
+                            {error === 'BFF_ERROR_500' ? 'Error del servidor. Intente más tarde.' : error}
+                        </ConsaludCore.Typography>
+                        <button
+                            style={{ marginTop: 24, padding: '8px 24px', borderRadius: 8, background: '#04A59B', color: '#fff', border: 'none', fontWeight: 600, cursor: 'pointer' }}
+                            onClick={() => window.location.reload()}
+                        >
+                            Reintentar
+                        </button>
+                    </div>
+                </ConsaludCore.Card>
+            </div>
+        );
+    }
+
+    // Render principal (formulario)
     return (
         <div className="route-container layout-stable" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+            {showStepperError && renderStepperError()}
             <ConsaludCore.Typography variant="h5" style={{ fontWeight: 700, color: '#222', marginBottom: 24, textAlign: 'center' }}>
                 Rut del titular
             </ConsaludCore.Typography>
-            {showStepperError && (
-                <div
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        width: '100vw',
-                        height: '100vh',
-                        background: 'rgba(0,0,0,0.3)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 9999,
-                    }}
-                >
-                    <ConsaludCore.Card
-                        variant="elevated"
-                        padding="large"
-                    >
-                        <div style={{
-                            minWidth: 320,
-                            textAlign: 'center',
-                            borderRadius: 16,
-                            boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
-                        }}>
-                            <ConsaludCore.Typography variant="h6" color="#E11D48">
-                                Ocurrió un error inesperado al consultar el BFF.<br />
-                                Intenta nuevamente más tarde.
-                            </ConsaludCore.Typography>
-                            <button
-                                style={{
-                                    marginTop: 24,
-                                    padding: '8px 24px',
-                                    borderRadius: 8,
-                                    background: '#04A59B',
-                                    color: '#fff',
-                                    border: 'none',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                }}
-                                onClick={() => setShowStepperError(false)}
-                            >
-                                Cerrar
-                            </button>
-                        </div>
-                    </ConsaludCore.Card>
-                </div>
-            )}
             <ConsaludCore.Card
                 title={undefined}
                 subtitle={undefined}
@@ -197,26 +245,7 @@ const IngresoTitular = () => {
                                 )}
                             </button>
                         </div>
-                        {showError && (
-                            <ConsaludCore.Typography
-                                variant="caption"
-                                color={ConsaludCore.theme?.textColors?.danger || "#E11D48"}
-                                className="errorRut"
-                                style={{ marginTop: 4, display: 'block', fontSize: 13 }}
-                            >
-                                RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
-                            </ConsaludCore.Typography>
-                        )}
-                        {error && !showError && (
-                          <ConsaludCore.Typography
-                            variant="caption"
-                            color={ConsaludCore.theme?.textColors?.danger || "#E11D48"}
-                            className="errorRut"
-                            style={{ marginTop: 4, display: 'block', fontSize: 13 }}
-                          >
-                            {error === 'BFF_ERROR_500' ? 'Error del servidor. Intente más tarde.' : error}
-                          </ConsaludCore.Typography>
-                        )}
+                        {showError && renderRutError()}
                     </div>
                 </form>
             </ConsaludCore.Card>

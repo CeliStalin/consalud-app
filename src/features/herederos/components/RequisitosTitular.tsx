@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import * as ConsaludCore from '@consalud/core'; 
 import { useTitular } from "../contexts/TitularContext";
 import RequisitosIcon from '@/assets/requisitos.svg';
@@ -7,47 +7,46 @@ import CheckIcon from '@/assets/check-requisitos.svg';
 
 const RequisitosTitular = () => {
     const navigator = useNavigate();
-    const { titular, loading } = useTitular();
+    const { titular, loading, buscarTitular } = useTitular();
+    const [rehidratando, setRehidratando] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const renderCount = useRef(0);
+    renderCount.current++;
 
+    // Rehidratar desde sessionStorage si el contexto está vacío
     useEffect(() => {
         if (!loading && (!titular || !titular.nombre || !titular.apellidoPat)) {
-            const timeout = setTimeout(() => {
-                navigator('/mnherederos/ingresoher/ingresotitular', { replace: true });
-            }, 500);
-            return () => clearTimeout(timeout);
+            const rutSession = sessionStorage.getItem('rutTitular');
+            if (rutSession) {
+                setRehidratando(true);
+                buscarTitular(rutSession)
+                    .then(() => setRehidratando(false))
+                    .catch(() => {
+                        setError('No se pudo recuperar los datos del titular.');
+                        setRehidratando(false);
+                    });
+            } else {
+                setError('No se encontró información del titular.');
+            }
         }
-    }, [titular, loading, navigator]);
+    }, [titular, loading, buscarTitular]);
 
-    if (loading) {
-        return (
-            <div className="route-container layout-stable" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ConsaludCore.LoadingSpinner  size="large" />
-                <span style={{ marginLeft: 16 }}>Cargando datos del titular...</span>
-            </div>
-        );
-    }
-
-    if (!titular || !titular.nombre || !titular.apellidoPat) {
-        return <span style={{ display: 'block', textAlign: 'center', marginTop: 40 }}>Redirigiendo...</span>;
-    }
-
-    const handleButtonClick = () => {
-        navigator('/mnherederos/ingresoher/DatosTitular');
-    };
-    const breadcrumbItems = [
-      { label: 'Administración devolución herederos' }
-    ];
-    const cleanedBreadcrumbItems = breadcrumbItems.map(item => ({
-      ...item,
-      label: typeof item.label === 'string' ? item.label.replace(/^\/+/, '') : item.label
-    }));
+    // Elimino todos los bloques de debug visual y logs de consola
+    // Elimino el try/catch del render
+    // Dejo solo el render limpio y profesional
     return (
-        <div style={{ paddingTop: 20 }}>
+        <div className="route-container layout-stable" style={{ paddingTop: 20 }}>
+            {/* Fallback visual si faltan campos */}
+            {(!titular?.nombre || !titular?.apellidoPat) && (
+                <div style={{ color: 'red', marginBottom: 16 }}>
+                    <b>Advertencia:</b> Faltan datos del titular (nombre o apellidoPat). Verifica el mapeo de datos.
+                </div>
+            )}
             <div style={{ width: '100%', marginBottom: 24 }}>
                 {/* Breadcrumb */}
                 <div style={{ marginBottom: 8 }}>
                     <ConsaludCore.Breadcrumb 
-                        items={cleanedBreadcrumbItems} 
+                        items={[{ label: 'Administración devolución herederos' }]} 
                         separator={<span>{'>'}</span>}
                         showHome={true}
                         className="breadcrumb-custom"
@@ -128,7 +127,7 @@ const RequisitosTitular = () => {
                                 <button
                                     className={`proceso-button animate-fade-in-up buttonRut--valid${loading ? ' button--pulse' : ''}`}
                                     style={{ display: 'flex', padding: '10px 24px', justifyContent: 'center', alignItems: 'center', gap: 8, minWidth: 120, borderRadius: 24, height: 42, fontSize: 16, background: '#04A59B', color: '#fff', border: 'none', boxShadow: 'none', fontWeight: 600, transition: 'background 0.2s', opacity: loading ? 0.7 : 1 }}
-                                    onClick={handleButtonClick}
+                                    onClick={() => navigator('/mnherederos/ingresoher/DatosTitular')}
                                     type="button"
                                     aria-label="Continuar"
                                     disabled={loading}
