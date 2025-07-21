@@ -37,9 +37,13 @@ body {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  background-color: #ffffff;
+  background-color: #F8F8FA; 
   /* Solo las optimizaciones esenciales */
   contain: layout;
+}
+
+.layout-stable {
+  background-color: #F8F8FA !important; 
 }
 
 /* NUEVO: Container estable para páginas */
