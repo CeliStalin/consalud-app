@@ -187,6 +187,16 @@
   transition: all 0.2s ease;
 }
 
+/* Regla específica para que solo "Inicio" tenga color púrpura */
+.breadcrumb-custom .breadcrumb-list-item:first-child .breadcrumb-item .breadcrumb-label {
+  color: #664EFB !important;
+}
+
+/* Regla específica para que los demás elementos mantengan color gris */
+.breadcrumb-custom .breadcrumb-list-item:not(:first-child) .breadcrumb-item .breadcrumb-label {
+  color: #6b7280 !important;
+}
+
 .breadcrumb-custom .breadcrumb-item:hover {
   color: #04A59B;
   background-color: #f0fdfc;
