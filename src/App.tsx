@@ -49,6 +49,19 @@ const App = () => {
 
   return (
     <>
+      {/* Fallback global anti-flash */}
+      <style>{`
+        #root, .route-container, .layout-stable, .page-transition, .page-transition--minimal, 
+        .instant-stable, .navigation-stable, .no-flash, .page-transition-container, 
+        main, main > div {
+          opacity: 1 !important;
+          visibility: visible !important;
+          pointer-events: auto !important;
+          z-index: 1 !important;
+          background: #F8F8FA !important;
+          min-height: 100vh !important;
+        }
+      `}</style>
       <ErrorBoundary fallback={<ErrorFallback />}>
         <AuthProvider>
           <MenuConfigProvider config={{
