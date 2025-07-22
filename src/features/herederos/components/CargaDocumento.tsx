@@ -302,22 +302,25 @@ const CargaDocumento: React.FC = () => {
               <span className="back-button-icon">←</span> Volver
             </button>
           </div>
-          {/* Stepper debajo del botón volver */}
+          
+          {/* Título arriba del stepper */}
+          <div className="mb-1" style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+            <ConsaludCore.Typography
+              variant="h5"
+              component="h2"
+              style={{ fontWeight: 700, textAlign: 'center', color: '#222', fontSize: '2rem' }}
+            >
+              Carga Documentos
+            </ConsaludCore.Typography>
+          </div>
+          
+          {/* Stepper debajo del título */}
           <div className="mb-5">
             <Stepper step={step} loadingTransition={loadingTransition} />
           </div>
         </div>
       </div>
       {/* Main Content Section */}
-      <div className="mb-1" style={{ display: 'flex', justifyContent: 'center' }}>
-        <ConsaludCore.Typography
-          variant="h5"
-          component="h2"
-          style={{ fontWeight: 700, textAlign: 'center', color: '#222', fontSize: '2rem' }}
-        >
-          Carga Documentos
-        </ConsaludCore.Typography>
-      </div>
       {/* Stepper SIEMPRE visible fuera del overlay, excepto cuando el overlay está activo */}
       {/* El Stepper ahora es global, no se renderiza aquí */}
       {/* Card principal */}
