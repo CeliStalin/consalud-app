@@ -6,6 +6,7 @@ import '../components/styles/ingresoTitular.css';
 import '../../../pages/styles/IngresoHerederosPage.css';
 import { useTitular } from "../contexts/TitularContext";
 import UserProfileIcon from '@/assets/user-profile.svg';
+import RutErrorMessage from './RutErrorMessage';
 
 /**
  * Componente robusto para el ingreso de RUT del titular.
@@ -73,16 +74,6 @@ const IngresoTitular: React.FC = () => {
     }, [isValidRut, rut, buscarTitular, goToRequisitosTitular]);
 
     // Feedback visual para error de validación de RUT
-    const renderRutError = () => (
-        <ConsaludCore.Typography
-            variant="caption"
-            color={ConsaludCore.theme?.textColors?.danger || "#E11D48"}
-            className="errorRut"
-            style={{ marginTop: 4, display: 'block', fontSize: 13 }}
-        >
-            RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
-        </ConsaludCore.Typography>
-    );
 
     // Feedback visual para error inesperado (modal)
     const renderStepperError = () => (
@@ -238,7 +229,7 @@ const IngresoTitular: React.FC = () => {
                                 )}
                             </button>
                         </div>
-                        {showError && renderRutError()}
+                        {showError && <RutErrorMessage id="rut-error" />}
                     </div>
                 </form>
             </ConsaludCore.Card>

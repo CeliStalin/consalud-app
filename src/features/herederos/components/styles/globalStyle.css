@@ -245,11 +245,10 @@
 }
 
 .errorRut {
-    /* color: #E11D48; */ /* Use theme.colors.danger or similar */
-    /* font-size: 12px; */
-    margin-top: -21px;
+    color: #E11D48 !important;
+    font-size: 13px;
+    margin-top: 4px;
     margin-left: 16px;
-    /* font-family: 'Work Sans', sans-serif; */
     align-self: flex-start;
 }
 .inputRut {

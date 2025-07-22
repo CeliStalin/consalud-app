@@ -3,6 +3,7 @@ import { useRutChileno } from "@/features/herederos/hooks/useRutChileno";
 import { useHeredero } from "@/features/herederos/contexts/HerederoContext";
 import * as ConsaludCore from '@consalud/core';
 import FormIngresoHeredero from './FormIngresoHeredero';
+import RutErrorMessage from './RutErrorMessage';
 
 interface RegistroTitularCardProps {
   buscarHeredero: (rut: string) => Promise<void>;
@@ -179,11 +180,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
               </button>
             </div>
             
-            {showError && (
-              <div style={{ color: '#E11D48', fontSize: 12, marginTop: 4, textAlign: 'left' }}>
-                RUT inválido. Por favor, verifica el formato.
-              </div>
-            )}
+            {showError && <RutErrorMessage id="rut-error" />}
             
             {error && (
               <div style={{ color: '#E11D48', fontSize: 12, marginTop: 4, textAlign: 'left' }}>

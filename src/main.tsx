@@ -4,6 +4,7 @@ import './styles/bulma-overrides.css'
 //import './styles/core-enhancements.css'
 import './styles/navigation-optimizations.css'
 import './styles/animations.css'
+import './features/herederos/components/styles/globalStyle.css';
 import { setCoreEnvConfig, initializeMsalConfig } from '@consalud/core';
 import React from 'react'
 import ReactDOM from 'react-dom/client'
