@@ -1,11 +1,20 @@
 import React from 'react';
 import { CargaDocumento } from '@/features/herederos/components/CargaDocumento'
+import { StepperProvider, Stepper, useStepper } from '@/features/herederos/components/Stepper';
+
+const StepperGlobal: React.FC = () => {
+  const { step } = useStepper();
+  return <Stepper step={step} />;
+};
 
 const CargaDocumentoPage: React.FC = () => {
   return (
-    <div className="route-container layout-stable" style={{ overflowY: 'auto', height: '100vh', paddingBottom: 40 }}>
-      <CargaDocumento />
-    </div>
+    <StepperProvider>
+      <div className="route-container layout-stable" style={{ overflowY: 'auto', height: '100vh', paddingBottom: 40 }}>
+        <StepperGlobal />
+        <CargaDocumento />
+      </div>
+    </StepperProvider>
   );
 };
 

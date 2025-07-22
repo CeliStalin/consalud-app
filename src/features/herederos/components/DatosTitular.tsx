@@ -67,10 +67,10 @@ const DatosTitular: React.FC = () => {
     return (
         <div className="route-container layout-stable">
             {/* Header Section */}
-            <div style={{ width: '100%', marginBottom: 24 }}>
+            <div style={{ width: '100%', marginBottom: 8 }}>
                 <div style={{ marginLeft: 48 }}>
                     {/* Breadcrumb */}
-                    <div style={{ marginBottom: 8 }}>
+                    <div style={{ marginBottom: 4 }}>
                         <ConsaludCore.Breadcrumb 
                             items={cleanedBreadcrumbItems} 
                             separator={<span>{'>'}</span>}
@@ -92,29 +92,29 @@ const DatosTitular: React.FC = () => {
             </div>
 
             {/* Main Content Section */}
-            <div className="container">
-                <div className="columns is-centered">
-                    <div className="column is-10-desktop is-12-tablet">
-                        {/* Stepper */}
-                        <div className="mb-5">
-                            <Stepper step={1} />
-                        </div>
-                        
-                        {/* Centered Card Container */}
-                        <div className="card-center-container">
-                            <div className="card-responsive">
-                                <div className="generalContainer">
-                                    <DatosTitularCard
-                                        nombre={titular?.nombre || ''}
-                                        apellidoPat={titular?.apellidoPat || ''}
-                                        apellidoMat={titular?.apellidoMat || ''}
-                                        fechaDefuncion={titular?.fechaDefuncion || ''}
-                                        onContinuar={handleClick}
-                                        loading={loading}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+            {/* Título centrado y en negrita */}
+            <div className="mb-1" style={{ display: 'flex', justifyContent: 'center' }}>
+                <ConsaludCore.Typography
+                    variant="h5"
+                    component="h2"
+                    style={{ fontWeight: 700, textAlign: 'center', color: '#222', fontSize: '2rem' }}
+                >
+                    Datos del titular
+                </ConsaludCore.Typography>
+            </div>
+            <Stepper step={1} />
+            {/* Centered Card Container */}
+            <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: 0 }}>
+                <div className="card-responsive">
+                    <div className="generalContainer">
+                        <DatosTitularCard
+                            nombre={titular?.nombre || ''}
+                            apellidoPat={titular?.apellidoPat || ''}
+                            apellidoMat={titular?.apellidoMat || ''}
+                            fechaDefuncion={titular?.fechaDefuncion || ''}
+                            onContinuar={handleClick}
+                            loading={loading}
+                        />
                     </div>
                 </div>
             </div>

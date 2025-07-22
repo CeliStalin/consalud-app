@@ -18,9 +18,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 2rem 1rem;
-    margin: 2rem auto;
-    min-height: 60vh;
+    padding: 0 1rem;
+    margin: 0.02rem auto;
     width: 100%;
 }
 
@@ -29,7 +28,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 60vh;
     width: 100%;
 }
 
@@ -42,13 +40,11 @@
 /* Responsive adjustments */
 @media screen and (max-width: 768px) {
     .generalContainer {
-        padding: 1rem 0.5rem;
-        margin: 1rem auto;
-        min-height: 50vh;
+        padding: 0 0.5rem;
+        margin: 0.25rem auto;
     }
     
     .card-center-container {
-        min-height: 50vh;
     }
 }
 

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRutChileno } from "@/features/herederos/hooks/useRutChileno";
 import { Stepper } from "../components/Stepper";
 import { useHeredero } from "../contexts/HerederoContext";
@@ -15,8 +15,23 @@ const RegistroHeredero: React.FC = () => {
     const navigator = useNavigate();
     const { buscarHeredero, error } = useHeredero();
 
+    const [loadingTransition, setLoadingTransition] = useState(true);
+    const [step, setStep] = useState(1);
+    useEffect(() => {
+        const timeout1 = setTimeout(() => setLoadingTransition(false), 700);
+        const timeout2 = setTimeout(() => setStep(2), 150); // Pequeño delay para animar el llenado
+        return () => {
+            clearTimeout(timeout1);
+            clearTimeout(timeout2);
+        };
+    }, []);
+
     const handleBackClick = useCallback((): void => {
-        navigator(-1);
+        setStep(1);
+        setLoadingTransition(true);
+        setTimeout(() => {
+            navigator(-1);
+        }, 700); // Espera a que la animación de vaciado termine
     }, [navigator]);
 
     const breadcrumbItems: BreadcrumbItem[] = [
@@ -56,22 +71,26 @@ const RegistroHeredero: React.FC = () => {
             </div>
 
             {/* Main Content Section */}
+            {/* Título centrado y en negrita */}
+            <div className="mb-1" style={{ display: 'flex', justifyContent: 'center' }}>
+                <ConsaludCore.Typography
+                    variant="h5"
+                    component="h2"
+                    style={{ fontWeight: 700, textAlign: 'center', color: '#222', fontSize: '2rem' }}
+                >
+                    Registrar persona heredera
+                </ConsaludCore.Typography>
+            </div>
+            {/* Espacio entre título y Stepper */}
+            <div style={{ height: 24 }} />
+            {/* Stepper */}
+            <div className="mb-5">
+                <Stepper step={step} loadingTransition={loadingTransition} />
+            </div>
+            {/* Centered Card Container */}
             <div className="container">
                 <div className="columns is-centered">
                     <div className="column is-10-desktop is-12-tablet">
-                        {/* Title */}
-                        <div className="textoTituloComponentes mb-4">
-                            <span className="titleComponent">
-                                Registrar persona heredera
-                            </span>
-                        </div>
-                        
-                        {/* Stepper */}
-                        <div className="mb-5">
-                            <Stepper step={2} />
-                        </div>
-                        
-                        {/* Centered Card Container */}
                         <div className="card-center-container">
                             <div className="card-responsive">
                                 <div className="generalContainer">
