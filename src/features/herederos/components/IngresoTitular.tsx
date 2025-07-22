@@ -58,22 +58,25 @@ const IngresoTitular: React.FC = () => {
             const titularResult = await buscarTitular(rut);
             // Bloquear avance si la persona está vigente (no fallecida)
             if (titularResult && titularResult.indFallecido === 'N') {
-                // El modal se mostrará automáticamente por el useEffect
+                return;
+            }
+            // Bloquear avance si la persona está fallecida pero no tiene devolución
+            if (titularResult && titularResult.indFallecido === 'S' && !titularResult.poseeFondos) {
                 return;
             }
         } catch (e) {
             setShowStepperError(true);
             return;
         }
-        // Navega solo si el contexto se setea correctamente y la persona está fallecida
+        // Navega solo si el contexto se setea correctamente y la persona está fallecida y tiene devolución
         setTimeout(() => {
             const stored = sessionStorage.getItem('titularContext');
             const titularContext = stored ? JSON.parse(stored) : null;
             const titularOk = titularContext && titularContext.rut && titularContext.rut.replace(/\./g, '').toLowerCase() === rut.replace(/\./g, '').toLowerCase();
-            if (titularOk && titularContext.indFallecido !== 'N') {
+            if (titularOk && titularContext.indFallecido === 'S' && titularContext.poseeFondos) {
                 goToRequisitosTitular();
             } else {
-                console.log('NO NAVEGA: titular en contexto/sessionStorage no coincide o está vigente');
+                console.log('NO NAVEGA: titular en contexto/sessionStorage no coincide o no cumple condiciones');
             }
         }, 0);
     }, [isValidRut, rut, buscarTitular, goToRequisitosTitular]);
@@ -161,6 +164,29 @@ const IngresoTitular: React.FC = () => {
         limpiarTitular(); // Limpiar contexto para evitar loops
     };
 
+    // Nuevo modal: fallecido sin devolución
+    const [isOpenSinDevolucion, setIsOpenSinDevolucion] = useState(false);
+    const [isVisibleSinDevolucion, setIsVisibleSinDevolucion] = useState(false);
+
+    useEffect(() => {
+        if (titular && titular.indFallecido === 'S' && !titular.poseeFondos) {
+            setIsOpenSinDevolucion(true);
+            setTimeout(() => setIsVisibleSinDevolucion(true), 10);
+        } else {
+            if (isOpenSinDevolucion) {
+                setIsVisibleSinDevolucion(false);
+                setTimeout(() => setIsOpenSinDevolucion(false), 350);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [titular]);
+
+    const handleCloseSinDevolucionModal = () => {
+        setIsVisibleSinDevolucion(false);
+        setTimeout(() => setIsOpenSinDevolucion(false), 350);
+        limpiarTitular();
+    };
+
     // --- RETURNS CONDICIONALES DESPUÉS DE LOS HOOKS ---
     // Render principal (formulario) + overlay modal si corresponde
     return (
@@ -193,6 +219,23 @@ const IngresoTitular: React.FC = () => {
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
                             <button className="boton-alerta" style={{ background: '#04A59B', color: '#fff', fontSize: 16, padding: '12px 45px', borderRadius: 50, fontWeight: 500, border: 'none', minWidth: 160, cursor: 'pointer' }} onClick={handleCloseModal}>
+                                Entendido
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Modal fallecido sin devolución */}
+            {isOpenSinDevolucion && (
+                <div className="modal-overlay fade-in" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.08)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.3s' }}>
+                    <div className={`swal2-modal ${isVisibleSinDevolucion ? 'modal-zoom-in' : 'modal-zoom-out'}`} style={{ background: '#fff', borderRadius: 20, padding: '2rem', width: 400, maxWidth: '90%', boxShadow: '0 4px 24px rgba(0,0,0,0.10)', position: 'relative', transition: 'transform 0.35s, opacity 0.35s' }}>
+                        <button className="swal-close-button" style={{ position: 'absolute', top: 15, right: 15, background: '#f0f0f0', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 24, color: '#666', cursor: 'pointer' }} onClick={handleCloseSinDevolucionModal} aria-label="Cerrar modal">×</button>
+                        <div className="titulo-alerta" style={{ color: '#222', fontWeight: 700, fontSize: 22, marginBottom: 16, textAlign: 'center' }}>EL RUT ingresado no tiene devolución</div>
+                        <div className="sub-titulo-alerta" style={{ color: '#555', fontSize: 16, marginBottom: 32, textAlign: 'center' }}>
+                            {/* Puedes agregar un subtítulo si lo deseas */}
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <button className="boton-alerta" style={{ background: '#04A59B', color: '#fff', fontSize: 16, padding: '12px 45px', borderRadius: 50, fontWeight: 500, border: 'none', minWidth: 160, cursor: 'pointer' }} onClick={handleCloseSinDevolucionModal}>
                                 Entendido
                             </button>
                         </div>
