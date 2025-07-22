@@ -14,11 +14,22 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
   buscarHeredero, 
   error 
 }) => {
-  const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
+  const { rut, isValid: isValidRut, handleRutChange, setRut } = useRutChileno();
   const { heredero } = useHeredero();
   const [showError, setShowError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [showForm, setShowForm] = useState<boolean>(false);
+
+  // Si ya hay un heredero cargado, mostrar directamente el formulario y establecer el RUT
+  React.useEffect(() => {
+    if (heredero) {
+      setShowForm(true);
+      // Establecer el RUT del heredero en el input
+      if (heredero.rut) {
+        setRut(heredero.rut);
+      }
+    }
+  }, [heredero, setRut]);
 
   const handleNavigator = useCallback(async (): Promise<void> => {
     const rutLimpio = rut.replace(/[^0-9kK]/g, '');
@@ -49,10 +60,6 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
     handleRutChange(e);
   }, [handleRutChange]);
 
-  const handleBackToSearch = useCallback((): void => {
-    setShowForm(false);
-  }, []);
-
   return (
     <div style={{ width: '100%' }}>
       {/* Card de búsqueda */}
@@ -61,7 +68,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
         subtitle={undefined}
         variant="elevated"
         padding="large"
-        className="ingreso-card animate-fade-in-up"
+        className={`ingreso-card ${heredero ? '' : 'animate-fade-in-up'}`}
         style={{ marginBottom: showForm ? 24 : 0 }}
       >
         <form
@@ -106,7 +113,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
                 onFocus={handleFocus}
                 placeholder="12.345.678-9"
                 className="inputRut"
-                disabled={loading}
+                disabled={loading || !!heredero}
                 aria-invalid={showError}
                 aria-describedby={showError ? 'rut-error' : undefined}
                 style={{ 
@@ -125,8 +132,8 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
               />
               
               <button
-                className={`proceso-button animate-fade-in-up ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}${loading ? ' button--pulse' : ''}`}
-                disabled={!isValidRut || loading}
+                className={`proceso-button ${heredero ? '' : 'animate-fade-in-up'} ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}${loading ? ' button--pulse' : ''}`}
+                disabled={!isValidRut || loading || !!heredero}
                 onClick={handleNavigator}
                 type="submit"
                 style={{ 

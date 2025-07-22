@@ -13,18 +13,27 @@ interface BreadcrumbItem {
 const RegistroHeredero: React.FC = () => {
     useRutChileno();
     const navigator = useNavigate();
-    const { buscarHeredero, error } = useHeredero();
+    const { buscarHeredero, error, heredero } = useHeredero();
 
     const [loadingTransition, setLoadingTransition] = useState(true);
     const [step, setStep] = useState(1);
+    
     useEffect(() => {
+        // Si ya hay un heredero cargado, evitar las animaciones de carga
+        if (heredero) {
+            setLoadingTransition(false);
+            setStep(2);
+            return;
+        }
+        
+        // Solo ejecutar animaciones si no hay heredero cargado
         const timeout1 = setTimeout(() => setLoadingTransition(false), 700);
         const timeout2 = setTimeout(() => setStep(2), 150); // Pequeño delay para animar el llenado
         return () => {
             clearTimeout(timeout1);
             clearTimeout(timeout2);
         };
-    }, []);
+    }, [heredero]);
 
     const handleBackClick = useCallback((): void => {
         setStep(1);

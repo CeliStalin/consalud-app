@@ -39,18 +39,13 @@ const CargaDocumento: React.FC = () => {
   }, [setStep]);
 
   const handleBack = () => {
-    setShowOverlay(true);
-    setStep(4); // Step 4: Cuenta bancaria
-    setLoadingTransition(true);
-    setTimeout(() => {
-      setShowOverlay(false);
-      navigate('/mnherederos/ingresoher/cuentabancaria');
-    }, 1200);
+    // Navegar directamente sin animaciones para evitar que se quede la página
+    navigate('/mnherederos/ingresoher/RegistroTitular');
   };
 
   const validateFile = useCallback((file: File): string | null => {
     const maxSize = 6 * 1024 * 1024; // 6MB
-    const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'] ;
     
     if (file.size > maxSize) {
       return 'El archivo debe ser menor a 6MB';

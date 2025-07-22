@@ -107,8 +107,9 @@ export const useRutChileno = () => {
     validarRut,
     formatearRut,
     resetRut,
-    formatSimpleRut
-  }), [rut, isValid, formattedRut, handleRutChange, validarRut, formatearRut, resetRut, formatSimpleRut]);
+    formatSimpleRut,
+    setRut
+  }), [rut, isValid, formattedRut, handleRutChange, validarRut, formatearRut, resetRut, formatSimpleRut, setRut]);
 
   return returnValue;
 };
