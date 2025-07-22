@@ -45,27 +45,17 @@ export async function fetchTitularByRut(rut: number, userName: string = ""): Pro
 
 export async function fetchSolicitanteMejorContactibilidad(rut: number, userName: string = "string"): Promise<SolicitanteResponse> {
   const baseUrl = import.meta.env.VITE_BFF_HEREDEROS_DNS;
-  const url = `${baseUrl}/api/Solicitante/mejorContactibilidad`;
+  const url = `${baseUrl}/api/Solicitante/mejorContactibilidad?IdentificadorUnico=${rut}&userName=${encodeURIComponent(userName)}`;
   const apiKeyHeader = import.meta.env.VITE_BFF_HEREDEROS_API_KEY_HEADER;
   const apiKeyValue = import.meta.env.VITE_BFF_HEREDEROS_API_KEY_VALUE;
 
-  // Body según requerimiento
-  const body = {
-    IdentificadorUnico: rut,
-    userName: userName
-  };
-
   const response = await fetch(url, {
-    method: 'POST',
+    method: 'GET',
     headers: {
       'accept': 'application/json',
-      'Content-Type': 'application/json',
       [apiKeyHeader]: apiKeyValue,
     },
-    body: JSON.stringify(body),
   });
-
-  console.log('Solicitante mejor contactibilidad status:', response.status);
 
   if (!response.ok) {
     throw new Error(String(response.status));

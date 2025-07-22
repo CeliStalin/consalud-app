@@ -27,7 +27,9 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         const rutLimpio = rut.replace(/[^0-9kK]/g, '');
         // Extraer solo la parte numérica del RUT (sin DV) para el BFF
         const rutSinDV = rutLimpio.slice(0, -1); // Remueve el último carácter (DV)
-        const response = await fetchSolicitanteMejorContactibilidad(Number(rutSinDV));
+        // Obtener userName desde localStorage o sessionStorage si existe
+        const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || '';
+        const response = await fetchSolicitanteMejorContactibilidad(Number(rutSinDV), userName);
         
         // Mapear la respuesta del BFF al modelo Heredero
         const herederoData: Heredero = {

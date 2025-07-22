@@ -40,11 +40,11 @@ const CargaDocumento: React.FC = () => {
 
   const handleBack = () => {
     setShowOverlay(true);
-    setStep(2);
+    setStep(4); // Step 4: Cuenta bancaria
     setLoadingTransition(true);
     setTimeout(() => {
       setShowOverlay(false);
-      navigate(-1);
+      navigate('/mnherederos/ingresoher/cuentabancaria');
     }, 1200);
   };
 
@@ -267,7 +267,7 @@ const CargaDocumento: React.FC = () => {
   }));
 
   return (
-    <>
+    <div className="route-container layout-stable" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
       {showOverlay && (
         <div style={{
           position: 'fixed',
@@ -285,35 +285,49 @@ const CargaDocumento: React.FC = () => {
           {/* El Stepper ahora es global, no se renderiza aquí */}
         </div>
       )}
+      {/* Header Section: Breadcrumb y botón volver */}
+      <div style={{ width: '100%', marginBottom: 24 }}>
+        <div style={{ marginLeft: 48 }}>
+          {/* Breadcrumb */}
+          <div style={{ marginBottom: 8 }}>
+            <ConsaludCore.Breadcrumb
+              items={cleanedBreadcrumbItems}
+              separator={<span>{'>'}</span>}
+              showHome={true}
+              className="breadcrumb-custom"
+            />
+          </div>
+          {/* Botón volver */}
+          <div>
+            <button
+              className="back-button"
+              onClick={handleBack}
+              aria-label="Volver a la página anterior"
+            >
+              <span className="back-button-icon">←</span> Volver
+            </button>
+          </div>
+          {/* Stepper debajo del botón volver */}
+          <div className="mb-5">
+            <Stepper step={step} loadingTransition={loadingTransition} />
+          </div>
+        </div>
+      </div>
+      {/* Main Content Section */}
+      <div className="mb-1" style={{ display: 'flex', justifyContent: 'center' }}>
+        <ConsaludCore.Typography
+          variant="h5"
+          component="h2"
+          style={{ fontWeight: 700, textAlign: 'center', color: '#222', fontSize: '2rem' }}
+        >
+          Carga Documentos
+        </ConsaludCore.Typography>
+      </div>
+      {/* Stepper SIEMPRE visible fuera del overlay, excepto cuando el overlay está activo */}
+      {/* El Stepper ahora es global, no se renderiza aquí */}
+      {/* Card principal */}
       <div className="card-center-container">
         <div className="card-responsive">
-          {/* Header Section: Breadcrumb y botón volver */}
-          <div style={{ width: '100%', marginBottom: 24 }}>
-            <div style={{ marginLeft: 48 }}>
-              {/* Breadcrumb */}
-              <div style={{ marginBottom: 8 }}>
-                <ConsaludCore.Breadcrumb
-                  items={cleanedBreadcrumbItems}
-                  separator={<span>{'>'}</span>}
-                  showHome={true}
-                  className="breadcrumb-custom"
-                />
-              </div>
-              {/* Botón volver */}
-              <div>
-                <button
-                  className="back-button"
-                  onClick={handleBack}
-                  aria-label="Volver a la página anterior"
-                >
-                  <span className="back-button-icon">←</span> Volver
-                </button>
-              </div>
-            </div>
-          </div>
-          {/* Stepper SIEMPRE visible fuera del overlay, excepto cuando el overlay está activo */}
-          {/* El Stepper ahora es global, no se renderiza aquí */}
-          {/* Card principal */}
           <div className="generalContainer">
             <ConsaludCore.Card
               title={undefined}
@@ -687,8 +701,8 @@ const CargaDocumento: React.FC = () => {
       </ConsaludCore.Card>
     </div>
   </div>
-  </div>
-  </>
+</div>
+</div>
   );
 };
 

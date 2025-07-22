@@ -11,7 +11,6 @@ const CargaDocumentoPage: React.FC = () => {
   return (
     <StepperProvider>
       <div className="route-container layout-stable" style={{ overflowY: 'auto', height: '100vh', paddingBottom: 40 }}>
-        <StepperGlobal />
         <CargaDocumento />
       </div>
     </StepperProvider>
