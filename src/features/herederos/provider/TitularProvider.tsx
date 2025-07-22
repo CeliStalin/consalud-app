@@ -32,7 +32,9 @@ export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) =>
         try {
           const rutNumeros = rut.replace(/[^0-9]/g, '');
           const rutSinDV = rutNumeros.slice(0, -1);
-          const titularData = await fetchTitularByRut(Number(rutSinDV));
+          // Obtener userName desde localStorage o sessionStorage si existe
+          const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || '';
+          const titularData = await fetchTitularByRut(Number(rutSinDV), userName);
           if (!titularData || !titularData.id) {
             throw new Error('Titular no encontrado');
           }
@@ -42,6 +44,8 @@ export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) =>
         } catch (err: any) {
           if (err.message === '500') {
             setError('BFF_ERROR_500');
+          } else if (err.message === 'No hay solicitantes en maestro de contactibilidad') {
+            setError('No hay solicitantes en maestro de contactibilidad');
           } else {
             setError('Error al buscar el titular en BFF');
           }

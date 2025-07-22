@@ -75,3 +75,54 @@
   .boton-alerta:hover {
     background-color: #039389 !important;
   }
+
+/* Animación de overlay y modal con blur y zoom */
+.modal-overlay {
+  opacity: 1;
+  transition: opacity 0.3s;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.fade-in {
+  animation: fadeInOverlayBlur 0.3s;
+}
+@keyframes fadeInOverlayBlur {
+  from { opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+}
+
+.modal-fade-in {
+  animation: zoomBlurInModal 0.35s cubic-bezier(0.4,0,0.2,1);
+  transform: scale(1);
+  opacity: 1;
+}
+.modal-zoom-in {
+  animation: zoomBlurInModal 0.35s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+.modal-zoom-out {
+  animation: zoomBlurOutModal 0.35s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+@keyframes zoomBlurInModal {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+}
+@keyframes zoomBlurOutModal {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.85);
+    filter: blur(4px);
+  }
+}
