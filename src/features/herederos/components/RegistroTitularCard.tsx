@@ -68,7 +68,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
         subtitle={undefined}
         variant="elevated"
         padding="large"
-        className={`ingreso-card ${heredero ? '' : 'animate-fade-in-up'}`}
+        className={`card-elevated ingreso-card ${heredero ? '' : 'animate-fade-in-up'}`}
         style={{ marginBottom: showForm ? 24 : 0 }}
       >
         <form
@@ -77,7 +77,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
           autoComplete="off"
           aria-labelledby="rut-heredero-label"
         >
-          <div style={{ width: '100%', maxWidth: 1000, margin: '0 auto' }}>
+          <div style={{ width: '100%' }}>
             <div style={{ marginBottom: 32, width: '100%' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">

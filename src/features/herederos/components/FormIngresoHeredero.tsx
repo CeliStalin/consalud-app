@@ -279,377 +279,369 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       )}
 
       {/* Main Content Section */}
-      <div className="container">
-        <div className="columns is-centered">
-          <div className="column is-10-desktop is-12-tablet">
-            {/* Title */}
-            <div className="textoTituloComponentes mb-4">
-              <span className="titleComponent">
-                Registrar persona heredera
-              </span>
-            </div>
-            
-            {/* Stepper */}
-            {showHeader && (
-              <div className="mb-5">
-                <Stepper step={2} />
+      <div style={{ width: '100%' }}>
+        {/* Title */}
+        {showHeader && (
+          <div className="textoTituloComponentes mb-4">
+            <span className="titleComponent">
+              Registrar persona heredera
+            </span>
+          </div>
+        )}
+        
+        {/* Stepper */}
+        {showHeader && (
+          <div className="mb-5">
+            <Stepper step={2} />
+          </div>
+        )}
+        
+        {/* Card */}
+        <ConsaludCore.Card
+          title={undefined}
+          subtitle={undefined}
+          variant="elevated"
+          padding="large"
+          className={`card-elevated ingreso-card ${showHeader ? 'animate-fade-in-up' : ''}`}
+        >
+          <form onSubmit={handleSubmit}>
+            {/* Sección de Datos Personales */}
+            <div className="form-section">
+              <div className="section-title">
+                <div className="person-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <span>Datos personales</span>
               </div>
-            )}
-            
-            {/* Centered Card Container */}
-            <div className="card-center-container">
-              <div className="card-responsive">
-                <div className="generalContainer">
-                  <ConsaludCore.Card
-                    title={undefined}
-                    subtitle={undefined}
-                    variant="elevated"
-                    padding="large"
-                    className={`ingreso-card ${showHeader ? 'animate-fade-in-up' : ''}`}
-                  >
-                    <form onSubmit={handleSubmit}>
-                      {/* Sección de Datos Personales */}
-                      <div className="form-section">
-                        <div className="section-title">
-                          <div className="person-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                              <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          </div>
-                          <span>Datos personales</span>
-                        </div>
-                        <p className="description">
-                          Verifica que los datos de la persona heredera sean correctos, de lo contrario actualízalos.
-                        </p>
+              <p className="description">
+                Verifica que los datos de la persona heredera sean correctos, de lo contrario actualízalos.
+              </p>
 
-                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
-                          {/* Fecha de nacimiento */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Fecha nacimiento</label>
-                            <div className={`datepicker-wrapper ${errors.fechaNacimiento ? 'is-danger' : ''}`}>
-                              <DatePicker
-                                selected={formData.fechaNacimiento}
-                                onChange={handleDateChange}
-                                dateFormat="dd/MM/yyyy"
-                                placeholderText="DD/MM/AAAA"
-                                className={`input ${errors.fechaNacimiento ? 'is-danger' : ''}`}
-                                showMonthDropdown
-                                showYearDropdown
-                                dropdownMode="select"
-                                maxDate={new Date()}
-                                locale={es}
-                              />
-                              <div className="calendar-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
-                                </svg>
-                              </div>
-                            </div>
-                            {errors.fechaNacimiento && (
-                              <p className="help is-danger">{errors.fechaNacimiento}</p>
-                            )}
-                          </div>
+              <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
+                {/* Fecha de nacimiento */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Fecha nacimiento</label>
+                  <div className={`datepicker-wrapper ${errors.fechaNacimiento ? 'is-danger' : ''}`}>
+                    <DatePicker
+                      selected={formData.fechaNacimiento}
+                      onChange={handleDateChange}
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="DD/MM/AAAA"
+                      className={`input ${errors.fechaNacimiento ? 'is-danger' : ''}`}
+                      showMonthDropdown
+                      showYearDropdown
+                      dropdownMode="select"
+                      maxDate={new Date()}
+                      locale={es}
+                    />
+                    <div className="calendar-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  {errors.fechaNacimiento && (
+                    <p className="help is-danger">{errors.fechaNacimiento}</p>
+                  )}
+                </div>
 
-                          {/* Nombres */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Nombres</label>
-                            <input
-                              className={`input ${errors.nombres ? 'is-danger' : ''}`}
-                              type="text"
-                              name="nombres"
-                              value={formData.nombres}
-                              onChange={handleInputChange}
-                              placeholder="Ingresar"
-                            />
-                            {errors.nombres && (
-                              <p className="help is-danger">{errors.nombres}</p>
-                            )}
-                          </div>
-                        </div>
+                {/* Nombres */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Nombres</label>
+                  <input
+                    className={`input ${errors.nombres ? 'is-danger' : ''}`}
+                    type="text"
+                    name="nombres"
+                    value={formData.nombres}
+                    onChange={handleInputChange}
+                    placeholder="Ingresar"
+                  />
+                  {errors.nombres && (
+                    <p className="help is-danger">{errors.nombres}</p>
+                  )}
+                </div>
+              </div>
 
-                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
-                          {/* Apellido Paterno */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Apellido Paterno</label>
-                            <input
-                              className={`input ${errors.apellidoPaterno ? 'is-danger' : ''}`}
-                              type="text"
-                              name="apellidoPaterno"
-                              value={formData.apellidoPaterno}
-                              onChange={handleInputChange}
-                              placeholder="Ingresar"
-                            />
-                            {errors.apellidoPaterno && (
-                              <p className="help is-danger">{errors.apellidoPaterno}</p>
-                            )}
-                          </div>
+              <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
+                {/* Apellido Paterno */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Apellido Paterno</label>
+                  <input
+                    className={`input ${errors.apellidoPaterno ? 'is-danger' : ''}`}
+                    type="text"
+                    name="apellidoPaterno"
+                    value={formData.apellidoPaterno}
+                    onChange={handleInputChange}
+                    placeholder="Ingresar"
+                  />
+                  {errors.apellidoPaterno && (
+                    <p className="help is-danger">{errors.apellidoPaterno}</p>
+                  )}
+                </div>
 
-                          {/* Apellido Materno */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Apellido Materno</label>
-                            <input
-                              className={`input ${errors.apellidoMaterno ? 'is-danger' : ''}`}
-                              type="text"
-                              name="apellidoMaterno"
-                              value={formData.apellidoMaterno}
-                              onChange={handleInputChange}
-                              placeholder="Ingresar"
-                            />
-                            {errors.apellidoMaterno && (
-                              <p className="help is-danger">{errors.apellidoMaterno}</p>
-                            )}
-                          </div>
-                        </div>
+                {/* Apellido Materno */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Apellido Materno</label>
+                  <input
+                    className={`input ${errors.apellidoMaterno ? 'is-danger' : ''}`}
+                    type="text"
+                    name="apellidoMaterno"
+                    value={formData.apellidoMaterno}
+                    onChange={handleInputChange}
+                    placeholder="Ingresar"
+                  />
+                  {errors.apellidoMaterno && (
+                    <p className="help is-danger">{errors.apellidoMaterno}</p>
+                  )}
+                </div>
+              </div>
 
-                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
-                          {/* Sexo */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Sexo</label>
-                            <div className={`select ${errors.sexo ? 'is-danger' : ''}`}>
-                              <select
-                                name="sexo"
-                                value={formData.sexo}
-                                onChange={handleInputChange}
-                              >
-                                <option value="" disabled>Seleccionar</option>
-                                {SEXO_OPTIONS.map(option => (
-                                  <option key={option.value} value={option.value}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            {errors.sexo && (
-                              <p className="help is-danger">{errors.sexo}</p>
-                            )}
-                          </div>
+              <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
+                {/* Sexo */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Sexo</label>
+                  <div className={`select ${errors.sexo ? 'is-danger' : ''}`}>
+                    <select
+                      name="sexo"
+                      value={formData.sexo}
+                      onChange={handleInputChange}
+                    >
+                      <option value="" disabled>Seleccionar</option>
+                      {SEXO_OPTIONS.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {errors.sexo && (
+                    <p className="help is-danger">{errors.sexo}</p>
+                  )}
+                </div>
 
-                          {/* Parentesco */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Parentesco</label>
-                            <div className={`select ${errors.parentesco ? 'is-danger' : ''}`}>
-                              <select
-                                name="parentesco"
-                                value={formData.parentesco}
-                                onChange={handleInputChange}
-                              >
-                                <option value="" disabled>Seleccionar</option>
-                                {PARENTESCO_OPTIONS.map(option => (
-                                  <option key={option.value} value={option.value}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            {errors.parentesco && (
-                              <p className="help is-danger">{errors.parentesco}</p>
-                            )}
-                          </div>
-                        </div>
+                {/* Parentesco */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Parentesco</label>
+                  <div className={`select ${errors.parentesco ? 'is-danger' : ''}`}>
+                    <select
+                      name="parentesco"
+                      value={formData.parentesco}
+                      onChange={handleInputChange}
+                    >
+                      <option value="" disabled>Seleccionar</option>
+                      {PARENTESCO_OPTIONS.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {errors.parentesco && (
+                    <p className="help is-danger">{errors.parentesco}</p>
+                  )}
+                </div>
+              </div>
 
-                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
-                          {/* Teléfono */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Teléfono</label>
-                            <input
-                              className={`input ${errors.telefono ? 'is-danger' : ''}`}
-                              type="tel"
-                              name="telefono"
-                              value={formData.telefono}
-                              onChange={handleInputChange}
-                              placeholder="Ingresar"
-                            />
-                            {errors.telefono && (
-                              <p className="help is-danger">{errors.telefono}</p>
-                            )}
-                          </div>
+              <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
+                {/* Teléfono */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Teléfono</label>
+                  <input
+                    className={`input ${errors.telefono ? 'is-danger' : ''}`}
+                    type="tel"
+                    name="telefono"
+                    value={formData.telefono}
+                    onChange={handleInputChange}
+                    placeholder="Ingresar"
+                  />
+                  {errors.telefono && (
+                    <p className="help is-danger">{errors.telefono}</p>
+                  )}
+                </div>
 
-                          {/* Correo electrónico */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Correo electrónico</label>
-                            <input
-                              className={`input ${errors.correoElectronico ? 'is-danger' : ''}`}
-                              type="email"
-                              name="correoElectronico"
-                              value={formData.correoElectronico}
-                              onChange={handleInputChange}
-                              placeholder="Ingresar"
-                            />
-                            {errors.correoElectronico && (
-                              <p className="help is-danger">{errors.correoElectronico}</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Separador entre secciones */}
-                      <div className="section-divider"></div>
-
-                      {/* Sección de Dirección */}
-                      <div className="form-section">
-                        <div className="section-title">
-                          <div className="location-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M21 10C21 17 12 23 12 23S3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                              <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          </div>
-                          <span>Dirección</span>
-                        </div>
-                        <p className="description">
-                          Verifica que los datos de la dirección de la persona heredera sean correctos, de lo contrario actualízalos.
-                        </p>
-
-                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
-                          {/* Región */}
-                          <div className="form-column full-width" style={{ flex: 1, width: '100%', maxWidth: '100%' }}>
-                            <label>Región</label>
-                            <div className={`select ${errors.region ? 'is-danger' : ''}`}>
-                              <select
-                                name="region"
-                                value={formData.region || ''}
-                                onChange={handleInputChange}
-                              >
-                                <option value="" disabled>Seleccionar</option>
-                                <option value="Metropolitana">Región Metropolitana</option>
-                                <option value="Valparaíso">Valparaíso</option>
-                                <option value="Biobío">Biobío</option>
-                                <option value="Araucanía">La Araucanía</option>
-                              </select>
-                            </div>
-                            {errors.region && (
-                              <p className="help is-danger">{errors.region}</p>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
-                          {/* Ciudad */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Ciudad</label>
-                            <div className={`select ${errors.ciudad ? 'is-danger' : ''}`}>
-                              <select
-                                name="ciudad"
-                                value={formData.ciudad}
-                                onChange={handleCiudadChange}
-                              >
-                                <option value="" disabled>Seleccionar</option>
-                                {CIUDAD_OPTIONS.map(option => (
-                                  <option key={option.value} value={option.value}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            {errors.ciudad && (
-                              <p className="help is-danger">{errors.ciudad}</p>
-                            )}
-                          </div>
-
-                          {/* Comuna */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Comuna</label>
-                            <div className={`select ${errors.comuna ? 'is-danger' : ''}`}>
-                              <select
-                                name="comuna"
-                                value={formData.comuna}
-                                onChange={handleInputChange}
-                                disabled={!formData.ciudad}
-                              >
-                                <option value="" disabled>Seleccionar</option>
-                                {formData.ciudad && COMUNA_OPTIONS[formData.ciudad as keyof typeof COMUNA_OPTIONS]?.map(option => (
-                                  <option key={option.value} value={option.value}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            {errors.comuna && (
-                              <p className="help is-danger">{errors.comuna}</p>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
-                          {/* Calle */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Calle</label>
-                            <input
-                              className={`input ${errors.calle ? 'is-danger' : ''}`}
-                              type="text"
-                              name="calle"
-                              value={formData.calle}
-                              onChange={handleInputChange}
-                              placeholder="Ingresar"
-                            />
-                            {errors.calle && (
-                              <p className="help is-danger">{errors.calle}</p>
-                            )}
-                          </div>
-
-                          {/* Número */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Número</label>
-                            <input
-                              className={`input ${errors.numero ? 'is-danger' : ''}`}
-                              type="text"
-                              name="numero"
-                              value={formData.numero}
-                              onChange={handleInputChange}
-                              placeholder="Ingresar"
-                            />
-                            {errors.numero && (
-                              <p className="help is-danger">{errors.numero}</p>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
-                          {/* Depto/Block (Opcional) */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Depto/Block (Opcional)</label>
-                            <input
-                              className="input"
-                              type="text"
-                              name="deptoBloqueOpcional"
-                              value={formData.deptoBloqueOpcional}
-                              onChange={handleInputChange}
-                              placeholder="Ingresar"
-                            />
-                          </div>
-
-                          {/* Villa (Opcional) */}
-                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                            <label>Villa (Opcional)</label>
-                            <input
-                              className="input"
-                              type="text"
-                              name="villaOpcional"
-                              value={formData.villaOpcional}
-                              onChange={handleInputChange}
-                              placeholder="Ingresar"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Botón de envío */}
-                      <div className="continue-button">
-                        <button
-                          type="submit"
-                          className="button is-primary is-rounded"
-                        >
-                          Continuar
-                        </button>
-                      </div>
-                    </form>
-                  </ConsaludCore.Card>
+                {/* Correo electrónico */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Correo electrónico</label>
+                  <input
+                    className={`input ${errors.correoElectronico ? 'is-danger' : ''}`}
+                    type="email"
+                    name="correoElectronico"
+                    value={formData.correoElectronico}
+                    onChange={handleInputChange}
+                    placeholder="Ingresar"
+                  />
+                  {errors.correoElectronico && (
+                    <p className="help is-danger">{errors.correoElectronico}</p>
+                  )}
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+
+            {/* Separador entre secciones */}
+            <div className="section-divider"></div>
+
+            {/* Sección de Dirección */}
+            <div className="form-section">
+              <div className="section-title">
+                <div className="location-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 10C21 17 12 23 12 23S3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <span>Dirección</span>
+              </div>
+              <p className="description">
+                Verifica que los datos de la dirección de la persona heredera sean correctos, de lo contrario actualízalos.
+              </p>
+
+              <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
+                {/* Región */}
+                <div className="form-column full-width" style={{ flex: 1, width: '100%', maxWidth: '100%' }}>
+                  <label>Región</label>
+                  <div className={`select ${errors.region ? 'is-danger' : ''}`}>
+                    <select
+                      name="region"
+                      value={formData.region || ''}
+                      onChange={handleInputChange}
+                    >
+                      <option value="" disabled>Seleccionar</option>
+                      <option value="Metropolitana">Región Metropolitana</option>
+                      <option value="Valparaíso">Valparaíso</option>
+                      <option value="Biobío">Biobío</option>
+                      <option value="Araucanía">La Araucanía</option>
+                    </select>
+                  </div>
+                  {errors.region && (
+                    <p className="help is-danger">{errors.region}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
+                {/* Ciudad */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Ciudad</label>
+                  <div className={`select ${errors.ciudad ? 'is-danger' : ''}`}>
+                    <select
+                      name="ciudad"
+                      value={formData.ciudad}
+                      onChange={handleCiudadChange}
+                    >
+                      <option value="" disabled>Seleccionar</option>
+                      {CIUDAD_OPTIONS.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {errors.ciudad && (
+                    <p className="help is-danger">{errors.ciudad}</p>
+                  )}
+                </div>
+
+                {/* Comuna */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Comuna</label>
+                  <div className={`select ${errors.comuna ? 'is-danger' : ''}`}>
+                    <select
+                      name="comuna"
+                      value={formData.comuna}
+                      onChange={handleInputChange}
+                      disabled={!formData.ciudad}
+                    >
+                      <option value="" disabled>Seleccionar</option>
+                      {formData.ciudad && COMUNA_OPTIONS[formData.ciudad as keyof typeof COMUNA_OPTIONS]?.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {errors.comuna && (
+                    <p className="help is-danger">{errors.comuna}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
+                {/* Calle */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Calle</label>
+                  <input
+                    className={`input ${errors.calle ? 'is-danger' : ''}`}
+                    type="text"
+                    name="calle"
+                    value={formData.calle}
+                    onChange={handleInputChange}
+                    placeholder="Ingresar"
+                  />
+                  {errors.calle && (
+                    <p className="help is-danger">{errors.calle}</p>
+                  )}
+                </div>
+
+                {/* Número */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Número</label>
+                  <input
+                    className={`input ${errors.numero ? 'is-danger' : ''}`}
+                    type="text"
+                    name="numero"
+                    value={formData.numero}
+                    onChange={handleInputChange}
+                    placeholder="Ingresar"
+                  />
+                  {errors.numero && (
+                    <p className="help is-danger">{errors.numero}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
+                {/* Depto/Block (Opcional) */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Depto/Block (Opcional)</label>
+                  <input
+                    className="input"
+                    type="text"
+                    name="deptoBloqueOpcional"
+                    value={formData.deptoBloqueOpcional}
+                    onChange={handleInputChange}
+                    placeholder="Ingresar"
+                  />
+                </div>
+
+                {/* Villa (Opcional) */}
+                <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
+                  <label>Villa (Opcional)</label>
+                  <input
+                    className="input"
+                    type="text"
+                    name="villaOpcional"
+                    value={formData.villaOpcional}
+                    onChange={handleInputChange}
+                    placeholder="Ingresar"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Botón de envío */}
+            <div className="continue-button">
+              <button
+                type="submit"
+                className="button is-primary is-rounded"
+              >
+                Continuar
+              </button>
+            </div>
+          </form>
+        </ConsaludCore.Card>
       </div>
     </div>
   );
