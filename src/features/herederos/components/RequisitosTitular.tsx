@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import * as ConsaludCore from '@consalud/core'; 
 import { useTitular } from "../contexts/TitularContext";
 import RequisitosIcon from '@/assets/requisitos.svg';
@@ -8,8 +8,6 @@ import CheckIcon from '@/assets/check-requisitos.svg';
 const RequisitosTitular: React.FC = () => {
     const navigator = useNavigate();
     const { titular, loading, buscarTitular } = useTitular();
-    const [rehidratando, setRehidratando] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const renderCount = useRef(0);
     renderCount.current++;
 
@@ -17,15 +15,12 @@ const RequisitosTitular: React.FC = () => {
         if (!loading && (!titular || !titular.nombre || !titular.apellidoPat)) {
             const rutSession = sessionStorage.getItem('rutTitular');
             if (rutSession) {
-                setRehidratando(true);
                 buscarTitular(rutSession)
-                    .then(() => setRehidratando(false))
                     .catch(() => {
-                        setError('No se pudo recuperar los datos del titular.');
-                        setRehidratando(false);
+                        console.error('No se pudo recuperar los datos del titular.');
                     });
             } else {
-                setError('No se encontró información del titular.');
+                console.error('No se encontró información del titular.');
             }
         }
     }, [titular, loading, buscarTitular]);

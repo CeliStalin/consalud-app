@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import * as ConsaludCore from '@consalud/core'; 
 import { useRutChileno } from "../hooks/useRutChileno";
 import { useHerederoNavigation } from "../hooks/useHerederoNavigation";
@@ -15,19 +15,15 @@ import RutErrorMessage from './RutErrorMessage';
 const IngresoTitular: React.FC = () => {
     // HOOKS SIEMPRE AL INICIO
     const { goToRequisitosTitular } = useHerederoNavigation();
-    const { rut, isValid: isValidRut, handleRutChange, resetRut } = useRutChileno();
+    const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
     const { buscarTitular, error, loading, titular, limpiarTitular } = useTitular();
     const [showStepperError, setShowStepperError] = useState(false);
-    const [busquedaIniciada, setBusquedaIniciada] = useState(false);
-    const [rutBuscado, setRutBuscado] = useState<string | null>(null);
 
     // Resetear navegación y errores al cambiar el RUT
     useEffect(() => {
-        setBusquedaIniciada(false);
         setShowError(false);
         setShowStepperError(false);
-        setRutBuscado(null);
     }, [rut]);
 
     // Lógica de validación y envío
@@ -52,8 +48,6 @@ const IngresoTitular: React.FC = () => {
         }
         setShowError(false);
         setShowStepperError(false);
-        setBusquedaIniciada(true);
-        setRutBuscado(rut);
         try {
             const titularResult = await buscarTitular(rut);
             // Bloquear avance si la persona está vigente (no fallecida)

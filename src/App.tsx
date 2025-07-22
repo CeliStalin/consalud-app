@@ -4,7 +4,6 @@ import {
   AuthProvider,
   MenuConfigProvider,
   Typography,
-  theme,
   MenuCollapseProvider
 } from '@consalud/core';
 import { AppRoutes } from './routes';

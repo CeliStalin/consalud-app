@@ -1,11 +1,6 @@
 import React from 'react';
 import { CargaDocumento } from '@/features/herederos/components/CargaDocumento'
-import { StepperProvider, Stepper, useStepper } from '@/features/herederos/components/Stepper';
-
-const StepperGlobal: React.FC = () => {
-  const { step } = useStepper();
-  return <Stepper step={step} />;
-};
+import { StepperProvider } from '@/features/herederos/components/Stepper';
 
 const CargaDocumentoPage: React.FC = () => {
   return (

@@ -1,5 +1,5 @@
-import React, { Suspense, useMemo } from 'react';
-import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
+import React, { useMemo } from 'react';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { 
   HomePage,
   Login,
@@ -124,14 +124,7 @@ const HerederosLayout: React.FC = () => (
 
 // Debug SyncedLayout
 const SyncedLayout = (props) => {
-  const location = useLocation();
   return <CoreSyncedLayout {...props} />;
-};
-
-// Debug ProtectedRoute
-const ProtectedRoute = (props) => {
-  const location = useLocation();
-  return <CoreProtectedRoute {...props} />;
 };
 
 interface AppRoutesProps {

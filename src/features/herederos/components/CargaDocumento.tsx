@@ -29,7 +29,7 @@ const CargaDocumento: React.FC = () => {
   const { ejemploCedula, ejemploPoder, ejemploPosesion } = UseAlert();
   const { step, setStep } = useStepper();
   const [loadingTransition, setLoadingTransition] = useState(false);
-  const [showOverlay, setShowOverlay] = useState(false);
+  const [showOverlay] = useState(false);
 
   useEffect(() => {
     setStep(3);
