@@ -232,6 +232,8 @@
 .back-button:hover {
   color: #04A59B;
   text-decoration: underline;
+  background: none !important;
+  border: none !important;
 }
 
 .back-button:focus {
