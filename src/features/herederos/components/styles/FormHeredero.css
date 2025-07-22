@@ -80,7 +80,7 @@
   align-items: center;
   margin-bottom: 8px;
   gap: 8px;
-  color: #10b981;
+  color: #000000;
   font-size: 18px;
   font-weight: 600;
   padding: 0;
@@ -93,7 +93,7 @@
   margin-left: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 600;
-  color: #10b981;
+  color: #000000;
 }
 
 .section-icon {
@@ -112,7 +112,6 @@
 
 /* Iconos específicos para las secciones */
 .section-title .person-icon {
-  background-color: #10b981;
   border-radius: 50%;
   padding: 8px;
   width: 36px;
@@ -120,11 +119,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+}
+
+.section-title .person-icon img {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 .section-title .location-icon {
-  background-color: #10b981;
   border-radius: 50%;
   padding: 8px;
   width: 36px;
@@ -132,7 +135,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+}
+
+.section-title .location-icon img {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 /* Estilos para los SVG dentro de los iconos */

@@ -1,10 +1,3 @@
-.titleComponent {
-    /* font-family: 'Work Sans'; */
-    /* font-size: 24px; */
-    /* font-weight: 700; */
-    /* color: #505050; */
-}
-
 .datosTitularContainer {
     display: flex;
     padding: 32px 40px;
@@ -43,9 +36,6 @@
         padding: 0 0.5rem;
         margin: 0.25rem auto;
     }
-    
-    .card-center-container {
-    }
 }
 
 .requitosTitularBox {
@@ -74,14 +64,6 @@
     display: flex;
     align-items: center;
     gap: 8px;
-}
-.textoTitulo {
-    /* color: #505050; */
-    /* font-family: "Work Sans"; */
-    /* font-size: 16px; */
-    /* font-style: normal; */
-    /* font-weight: 500; */
-    /* line-height: 19px; */
 }
 
 .iconCheck {
@@ -135,22 +117,6 @@
     align-items: center;
     gap: 8px;
 }
-.textToDataTitular {
-    /* font-family: 'Work Sans', sans-serif; */
-    /* font-size: 16px; */
-    /* font-style: normal; */
-    /* font-weight: 500; */
-    /* line-height: normal; */
-    /* color: #505050; */
-}
-
-.subTituloRitular {
-    /* font-family: 'Source Sans Pro'; */
-    /* font-size: 14px; */
-    /* font-style: normal; */
-    /* font-weight: 400; */
-    /* line-height: 18px; */
-}
 
 .rutText {
     /* font-size: 14px; */
@@ -172,13 +138,7 @@
     gap: 1.5rem;
     margin: 0 auto;
 }
-.textoRegistro {
-    /* font-family: 'Work Sans'; */
-    /* font-size: 16px; */
-    /* font-weight: 500; */
-    /* color: #505050; */
 
-}
 .textoTituloComponentes {
     display: flex;
     justify-content: center;
@@ -219,9 +179,6 @@
     border: none;
     padding: 13px 24px;
     margin: 16px;
-}
-.colortextButton{
-        /* color: #FFFFFF */ /* Handled by Typography */
 }
 .datosTitular {
     border-radius: 10px;
@@ -323,15 +280,6 @@
     /* line-height: 18px; */
 }
 
-.labelCargaDocumento{
-    /* color: var(--Colores-Nueva-SD-Medio-Gris-Medio, #656565); */ /* Use theme text color */
-    /* Párrafo (transversal)/P.Normal */
-    /* font-family: "Source Sans Pro"; */
-    /* font-size: 14px; */
-    /* font-style: normal; */
-    /* font-weight: 400; */
-    /* line-height: 18px; */ /* 128.571% */
-}
 
 .divDeclaroCargaDocumento {
     display: flex;
@@ -350,25 +298,6 @@
     align-self: stretch;
 }
 
-.divTextoObligatorioCargaDocumento{
-    /* color: var(--Colores-Nueva-SD-Oscuro-Gris-Oscuro, #505050); */ /* Use theme text color */
-    /* Párrafo (transversal)/P.Normal Bold */
-    /* font-family: "Source Sans Pro"; */
-    /* font-size: 14px; */
-    /* font-style: normal; */
-    /* font-weight: 700; */
-    /* line-height: 18px; */ /* 128.571% */
-}
-
-.divTextoObligatorioRojoCargaDocumento{
-    /* color: var(--colores-nueva-sd-secundarios-rojo-alternativo, #FF5252); */ /* Use theme.colors.danger */
-    /* Párrafo (transversal)/P.Normal Bold */
-    /* font-family: "Source Sans Pro"; */
-    /* font-size: 14px; */
-    /* font-style: normal;
-    /* font-weight: 700; */
-    /* line-height: 18px; */
-}
 
 .divTextoObligatorio{
     display: flex;

@@ -309,10 +309,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
             <div className="form-section">
               <div className="section-title">
                 <div className="person-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <img src="/DatosPersonales.svg" alt="Datos personales" width="20" height="20" />
                 </div>
                 <span>Datos personales</span>
               </div>
@@ -480,24 +477,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
               </div>
             </div>
 
-            {/* Separador entre secciones */}
-            <div className="section-divider"></div>
-
             {/* Sección de Dirección */}
             <div className="form-section">
               <div className="section-title">
                 <div className="location-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21 10C21 17 12 23 12 23S3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <img src="/Direccion.svg" alt="Dirección" width="20" height="20" />
                 </div>
                 <span>Dirección</span>
               </div>
-              <p className="description">
-                Verifica que los datos de la dirección de la persona heredera sean correctos, de lo contrario actualízalos.
-              </p>
-
               <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
                 {/* Región */}
                 <div className="form-column full-width" style={{ flex: 1, width: '100%', maxWidth: '100%' }}>
@@ -630,7 +617,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 </div>
               </div>
             </div>
-
+            {/* Separador antes del botón */}
+            <div className="section-divider"></div>
             {/* Botón de envío */}
             <div className="continue-button">
               <button
@@ -646,5 +634,4 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     </div>
   );
 };
-
 export default FormIngresoHeredero;
