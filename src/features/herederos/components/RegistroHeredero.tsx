@@ -29,7 +29,7 @@ const RegistroHeredero: React.FC = () => {
     }));
 
     return (
-        <div className="route-container layout-stable">
+        <div className="route-container layout-stable" style={{ overflowY: 'auto', height: '100vh', paddingBottom: 40 }}>
             {/* Header Section */}
             <div style={{ width: '100%', marginBottom: 24 }}>
                 <div style={{ marginLeft: 48 }}>

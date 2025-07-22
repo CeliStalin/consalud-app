@@ -2,307 +2,609 @@
 
 /* Contenedor principal de la página con scroll */
 .route-container.layout-stable {
-  overflow-y: auto;
-  height: 100vh;
-  padding-bottom: 40px; /* Espacio adicional al final */
+  /* overflow-y: auto; */
+  /* height: 100vh; */
+  /* padding-bottom: 40px; */
+  /* scroll-behavior: smooth; */
 }
 
 .main-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Cambiado de center a flex-start para permitir scroll */
-    width: 100%;
-    padding: 40px 0;
-    background-color: #f8f9fa;
-    min-height: 100vh; /* Asegura que el contenedor tenga altura mínima */
-    overflow-y: auto; /* Permite scroll vertical */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  padding: 40px 0;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+/* Configuración global del formulario */
+.form-container {
+  width: 100%;
+  max-width: 600px;
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
+
+/* Contenedor principal del formulario */
+.form-card {
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  max-height: none;
+}
+
+/* Estilos para el card de ConsaludCore */
+.ingreso-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: none;
+  overflow: hidden;
+  position: relative;
+  padding: 32px;
+}
+
+/* Animación fade-in-up */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Card elevated con sombra más pronunciada */
+.card-elevated {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: none;
+  background: white;
+  border-radius: 12px;
+}
+
+/* Títulos de sección con iconos */
+.section-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+  color: #10b981;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  margin-bottom: 8px;
+}
+
+.section-title span {
+  margin-left: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
+  color: #10b981;
+}
+
+.section-icon {
+  width: 20px;
+  height: 20px;
+  background-color: #10b981;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: white;
+  margin-right: 0;
+  padding: 0;
+}
+
+/* Iconos específicos para las secciones */
+.section-title .person-icon {
+  background-color: #10b981;
+  border-radius: 50%;
+  padding: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.section-title .location-icon {
+  background-color: #10b981;
+  border-radius: 50%;
+  padding: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+/* Estilos para los SVG dentro de los iconos */
+.section-title .person-icon svg,
+.section-title .location-icon svg {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
+/* Control de tamaño de SVG */
+.section-icon svg, 
+.calendar-icon svg {
+  width: 12px;
+  height: 12px;
+  color: white;
+}
+
+/* Estilos de tipografía */
+.form-container label,
+.form-container p,
+.form-container .help {
+  color: #374151;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  margin-bottom: 6px;
+}
+
+.form-container .description {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* Estilos para inputs y selectores */
+.form-container .input,
+.form-container .select select,
+.form-container .textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  color: #374151;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  height: auto;
+  box-sizing: border-box;
+}
+
+.form-container .input:focus,
+.form-container .select select:focus,
+.form-container .textarea:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  background-color: white;
+}
+
+.form-container .input::placeholder,
+.form-container .textarea::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* Estilos para los selects */
+.form-container .select {
+  width: 100%;
+  position: relative;
+}
+
+.form-container .select select {
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3e%3cpath fill='none' d='M0 0h24v24H0z'/%3e%3cpath d='M12 15l-4.243-4.243 1.415-1.414L12 12.172l2.828-2.829 1.415 1.414z' fill='%236b7280'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  background-color: white;
+  color: #374151;
+  padding-right: 40px;
+}
+
+/* Estilos para DatePicker */
+.datepicker-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.datepicker-wrapper .react-datepicker-wrapper {
+  width: 100%;
+}
+
+.datepicker-wrapper .react-datepicker__input-container {
+  width: 100%;
+}
+
+/* Personalización del input del datepicker */
+.datepicker-wrapper input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: white;
+  color: #374151;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  height: auto;
+}
+
+.datepicker-wrapper input:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  background-color: white;
+}
+
+.datepicker-wrapper .calendar-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #10b981;
+  pointer-events: none;
+}
+
+/* Personalización del calendario */
+.react-datepicker {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.react-datepicker__header {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #d1d5db;
+  border-radius: 8px 8px 0 0;
+}
+
+.react-datepicker__current-month, 
+.react-datepicker-time__header, 
+.react-datepicker-year-header {
+  color: #374151;
+  font-weight: 600;
+}
+
+.react-datepicker__day {
+  color: #374151;
+  border-radius: 4px;
+}
+
+.react-datepicker__day--selected, 
+.react-datepicker__day--keyboard-selected {
+  background-color: #10b981;
+  border-radius: 4px;
+  color: white;
+}
+
+.react-datepicker__day:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+  border-radius: 4px;
+}
+
+/* Estilos para secciones */
+.form-section {
+  margin-bottom: 32px;
+  padding: 0;
+}
+
+.form-section:not(:last-child) {
+  border-bottom: none;
+}
+
+.section-divider {
+  margin: 32px 0 24px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Estilos específicos para las filas y columnas */
+.ingreso-card .form-row {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 16px !important;
+  margin-bottom: 20px !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.ingreso-card .form-column {
+  flex: 1 !important;
+  min-width: 0 !important;
+  width: calc(50% - 8px) !important;
+  max-width: calc(50% - 8px) !important;
+  box-sizing: border-box !important;
+}
+
+.ingreso-card .form-column.full-width {
+  flex: 1 1 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Asegurar que los inputs ocupen todo el ancho de su columna */
+.ingreso-card .form-column input,
+.ingreso-card .form-column select,
+.ingreso-card .form-column .datepicker-wrapper,
+.ingreso-card .form-column .select {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Estilos específicos para el formulario dentro del card */
+.ingreso-card form {
+  width: 100% !important;
+}
+
+.ingreso-card .form-section {
+  width: 100% !important;
+}
+
+/* Botón continuar */
+.form-container .continue-button {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.form-container .button.is-primary.is-rounded {
+  background-color: #7dd3fc;
+  color: white;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-width: auto;
+  height: auto;
+  display: inline-block;
+}
+
+.form-container .button.is-primary.is-rounded:hover {
+  background-color: #38bdf8;
+  transform: none;
+  box-shadow: none;
+}
+
+.form-container .button.is-primary.is-rounded:active {
+  transform: translateY(1px);
+}
+
+/* Estilos para los mensajes de error */
+.form-container .help.is-danger {
+  font-size: 12px;
+  margin-top: 4px;
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.form-container .input.is-danger,
+.form-container .select.is-danger select,
+.form-container .datepicker-wrapper.is-danger input {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .ingreso-card .form-row {
+    flex-direction: column !important;
+    gap: 12px !important;
   }
   
-  /* Configuración global del formulario */
+  .ingreso-card .form-column {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
   .form-container {
-    width: 100%;
-    max-width: 720px;
-    background-color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    border-radius: 10px;
-    margin: 20px 0; /* Agrega margen para separación */
+    padding: 20px;
+    margin: 10px;
   }
-  
-  /* Contenedor principal del formulario */
-  .form-card {
-    padding: 32px 28px;
-    border-radius: 8px;
-    background: #FFFFFF;
-    max-height: none; /* Permite que el contenido se expanda */
+
+  .ingreso-card {
+    padding: 20px;
   }
-  
-  /* Títulos de sección con iconos */
-  .section-title {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-    color: #04A59B;
-    font-size: 18px;
-    font-weight: 500;
-  }
-  
-  .section-icon {
-    margin-right: 8px;
-    color: #04A59B;
-    width: 20px !important;
-    height: 20px !important;
-    display: inline-block;
-  }
-  
-  /* Control de tamaño de SVG */
-  .section-icon svg, 
-  .calendar-icon svg {
-    width: 20px;
-    height: 20px;
-  }
-  
-  /* Estilos de tipografía */
-  .form-container label,
-  .form-container p,
-  .form-container .help {
-    color: #575757;
-    font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 18px;
-    margin-bottom: 6px;
-  }
-  
-  .form-container .description {
-    color: #777777;
-    font-size: 14px;
-    margin-bottom: 20px;
-  }
-  
-  /* Estilos para inputs y selectores */
-  .form-container .input,
-  .form-container .select select,
-  .form-container .textarea {
-    height: 36px;
-    border-radius: 4px;
-    border: 1px solid #D0D0D0;
-    background-color: #FFFFFF;
-    padding: 8px 12px;
-    color: #333333;
-    font-family: "Source Sans Pro", sans-serif;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    width: 100%;
-  }
-  
-  .form-container .input:focus,
-  .form-container .select select:focus,
-  .form-container .textarea:focus {
-    border-color: #04A59B;
-    box-shadow: 0 0 0 1px rgba(4, 165, 155, 0.2);
-  }
-  
-  .form-container .input::placeholder,
-  .form-container .textarea::placeholder {
-    color: #A0A0A0;
-  }
-  
-  /* Estilos para los selects */
-  .form-container .select {
-    width: 100%;
-    position: relative;
-  }
-  
-  .form-container .select:after {
-    border-color: #04A59B !important;
-  }
-  
-  .form-container .select select {
-    padding-right: 2.5em;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3e%3cpath fill='none' d='M0 0h24v24H0z'/%3e%3cpath d='M12 15l-4.243-4.243 1.415-1.414L12 12.172l2.828-2.829 1.415 1.414z' fill='rgba(4, 165, 155, 0.8)'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 16px;
-  }
-  
-  /* Estilos para DatePicker */
-  .datepicker-wrapper {
-    position: relative;
-    width: 100%;
-  }
-  
-  .datepicker-wrapper .react-datepicker-wrapper {
-    width: 100%;
-  }
-  
-  .datepicker-wrapper .react-datepicker__input-container {
-    width: 100%;
-  }
-  
-  /* Personalización del input del datepicker */
-  .datepicker-wrapper input {
-    height: 36px;
-    width: 100%;
-    border-radius: 4px;
-    border: 1px solid #D0D0D0;
-    background-color: #FFFFFF;
-    padding: 8px 12px;
-    color: #333333;
-    font-family: "Source Sans Pro", sans-serif;
-    font-size: 14px;
-    transition: all 0.2s ease;
-  }
-  
-  .datepicker-wrapper input:focus {
-    outline: none;
-    border-color: #04A59B;
-    box-shadow: 0 0 0 1px rgba(4, 165, 155, 0.2);
-  }
-  
-  .datepicker-wrapper .calendar-icon {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #04A59B;
-    pointer-events: none;
-  }
-  
-  /* Personalización del calendario */
-  .react-datepicker {
-    font-family: "Source Sans Pro", sans-serif;
-    border-radius: 6px;
-    border: 1px solid #E0E0E0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .react-datepicker__header {
-    background-color: #f8f8f8;
-    border-bottom: 1px solid #E0E0E0;
-  }
-  
-  .react-datepicker__current-month, 
-  .react-datepicker-time__header, 
-  .react-datepicker-year-header {
-    color: #333333;
-    font-weight: 600;
-  }
-  
-  .react-datepicker__day {
-    color: #555555;
-  }
-  
-  .react-datepicker__day--selected, 
-  .react-datepicker__day--keyboard-selected {
-    background-color: #04A59B;
-    border-radius: 4px;
-    color: white;
-  }
-  
-  .react-datepicker__day:hover {
-    background-color: rgba(4, 165, 155, 0.1);
-    border-radius: 4px;
-  }
-  
-  /* Estilos para secciones */
-  .form-section {
-    margin-bottom: 28px;
-  }
-  
-  .form-container .form-row {
-    display: flex;
-    flex-wrap: wrap;
-    margin-left: -10px;
-    margin-right: -10px;
-  }
-  
-  .form-container .form-column {
-    flex: 0 0 50%;
-    padding: 0 10px;
-    margin-bottom: 14px;
-  }
-  
-  /* Botón continuar */
+
   .form-container .continue-button {
-    display: flex;
-    width: 652px;
-    padding: 31px 44px 44px 44px;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 39px;
-    color : white;
+    padding: 24px 0;
   }
-  
+
   .form-container .button.is-primary.is-rounded {
-    background-color: #04A59B;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 6px 24px;
-    font-weight: 500;
-    font-size: 15px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    width: 100%;
+    max-width: 280px;
   }
-  
-  .form-container .button.is-primary.is-rounded:hover {
-    background-color: #038C84;
-  }
-  
-  /* Estilos para los mensajes de error */
-  .form-container .help.is-danger {
-    font-size: 12px;
-    margin-top: 4px;
-    color: #dc3545;
-  }
-  
-  .form-container .input.is-danger,
-  .form-container .select.is-danger select,
-  .form-container .datepicker-wrapper.is-danger input {
-    border-color: #dc3545;
-  }
-  
-  /* Responsive */
-  @media screen and (max-width: 768px) {
-    .form-container {
-      width: 95%;
-      margin: 0 auto;
-    }
-    
-    .form-card {
-      padding: 20px 16px;
-    }
-    
-    .form-container .form-column {
-      flex: 0 0 100%;
-    }
+}
 
-    /* Mejoras para scroll en móviles */
-    .route-container.layout-stable {
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
-    }
+/* Estilos para scroll suave */
+.route-container.layout-stable {
+  scroll-behavior: smooth;
+}
 
-    .main-container {
-      padding: 20px 0;
-    }
-  }
+/* Asegurar que el botón de continuar sea siempre visible */
+.form-container .continue-button {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 20px;
+  z-index: 10;
+}
 
-  /* Estilos para scroll suave */
-  .route-container.layout-stable {
-    scroll-behavior: smooth;
-  }
+/* Estilos para inputs y selectores - usando los mismos estilos que las páginas anteriores */
+.ingreso-card .form-column input,
+.ingreso-card .form-column select,
+.ingreso-card .form-column .select select,
+.ingreso-card .form-column .datepicker-wrapper input {
+  width: 100% !important;
+  height: 42px !important;
+  flex-shrink: 0 !important;
+  border: 1.5px solid #e0e0e0 !important;
+  border-radius: 24px !important;
+  font-size: 16px !important;
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+  background: #f8f9fa !important;
+  box-shadow: 0 2px 8px rgba(4, 165, 155, 0.07) !important;
+  outline: none !important;
+  transition: border 0.2s !important;
+  color: #374151 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  box-sizing: border-box !important;
+}
 
-  /* Asegurar que el botón de continuar sea siempre visible */
-  .form-container .continue-button {
-    position: sticky;
-    bottom: 0;
-    background: white;
-    border-top: 1px solid #e0e0e0;
-    margin-top: 20px;
-    z-index: 10;
-  }
+.ingreso-card .form-column input:focus,
+.ingreso-card .form-column select:focus,
+.ingreso-card .form-column .select select:focus,
+.ingreso-card .form-column .datepicker-wrapper input:focus {
+  border-color: #04A59B !important;
+  box-shadow: 0 2px 8px rgba(4, 165, 155, 0.15) !important;
+  background: #f8f9fa !important;
+}
+
+.ingreso-card .form-column input.is-danger,
+.ingreso-card .form-column select.is-danger,
+.ingreso-card .form-column .select.is-danger select,
+.ingreso-card .form-column .datepicker-wrapper.is-danger input {
+  border-color: #E11D48 !important;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.15) !important;
+}
+
+.ingreso-card .form-column input::placeholder,
+.ingreso-card .form-column .datepicker-wrapper input::placeholder {
+  color: #9ca3af !important;
+  font-weight: 400 !important;
+}
+
+/* Estilos específicos para los selects */
+.ingreso-card .form-column .select {
+  width: 100% !important;
+  position: relative !important;
+}
+
+.ingreso-card .form-column .select select {
+  cursor: pointer !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3e%3cpath fill='none' d='M0 0h24v24H0z'/%3e%3cpath d='M12 15l-4.243-4.243 1.415-1.414L12 12.172l2.828-2.829 1.415 1.414z' fill='%236b7280'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 18px center !important;
+  background-size: 16px !important;
+  padding-right: 50px !important;
+}
+
+/* Estilos para DatePicker */
+.ingreso-card .form-column .datepicker-wrapper {
+  position: relative !important;
+  width: 100% !important;
+}
+
+.ingreso-card .form-column .datepicker-wrapper .react-datepicker-wrapper {
+  width: 100% !important;
+}
+
+.ingreso-card .form-column .datepicker-wrapper .react-datepicker__input-container {
+  width: 100% !important;
+}
+
+.ingreso-card .form-column .datepicker-wrapper .calendar-icon {
+  position: absolute !important;
+  right: 18px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #04A59B !important;
+  pointer-events: none !important;
+}
+
+/* Estilos de tipografía - usando los mismos estilos que las páginas anteriores */
+.ingreso-card .form-column label {
+  color: #808080 !important;
+  font-family: 'Work Sans', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 18px !important;
+  margin-bottom: 8px !important;
+  display: block !important;
+}
+
+.ingreso-card .description {
+  color: #6b7280 !important;
+  font-size: 14px !important;
+  margin-bottom: 24px !important;
+  line-height: 1.5 !important;
+  font-weight: 400 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.ingreso-card .help.is-danger {
+  font-size: 12px !important;
+  margin-top: 4px !important;
+  color: #E11D48 !important;
+  font-weight: 500 !important;
+  font-family: 'Work Sans', sans-serif !important;
+}
+
+/* Botón continuar - usando los mismos estilos que las páginas anteriores */
+.ingreso-card .continue-button {
+  margin-top: 32px !important;
+  text-align: center !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.ingreso-card .button.is-primary.is-rounded {
+  display: flex !important;
+  padding: 10px 24px !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-width: 120px !important;
+  border-radius: 24px !important;
+  height: 42px !important;
+  font-size: 16px !important;
+  background: #04A59B !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-weight: 600 !important;
+  transition: background 0.2s !important;
+  cursor: pointer !important;
+  margin: 0 auto !important;
+}
+
+.ingreso-card .button.is-primary.is-rounded:hover {
+  background: #059669 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.ingreso-card .button.is-primary.is-rounded:active {
+  transform: translateY(1px) !important;
+}

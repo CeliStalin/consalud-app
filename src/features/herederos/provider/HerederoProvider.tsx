@@ -84,8 +84,9 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         
         setHeredero(herederoData);
         
-        // Redirigir a IngresoHerederoFormPage cuando el status sea 200
-        navigate('/mnherederos/ingresoher/formingreso');
+        // Comentado: Redirigir a IngresoHerederoFormPage cuando el status sea 200
+        // Ahora el formulario se muestra en la misma página
+        // navigate('/mnherederos/ingresoher/formingreso');
         
       } else {
         // Fallback a mock (para desarrollo)
@@ -99,7 +100,8 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         }
         
         setHeredero(herederoEncontrado);
-        navigate('/mnherederos/ingresoher/formingreso');
+        // Comentado: navegación automática
+        // navigate('/mnherederos/ingresoher/formingreso');
       }
       
     } catch (err: any) {

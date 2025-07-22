@@ -12,6 +12,10 @@ interface BreadcrumbItem {
     label: string;
 }
 
+interface FormIngresoHerederoProps {
+  showHeader?: boolean;
+}
+
 // Datos para los selectores
 const SEXO_OPTIONS = [
   { value: 'M', label: 'Masculino' },
@@ -64,9 +68,10 @@ interface FormData {
   numero: string;
   deptoBloqueOpcional: string;
   villaOpcional: string;
+  region?: string; // Added for the new form structure
 }
 
-const FormIngresoHeredero: React.FC = () => {
+const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = true }) => {
   const navigate = useNavigate();
   const {heredero} = useHeredero();
   const [formData, setFormData] = useState<FormData>({
@@ -83,7 +88,8 @@ const FormIngresoHeredero: React.FC = () => {
     calle: heredero?.contactabilidad.direccion.calle || '',
     numero: heredero?.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
     deptoBloqueOpcional: heredero?.contactabilidad.direccion.departamento || '',
-    villaOpcional: heredero?.contactabilidad.direccion.villa || ''
+    villaOpcional: heredero?.contactabilidad.direccion.villa || '',
+    region: heredero?.contactabilidad.direccion.regionNombre || '' // Initialize region
   });
 
   // Estado para manejar errores de validación
@@ -196,6 +202,11 @@ const FormIngresoHeredero: React.FC = () => {
     }
 
     // Validación de dirección
+    if (!formData.region) {
+      newErrors.region = 'Seleccione una región';
+      isValid = false;
+    }
+
     if (!formData.ciudad) {
       newErrors.ciudad = 'Seleccione una ciudad';
       isValid = false;
@@ -228,7 +239,7 @@ const FormIngresoHeredero: React.FC = () => {
       console.log('Datos del formulario:', formData);
       // Aquí iría la lógica para enviar los datos al backend
       
-      // Redirigir a la siguiente página o mostrar mensaje de éxito
+      // Redirigir a la página de carga de documentos (stepper 3)
       navigate('/mnherederos/ingresoher/cargadoc');
     }
   };
@@ -238,30 +249,34 @@ const FormIngresoHeredero: React.FC = () => {
   
   return (
     <div className="route-container layout-stable">
-      {/* Header Section */}
-      <div style={{ width: '100%', marginBottom: 24 }}>
-        <div style={{ marginLeft: 48 }}>
-          {/* Breadcrumb */}
-          <div style={{ marginBottom: 8 }}>
-            <ConsaludCore.Breadcrumb 
-              items={cleanedBreadcrumbItems} 
-              separator={<span>{'>'}</span>}
-              showHome={true}
-              className="breadcrumb-custom"
-            />
+      {showHeader && (
+        <>
+          {/* Header Section */}
+          <div style={{ width: '100%', marginBottom: 24 }}>
+            <div style={{ marginLeft: 48 }}>
+              {/* Breadcrumb */}
+              <div style={{ marginBottom: 8 }}>
+                <ConsaludCore.Breadcrumb 
+                  items={cleanedBreadcrumbItems} 
+                  separator={<span>{'>'}</span>}
+                  showHome={true}
+                  className="breadcrumb-custom"
+                />
+              </div>
+              {/* Botón volver */}
+              <div>
+                <button
+                  className="back-button"
+                  onClick={handleBackClick}
+                  aria-label="Volver a la página anterior"
+                >
+                  <span className="back-button-icon">←</span> Volver
+                </button>
+              </div>
+            </div>
           </div>
-          {/* Botón volver */}
-          <div>
-            <button
-              className="back-button"
-              onClick={handleBackClick}
-              aria-label="Volver a la página anterior"
-            >
-              <span className="back-button-icon">←</span> Volver
-            </button>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
 
       {/* Main Content Section */}
       <div className="container">
@@ -275,9 +290,11 @@ const FormIngresoHeredero: React.FC = () => {
             </div>
             
             {/* Stepper */}
-            <div className="mb-5">
-              <Stepper step={3} />
-            </div>
+            {showHeader && (
+              <div className="mb-5">
+                <Stepper step={2} />
+              </div>
+            )}
             
             {/* Centered Card Container */}
             <div className="card-center-container">
@@ -294,15 +311,21 @@ const FormIngresoHeredero: React.FC = () => {
                       {/* Sección de Datos Personales */}
                       <div className="form-section">
                         <div className="section-title">
+                          <div className="person-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </div>
                           <span>Datos personales</span>
                         </div>
                         <p className="description">
                           Verifica que los datos de la persona heredera sean correctos, de lo contrario actualízalos.
                         </p>
 
-                        <div className="form-row">
+                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
                           {/* Fecha de nacimiento */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Fecha nacimiento</label>
                             <div className={`datepicker-wrapper ${errors.fechaNacimiento ? 'is-danger' : ''}`}>
                               <DatePicker
@@ -329,7 +352,7 @@ const FormIngresoHeredero: React.FC = () => {
                           </div>
 
                           {/* Nombres */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Nombres</label>
                             <input
                               className={`input ${errors.nombres ? 'is-danger' : ''}`}
@@ -343,9 +366,11 @@ const FormIngresoHeredero: React.FC = () => {
                               <p className="help is-danger">{errors.nombres}</p>
                             )}
                           </div>
+                        </div>
 
+                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
                           {/* Apellido Paterno */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Apellido Paterno</label>
                             <input
                               className={`input ${errors.apellidoPaterno ? 'is-danger' : ''}`}
@@ -361,7 +386,7 @@ const FormIngresoHeredero: React.FC = () => {
                           </div>
 
                           {/* Apellido Materno */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Apellido Materno</label>
                             <input
                               className={`input ${errors.apellidoMaterno ? 'is-danger' : ''}`}
@@ -375,9 +400,11 @@ const FormIngresoHeredero: React.FC = () => {
                               <p className="help is-danger">{errors.apellidoMaterno}</p>
                             )}
                           </div>
+                        </div>
 
+                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
                           {/* Sexo */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Sexo</label>
                             <div className={`select ${errors.sexo ? 'is-danger' : ''}`}>
                               <select
@@ -399,7 +426,7 @@ const FormIngresoHeredero: React.FC = () => {
                           </div>
 
                           {/* Parentesco */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Parentesco</label>
                             <div className={`select ${errors.parentesco ? 'is-danger' : ''}`}>
                               <select
@@ -419,9 +446,11 @@ const FormIngresoHeredero: React.FC = () => {
                               <p className="help is-danger">{errors.parentesco}</p>
                             )}
                           </div>
+                        </div>
 
+                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
                           {/* Teléfono */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Teléfono</label>
                             <input
                               className={`input ${errors.telefono ? 'is-danger' : ''}`}
@@ -437,7 +466,7 @@ const FormIngresoHeredero: React.FC = () => {
                           </div>
 
                           {/* Correo electrónico */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Correo electrónico</label>
                             <input
                               className={`input ${errors.correoElectronico ? 'is-danger' : ''}`}
@@ -454,18 +483,50 @@ const FormIngresoHeredero: React.FC = () => {
                         </div>
                       </div>
 
+                      {/* Separador entre secciones */}
+                      <div className="section-divider"></div>
+
                       {/* Sección de Dirección */}
                       <div className="form-section">
                         <div className="section-title">
+                          <div className="location-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M21 10C21 17 12 23 12 23S3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </div>
                           <span>Dirección</span>
                         </div>
                         <p className="description">
                           Verifica que los datos de la dirección de la persona heredera sean correctos, de lo contrario actualízalos.
                         </p>
 
-                        <div className="form-row">
+                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
+                          {/* Región */}
+                          <div className="form-column full-width" style={{ flex: 1, width: '100%', maxWidth: '100%' }}>
+                            <label>Región</label>
+                            <div className={`select ${errors.region ? 'is-danger' : ''}`}>
+                              <select
+                                name="region"
+                                value={formData.region || ''}
+                                onChange={handleInputChange}
+                              >
+                                <option value="" disabled>Seleccionar</option>
+                                <option value="Metropolitana">Región Metropolitana</option>
+                                <option value="Valparaíso">Valparaíso</option>
+                                <option value="Biobío">Biobío</option>
+                                <option value="Araucanía">La Araucanía</option>
+                              </select>
+                            </div>
+                            {errors.region && (
+                              <p className="help is-danger">{errors.region}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
                           {/* Ciudad */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Ciudad</label>
                             <div className={`select ${errors.ciudad ? 'is-danger' : ''}`}>
                               <select
@@ -487,7 +548,7 @@ const FormIngresoHeredero: React.FC = () => {
                           </div>
 
                           {/* Comuna */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Comuna</label>
                             <div className={`select ${errors.comuna ? 'is-danger' : ''}`}>
                               <select
@@ -508,9 +569,11 @@ const FormIngresoHeredero: React.FC = () => {
                               <p className="help is-danger">{errors.comuna}</p>
                             )}
                           </div>
+                        </div>
 
+                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
                           {/* Calle */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Calle</label>
                             <input
                               className={`input ${errors.calle ? 'is-danger' : ''}`}
@@ -526,7 +589,7 @@ const FormIngresoHeredero: React.FC = () => {
                           </div>
 
                           {/* Número */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Número</label>
                             <input
                               className={`input ${errors.numero ? 'is-danger' : ''}`}
@@ -540,9 +603,11 @@ const FormIngresoHeredero: React.FC = () => {
                               <p className="help is-danger">{errors.numero}</p>
                             )}
                           </div>
+                        </div>
 
+                        <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
                           {/* Depto/Block (Opcional) */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Depto/Block (Opcional)</label>
                             <input
                               className="input"
@@ -555,7 +620,7 @@ const FormIngresoHeredero: React.FC = () => {
                           </div>
 
                           {/* Villa (Opcional) */}
-                          <div className="form-column">
+                          <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                             <label>Villa (Opcional)</label>
                             <input
                               className="input"
