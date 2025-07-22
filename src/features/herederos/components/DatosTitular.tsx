@@ -1,14 +1,18 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { Stepper } from "../components/Stepper";
 import { useTitular } from "../contexts/TitularContext";
 import * as ConsaludCore from '@consalud/core';
 import { DatosTitularCard } from "./DatosTitularCard";
 
-const DatosTitular = () => {
+interface BreadcrumbItem {
+    label: string;
+}
+
+const DatosTitular: React.FC = () => {
     const navigator = useNavigate();
     const { titular, loading, buscarTitular } = useTitular();
-    const hasRedirected = useRef(false);
+    const hasRedirected = useRef<boolean>(false);
 
     // Si no hay titular pero hay rut en sessionStorage, re-buscar
     useEffect(() => {
@@ -20,11 +24,23 @@ const DatosTitular = () => {
         }
     }, [titular, loading, buscarTitular]);
 
+    const handleClick = useCallback((): void => {
+        navigator('/mnherederos/ingresoher/RegistroTitular');
+    }, [navigator]);
+
+    const handleBackClick = useCallback((): void => {
+        navigator(-1);
+    }, [navigator]);
+
     if (loading) {
         return (
-            <div className="route-container layout-stable" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ConsaludCore.LoadingSpinner  size="large" />
-                <span style={{ marginLeft: 16 }}>Cargando datos del titular...</span>
+            <div className="route-container layout-stable">
+                <div className="columns is-centered is-vcentered" style={{ minHeight: '60vh' }}>
+                    <div className="column is-narrow has-text-centered">
+                        <ConsaludCore.LoadingSpinner size="large" />
+                        <span className="ml-3">Cargando datos del titular...</span>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -32,65 +48,78 @@ const DatosTitular = () => {
     if (!titular || !titular.nombre || !titular.apellidoPat) {
         useEffect(() => {
             if (!hasRedirected.current) {
+                hasRedirected.current = true;
                 navigator('/mnherederos/ingresoher/ingresotitular', { replace: true });
             }
         }, [navigator]);
         return null;
     }
 
-    const handleClick = () => {
-        navigator('/mnherederos/ingresoher/RegistroTitular');
-    };
-
-    const breadcrumbItems = [
-      { label: 'Administración devolución herederos' }
+    const breadcrumbItems: BreadcrumbItem[] = [
+        { label: 'Administración devolución herederos' }
     ];
+    
     const cleanedBreadcrumbItems = breadcrumbItems.map(item => ({
-      ...item,
-      label: typeof item.label === 'string' ? item.label.replace(/^\/+/,'') : item.label
+        ...item,
+        label: typeof item.label === 'string' ? item.label.replace(/^\/+/, '') : item.label
     }));
+
     return (
-        <div className="route-container layout-stable" style={{ paddingTop: 20 }}>
-          <div style={{ width: '100%', marginBottom: 24 }}>
-            <div style={{ marginLeft: 48 }}>
-              {/* Breadcrumb */}
-              <div style={{ marginBottom: 8 }}>
-                <ConsaludCore.Breadcrumb 
-                  items={cleanedBreadcrumbItems} 
-                  separator={<span>{'>'}</span>}
-                  showHome={true}
-                  className="breadcrumb-custom"
-                />
-              </div>
-              {/* Botón volver */}
-              <div>
-                <button
-                  className="back-button"
-                  onClick={() => navigator(-1)}
-                  aria-label="Volver a la página anterior"
-                >
-                  <span className="back-button-icon">←</span> Volver
-                </button>
-              </div>
+        <div className="route-container layout-stable">
+            {/* Header Section */}
+            <div style={{ width: '100%', marginBottom: 24 }}>
+                <div style={{ marginLeft: 48 }}>
+                    {/* Breadcrumb */}
+                    <div style={{ marginBottom: 8 }}>
+                        <ConsaludCore.Breadcrumb 
+                            items={cleanedBreadcrumbItems} 
+                            separator={<span>{'>'}</span>}
+                            showHome={true}
+                            className="breadcrumb-custom"
+                        />
+                    </div>
+                    {/* Botón volver */}
+                    <div>
+                        <button
+                            className="back-button"
+                            onClick={handleBackClick}
+                            aria-label="Volver a la página anterior"
+                        >
+                            <span className="back-button-icon">←</span> Volver
+                        </button>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div className="generalContainer" style={{ alignItems: 'center', paddingLeft: 0 }}>
-            <div style={{ width: 1000, marginLeft: 48 }}>
-              <Stepper step={1}/>
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', minHeight: '60vh', width: '100%' }}>
-                <DatosTitularCard
-                  nombre={titular?.nombre || ''}
-                  apellidoPat={titular?.apellidoPat || ''}
-                  apellidoMat={titular?.apellidoMat || ''}
-                  fechaDefuncion={titular?.fechaDefuncion || ''}
-                  onContinuar={handleClick}
-                  loading={loading}
-                />
-              </div>
+
+            {/* Main Content Section */}
+            <div className="container">
+                <div className="columns is-centered">
+                    <div className="column is-10-desktop is-12-tablet">
+                        {/* Stepper */}
+                        <div className="mb-5">
+                            <Stepper step={1} />
+                        </div>
+                        
+                        {/* Centered Card Container */}
+                        <div className="card-center-container">
+                            <div className="card-responsive">
+                                <div className="generalContainer">
+                                    <DatosTitularCard
+                                        nombre={titular?.nombre || ''}
+                                        apellidoPat={titular?.apellidoPat || ''}
+                                        apellidoMat={titular?.apellidoMat || ''}
+                                        fechaDefuncion={titular?.fechaDefuncion || ''}
+                                        onContinuar={handleClick}
+                                        loading={loading}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
     );
-}
+};
 
 export { DatosTitular };

@@ -11,21 +11,29 @@ const IngresoTitularPage: React.FC = () => {
 
   return (
     <>
-      <div style={{ marginBottom: 24 }}>
-        <ConsaludCore.Breadcrumb
-          items={breadcrumbItems}
-          separator={<span>{'>'}</span>}
-          showHome={true}
-          className="breadcrumb-custom"
-        />
-        <button
-          className="back-button"
-          onClick={() => navigate(-1)}
-          aria-label="Volver a la página anterior"
-          style={{ marginTop: 8 }}
-        >
-          <span className="back-button-icon">←</span> Volver
-        </button>
+      {/* Header Section */}
+      <div style={{ width: '100%', marginBottom: 24 }}>
+        <div style={{ marginLeft: 48 }}>
+          {/* Breadcrumb */}
+          <div style={{ marginBottom: 8 }}>
+            <ConsaludCore.Breadcrumb
+              items={breadcrumbItems}
+              separator={<span>{'>'}</span>}
+              showHome={true}
+              className="breadcrumb-custom"
+            />
+          </div>
+          {/* Botón volver */}
+          <div>
+            <button
+              className="back-button"
+              onClick={() => navigate(-1)}
+              aria-label="Volver a la página anterior"
+            >
+              <span className="back-button-icon">←</span> Volver
+            </button>
+          </div>
+        </div>
       </div>
       <IngresoTitular />
     </>

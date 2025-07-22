@@ -35,34 +35,39 @@ const RequisitosTitular = () => {
     // Elimino el try/catch del render
     // Dejo solo el render limpio y profesional
     return (
-        <div className="route-container layout-stable" style={{ paddingTop: 20 }}>
+        <div className="route-container layout-stable">
             {/* Fallback visual si faltan campos */}
             {(!titular?.nombre || !titular?.apellidoPat) && (
                 <div style={{ color: 'red', marginBottom: 16 }}>
                     <b>Advertencia:</b> Faltan datos del titular (nombre o apellidoPat). Verifica el mapeo de datos.
                 </div>
             )}
+            
+            {/* Header Section */}
             <div style={{ width: '100%', marginBottom: 24 }}>
-                {/* Breadcrumb */}
-                <div style={{ marginBottom: 8 }}>
-                    <ConsaludCore.Breadcrumb 
-                        items={[{ label: 'Administración devolución herederos' }]} 
-                        separator={<span>{'>'}</span>}
-                        showHome={true}
-                        className="breadcrumb-custom"
-                    />
-                </div>
-                {/* Botón volver */}
-                <div>
-                    <button
-                        className="back-button"
-                        onClick={() => navigator(-1)}
-                        aria-label="Volver a la página anterior"
-                    >
-                        <span className="back-button-icon">←</span> Volver
-                    </button>
+                <div style={{ marginLeft: 48 }}>
+                    {/* Breadcrumb */}
+                    <div style={{ marginBottom: 8 }}>
+                        <ConsaludCore.Breadcrumb 
+                            items={[{ label: 'Administración devolución herederos' }]} 
+                            separator={<span>{'>'}</span>}
+                            showHome={true}
+                            className="breadcrumb-custom"
+                        />
+                    </div>
+                    {/* Botón volver */}
+                    <div>
+                        <button
+                            className="back-button"
+                            onClick={() => navigator(-1)}
+                            aria-label="Volver a la página anterior"
+                        >
+                            <span className="back-button-icon">←</span> Volver
+                        </button>
+                    </div>
                 </div>
             </div>
+
             {/* Título fuera de la Card */}
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
               <div>

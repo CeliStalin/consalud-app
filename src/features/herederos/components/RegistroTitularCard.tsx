@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useRutChileno } from "@/features/herederos/hooks/useRutChileno";
 import * as ConsaludCore from '@consalud/core';
 
@@ -7,12 +7,15 @@ interface RegistroTitularCardProps {
   error: string | null;
 }
 
-export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({ buscarHeredero, error }) => {
+export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({ 
+  buscarHeredero, 
+  error 
+}) => {
   const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
-  const [showError, setShowError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [showError, setShowError] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleNavigator = async () => {
+  const handleNavigator = useCallback(async (): Promise<void> => {
     const rutLimpio = rut.replace(/[^0-9kK]/g, '');
     if (!isValidRut) {
       setShowError(true);
@@ -25,15 +28,19 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({ buscar
     } finally {
       setLoading(false);
     }
-  };
+  }, [rut, isValidRut, buscarHeredero]);
 
-  const handleBlur = () => {
+  const handleBlur = useCallback((): void => {
     setShowError(rut.length > 0 && !isValidRut);
-  };
+  }, [rut, isValidRut]);
 
-  const handleFocus = () => {
+  const handleFocus = useCallback((): void => {
     setShowError(false);
-  };
+  }, []);
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
+    handleRutChange(e);
+  }, [handleRutChange]);
 
   return (
     <ConsaludCore.Card
@@ -66,18 +73,21 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({ buscar
             inputMode="text"
             pattern="[0-9kK.-]*"
             value={rut}
-            onChange={handleRutChange}
+            onChange={handleInputChange}
             onBlur={handleBlur}
             onFocus={handleFocus}
             placeholder="12.345.678-9"
             className="inputRut"
             disabled={loading}
+            aria-invalid={showError}
+            aria-describedby={showError ? 'rut-error' : undefined}
           />
           <button
             className={`buttonRut ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}`}
             disabled={!isValidRut || loading}
             onClick={handleNavigator}
             type="button"
+            aria-label="Buscar heredero"
           >
             Buscar
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
@@ -87,7 +97,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({ buscar
           </button>
         </div>
         {showError && (
-          <span className="errorRut">
+          <span className="errorRut" id="rut-error">
             RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
           </span>
         )}

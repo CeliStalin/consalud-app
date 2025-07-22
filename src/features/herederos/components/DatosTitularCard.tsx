@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import styles from './DatosTitularCard.module.css';
 
 interface DatosTitularCardProps {
@@ -19,7 +19,7 @@ export const DatosTitularCard: React.FC<DatosTitularCardProps> = ({
   loading = false,
 }) => {
   // Función para formatear la fecha a dd/mm/yyyy
-  const formatFecha = (fecha: string) => {
+  const formatFecha = useCallback((fecha: string): string => {
     if (!fecha) return '';
     const d = new Date(fecha);
     if (isNaN(d.getTime())) return fecha;
@@ -27,7 +27,15 @@ export const DatosTitularCard: React.FC<DatosTitularCardProps> = ({
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
     return `${day}/${month}/${year}`;
-  };
+  }, []);
+
+  const handleContinuarClick = useCallback((): void => {
+    if (!loading) {
+      onContinuar();
+    }
+  }, [onContinuar, loading]);
+
+  const nombreCompleto = `${nombre} ${apellidoPat} ${apellidoMat}`.trim();
 
   return (
     <div className={`${styles.cardContainer} card-elevated ingreso-card animate-fade-in-up`}>
@@ -45,13 +53,13 @@ export const DatosTitularCard: React.FC<DatosTitularCardProps> = ({
       </div>
       <div className={styles.subtitulo}>Confirma que los datos del titular sean correctos.</div>
       <div className={styles.datosBox}>
-        <span className={styles.nombreTitular}><b>{nombre} {apellidoPat} {apellidoMat}</b></span>
+        <span className={styles.nombreTitular}><b>{nombreCompleto}</b></span>
         <span className={styles.fechaDefuncion}>Fecha de defunción: {formatFecha(fechaDefuncion)}</span>
       </div>
       <div className={styles.btnContainer}>
         <button
           className={styles.btnContinuar}
-          onClick={onContinuar}
+          onClick={handleContinuarClick}
           type="button"
           aria-label="Continuar"
           disabled={loading}
@@ -61,4 +69,4 @@ export const DatosTitularCard: React.FC<DatosTitularCardProps> = ({
       </div>
     </div>
   );
-} 
+}; 
