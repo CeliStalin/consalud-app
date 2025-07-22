@@ -1,10 +1,11 @@
 import React from 'react';
 import { CargaDocumento } from '@/features/herederos/components/CargaDocumento'
 
-
 const CargaDocumentoPage: React.FC = () => {
   return (
-    <CargaDocumento />
+    <div className="route-container layout-stable" style={{ overflowY: 'auto', height: '100vh', paddingBottom: 40 }}>
+      <CargaDocumento />
+    </div>
   );
 };
 
