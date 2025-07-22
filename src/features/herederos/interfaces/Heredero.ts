@@ -10,5 +10,22 @@ interface Heredero {
     parentesco: number;
     Genero: string;
     contactabilidad: Contactabilidad;
-  }
-  export type { Heredero };
+    // Campos adicionales para compatibilidad con BFF
+    codCiudad?: number;
+    codComuna?: number;
+    codRegion?: number;
+    codigoPostal?: number;
+    email?: string;
+    descripcionCiudad?: string;
+    descripcionComuna?: string;
+    descripcionRegion?: string;
+    numeroBloque?: number;
+    numeroDepartamento?: number;
+    nombreVillaCondominio?: string;
+    nombreCalle?: string;
+    numeroCalle?: number;
+    numeroCelular?: number;
+    numeroFijo?: number;
+    tipoDireccion?: string;
+}
+export type { Heredero };

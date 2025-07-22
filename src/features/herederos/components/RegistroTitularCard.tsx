@@ -44,69 +44,151 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
 
   return (
     <ConsaludCore.Card
+      title={undefined}
+      subtitle={undefined}
       variant="elevated"
-      className="card-elevated ingreso-card animate-fade-in-up"
-      style={{ maxWidth: 700, width: '100%', margin: '0 auto' }}
+      padding="large"
+      className="ingreso-card animate-fade-in-up"
     >
-      <div className="containerInfoHeredero">
-        <div className="iconoGenerico">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path fillRule="evenodd" clipRule="evenodd" d="M16.3346 21.0043H4.66379C3.7424 21.0043 2.99609 20.258 2.99609 19.3366V7.66574C2.99609 6.74436 3.7424 5.99805 4.66379 5.99805H16.3356C17.256 5.99805 18.0023 6.74436 18.0023 7.66574V19.3376C18.0023 20.258 17.256 21.0043 16.3346 21.0043Z" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M12.2682 10.1643C13.2446 11.1407 13.2446 12.7244 12.2682 13.7018C11.2918 14.6782 9.70813 14.6782 8.73073 13.7018C7.75332 12.7254 7.75432 11.1417 8.73073 10.1643C9.70713 9.18691 11.2908 9.18791 12.2682 10.1643" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M15.0008 18.4362C14.8698 18.107 14.6667 17.8109 14.4066 17.5698V17.5698C13.9674 17.1616 13.3922 16.9355 12.7919 16.9355C11.7915 16.9355 9.20641 16.9355 8.20599 16.9355C7.60574 16.9355 7.0315 17.1626 6.59132 17.5698V17.5698C6.33121 17.8109 6.12812 18.107 5.99707 18.4362" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M5.99707 5.99734V4.66379C5.99707 3.7424 6.74338 2.99609 7.66476 2.99609H19.3366C20.257 2.99609 21.0033 3.7424 21.0033 4.66379V16.3356C21.0033 17.256 20.257 18.0023 19.3356 18.0023H18.0021" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <p className="textoRegistro">
-            Registrar persona heredera
-          </p>
+      <form
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', marginTop: 8 }}
+        onSubmit={e => { e.preventDefault(); handleNavigator(); }}
+        autoComplete="off"
+        aria-labelledby="rut-heredero-label"
+      >
+        <div style={{ width: '100%', maxWidth: 350, margin: '0 auto' }}>
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path fillRule="evenodd" clipRule="evenodd" d="M16.3346 21.0043H4.66379C3.7424 21.0043 2.99609 20.258 2.99609 19.3366V7.66574C2.99609 6.74436 3.7424 5.99805 4.66379 5.99805H16.3356C17.256 5.99805 18.0023 6.74436 18.0023 7.66574V19.3376C18.0023 20.258 17.256 21.0043 16.3346 21.0043Z" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12.2682 10.1643C13.2446 11.1407 13.2446 12.7244 12.2682 13.7018C11.2918 14.6782 9.70813 14.6782 8.73073 13.7018C7.75332 12.7254 7.75432 11.1417 8.73073 10.1643C9.70713 9.18691 11.2908 9.18791 12.2682 10.1643" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M15.0008 18.4362C14.8698 18.107 14.6667 17.8109 14.4066 17.5698V17.5698C13.9674 17.1616 13.3922 16.9355 12.7919 16.9355C11.7915 16.9355 9.20641 16.9355 8.20599 16.9355C7.60574 16.9355 7.0315 17.1626 6.59132 17.5698V17.5698C6.33121 17.8109 6.12812 18.107 5.99707 18.4362" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M5.99707 5.99734V4.66379C5.99707 3.7424 6.74338 2.99609 7.66476 2.99609H19.3366C20.257 2.99609 21.0033 3.7424 21.0033 4.66379V16.3356C21.0033 17.256 20.257 18.0023 19.3356 18.0023H18.0021" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <ConsaludCore.Typography
+                variant="subtitle1"
+                style={{ fontWeight: 700, color: '#505050', fontSize: 18, width: '100%' }}
+              >
+                Registrar persona heredera
+              </ConsaludCore.Typography>
+            </div>
+            <ConsaludCore.Typography
+              variant="body2"
+              style={{ color: '#656565', fontSize: 15 }}
+            >
+              Ingresa los datos de la persona heredera para la devolución.
+            </ConsaludCore.Typography>
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
+            <input
+              id="RutHeredero"
+              type="text"
+              inputMode="text"
+              pattern="[0-9kK.-]*"
+              value={rut}
+              onChange={handleInputChange}
+              onBlur={handleBlur}
+              onFocus={handleFocus}
+              placeholder="12.345.678-9"
+              className="inputRut"
+              disabled={loading}
+              aria-invalid={showError}
+              aria-describedby={showError ? 'rut-error' : undefined}
+              style={{ 
+                width: 378, 
+                height: 42, 
+                flexShrink: 0, 
+                border: showError ? '1.5px solid #E11D48' : '1.5px solid #e0e0e0', 
+                borderRadius: 24, 
+                fontSize: 16, 
+                paddingLeft: 18, 
+                background: '#f8f9fa', 
+                boxShadow: '0 2px 8px rgba(4, 165, 155, 0.07)', 
+                outline: 'none', 
+                transition: 'border 0.2s' 
+              }}
+            />
+            <button
+              className={`proceso-button animate-fade-in-up ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}${loading ? ' button--pulse' : ''}`}
+              disabled={!isValidRut || loading}
+              onClick={handleNavigator}
+              type="submit"
+              style={{ 
+                display: 'flex', 
+                padding: '10px 24px', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                gap: 8, 
+                minWidth: 120, 
+                borderRadius: 24, 
+                height: 42, 
+                fontSize: 16, 
+                background: isValidRut ? '#04A59B' : '#E0F7F6', 
+                color: '#fff', 
+                border: 'none', 
+                boxShadow: 'none', 
+                fontWeight: 600, 
+                transition: 'background 0.2s', 
+                opacity: loading ? 0.7 : 1 
+              }}
+              aria-label="Buscar heredero"
+            >
+              {loading ? (
+                <span style={{ display: 'flex', alignItems: 'center', background: 'transparent', minWidth: 120, justifyContent: 'center' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', background: 'transparent', marginRight: 8 }}>
+                    <ConsaludCore.LoadingSpinner size="medium" style={{ color: '#fff' }} />
+                  </span>
+                  <ConsaludCore.Typography
+                    variant="button"
+                    color="#fff"
+                    style={{ fontWeight: 600 }}
+                  >
+                    Buscar
+                  </ConsaludCore.Typography>
+                </span>
+              ) : (
+                <>
+                  <ConsaludCore.Typography
+                    variant="button"
+                    color={isValidRut ? '#fff' : '#bdbdbd'}
+                    style={{ fontWeight: 600 }}
+                  >
+                    Buscar
+                  </ConsaludCore.Typography>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ marginLeft: 8 }}>
+                    <circle cx="11" cy="11" r="8" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" />
+                    <path d="M21 21L16.65 16.65" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </>
+              )}
+            </button>
+          </div>
+          
+          {showError && (
+            <div id="rut-error">
+              <ConsaludCore.Typography
+                variant="caption"
+                color={ConsaludCore.theme?.textColors?.danger || "#E11D48"}
+                className="errorRut"
+                style={{ marginTop: 4, display: 'block', fontSize: 13 }}
+              >
+                RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
+              </ConsaludCore.Typography>
+            </div>
+          )}
+          {error && !showError && (
+            <ConsaludCore.Typography
+              variant="caption"
+              color={ConsaludCore.theme?.textColors?.danger || "#E11D48"}
+              className="errorRut"
+              style={{ marginTop: 4, display: 'block', fontSize: 13 }}
+            >
+              {error}
+            </ConsaludCore.Typography>
+          )}
         </div>
-        <p className="textoImportante">
-          Ingresa los datos de la persona heredera para la devolución.
-        </p>
-        <span className="rutText">
-          RUT persona heredera
-        </span>
-        <div className="divRut">
-          <input
-            id="RutHeredero"
-            type="text"
-            inputMode="text"
-            pattern="[0-9kK.-]*"
-            value={rut}
-            onChange={handleInputChange}
-            onBlur={handleBlur}
-            onFocus={handleFocus}
-            placeholder="12.345.678-9"
-            className="inputRut"
-            disabled={loading}
-            aria-invalid={showError}
-            aria-describedby={showError ? 'rut-error' : undefined}
-          />
-          <button
-            className={`buttonRut ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}`}
-            disabled={!isValidRut || loading}
-            onClick={handleNavigator}
-            type="button"
-            aria-label="Buscar heredero"
-          >
-            Buscar
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
-              <path d="M15.7138 7.3382C18.1647 9.78913 18.1647 13.7629 15.7138 16.2138C13.2629 18.6647 9.28913 18.6647 6.8382 16.2138C4.38727 13.7629 4.38727 9.78913 6.8382 7.3382C9.28913 4.88727 13.2629 4.88727 15.7138 7.3382" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M19 19.5009L15.71 16.2109" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        </div>
-        {showError && (
-          <span className="errorRut" id="rut-error">
-            RUT inválido. Ingrese un RUT válido (Ej: 12345678-9)
-          </span>
-        )}
-        {error && !showError && (
-          <span className="errorRut">
-            {error}
-          </span>
-        )}
-      </div>
+      </form>
     </ConsaludCore.Card>
   );
 }; 

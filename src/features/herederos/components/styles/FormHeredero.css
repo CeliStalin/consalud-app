@@ -1,12 +1,21 @@
 /* Estilos para el formulario de herederos */
 
+/* Contenedor principal de la página con scroll */
+.route-container.layout-stable {
+  overflow-y: auto;
+  height: 100vh;
+  padding-bottom: 40px; /* Espacio adicional al final */
+}
+
 .main-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Cambiado de center a flex-start para permitir scroll */
     width: 100%;
     padding: 40px 0;
     background-color: #f8f9fa;
+    min-height: 100vh; /* Asegura que el contenedor tenga altura mínima */
+    overflow-y: auto; /* Permite scroll vertical */
   }
   
   /* Configuración global del formulario */
@@ -16,6 +25,7 @@
     background-color: white;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     border-radius: 10px;
+    margin: 20px 0; /* Agrega margen para separación */
   }
   
   /* Contenedor principal del formulario */
@@ -23,6 +33,7 @@
     padding: 32px 28px;
     border-radius: 8px;
     background: #FFFFFF;
+    max-height: none; /* Permite que el contenido se expanda */
   }
   
   /* Títulos de sección con iconos */
@@ -269,4 +280,29 @@
     .form-container .form-column {
       flex: 0 0 100%;
     }
+
+    /* Mejoras para scroll en móviles */
+    .route-container.layout-stable {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+    }
+
+    .main-container {
+      padding: 20px 0;
+    }
+  }
+
+  /* Estilos para scroll suave */
+  .route-container.layout-stable {
+    scroll-behavior: smooth;
+  }
+
+  /* Asegurar que el botón de continuar sea siempre visible */
+  .form-container .continue-button {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 20px;
+    z-index: 10;
   }
