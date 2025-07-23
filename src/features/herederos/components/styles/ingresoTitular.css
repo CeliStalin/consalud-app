@@ -126,3 +126,23 @@
     filter: blur(4px);
   }
 }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loader-inner {
+  border: 2px solid transparent;
+  border-top: 2px solid #04A59B;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  background: transparent;
+}
+
+.button.is-loading::after {
+  display: none !important;
+}

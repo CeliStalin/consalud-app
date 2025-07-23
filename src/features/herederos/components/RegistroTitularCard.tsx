@@ -139,57 +139,41 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
                 />
                 
                 <button
-                  className={`proceso-button ${heredero ? '' : 'animate-fade-in-up'} ${isValidRut ? 'buttonRut--valid' : 'buttonRut--invalid'}${loading ? ' button--pulse' : ''}`}
+                  className={`button is-primary is-rounded proceso-button animate-fade-in-up${isValidRut ? ' buttonRut--valid' : ' buttonRut--invalid'}`}
                   disabled={!isValidRut || loading || !!heredero}
                   onClick={handleNavigator}
                   type="submit"
-                  style={{ 
-                    display: 'flex', 
-                    padding: '10px 24px', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    gap: 8, 
-                    minWidth: 120, 
-                    borderRadius: 24, 
-                    height: 42, 
-                    fontSize: 16, 
-                    background: isValidRut ? '#04A59B' : '#E0F7F6', 
-                    color: '#fff', 
-                    border: 'none', 
-                    boxShadow: 'none', 
-                    fontWeight: 600, 
-                    transition: 'background 0.2s', 
-                    opacity: loading ? 0.7 : 1 
-                  }}
                   aria-label="Buscar heredero"
+                  aria-busy={loading}
+                  style={{
+                    minWidth: 120,
+                    height: 42,
+                    fontWeight: 600,
+                    opacity: loading ? 0.7 : 1,
+                    transition: 'opacity 0.2s',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 8,
+                    border: 'none',
+                    boxShadow: 'none',
+                    fontSize: 16,
+                    background: isValidRut ? '#04A59B' : '#E0F7F6',
+                    color: '#fff',
+                  }}
                 >
                   {loading ? (
-                    <span style={{ display: 'flex', alignItems: 'center', background: 'transparent', minWidth: 120, justifyContent: 'center' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', background: 'transparent', marginRight: 8 }}>
-                        <ConsaludCore.LoadingSpinner size="medium" style={{ color: '#fff' }} />
-                      </span>
-                      <ConsaludCore.Typography
-                        variant="button"
-                        color="#fff"
-                        style={{ fontWeight: 600 }}
-                      >
-                        Buscar
-                      </ConsaludCore.Typography>
+                    <span className="loader is-loading-custom" style={{ width: 22, height: 22, display: 'inline-block' }}>
+                      <span className="loader-inner" />
                     </span>
                   ) : (
-                    <>
-                      <ConsaludCore.Typography
-                        variant="button"
-                        color={isValidRut ? '#fff' : '#bdbdbd'}
-                        style={{ fontWeight: 600 }}
-                      >
-                        Buscar
-                      </ConsaludCore.Typography>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      Buscar
                       <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ marginLeft: 8 }}>
                         <circle cx="11" cy="11" r="8" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" />
                         <path d="M21 21L16.65 16.65" stroke={isValidRut ? 'white' : '#bdbdbd'} strokeWidth="2" strokeLinecap="round" />
                       </svg>
-                    </>
+                    </span>
                   )}
                 </button>
               </div>
