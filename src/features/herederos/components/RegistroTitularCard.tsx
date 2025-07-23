@@ -68,7 +68,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
         subtitle={undefined}
         variant="elevated"
         padding="large"
-        className={`card-elevated ingreso-card ${heredero ? '' : 'animate-fade-in-up'}`}
+        className="card-elevated ingreso-card animate-fade-in-up"
         style={{ marginBottom: showForm ? 24 : 0 }}
       >
         <form

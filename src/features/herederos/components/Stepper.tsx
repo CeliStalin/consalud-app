@@ -27,44 +27,15 @@ export const useStepper = () => {
   return context;
 };
 
-interface StepperPropsWithLoading extends StepperProps {
-  loadingTransition?: boolean;
-}
+interface StepperPropsWithLoading extends StepperProps {}
 
-const Stepper: React.FC<StepperPropsWithLoading> = ({ step, loadingTransition = false }) => {
+const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
   const steps = [
     { title: "Paso 1", description: "Datos del titular" },
     { title: "Paso 2", description: "Registrar persona heredera" },
     { title: "Paso 3", description: "Carga de documentos" },
     { title: "Paso 4", description: "Cuenta bancaria" },
   ];
-
-  // Estado para animar el llenado de la barra entre el paso anterior y el actual
-  const [progressWidths, setProgressWidths] = useState<string[]>(Array(steps.length - 1).fill('0%'));
-  const prevStep = React.useRef(step);
-
-  React.useEffect(() => {
-    if (step > prevStep.current) {
-      setProgressWidths((prev) => prev.map((w, i) => {
-        if (i === step - 2) return '100%';
-        if (i < step - 2) return '100%';
-        return w;
-      }));
-    } else if (step < prevStep.current) {
-      setProgressWidths((prev) => prev.map((w, i) => {
-        if (i === step - 1) return '0%';
-        if (i < step - 1) return '100%';
-        return w;
-      }));
-    }
-    prevStep.current = step;
-  }, [step]);
-
-  React.useEffect(() => {
-    if (step === 1) {
-      setProgressWidths(Array(steps.length - 1).fill('0%'));
-    }
-  }, [step, steps.length]);
 
   const renderCircle = (index: number) => {
     const isCompleted = index < step - 1;
@@ -104,12 +75,12 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step, loadingTransition = 
               <div
                 className={`progressLine${index < step - 1 ? ' active' : ''}`}
                 style={{
-                  width: 'calc(100% - 24px)', // 24px es el diámetro del círculo
+                  width: 'calc(100% - 24px)',
                   backgroundColor: index < step - 1 ? '#00CBBF' : '#EEEEEE',
                   height: 2,
                   position: 'absolute',
                   top: '50%',
-                  left: 'calc(50% + 12px)', // 12px es el radio del círculo, para empezar justo al borde derecho
+                  left: 'calc(50% + 12px)',
                   zIndex: 0,
                   transform: 'translateY(-50%)',
                   transition: 'background-color 0.5s, width 0.5s',

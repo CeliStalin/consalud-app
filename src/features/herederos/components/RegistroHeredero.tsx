@@ -15,32 +15,26 @@ const RegistroHeredero: React.FC = () => {
     const navigator = useNavigate();
     const { buscarHeredero, error, heredero } = useHeredero();
 
-    const [loadingTransition, setLoadingTransition] = useState(true);
+    // Eliminar loadingTransition
+    // const [loadingTransition, setLoadingTransition] = useState(true);
     const [step, setStep] = useState(1);
     
     useEffect(() => {
         // Si ya hay un heredero cargado, evitar las animaciones de carga
         if (heredero) {
-            setLoadingTransition(false);
             setStep(2);
             return;
         }
-        
         // Solo ejecutar animaciones si no hay heredero cargado
-        const timeout1 = setTimeout(() => setLoadingTransition(false), 700);
         const timeout2 = setTimeout(() => setStep(2), 150); // Pequeño delay para animar el llenado
         return () => {
-            clearTimeout(timeout1);
             clearTimeout(timeout2);
         };
     }, [heredero]);
 
     const handleBackClick = useCallback((): void => {
         setStep(1);
-        setLoadingTransition(true);
-        setTimeout(() => {
-            navigator(-1);
-        }, 700); // Espera a que la animación de vaciado termine
+        navigator(-1);
     }, [navigator]);
 
     const breadcrumbItems: BreadcrumbItem[] = [
@@ -93,9 +87,7 @@ const RegistroHeredero: React.FC = () => {
             {/* Espacio entre título y Stepper */}
             <div style={{ height: 24 }} />
             {/* Stepper */}
-            <div className="mb-5">
-                <Stepper step={step} loadingTransition={loadingTransition} />
-            </div>
+            <Stepper step={step} />
             {/* Centered Card Container */}
             <div className="container">
                 <div className="columns is-centered">

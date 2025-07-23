@@ -28,14 +28,13 @@ const CargaDocumento: React.FC = () => {
 
   const { ejemploCedula, ejemploPoder, ejemploPosesion } = UseAlert();
   const { step, setStep } = useStepper();
-  const [loadingTransition, setLoadingTransition] = useState(false);
+  // Eliminar loadingTransition y su uso en useEffect
   const [showOverlay] = useState(false);
 
   useEffect(() => {
     setStep(3);
-    setLoadingTransition(true);
-    const timeout = setTimeout(() => setLoadingTransition(false), 1200);
-    return () => clearTimeout(timeout);
+    // Eliminar setLoadingTransition(true) y setTimeout relacionado
+    return () => {};
   }, [setStep]);
 
   const handleBack = () => {
@@ -316,7 +315,7 @@ const CargaDocumento: React.FC = () => {
           
           {/* Stepper debajo del título */}
           <div className="mb-5">
-            <Stepper step={step} loadingTransition={loadingTransition} />
+            <Stepper step={step} />
           </div>
         </div>
       </div>

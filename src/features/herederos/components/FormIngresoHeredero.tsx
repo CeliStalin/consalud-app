@@ -302,7 +302,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
           subtitle={undefined}
           variant="elevated"
           padding="large"
-          className={`card-elevated ingreso-card ${showHeader ? 'animate-fade-in-up' : ''}`}
+          className="card-elevated ingreso-card animate-fade-in-up"
         >
           <form onSubmit={handleSubmit}>
             {/* Sección de Datos Personales */}
