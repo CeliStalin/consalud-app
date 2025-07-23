@@ -7,6 +7,7 @@ import './styles/FormHeredero.css';
 import { Stepper } from './Stepper';
 import { useHeredero } from '../contexts/HerederoContext';
 import * as ConsaludCore from '@consalud/core';
+import { fetchGeneros, fetchCiudades, fetchComunasPorCiudad, Genero, Ciudad, Comuna } from '../services';
 
 interface BreadcrumbItem {
     label: string;
@@ -17,24 +18,12 @@ interface FormIngresoHerederoProps {
 }
 
 // Datos para los selectores
-const SEXO_OPTIONS = [
-  { value: 'M', label: 'Masculino' },
-  { value: 'F', label: 'Femenino' },
-  { value: 'O', label: 'Otro' }
-];
-
 const PARENTESCO_OPTIONS = [
   { value: 'H', label: 'Hijo/a' },
   { value: 'P', label: 'Padre' },
   { value: 'M', label: 'Madre' },
   { value: 'C', label: 'Cónyuge' },
   { value: 'O', label: 'Otro' }
-];
-
-const CIUDAD_OPTIONS = [
-  { value: 'Santiago', label: 'Santiago' },
-  { value: 'Valparaíso', label: 'Valparaíso' },
-  { value: 'Concepción', label: 'Concepción' }
 ];
 
 const COMUNA_OPTIONS = {
@@ -95,6 +84,49 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Estado para manejar errores de validación
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
+  // Estado para géneros
+  const [generos, setGeneros] = useState<Genero[]>([]);
+  const [loadingGeneros, setLoadingGeneros] = useState<boolean>(false);
+  const [errorGeneros, setErrorGeneros] = useState<string | null>(null);
+
+  // Estado para ciudades
+  const [ciudades, setCiudades] = useState<Ciudad[]>([]);
+  const [loadingCiudades, setLoadingCiudades] = useState<boolean>(false);
+  const [errorCiudades, setErrorCiudades] = useState<string | null>(null);
+
+  // Estado para comunas
+  const [comunas, setComunas] = useState<Comuna[]>([]);
+  const [loadingComunas, setLoadingComunas] = useState<boolean>(false);
+  const [errorComunas, setErrorComunas] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    setLoadingGeneros(true);
+    fetchGeneros()
+      .then((data) => {
+        setGeneros(data);
+        setErrorGeneros(null);
+      })
+      .catch((err) => {
+        setErrorGeneros('No se pudieron cargar los géneros');
+        setGeneros([]);
+      })
+      .finally(() => setLoadingGeneros(false));
+  }, []);
+
+  React.useEffect(() => {
+    setLoadingCiudades(true);
+    fetchCiudades()
+      .then((data) => {
+        setCiudades(data);
+        setErrorCiudades(null);
+      })
+      .catch(() => {
+        setErrorCiudades('No se pudieron cargar las ciudades');
+        setCiudades([]);
+      })
+      .finally(() => setLoadingCiudades(false));
+  }, []);
+
   const handleBackClick = useCallback((): void => {
     navigate(-1);
   }, [navigate]);
@@ -140,7 +172,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     }
   };
 
-  // Manejar cambio de ciudad (resetea comuna)
+  // Manejar cambio de ciudad (resetea comuna y carga comunas)
   const handleCiudadChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
     setFormData({
@@ -154,6 +186,24 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         ...errors,
         ciudad: ''
       });
+    }
+
+    // Buscar idCiudad correspondiente
+    const ciudadObj = ciudades.find((c) => c.nombreCiudad === value);
+    if (ciudadObj) {
+      setLoadingComunas(true);
+      fetchComunasPorCiudad(ciudadObj.idCiudad)
+        .then((data) => {
+          setComunas(data);
+          setErrorComunas(null);
+        })
+        .catch(() => {
+          setErrorComunas('No se pudieron cargar las comunas');
+          setComunas([]);
+        })
+        .finally(() => setLoadingComunas(false));
+    } else {
+      setComunas([]);
     }
   };
 
@@ -400,22 +450,28 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 {/* Sexo */}
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                   <label>Sexo</label>
-                  <div className={`select ${errors.sexo ? 'is-danger' : ''}`}>
+                  <div className={`select ${errors.sexo ? 'is-danger' : ''}`}> 
                     <select
                       name="sexo"
                       value={formData.sexo}
                       onChange={handleInputChange}
+                      disabled={loadingGeneros || !!errorGeneros}
                     >
-                      <option value="" disabled>Seleccionar</option>
-                      {SEXO_OPTIONS.map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
+                      <option value="" disabled>
+                        {loadingGeneros ? 'Cargando...' : errorGeneros ? 'Error al cargar' : 'Seleccionar'}
+                      </option>
+                      {generos.map((genero) => (
+                        <option key={genero.Codigo} value={genero.Codigo}>
+                          {genero.Descripcion}
                         </option>
                       ))}
                     </select>
                   </div>
                   {errors.sexo && (
                     <p className="help is-danger">{errors.sexo}</p>
+                  )}
+                  {errorGeneros && (
+                    <p className="help is-danger">{errorGeneros}</p>
                   )}
                 </div>
 
@@ -517,17 +573,23 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                       name="ciudad"
                       value={formData.ciudad}
                       onChange={handleCiudadChange}
+                      disabled={loadingCiudades || !!errorCiudades}
                     >
-                      <option value="" disabled>Seleccionar</option>
-                      {CIUDAD_OPTIONS.map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
+                      <option value="" disabled>
+                        {loadingCiudades ? 'Cargando...' : errorCiudades ? 'Error al cargar' : 'Seleccionar'}
+                      </option>
+                      {ciudades.map((ciudad) => (
+                        <option key={ciudad.idCiudad} value={ciudad.nombreCiudad}>
+                          {ciudad.nombreCiudad}
                         </option>
                       ))}
                     </select>
                   </div>
                   {errors.ciudad && (
                     <p className="help is-danger">{errors.ciudad}</p>
+                  )}
+                  {errorCiudades && (
+                    <p className="help is-danger">{errorCiudades}</p>
                   )}
                 </div>
 
@@ -539,18 +601,23 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                       name="comuna"
                       value={formData.comuna}
                       onChange={handleInputChange}
-                      disabled={!formData.ciudad}
+                      disabled={!formData.ciudad || loadingComunas || !!errorComunas}
                     >
-                      <option value="" disabled>Seleccionar</option>
-                      {formData.ciudad && COMUNA_OPTIONS[formData.ciudad as keyof typeof COMUNA_OPTIONS]?.map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
+                      <option value="" disabled>
+                        {!formData.ciudad ? 'Seleccione ciudad' : loadingComunas ? 'Cargando...' : errorComunas ? 'Error al cargar' : 'Seleccionar'}
+                      </option>
+                      {comunas.map((comuna) => (
+                        <option key={comuna.idComuna} value={comuna.NombreComuna}>
+                          {comuna.NombreComuna}
                         </option>
                       ))}
                     </select>
                   </div>
                   {errors.comuna && (
                     <p className="help is-danger">{errors.comuna}</p>
+                  )}
+                  {errorComunas && (
+                    <p className="help is-danger">{errorComunas}</p>
                   )}
                 </div>
               </div>

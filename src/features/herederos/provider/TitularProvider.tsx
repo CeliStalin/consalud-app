@@ -5,7 +5,7 @@ import axios from "axios";
 import { TitularContextType } from "../interfaces/TitularContext";
 import { TitularContext } from "../contexts/TitularContext";
 import { useRutChileno } from "../hooks/useRutChileno";
-import { fetchTitularByRut } from '../services/bffHerederosService';
+import { fetchTitularByRut } from '../services';
 
 export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) => {
   const [titular, setTitular] = useState<Titular | null>(() => {

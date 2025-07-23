@@ -1,66 +1,14 @@
-import { Titular } from '../interfaces/Titular';
-import { SolicitanteResponse } from '../interfaces/Solicitante';
+/**
+ * @deprecated Este archivo ha sido refactorizado por dominio.
+ * 
+ * Nuevos servicios organizados:
+ * - herederosService.ts - Gestión de herederos, titulares, solicitantes
+ * - pargenService.ts - Parámetros generales (géneros, ciudades, comunas)
+ * - apiUtils.ts - Utilidades centralizadas para API
+ * 
+ * Importa desde '../services' en lugar de este archivo.
+ */
 
-export async function fetchTitularByRut(rut: number, userName: string = ""): Promise<Titular> {
-  const baseUrl = import.meta.env.VITE_BFF_HEREDEROS_DNS;
-  const url = `${baseUrl}/api/Titular/ByRut?IdentificadorUnico=${rut}&userName=${encodeURIComponent(userName)}`;
-  const apiKeyHeader = import.meta.env.VITE_BFF_HEREDEROS_API_KEY_HEADER;
-  const apiKeyValue = import.meta.env.VITE_BFF_HEREDEROS_API_KEY_VALUE;
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'accept': 'application/json',
-      [apiKeyHeader]: apiKeyValue,
-    },
-  });
-
-  console.log('fetchTitularByRut status:', response.status);
-
-  if (response.status === 404) {
-    throw new Error('No hay solicitantes en maestro de contactibilidad');
-  }
-
-  if (!response.ok) {
-    throw new Error(String(response.status));
-  }
-
-  const data = await response.json();
-
-  // Mapear la respuesta del BFF al modelo Titular
-  const titular: Titular = {
-    id: data.IdPersona,
-    rut: `${data.RutPersona}-${data.RutDigito}`,
-    nombre: data.NomPersona,
-    apellidoPat: data.ApePaterno,
-    apellidoMat: data.ApeMaterno,
-    fechaDefuncion: data.FecFallecido,
-    poseeFondos: data.PoseeFondos,
-    poseeSolicitud: data.PoseeSolicitudes,
-    indFallecido: data.IndFallecido,
-  };
-
-  return titular;
-}
-
-export async function fetchSolicitanteMejorContactibilidad(rut: number, userName: string = "string"): Promise<SolicitanteResponse> {
-  const baseUrl = import.meta.env.VITE_BFF_HEREDEROS_DNS;
-  const url = `${baseUrl}/api/Solicitante/mejorContactibilidad?IdentificadorUnico=${rut}&userName=${encodeURIComponent(userName)}`;
-  const apiKeyHeader = import.meta.env.VITE_BFF_HEREDEROS_API_KEY_HEADER;
-  const apiKeyValue = import.meta.env.VITE_BFF_HEREDEROS_API_KEY_VALUE;
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'accept': 'application/json',
-      [apiKeyHeader]: apiKeyValue,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(String(response.status));
-  }
-
-  const data = await response.json();
-  return data;
-} 
+// Re-exportar para compatibilidad temporal
+export * from './herederosService';
+export * from './pargenService'; 

@@ -6,7 +6,7 @@ import axios from "axios";
 import { HerederoContextType } from "../interfaces/HerederoContext";
 import { HerederoContext } from "../contexts/HerederoContext";
 import { useRutChileno } from "../hooks/useRutChileno";
-import { fetchSolicitanteMejorContactibilidad } from "../services/bffHerederosService";
+import { fetchSolicitanteMejorContactibilidad } from "../services";
 
 export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) => {
   const [heredero, setHeredero] = useState<Heredero | null>(null);
