@@ -1,11 +1,10 @@
 // Utilidades de API
 export * from './apiUtils';
 
-// Servicios por dominio
+// Servicio principal de herederos (incluye parámetros generales)
 export * from './herederosService';
-export * from './pargenService';
 
 // Re-exportar interfaces para facilitar importaciones
-export type { Genero, Ciudad, Comuna } from './pargenService';
+export type { Genero, Ciudad, Comuna } from '../interfaces/Pargen';
 export type { Titular } from '../interfaces/Titular';
 export type { SolicitanteResponse } from '../interfaces/Solicitante'; 

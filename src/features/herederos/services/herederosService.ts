@@ -1,13 +1,16 @@
 import { Titular } from '../interfaces/Titular';
 import { SolicitanteResponse } from '../interfaces/Solicitante';
+import { Genero, Ciudad, Comuna } from '../interfaces/Pargen';
 import { apiGet, getHerederosApiConfig } from './apiUtils';
 
 /**
  * Servicio para gestión de herederos
- * Maneja titulares, solicitantes y operaciones relacionadas con herederos
+ * Maneja titulares, solicitantes y parámetros generales del sistema
  */
 export class HerederosService {
   private config = getHerederosApiConfig();
+
+  // ===== MÉTODOS DE HEREDEROS =====
 
   /**
    * Obtiene información de un titular por RUT
@@ -52,6 +55,33 @@ export class HerederosService {
     const url = `${this.config.baseUrl}/api/Solicitante/mejorContactibilidad?IdentificadorUnico=${rut}&userName=${encodeURIComponent(userName)}`;
     return apiGet<SolicitanteResponse>(url, this.config, 'obtener mejor contactibilidad del solicitante');
   }
+
+  // ===== MÉTODOS DE PARÁMETROS GENERALES =====
+
+  /**
+   * Obtiene la lista de géneros
+   */
+  async getGeneros(): Promise<Genero[]> {
+    const url = `${this.config.baseUrl}/api/Pargen/Generos`;
+    return apiGet<Genero[]>(url, this.config, 'obtener géneros');
+  }
+
+  /**
+   * Obtiene la lista de ciudades
+   */
+  async getCiudades(): Promise<Ciudad[]> {
+    const url = `${this.config.baseUrl}/api/Pargen/CiudadesIsapre`;
+    return apiGet<Ciudad[]>(url, this.config, 'obtener ciudades');
+  }
+
+  /**
+   * Obtiene la lista de comunas para una ciudad específica
+   * @param idCiudad - ID de la ciudad
+   */
+  async getComunasPorCiudad(idCiudad: number): Promise<Comuna[]> {
+    const url = `${this.config.baseUrl}/api/Pargen/ComunasIsaprePorCiudad?IdCiudad=${idCiudad}`;
+    return apiGet<Comuna[]>(url, this.config, 'obtener comunas por ciudad');
+  }
 }
 
 // Exportar instancia única
@@ -62,4 +92,8 @@ export const fetchTitularByRut = (rut: number, userName: string = "") =>
   herederosService.getTitularByRut(rut, userName);
 
 export const fetchSolicitanteMejorContactibilidad = (rut: number, userName: string = "") => 
-  herederosService.getSolicitanteMejorContactibilidad(rut, userName); 
+  herederosService.getSolicitanteMejorContactibilidad(rut, userName);
+
+export const fetchGeneros = () => herederosService.getGeneros();
+export const fetchCiudades = () => herederosService.getCiudades();
+export const fetchComunasPorCiudad = (idCiudad: number) => herederosService.getComunasPorCiudad(idCiudad); 
