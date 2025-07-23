@@ -31,7 +31,7 @@ interface StepperPropsWithLoading extends StepperProps {
   loadingTransition?: boolean;
 }
 
-const Stepper = ({ step, loadingTransition = false }: StepperPropsWithLoading) => {
+const Stepper: React.FC<StepperPropsWithLoading> = ({ step, loadingTransition = false }) => {
   const steps = [
     { title: "Paso 1", description: "Datos del titular" },
     { title: "Paso 2", description: "Registrar persona heredera" },
@@ -40,21 +40,20 @@ const Stepper = ({ step, loadingTransition = false }: StepperPropsWithLoading) =
   ];
 
   // Estado para animar el llenado de la barra entre el paso anterior y el actual
-  const [progressWidths, setProgressWidths] = useState(Array(steps.length - 1).fill('0%'));
+  const [progressWidths, setProgressWidths] = useState<string[]>(Array(steps.length - 1).fill('0%'));
   const prevStep = React.useRef(step);
 
   React.useEffect(() => {
-    // Si el step avanza, animar la barra correspondiente
     if (step > prevStep.current) {
       setProgressWidths((prev) => prev.map((w, i) => {
-        if (i === step - 2) return '100%'; // Solo la barra del paso recién avanzado
-        if (i < step - 2) return '100%'; // Barras previas ya completas
+        if (i === step - 2) return '100%';
+        if (i < step - 2) return '100%';
         return w;
       }));
     } else if (step < prevStep.current) {
       setProgressWidths((prev) => prev.map((w, i) => {
-        if (i === step - 1) return '0%'; // Solo la barra que retrocede
-        if (i < step - 1) return '100%'; // Barras previas ya completas
+        if (i === step - 1) return '0%';
+        if (i < step - 1) return '100%';
         return w;
       }));
     }
@@ -62,25 +61,23 @@ const Stepper = ({ step, loadingTransition = false }: StepperPropsWithLoading) =
   }, [step]);
 
   React.useEffect(() => {
-    // Al montar, si el step es 1, todas las barras en 0%
     if (step === 1) {
       setProgressWidths(Array(steps.length - 1).fill('0%'));
     }
   }, [step, steps.length]);
 
   const renderCircle = (index: number) => {
-    const isCompleted = index < step;
+    const isCompleted = index < step - 1;
     const isActive = index === step - 1;
     return (
       <div
-        className={`circle ${isCompleted ? 'completed' : 'incomplete'}${isActive ? ' circle-animate animate-pulse animate-ping' : ''}${isCompleted && !isActive ? ' animate-bounce' : ''}`}
+        className={`stepper-circle${isCompleted ? ' completed' : ''}${isActive ? ' active' : ''}`}
       >
         {isCompleted && (
           <svg
-            className={isActive ? 'animate-spin' : ''}
             xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
+            width="14"
+            height="14"
             viewBox="0 0 16 16"
             fill="none"
           >
@@ -98,59 +95,45 @@ const Stepper = ({ step, loadingTransition = false }: StepperPropsWithLoading) =
   };
 
   return (
-    <div
-     className="containerStepper"
-    >
-      {/* Línea superior con los pasos */}
-      <div
-        className="lineStepper"
-      >
+    <div className="containerStepper">
+      <div className="lineStepper">
         {steps.map((_, index) => (
-          <div
-            key={index}
-            className="flexCenterRelative"
-          >
+          <div key={index} className="flexCenterRelative" style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
             {renderCircle(index)}
-
-            {/* Línea conectando al siguiente círculo */}
             {index < steps.length - 1 && (
               <div
-                className={`progressLine duration-500${index < step - 1 ? ' active scale-110 opacity-100' : ' inactive opacity-0'}${loadingTransition && index === step - 2 ? ' shimmer-green' : ''}`}
+                className={`progressLine${index < step - 1 ? ' active' : ''}`}
                 style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  width: progressWidths[index],
-                  height: "2px",
+                  width: 'calc(100% - 24px)', // 24px es el diámetro del círculo
+                  backgroundColor: index < step - 1 ? '#00CBBF' : '#EEEEEE',
+                  height: 2,
+                  position: 'absolute',
+                  top: '50%',
+                  left: 'calc(50% + 12px)', // 12px es el radio del círculo, para empezar justo al borde derecho
                   zIndex: 0,
-                  transform: "translate(-50%, -50%)",
-                  backgroundColor: index < step - 1 ? "#00CBBF" : "#EEEEEE",
-                  transition: 'background-color 1s cubic-bezier(0.34, 1.56, 0.64, 1), width 1s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                  transform: 'translateY(-50%)',
+                  transition: 'background-color 0.5s, width 0.5s',
                 }}
               />
             )}
           </div>
         ))}
       </div>
-
-      {/* Textos debajo de los pasos */}
-      <div
-        className="stepperRow"
-      >
+      <div className="stepperRow">
         {steps.map((s, index) => (
           <div key={index} style={{ textAlign: "center", width: "100%" }}>
-            <ConsaludCore.Typography 
-              variant="bodySmall" 
-              weight="bold" 
-              style={{ fontSize: '0.875rem' }} 
+            <ConsaludCore.Typography
+              variant="bodySmall"
+              weight="bold"
+              style={{ fontSize: '0.875rem' }}
               color={ConsaludCore.theme?.textColors?.primary || "#505050"}
               gutterBottom
             >
               {s.title}
             </ConsaludCore.Typography>
-            <ConsaludCore.Typography 
-              variant="caption" 
-              style={{ fontSize: '0.75rem' }} 
+            <ConsaludCore.Typography
+              variant="caption"
+              style={{ fontSize: '0.75rem' }}
               color={ConsaludCore.theme?.textColors?.muted || "#909090"}
             >
               {s.description}
