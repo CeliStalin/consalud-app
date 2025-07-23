@@ -4,6 +4,7 @@ import * as ConsaludCore from '@consalud/core';
 import { useTitular } from "../contexts/TitularContext";
 import RequisitosIcon from '@/assets/requisitos.svg';
 import CheckIcon from '@/assets/check-requisitos.svg';
+import './styles/RequisitosTitular.css';
 
 const RequisitosTitular: React.FC = () => {
     const navigator = useNavigate();
@@ -25,20 +26,47 @@ const RequisitosTitular: React.FC = () => {
         }
     }, [titular, loading, buscarTitular]);
 
+    const renderRequirementItem = (text: string, description?: string) => (
+        <li className="requirementItem">
+            <img 
+                src={CheckIcon} 
+                width={20} 
+                height={20} 
+                alt="Check" 
+                className="checkIcon" 
+            />
+            <ConsaludCore.Typography 
+                variant="body" 
+                weight="bold" 
+                className="requirementText"
+            >
+                {text}
+            </ConsaludCore.Typography>
+            {description && (
+                <ConsaludCore.Typography 
+                    variant="body" 
+                    className="requirementDescription"
+                >
+                    {description}
+                </ConsaludCore.Typography>
+            )}
+        </li>
+    );
+
     return (
         <div className="route-container layout-stable">
             {/* Fallback visual si faltan campos */}
             {(!titular?.nombre || !titular?.apellidoPat) && (
-                <div className="has-text-danger mb-4">
+                <div className="has-text-danger warningMessage">
                     <b>Advertencia:</b> Faltan datos del titular (nombre o apellidoPat). Verifica el mapeo de datos.
                 </div>
             )}
 
             {/* Header Section */}
-            <div className="mb-5" style={{ width: '100%' }}>
-                <div className="ml-6">
+            <div className="headerSection">
+                <div className="headerContent">
                     {/* Breadcrumb */}
-                    <div className="mb-2">
+                    <div className="breadcrumbContainer">
                         <ConsaludCore.Breadcrumb 
                             items={[{ label: 'Administración devolución herederos' }]} 
                             separator={<span>{'>'}</span>}
@@ -47,7 +75,7 @@ const RequisitosTitular: React.FC = () => {
                         />
                     </div>
                     {/* Botón volver */}
-                    <div>
+                    <div className="backButtonContainer">
                         <button
                             className="back-button"
                             onClick={() => navigator(-1)}
@@ -60,69 +88,57 @@ const RequisitosTitular: React.FC = () => {
             </div>
 
             {/* Título fuera de la Card */}
-            <div className="is-flex is-justify-content-center mb-5">
+            <div className="titleSection">
                 <ConsaludCore.Typography
                     variant="h5"
                     component="h2"
                     weight={600}
                     className="titleComponent"
-                    style={{ textAlign: 'center', fontWeight: 600, color: '#000', fontSize: '30px' }}
                 >
                     Requisitos
                 </ConsaludCore.Typography>
             </div>
 
             {/* Card centrado con Bulma */}
-            <div className="is-flex is-justify-content-center is-align-items-flex-start" style={{ minHeight: '70vh', width: '100%' }}>
+            <div className="cardContainer">
                 <ConsaludCore.Card
                     variant="elevated"
                     padding={undefined}
-                    className="card-elevated ingreso-card animate-fade-in-up p-6"
-                    style={{ maxWidth: 653, width: '100%' }}
+                    className="card-elevated ingreso-card animate-fade-in-up p-6 requisitosCard"
                 >
-                    <div className="is-flex is-flex-direction-column is-align-items-center" style={{ width: '100%' }}>
+                    <div className="cardContent">
                         {/* Icono y subtítulo */}
-                        <div style={{ width: '100%' }}>
-                            <div className="is-flex is-align-items-center mb-2" style={{ gap: 8 }}>
-                                <img src={RequisitosIcon} width={24} height={24} alt="Ícono requisitos" style={{ display: 'inline', verticalAlign: 'middle' }} />
-                                <ConsaludCore.Typography variant="body" style={{ color: '#222', fontWeight: 400 }}>
+                        <div className="iconSubtitleSection">
+                            <div className="iconTitleContainer">
+                                <img 
+                                    src={RequisitosIcon} 
+                                    width={24} 
+                                    height={24} 
+                                    alt="Ícono requisitos" 
+                                    className="requisitosIcon" 
+                                />
+                                <ConsaludCore.Typography 
+                                    variant="body" 
+                                    className="iconTitle"
+                                >
                                     Requisitos
                                 </ConsaludCore.Typography>
                             </div>
-                            <ConsaludCore.Typography variant="bodySmall" style={{ color: '#505050', marginBottom: 18, fontWeight: 400 }}>
+                            <ConsaludCore.Typography 
+                                variant="bodySmall" 
+                                className="subtitleText"
+                            >
                                 Antes de comenzar, verifica que la persona heredera tenga lo siguiente:
                             </ConsaludCore.Typography>
-                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, width: '100%' }}>
-                                <li className="is-flex is-align-items-center mb-3" style={{ gap: 12 }}>
-                                    <img src={CheckIcon} width={20} height={20} alt="Check" style={{ display: 'inline', verticalAlign: 'middle' }} />
-                                    <ConsaludCore.Typography variant="body" weight="bold" style={{ fontWeight: 700, color: '#222' }}>
-                                        Cédula de identidad vigente.
-                                    </ConsaludCore.Typography>
-                                </li>
-                                <li className="is-flex is-align-items-center mb-3" style={{ gap: 12 }}>
-                                    <img src={CheckIcon} width={20} height={20} alt="Check" style={{ display: 'inline', verticalAlign: 'middle' }} />
-                                    <ConsaludCore.Typography variant="body" weight="bold" style={{ fontWeight: 700, color: '#222' }}>
-                                        Posesión efectiva
-                                    </ConsaludCore.Typography>
-                                    <ConsaludCore.Typography variant="body" style={{ marginLeft: 4, color: '#222', fontWeight: 400 }}>
-                                        que acredite su condición de heredero.
-                                    </ConsaludCore.Typography>
-                                </li>
-                                <li className="is-flex is-align-items-center" style={{ gap: 12 }}>
-                                    <img src={CheckIcon} width={20} height={20} alt="Check" style={{ display: 'inline', verticalAlign: 'middle' }} />
-                                    <ConsaludCore.Typography variant="body" weight="bold" style={{ fontWeight: 700, color: '#222' }}>
-                                        Poder notarial válido
-                                    </ConsaludCore.Typography>
-                                    <ConsaludCore.Typography variant="body" style={{ marginLeft: 4, color: '#222', fontWeight: 400 }}>
-                                        para actuar en representación del titular.
-                                    </ConsaludCore.Typography>
-                                </li>
+                            <ul className="requirementsList">
+                                {renderRequirementItem("Cédula de identidad vigente.")}
+                                {renderRequirementItem("Posesión efectiva", "que acredite su condición de heredero.")}
+                                {renderRequirementItem("Poder notarial válido", "para actuar en representación del titular.")}
                             </ul>
                         </div>
-                        <div className="is-flex is-justify-content-center mt-6" style={{ width: '100%' }}>
+                        <div className="buttonSection">
                             <button
-                                className={`button proceso-button animate-fade-in-up buttonRut--valid${loading ? ' button--pulse' : ''}`}
-                                style={{ minWidth: 120, borderRadius: 24, height: 42, fontSize: 16, background: '#04A59B', color: '#fff', border: 'none', boxShadow: 'none', fontWeight: 600, transition: 'background 0.2s', opacity: loading ? 0.7 : 1 }}
+                                className={`button is-primary is-rounded proceso-button animate-fade-in-up${loading ? ' is-loading-custom' : ''}`}
                                 onClick={() => navigator('/mnherederos/ingresoher/DatosTitular')}
                                 type="button"
                                 aria-label="Entendido"
@@ -131,7 +147,7 @@ const RequisitosTitular: React.FC = () => {
                                 <ConsaludCore.Typography
                                     variant="button"
                                     color="#fff"
-                                    style={{ fontWeight: 600 }}
+                                    className="buttonText"
                                 >
                                     Entendido
                                 </ConsaludCore.Typography>
