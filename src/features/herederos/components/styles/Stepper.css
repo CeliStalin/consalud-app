@@ -10,14 +10,17 @@
   z-index: 1;
   transition: border-color 0.3s, background 0.3s;
 }
+
 .stepper-circle.completed {
   background: #00CBBF;
   border-color: #00CBBF;
 }
+
 .stepper-circle.active {
   border-color: #00CBBF;
   background: #fff;
 }
+
 .stepper-circle svg {
   display: block;
 }
@@ -31,6 +34,7 @@
   margin: 0 auto;
   gap: 20px;
 }
+
 .lineStepper {
   display: flex;
   justify-content: space-between;
@@ -38,49 +42,84 @@
   max-width: 1300px;
   position: relative;
 }
+
 .flexCenterRelative {
   position: relative;
   flex: 1;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
+
 .progressLine {
   position: absolute;
   top: 50%;
-  left: 50%;
-  width: 100%;
+  left: calc(50% + 12px);
+  width: calc(100% - 24px);
   height: 2px;
   z-index: 0;
-  transform: translate(-50%, -50%);
+  transform: translateY(-50%);
   background: #EEEEEE;
-  transition: background-color 0.5s;
+  transition: background-color 0.5s, width 0.5s;
 }
+
 .progressLine.active {
   background: #00CBBF;
 }
+
 .stepperRow {
   display: flex;
   justify-content: space-between;
   width: 100%;
+  max-width: 1300px;
 }
+
+.stepText {
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stepTitle {
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: #505050;
+  margin-bottom: 4px;
+}
+
+.stepDescription {
+  font-size: 0.75rem;
+  color: #909090;
+}
+
 @media screen and (max-width: 1400px) {
-  .containerStepper, .lineStepper {
+  .containerStepper, .lineStepper, .stepperRow {
     max-width: 100vw;
   }
 }
+
 @media screen and (max-width: 900px) {
-  .containerStepper, .lineStepper {
+  .containerStepper, .lineStepper, .stepperRow {
     max-width: 98vw;
   }
 }
+
 @media screen and (max-width: 600px) {
-  .containerStepper, .lineStepper {
+  .containerStepper, .lineStepper, .stepperRow {
     max-width: 100vw;
     min-width: 0;
   }
+  
   .stepperRow {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+  
+  .stepText {
+    align-items: flex-start;
+    text-align: left;
   }
 }

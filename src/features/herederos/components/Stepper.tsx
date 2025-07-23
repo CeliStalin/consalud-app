@@ -1,7 +1,8 @@
 import { StepperProps } from "../interfaces/StepperProps";
 import * as ConsaludCore from '@consalud/core';
-import './styles/Stepper.css'
+import './styles/Stepper.css';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import CheckIcon from '@/assets/check-icon.svg';
 
 interface StepperContextType {
   step: number;
@@ -40,75 +41,59 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
   const renderCircle = (index: number) => {
     const isCompleted = index < step - 1;
     const isActive = index === step - 1;
+    
     return (
       <div
         className={`stepper-circle${isCompleted ? ' completed' : ''}${isActive ? ' active' : ''}`}
       >
-        {isCompleted && (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 16 16"
-            fill="none"
-          >
-            <path
-              d="M4.83887 8.30114L6.76509 10.2274L6.75264 10.2149L11.0984 5.86914"
-              stroke="white"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        )}
+        {isCompleted && <img src={CheckIcon} alt="Completado" />}
       </div>
     );
   };
+
+  const renderProgressLine = (index: number) => {
+    if (index >= steps.length - 1) return null;
+    
+    return (
+      <div className={`progressLine${index < step - 1 ? ' active' : ''}`} />
+    );
+  };
+
+  const renderStepText = (stepData: { title: string; description: string }, index: number) => (
+    <div className="stepText">
+      <ConsaludCore.Typography
+        variant="bodySmall"
+        weight="bold"
+        className="stepTitle"
+        color={ConsaludCore.theme?.textColors?.primary || "#505050"}
+        gutterBottom
+      >
+        {stepData.title}
+      </ConsaludCore.Typography>
+      <ConsaludCore.Typography
+        variant="caption"
+        className="stepDescription"
+        color={ConsaludCore.theme?.textColors?.muted || "#909090"}
+      >
+        {stepData.description}
+      </ConsaludCore.Typography>
+    </div>
+  );
 
   return (
     <div className="containerStepper">
       <div className="lineStepper">
         {steps.map((_, index) => (
-          <div key={index} className="flexCenterRelative" style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+          <div key={index} className="flexCenterRelative">
             {renderCircle(index)}
-            {index < steps.length - 1 && (
-              <div
-                className={`progressLine${index < step - 1 ? ' active' : ''}`}
-                style={{
-                  width: 'calc(100% - 24px)',
-                  backgroundColor: index < step - 1 ? '#00CBBF' : '#EEEEEE',
-                  height: 2,
-                  position: 'absolute',
-                  top: '50%',
-                  left: 'calc(50% + 12px)',
-                  zIndex: 0,
-                  transform: 'translateY(-50%)',
-                  transition: 'background-color 0.5s, width 0.5s',
-                }}
-              />
-            )}
+            {renderProgressLine(index)}
           </div>
         ))}
       </div>
       <div className="stepperRow">
-        {steps.map((s, index) => (
-          <div key={index} style={{ textAlign: "center", width: "100%" }}>
-            <ConsaludCore.Typography
-              variant="bodySmall"
-              weight="bold"
-              style={{ fontSize: '0.875rem' }}
-              color={ConsaludCore.theme?.textColors?.primary || "#505050"}
-              gutterBottom
-            >
-              {s.title}
-            </ConsaludCore.Typography>
-            <ConsaludCore.Typography
-              variant="caption"
-              style={{ fontSize: '0.75rem' }}
-              color={ConsaludCore.theme?.textColors?.muted || "#909090"}
-            >
-              {s.description}
-            </ConsaludCore.Typography>
+        {steps.map((stepData, index) => (
+          <div key={index} className="flexCenterRelative">
+            {renderStepText(stepData, index)}
           </div>
         ))}
       </div>
@@ -116,7 +101,4 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
   );
 };
 
-
-export{
-  Stepper
-}
+export { Stepper };

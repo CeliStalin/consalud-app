@@ -10,8 +10,6 @@ import cartaPosesion from '../components/styles/img/posesion.png';
         Swal.fire({
           title: 'No es posible continuar con este RUT',
           text: 'La persona sigue vigente en Consalud y no aparece como fallecida.',
-          // No se usa icono para que se vea como en la imagen
-          // icon: 'info',
           confirmButtonColor: '#04A59B',
           showCloseButton: true,
           confirmButtonText: 'Entendido',
