@@ -1,13 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { es } from 'date-fns/locale';
 import './styles/FormHeredero.css';
 import { Stepper } from './Stepper';
 import { useHeredero } from '../contexts/HerederoContext';
 import * as ConsaludCore from '@consalud/core';
 import { fetchGeneros, fetchCiudades, fetchComunasPorCiudad, Genero, Ciudad, Comuna } from '../services';
+import { CustomDatePicker } from './CustomDatePicker';
 
 interface BreadcrumbItem {
     label: string;
@@ -370,26 +369,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
               <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
                 {/* Fecha de nacimiento */}
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                  <label>Fecha nacimiento</label>
-                  <div className={`datepicker-wrapper ${errors.fechaNacimiento ? 'is-danger' : ''}`}>
-                    <DatePicker
-                      selected={formData.fechaNacimiento}
-                      onChange={handleDateChange}
-                      dateFormat="dd/MM/yyyy"
-                      placeholderText="DD/MM/AAAA"
-                      className={`input ${errors.fechaNacimiento ? 'is-danger' : ''}`}
-                      showMonthDropdown
-                      showYearDropdown
-                      dropdownMode="select"
-                      maxDate={new Date()}
-                      locale={es}
-                    />
-                    <div className="calendar-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
-                      </svg>
-                    </div>
-                  </div>
+                  <CustomDatePicker
+                    selected={formData.fechaNacimiento}
+                    onChange={handleDateChange}
+                    placeholder="DD/MM/AAAA"
+                    isError={!!errors.fechaNacimiento}
+                    maxDate={new Date()}
+                    label="Fecha nacimiento"
+                  />
                   {errors.fechaNacimiento && (
                     <p className="help is-danger">{errors.fechaNacimiento}</p>
                   )}
