@@ -1,9 +1,13 @@
-import FormIngresoHeredero from './FormIngresoHeredero';
-import '../styles/FormHeredero.css';
-
-export default FormIngresoHeredero;
-
+// Componentes principales
 export { RegistroTitularCard } from './RegistroTitularCard';
+export { default as FormIngresoHeredero } from './FormIngresoHeredero';
+export { AutoCompleteInput } from './AutoCompleteInput';
+
+// Componentes de UI
 export { CustomDatePicker } from './CustomDatePicker';
-export { LockedFieldIndicator } from './LockedFieldIndicator';
 export { CustomSelect } from './CustomSelect';
+export { Stepper } from './Stepper';
+export { default as RutErrorMessage } from './RutErrorMessage';
+
+// Hooks
+export { useCallesAutocomplete } from '../hooks/useCallesAutocomplete';

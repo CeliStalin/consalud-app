@@ -1,6 +1,6 @@
 import { Titular } from '../interfaces/Titular';
 import { SolicitanteResponse } from '../interfaces/Solicitante';
-import { Genero, Ciudad, Comuna } from '../interfaces/Pargen';
+import { Genero, Ciudad, Comuna, Calle } from '../interfaces/Pargen';
 import { apiGet, getHerederosApiConfig } from './apiUtils';
 
 /**
@@ -82,6 +82,15 @@ export class HerederosService {
     const url = `${this.config.baseUrl}/api/Pargen/ComunasIsaprePorCiudad?IdCiudad=${idCiudad}`;
     return apiGet<Comuna[]>(url, this.config, 'obtener comunas por ciudad');
   }
+
+  /**
+   * Obtiene la lista de calles para una comuna específica
+   * @param idComuna - ID de la comuna
+   */
+  async getCallesPorComuna(idComuna: number): Promise<Calle[]> {
+    const url = `${this.config.baseUrl}/api/Pargen/CallesXygo?idComuna=${idComuna}`;
+    return apiGet<Calle[]>(url, this.config, 'obtener calles por comuna');
+  }
 }
 
 // Exportar instancia única
@@ -96,4 +105,5 @@ export const fetchSolicitanteMejorContactibilidad = (rut: number, userName: stri
 
 export const fetchGeneros = () => herederosService.getGeneros();
 export const fetchCiudades = () => herederosService.getCiudades();
-export const fetchComunasPorCiudad = (idCiudad: number) => herederosService.getComunasPorCiudad(idCiudad); 
+export const fetchComunasPorCiudad = (idCiudad: number) => herederosService.getComunasPorCiudad(idCiudad);
+export const fetchCallesPorComuna = (idComuna: number) => herederosService.getCallesPorComuna(idComuna); 

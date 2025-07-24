@@ -59,7 +59,7 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
     );
   };
 
-  const renderStepText = (stepData: { title: string; description: string }, index: number) => (
+  const renderStepText = (stepData: { title: string; description: string }) => (
     <div className="stepText">
       <ConsaludCore.Typography
         variant="bodySmall"
@@ -93,7 +93,7 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
       <div className="stepperRow">
         {steps.map((stepData, index) => (
           <div key={index} className="flexCenterRelative">
-            {renderStepText(stepData, index)}
+            {renderStepText(stepData)}
           </div>
         ))}
       </div>

@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { es } from 'date-fns/locale';
 import './styles/FormHeredero.css';
 import { Stepper } from './Stepper';
 import { useHeredero } from '../contexts/HerederoContext';
@@ -8,6 +7,8 @@ import * as ConsaludCore from '@consalud/core';
 import { fetchGeneros, fetchCiudades, fetchComunasPorCiudad, Genero, Ciudad, Comuna } from '../services';
 import { CustomDatePicker } from './CustomDatePicker';
 import { CustomSelect } from './CustomSelect';
+import { AutoCompleteInput } from './AutoCompleteInput';
+import { useCallesAutocomplete } from '../hooks/useCallesAutocomplete';
 
 interface BreadcrumbItem {
     label: string;
@@ -25,22 +26,6 @@ const PARENTESCO_OPTIONS = [
   { value: 'C', label: 'Cónyuge' },
   { value: 'O', label: 'Otro' }
 ];
-
-const COMUNA_OPTIONS = {
-  'Santiago': [
-    { value: 'Santiago', label: 'Santiago' },
-    { value: 'Providencia', label: 'Providencia' },
-    { value: 'Las Condes', label: 'Las Condes' }
-  ],
-  'Valparaíso': [
-    { value: 'Valparaíso', label: 'Valparaíso' },
-    { value: 'Viña del Mar', label: 'Viña del Mar' }
-  ],
-  'Concepción': [
-    { value: 'Concepción', label: 'Concepción' },
-    { value: 'Talcahuano', label: 'Talcahuano' }
-  ]
-};
 
 interface FormData {
   fechaNacimiento: Date | null;
@@ -99,6 +84,12 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   const [loadingComunas, setLoadingComunas] = useState<boolean>(false);
   const [errorComunas, setErrorComunas] = useState<string | null>(null);
 
+  // Hook para autocompletado de calles
+  const selectedComuna = comunas.find(comuna => comuna.NombreComuna === formData.comuna);
+  const { calles, loading: loadingCalles, error: errorCalles, searchCalles } = useCallesAutocomplete({
+    idComuna: selectedComuna?.idComuna
+  });
+
   React.useEffect(() => {
     setLoadingGeneros(true);
     fetchGeneros()
@@ -106,7 +97,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         setGeneros(data);
         setErrorGeneros(null);
       })
-      .catch((err) => {
+      .catch(() => {
         setErrorGeneros('No se pudieron cargar los géneros');
         setGeneros([]);
       })
@@ -204,6 +195,42 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         .finally(() => setLoadingComunas(false));
     } else {
       setComunas([]);
+    }
+  };
+
+  // Manejar cambio de comuna (resetea calle y carga calles)
+  const handleComunaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+    setFormData({
+      ...formData,
+      comuna: value,
+      calle: '' // Resetear calle al cambiar comuna
+    });
+
+    if (errors.comuna) {
+      setErrors({
+        ...errors,
+        comuna: ''
+      });
+    }
+  };
+
+  // Manejar cambio de calle con autocompletado
+  const handleCalleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setFormData({
+      ...formData,
+      calle: value
+    });
+
+    // Actualizar búsqueda de calles
+    searchCalles(value);
+
+    if (errors.calle) {
+      setErrors({
+        ...errors,
+        calle: ''
+      });
     }
   };
 
@@ -581,7 +608,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                   <CustomSelect
                     name="comuna"
                     value={formData.comuna}
-                    onChange={handleInputChange}
+                    onChange={handleComunaChange}
                     options={comunas.map((comuna) => ({
                       value: comuna.NombreComuna,
                       label: comuna.NombreComuna
@@ -603,16 +630,27 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 {/* Calle */}
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                   <label>Calle</label>
-                  <input
-                    className={`input ${errors.calle ? 'is-danger' : ''}`}
-                    type="text"
+                  <AutoCompleteInput
                     name="calle"
                     value={formData.calle}
-                    onChange={handleInputChange}
-                    placeholder="Ingresar"
+                    onChange={handleCalleChange}
+                    options={calles.map(calle => ({
+                      value: calle.nombreCalle,
+                      label: calle.nombreCalle,
+                      id: calle.idCalle
+                    }))}
+                    placeholder={!formData.comuna ? 'Seleccione comuna primero' : 'Buscar calle...'}
+                    disabled={!formData.comuna}
+                    loading={loadingCalles}
+                    error={!!errors.calle}
+                    minCharsToSearch={2}
+                    debounceMs={300}
                   />
                   {errors.calle && (
                     <p className="help is-danger">{errors.calle}</p>
+                  )}
+                  {errorCalles && (
+                    <p className="help is-danger">{errorCalles}</p>
                   )}
                 </div>
 

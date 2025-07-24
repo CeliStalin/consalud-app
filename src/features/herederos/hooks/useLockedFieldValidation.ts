@@ -11,7 +11,7 @@ interface UseLockedFieldValidationReturn {
  */
 export const useLockedFieldValidation = (): UseLockedFieldValidationReturn => {
   
-  const validateLockedFields = useCallback((formData: any, fieldsLocked: boolean): boolean => {
+  const validateLockedFields = useCallback((fieldsLocked: boolean): boolean => {
     if (!fieldsLocked) {
       return true; // Si no están bloqueados, la validación se hace normalmente
     }
@@ -20,7 +20,7 @@ export const useLockedFieldValidation = (): UseLockedFieldValidationReturn => {
     return true;
   }, []);
 
-  const getLockedFieldErrors = useCallback((formData: any, fieldsLocked: boolean): Record<string, string> => {
+  const getLockedFieldErrors = useCallback((fieldsLocked: boolean): Record<string, string> => {
     if (!fieldsLocked) {
       return {}; // Si no están bloqueados, no hay errores específicos
     }

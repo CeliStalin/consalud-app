@@ -23,4 +23,10 @@ export interface Comuna {
   idRegion: number;
   idProvicia: number;
   NombreComuna: string;
+}
+
+export interface Calle {
+  idCalle: number;
+  nombreCalle: string;
+  idComuna: number;
 } 

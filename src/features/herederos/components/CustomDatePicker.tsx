@@ -46,12 +46,6 @@ export const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
     setIsOpen(false);
   };
 
-  const handleMonthChange = (direction: 'prev' | 'next') => {
-    setCurrentMonth(prev => 
-      direction === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1)
-    );
-  };
-
   const handleMonthSelect = (monthIndex: number) => {
     setCurrentMonth(prev => setMonth(prev, monthIndex));
     setShowMonthDropdown(false);
