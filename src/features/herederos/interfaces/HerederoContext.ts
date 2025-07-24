@@ -6,5 +6,6 @@ interface HerederoContextType {
     error: string | null;
     buscarHeredero: (rut: string) => Promise<void>;
     limpiarHeredero: () => void;
+    fieldsLocked: boolean;
   }
     export type { HerederoContextType };

@@ -5,3 +5,5 @@ export default FormIngresoHeredero;
 
 export { RegistroTitularCard } from './RegistroTitularCard';
 export { CustomDatePicker } from './CustomDatePicker';
+export { LockedFieldIndicator } from './LockedFieldIndicator';
+export { CustomSelect } from './CustomSelect';

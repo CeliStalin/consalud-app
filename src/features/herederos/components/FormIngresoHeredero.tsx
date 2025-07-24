@@ -7,6 +7,7 @@ import { useHeredero } from '../contexts/HerederoContext';
 import * as ConsaludCore from '@consalud/core';
 import { fetchGeneros, fetchCiudades, fetchComunasPorCiudad, Genero, Ciudad, Comuna } from '../services';
 import { CustomDatePicker } from './CustomDatePicker';
+import { CustomSelect } from './CustomSelect';
 
 interface BreadcrumbItem {
     label: string;
@@ -61,7 +62,7 @@ interface FormData {
 
 const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = true }) => {
   const navigate = useNavigate();
-  const {heredero} = useHeredero();
+  const {heredero, fieldsLocked} = useHeredero();
   const [formData, setFormData] = useState<FormData>({
     fechaNacimiento: heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
     nombres: heredero?.nombre || '',
@@ -212,22 +213,25 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     const newErrors: Partial<Record<keyof FormData, string>> = {};
     let isValid = true;
 
-    // Campos requeridos
-    if (!formData.fechaNacimiento) {
-      newErrors.fechaNacimiento = 'La fecha de nacimiento es requerida';
-      isValid = false;
+    // Campos requeridos - solo validar si no están bloqueados
+    if (!fieldsLocked) {
+      if (!formData.fechaNacimiento) {
+        newErrors.fechaNacimiento = 'La fecha de nacimiento es requerida';
+        isValid = false;
+      }
+
+      if (!formData.nombres.trim()) {
+        newErrors.nombres = 'El nombre es requerido';
+        isValid = false;
+      }
+
+      if (!formData.apellidoPaterno.trim()) {
+        newErrors.apellidoPaterno = 'El apellido paterno es requerido';
+        isValid = false;
+      }
     }
 
-    if (!formData.nombres.trim()) {
-      newErrors.nombres = 'El nombre es requerido';
-      isValid = false;
-    }
-
-    if (!formData.apellidoPaterno.trim()) {
-      newErrors.apellidoPaterno = 'El apellido paterno es requerido';
-      isValid = false;
-    }
-
+    // Campos que siempre se validan (no están en la lista de bloqueados)
     if (!formData.sexo) {
       newErrors.sexo = 'Seleccione un sexo';
       isValid = false;
@@ -376,6 +380,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     isError={!!errors.fechaNacimiento}
                     maxDate={new Date()}
                     label="Fecha nacimiento"
+                    disabled={fieldsLocked}
                   />
                   {errors.fechaNacimiento && (
                     <p className="help is-danger">{errors.fechaNacimiento}</p>
@@ -386,12 +391,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                   <label>Nombres</label>
                   <input
-                    className={`input ${errors.nombres ? 'is-danger' : ''}`}
+                    className={`input ${errors.nombres ? 'is-danger' : ''} ${fieldsLocked ? 'is-static' : ''}`}
                     type="text"
                     name="nombres"
                     value={formData.nombres}
                     onChange={handleInputChange}
                     placeholder="Ingresar"
+                    disabled={fieldsLocked}
+                    style={fieldsLocked ? { backgroundColor: '#f5f5f5', cursor: 'not-allowed' } : {}}
                   />
                   {errors.nombres && (
                     <p className="help is-danger">{errors.nombres}</p>
@@ -404,12 +411,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                   <label>Apellido Paterno</label>
                   <input
-                    className={`input ${errors.apellidoPaterno ? 'is-danger' : ''}`}
+                    className={`input ${errors.apellidoPaterno ? 'is-danger' : ''} ${fieldsLocked ? 'is-static' : ''}`}
                     type="text"
                     name="apellidoPaterno"
                     value={formData.apellidoPaterno}
                     onChange={handleInputChange}
                     placeholder="Ingresar"
+                    disabled={fieldsLocked}
+                    style={fieldsLocked ? { backgroundColor: '#f5f5f5', cursor: 'not-allowed' } : {}}
                   />
                   {errors.apellidoPaterno && (
                     <p className="help is-danger">{errors.apellidoPaterno}</p>
@@ -420,12 +429,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                   <label>Apellido Materno</label>
                   <input
-                    className={`input ${errors.apellidoMaterno ? 'is-danger' : ''}`}
+                    className={`input ${errors.apellidoMaterno ? 'is-danger' : ''} ${fieldsLocked ? 'is-static' : ''}`}
                     type="text"
                     name="apellidoMaterno"
                     value={formData.apellidoMaterno}
                     onChange={handleInputChange}
                     placeholder="Ingresar"
+                    disabled={fieldsLocked}
+                    style={fieldsLocked ? { backgroundColor: '#f5f5f5', cursor: 'not-allowed' } : {}}
                   />
                   {errors.apellidoMaterno && (
                     <p className="help is-danger">{errors.apellidoMaterno}</p>
@@ -437,23 +448,18 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 {/* Sexo */}
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                   <label>Sexo</label>
-                  <div className={`select ${errors.sexo ? 'is-danger' : ''}`}> 
-                    <select
-                      name="sexo"
-                      value={formData.sexo}
-                      onChange={handleInputChange}
-                      disabled={loadingGeneros || !!errorGeneros}
-                    >
-                      <option value="" disabled>
-                        {loadingGeneros ? 'Cargando...' : errorGeneros ? 'Error al cargar' : 'Seleccionar'}
-                      </option>
-                      {generos.map((genero) => (
-                        <option key={genero.Codigo} value={genero.Codigo}>
-                          {genero.Descripcion}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <CustomSelect
+                    name="sexo"
+                    value={formData.sexo}
+                    onChange={handleInputChange}
+                    options={generos.map((genero) => ({
+                      value: genero.Codigo,
+                      label: genero.Descripcion
+                    }))}
+                    placeholder={loadingGeneros ? 'Cargando...' : errorGeneros ? 'Error al cargar' : 'Seleccionar'}
+                    disabled={loadingGeneros || !!errorGeneros}
+                    error={!!errors.sexo}
+                  />
                   {errors.sexo && (
                     <p className="help is-danger">{errors.sexo}</p>
                   )}
@@ -465,20 +471,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 {/* Parentesco */}
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                   <label>Parentesco</label>
-                  <div className={`select ${errors.parentesco ? 'is-danger' : ''}`}>
-                    <select
-                      name="parentesco"
-                      value={formData.parentesco}
-                      onChange={handleInputChange}
-                    >
-                      <option value="" disabled>Seleccionar</option>
-                      {PARENTESCO_OPTIONS.map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <CustomSelect
+                    name="parentesco"
+                    value={formData.parentesco}
+                    onChange={handleInputChange}
+                    options={PARENTESCO_OPTIONS}
+                    placeholder="Seleccionar"
+                    error={!!errors.parentesco}
+                  />
                   {errors.parentesco && (
                     <p className="help is-danger">{errors.parentesco}</p>
                   )}
@@ -532,19 +532,19 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 {/* Región */}
                 <div className="form-column full-width" style={{ flex: 1, width: '100%', maxWidth: '100%' }}>
                   <label>Región</label>
-                  <div className={`select ${errors.region ? 'is-danger' : ''}`}>
-                    <select
-                      name="region"
-                      value={formData.region || ''}
-                      onChange={handleInputChange}
-                    >
-                      <option value="" disabled>Seleccionar</option>
-                      <option value="Metropolitana">Región Metropolitana</option>
-                      <option value="Valparaíso">Valparaíso</option>
-                      <option value="Biobío">Biobío</option>
-                      <option value="Araucanía">La Araucanía</option>
-                    </select>
-                  </div>
+                  <CustomSelect
+                    name="region"
+                    value={formData.region || ''}
+                    onChange={handleInputChange}
+                    options={[
+                      { value: 'Metropolitana', label: 'Región Metropolitana' },
+                      { value: 'Valparaíso', label: 'Valparaíso' },
+                      { value: 'Biobío', label: 'Biobío' },
+                      { value: 'Araucanía', label: 'La Araucanía' }
+                    ]}
+                    placeholder="Seleccionar"
+                    error={!!errors.region}
+                  />
                   {errors.region && (
                     <p className="help is-danger">{errors.region}</p>
                   )}
@@ -555,23 +555,18 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 {/* Ciudad */}
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                   <label>Ciudad</label>
-                  <div className={`select ${errors.ciudad ? 'is-danger' : ''}`}>
-                    <select
-                      name="ciudad"
-                      value={formData.ciudad}
-                      onChange={handleCiudadChange}
-                      disabled={loadingCiudades || !!errorCiudades}
-                    >
-                      <option value="" disabled>
-                        {loadingCiudades ? 'Cargando...' : errorCiudades ? 'Error al cargar' : 'Seleccionar'}
-                      </option>
-                      {ciudades.map((ciudad) => (
-                        <option key={ciudad.idCiudad} value={ciudad.nombreCiudad}>
-                          {ciudad.nombreCiudad}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <CustomSelect
+                    name="ciudad"
+                    value={formData.ciudad}
+                    onChange={handleCiudadChange}
+                    options={ciudades.map((ciudad) => ({
+                      value: ciudad.nombreCiudad,
+                      label: ciudad.nombreCiudad
+                    }))}
+                    placeholder={loadingCiudades ? 'Cargando...' : errorCiudades ? 'Error al cargar' : 'Seleccionar'}
+                    disabled={loadingCiudades || !!errorCiudades}
+                    error={!!errors.ciudad}
+                  />
                   {errors.ciudad && (
                     <p className="help is-danger">{errors.ciudad}</p>
                   )}
@@ -583,23 +578,18 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 {/* Comuna */}
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                   <label>Comuna</label>
-                  <div className={`select ${errors.comuna ? 'is-danger' : ''}`}>
-                    <select
-                      name="comuna"
-                      value={formData.comuna}
-                      onChange={handleInputChange}
-                      disabled={!formData.ciudad || loadingComunas || !!errorComunas}
-                    >
-                      <option value="" disabled>
-                        {!formData.ciudad ? 'Seleccione ciudad' : loadingComunas ? 'Cargando...' : errorComunas ? 'Error al cargar' : 'Seleccionar'}
-                      </option>
-                      {comunas.map((comuna) => (
-                        <option key={comuna.idComuna} value={comuna.NombreComuna}>
-                          {comuna.NombreComuna}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <CustomSelect
+                    name="comuna"
+                    value={formData.comuna}
+                    onChange={handleInputChange}
+                    options={comunas.map((comuna) => ({
+                      value: comuna.NombreComuna,
+                      label: comuna.NombreComuna
+                    }))}
+                    placeholder={!formData.ciudad ? 'Seleccione ciudad' : loadingComunas ? 'Cargando...' : errorComunas ? 'Error al cargar' : 'Seleccionar'}
+                    disabled={!formData.ciudad || loadingComunas || !!errorComunas}
+                    error={!!errors.comuna}
+                  />
                   {errors.comuna && (
                     <p className="help is-danger">{errors.comuna}</p>
                   )}

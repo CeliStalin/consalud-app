@@ -12,6 +12,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
   const [heredero, setHeredero] = useState<Heredero | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldsLocked, setFieldsLocked] = useState<boolean>(false);
   const { formatSimpleRut } = useRutChileno();
   const navigate = useNavigate();
   
@@ -19,6 +20,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
   const buscarHeredero = useCallback(async (rut: string) => {
     setLoading(true);
     setError(null);
+    setFieldsLocked(false); // Resetear el estado de bloqueo al iniciar nueva búsqueda
     
     try {
       const bffDns = import.meta.env.VITE_BFF_HEREDEROS_DNS;
@@ -86,6 +88,9 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         
         setHeredero(herederoData);
         
+        // Bloquear campos cuando la API devuelve 200 exitosamente
+        setFieldsLocked(true);
+        
         // Comentado: Redirigir a IngresoHerederoFormPage cuando el status sea 200
         // Ahora el formulario se muestra en la misma página
         // navigate('/mnherederos/ingresoher/formingreso');
@@ -102,6 +107,8 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         }
         
         setHeredero(herederoEncontrado);
+        // Para desarrollo, también bloquear campos
+        setFieldsLocked(true);
         // Comentado: navegación automática
         // navigate('/mnherederos/ingresoher/formingreso');
       }
@@ -110,6 +117,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       const errorMessage = err instanceof Error ? err.message : 'Error al buscar el heredero';
       setError(errorMessage);
       setHeredero(null);
+      setFieldsLocked(false); // No bloquear campos si hay error
       console.error('Error en buscarHeredero:', err);
     } finally {
       setLoading(false);
@@ -119,6 +127,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
   const limpiarHeredero = useCallback(() => {
     setHeredero(null);
     setError(null);
+    setFieldsLocked(false); // Limpiar también el estado de bloqueo
   }, []);
 
   // Valor del contexto
@@ -127,7 +136,8 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
     loading,
     error,
     buscarHeredero,
-    limpiarHeredero
+    limpiarHeredero,
+    fieldsLocked
   };
 
   return (
