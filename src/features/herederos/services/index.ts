@@ -5,6 +5,6 @@ export * from './apiUtils';
 export * from './herederosService';
 
 // Re-exportar interfaces para facilitar importaciones
-export type { Genero, Ciudad, Comuna, Calle } from '../interfaces/Pargen';
+export type { Genero, Ciudad, Comuna, Calle, Region } from '../interfaces/Pargen';
 export type { Titular } from '../interfaces/Titular';
 export type { SolicitanteResponse } from '../interfaces/Solicitante'; 

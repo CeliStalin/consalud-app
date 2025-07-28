@@ -7,6 +7,14 @@ export interface Genero {
   Descripcion: string;
 }
 
+export interface Region {
+  idRegion: number;
+  codRegion: number;
+  nombreRegion: string;
+  estadoPar: string;
+  estadoReg: string;
+}
+
 export interface Ciudad {
   idCiudad: number;
   idRegion: number;

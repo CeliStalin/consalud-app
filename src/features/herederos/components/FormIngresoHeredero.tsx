@@ -4,7 +4,7 @@ import './styles/FormHeredero.css';
 import { Stepper } from './Stepper';
 import { useHeredero } from '../contexts/HerederoContext';
 import * as ConsaludCore from '@consalud/core';
-import { fetchGeneros, fetchCiudades, fetchComunasPorCiudad, Genero, Ciudad, Comuna } from '../services';
+import { fetchGeneros, fetchCiudades, fetchComunasPorCiudad, fetchRegiones, Genero, Ciudad, Comuna, Region } from '../services';
 import { CustomDatePicker } from './CustomDatePicker';
 import { CustomSelect } from './CustomSelect';
 import { AutoCompleteInput } from './AutoCompleteInput';
@@ -48,6 +48,13 @@ interface FormData {
 const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = true }) => {
   const navigate = useNavigate();
   const {heredero, fieldsLocked} = useHeredero();
+
+  // Función para obtener la descripción de región por código
+  const obtenerDescripcionRegion = (codRegion: number): string => {
+    const region = regiones.find(r => r.codRegion === codRegion);
+    return region ? region.nombreRegion : '';
+  };
+
   const [formData, setFormData] = useState<FormData>({
     fechaNacimiento: heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
     nombres: heredero?.nombre || '',
@@ -57,13 +64,13 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     parentesco: '',
     telefono: heredero?.contactabilidad.telefono.numero || '',
     correoElectronico:heredero?.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
-    ciudad: '',
-    comuna: '',
+    ciudad: heredero?.descripcionCiudad || '',
+    comuna: heredero?.descripcionComuna || '',
     calle: heredero?.contactabilidad.direccion.calle || '',
     numero: heredero?.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
     deptoBloqueOpcional: heredero?.contactabilidad.direccion.departamento || '',
     villaOpcional: heredero?.contactabilidad.direccion.villa || '',
-    region: heredero?.contactabilidad.direccion.regionNombre || '' // Initialize region
+    region: '' // Inicializar vacío, se actualizará cuando se carguen las regiones
   });
 
   // Estado para manejar errores de validación
@@ -83,6 +90,11 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   const [comunas, setComunas] = useState<Comuna[]>([]);
   const [loadingComunas, setLoadingComunas] = useState<boolean>(false);
   const [errorComunas, setErrorComunas] = useState<string | null>(null);
+
+  // Estado para regiones
+  const [regiones, setRegiones] = useState<Region[]>([]);
+  const [loadingRegiones, setLoadingRegiones] = useState<boolean>(false);
+  const [errorRegiones, setErrorRegiones] = useState<string | null>(null);
 
   // Hook para autocompletado de calles
   const selectedComuna = comunas.find(comuna => comuna.NombreComuna === formData.comuna);
@@ -104,19 +116,106 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       .finally(() => setLoadingGeneros(false));
   }, []);
 
+  // Comentado: Ahora las ciudades se cargan cuando se selecciona una región
+  // React.useEffect(() => {
+  //   setLoadingCiudades(true);
+  //   fetchCiudades()
+  //     .then((data) => {
+  //       setCiudades(data);
+  //       setErrorCiudades(null);
+  //     })
+  //     .catch(() => {
+  //       setErrorCiudades('No se pudieron cargar las ciudades');
+  //       setCiudades([]);
+  //     })
+  //     .finally(() => setLoadingCiudades(false));
+  // }, []);
+
   React.useEffect(() => {
-    setLoadingCiudades(true);
-    fetchCiudades()
+    setLoadingRegiones(true);
+    fetchRegiones()
       .then((data) => {
-        setCiudades(data);
-        setErrorCiudades(null);
+        setRegiones(data);
+        setErrorRegiones(null);
       })
       .catch(() => {
-        setErrorCiudades('No se pudieron cargar las ciudades');
-        setCiudades([]);
+        setErrorRegiones('No se pudieron cargar las regiones');
+        setRegiones([]);
       })
-      .finally(() => setLoadingCiudades(false));
+      .finally(() => setLoadingRegiones(false));
   }, []);
+
+  // Cargar datos de ubicación cuando se carga un heredero
+  React.useEffect(() => {
+    if (heredero && heredero.codRegion) {
+      // Cargar ciudades de la región del heredero para tener las opciones disponibles
+      setLoadingCiudades(true);
+      fetchCiudades(heredero.codRegion)
+        .then((data) => {
+          setCiudades(data);
+          setErrorCiudades(null);
+          
+          // Si hay ciudad del heredero, cargar comunas para tener las opciones disponibles
+          if (heredero.codCiudad) {
+            setLoadingComunas(true);
+            fetchComunasPorCiudad(heredero.codCiudad)
+              .then((comunasData) => {
+                setComunas(comunasData);
+                setErrorComunas(null);
+              })
+              .catch(() => {
+                setErrorComunas('No se pudieron cargar las comunas');
+                setComunas([]);
+              })
+              .finally(() => setLoadingComunas(false));
+          }
+        })
+        .catch(() => {
+          setErrorCiudades('No se pudieron cargar las ciudades');
+          setCiudades([]);
+        })
+        .finally(() => setLoadingCiudades(false));
+    }
+  }, [heredero]);
+
+  // Actualizar formData cuando cambie el heredero
+  React.useEffect(() => {
+    if (heredero) {
+      setFormData(prevData => {
+        const newData = {
+          ...prevData,
+          fechaNacimiento: heredero.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
+          nombres: heredero.nombre || '',
+          apellidoPaterno: heredero.apellidoPat || '',
+          apellidoMaterno: heredero.apellidoMat || '',
+          telefono: heredero.contactabilidad.telefono.numero || '',
+          correoElectronico: heredero.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
+          ciudad: heredero.descripcionCiudad || '',
+          comuna: heredero.descripcionComuna || '',
+          calle: heredero.contactabilidad.direccion.calle || '',
+          numero: heredero.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
+          deptoBloqueOpcional: heredero.contactabilidad.direccion.departamento || '',
+          villaOpcional: heredero.contactabilidad.direccion.villa || ''
+          // La región se maneja en un useEffect separado
+        };
+        
+        return newData;
+      });
+    }
+  }, [heredero]); // Remover regiones de las dependencias
+
+  // Actualizar región cuando se carguen las regiones y haya un heredero
+  React.useEffect(() => {
+    if (regiones.length > 0 && heredero?.codRegion) {
+      const descripcionRegion = obtenerDescripcionRegion(heredero.codRegion);
+      if (descripcionRegion) {
+        setFormData(prevData => ({
+          ...prevData,
+          region: descripcionRegion
+        }));
+      }
+    }
+  }, [regiones, heredero?.codRegion]);
 
   const handleBackClick = useCallback((): void => {
     navigate(-1);
@@ -160,6 +259,42 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         ...errors,
         fechaNacimiento: ''
       });
+    }
+  };
+
+  // Manejar cambio de región (resetea ciudad, comuna y carga ciudades)
+  const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+    setFormData({
+      ...formData,
+      region: value,
+      ciudad: '', // Resetear ciudad al cambiar región
+      comuna: '' // Resetear comuna al cambiar región
+    });
+
+    if (errors.region) {
+      setErrors({
+        ...errors,
+        region: ''
+      });
+    }
+
+    // Buscar idRegion correspondiente
+    const regionObj = regiones.find((r) => r.nombreRegion === value);
+    if (regionObj) {
+      setLoadingCiudades(true);
+      fetchCiudades(regionObj.idRegion)
+        .then((data) => {
+          setCiudades(data);
+          setErrorCiudades(null);
+        })
+        .catch(() => {
+          setErrorCiudades('No se pudieron cargar las ciudades');
+          setCiudades([]);
+        })
+        .finally(() => setLoadingCiudades(false));
+    } else {
+      setCiudades([]);
     }
   };
 
@@ -562,18 +697,20 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                   <CustomSelect
                     name="region"
                     value={formData.region || ''}
-                    onChange={handleInputChange}
-                    options={[
-                      { value: 'Metropolitana', label: 'Región Metropolitana' },
-                      { value: 'Valparaíso', label: 'Valparaíso' },
-                      { value: 'Biobío', label: 'Biobío' },
-                      { value: 'Araucanía', label: 'La Araucanía' }
-                    ]}
-                    placeholder="Seleccionar"
+                    onChange={handleRegionChange}
+                    options={regiones.map((region) => ({
+                      value: region.nombreRegion,
+                      label: region.nombreRegion
+                    }))}
+                    placeholder={loadingRegiones ? 'Cargando...' : errorRegiones ? 'Error al cargar' : 'Seleccionar'}
+                    disabled={loadingRegiones || !!errorRegiones}
                     error={!!errors.region}
                   />
                   {errors.region && (
                     <p className="help is-danger">{errors.region}</p>
+                  )}
+                  {errorRegiones && (
+                    <p className="help is-danger">{errorRegiones}</p>
                   )}
                 </div>
               </div>
@@ -590,8 +727,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                       value: ciudad.nombreCiudad,
                       label: ciudad.nombreCiudad
                     }))}
-                    placeholder={loadingCiudades ? 'Cargando...' : errorCiudades ? 'Error al cargar' : 'Seleccionar'}
-                    disabled={loadingCiudades || !!errorCiudades}
+                    placeholder={!formData.region ? 'Seleccione región primero' : loadingCiudades ? 'Cargando...' : errorCiudades ? 'Error al cargar' : 'Seleccionar'}
+                    disabled={!formData.region || loadingCiudades || !!errorCiudades}
                     error={!!errors.ciudad}
                   />
                   {errors.ciudad && (
@@ -613,8 +750,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                       value: comuna.NombreComuna,
                       label: comuna.NombreComuna
                     }))}
-                    placeholder={!formData.ciudad ? 'Seleccione ciudad' : loadingComunas ? 'Cargando...' : errorComunas ? 'Error al cargar' : 'Seleccionar'}
-                    disabled={!formData.ciudad || loadingComunas || !!errorComunas}
+                    placeholder={!formData.region ? 'Seleccione región primero' : !formData.ciudad ? 'Seleccione ciudad primero' : loadingComunas ? 'Cargando...' : errorComunas ? 'Error al cargar' : 'Seleccionar'}
+                    disabled={!formData.region || !formData.ciudad || loadingComunas || !!errorComunas}
                     error={!!errors.comuna}
                   />
                   {errors.comuna && (
@@ -639,8 +776,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                       label: calle.nombreCalle,
                       id: calle.idCalle
                     }))}
-                    placeholder={!formData.comuna ? 'Seleccione comuna primero' : 'Buscar calle...'}
-                    disabled={!formData.comuna}
+                    placeholder={!formData.region ? 'Seleccione región primero' : !formData.ciudad ? 'Seleccione ciudad primero' : !formData.comuna ? 'Seleccione comuna primero' : 'Buscar calle...'}
+                    disabled={!formData.region || !formData.ciudad || !formData.comuna}
                     loading={loadingCalles}
                     error={!!errors.calle}
                     minCharsToSearch={2}

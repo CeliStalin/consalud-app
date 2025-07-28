@@ -1,6 +1,6 @@
 import { Titular } from '../interfaces/Titular';
 import { SolicitanteResponse } from '../interfaces/Solicitante';
-import { Genero, Ciudad, Comuna, Calle } from '../interfaces/Pargen';
+import { Genero, Ciudad, Comuna, Calle, Region } from '../interfaces/Pargen';
 import { apiGet, getHerederosApiConfig } from './apiUtils';
 
 /**
@@ -67,10 +67,21 @@ export class HerederosService {
   }
 
   /**
-   * Obtiene la lista de ciudades
+   * Obtiene la lista de regiones
    */
-  async getCiudades(): Promise<Ciudad[]> {
-    const url = `${this.config.baseUrl}/api/Pargen/CiudadesIsapre`;
+  async getRegiones(): Promise<Region[]> {
+    const url = `${this.config.baseUrl}/api/Pargen/RegionesIsapre`;
+    return apiGet<Region[]>(url, this.config, 'obtener regiones');
+  }
+
+  /**
+   * Obtiene la lista de ciudades
+   * @param idRegion - ID de la región (opcional)
+   */
+  async getCiudades(idRegion?: number): Promise<Ciudad[]> {
+    const url = idRegion 
+      ? `${this.config.baseUrl}/api/Pargen/CiudadesIsapre?idRegion=${idRegion}`
+      : `${this.config.baseUrl}/api/Pargen/CiudadesIsapre`;
     return apiGet<Ciudad[]>(url, this.config, 'obtener ciudades');
   }
 
@@ -104,6 +115,7 @@ export const fetchSolicitanteMejorContactibilidad = (rut: number, userName: stri
   herederosService.getSolicitanteMejorContactibilidad(rut, userName);
 
 export const fetchGeneros = () => herederosService.getGeneros();
-export const fetchCiudades = () => herederosService.getCiudades();
+export const fetchRegiones = () => herederosService.getRegiones();
+export const fetchCiudades = (idRegion?: number) => herederosService.getCiudades(idRegion);
 export const fetchComunasPorCiudad = (idCiudad: number) => herederosService.getComunasPorCiudad(idCiudad);
 export const fetchCallesPorComuna = (idComuna: number) => herederosService.getCallesPorComuna(idComuna); 
