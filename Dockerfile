@@ -20,7 +20,7 @@ COPY . .
 # Selecciona el archivo de entorno según el ambiente
 RUN if [ "$AMBIENTE" = "desarrollo" ]; then \
       cp .env.development .env ; \
-    elif [ "$AMBIENTE" = "test" ]; then \
+    elif [ "$AMBIENTE" = "testing" ]; then \
       cp .env.test .env ; \
     else \
       cp .env.production .env ; \

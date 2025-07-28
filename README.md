@@ -146,9 +146,9 @@ Esta aplicación React con TypeScript está optimizada para ejecutarse en conten
 
 El Dockerfile principal ahora permite construir imágenes para **cualquier ambiente** (desarrollo, test, produccion) usando dos argumentos de build:
 
-- `AMBIENTE`: El ambiente deseado (`desarrollo`, `test`, `produccion`). El Dockerfile selecciona automáticamente el archivo de entorno correcto:
+- `AMBIENTE`: El ambiente deseado (`desarrollo`, `testing`, `produccion`). El Dockerfile selecciona automáticamente el archivo de entorno correcto:
   - `desarrollo` → `.env.development`
-  - `test` → `.env.test`
+  - `testing` → `.env.test`
   - `produccion` (o cualquier otro valor) → `.env.production`
 - `MODE`: El modo de build de Vite (`development`, `test`, `production`).
 

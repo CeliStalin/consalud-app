@@ -8,10 +8,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts: 
-      - solicitudes.canales.development.consalud.net
+      - solicitudes.canales.$(ambiente).consalud.net
       secretName: solicitudes-canales-tls
   rules:
-    - host: solicitudes.canales.development.consalud.net
+    - host: solicitudes.canales.$(ambiente).consalud.net
       http:
         paths:
           - path: /

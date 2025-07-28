@@ -1,0 +1,184 @@
+name: $(date:yyyyMMdd)$(rev:.r)
+stages:
+  - stage: BuildDev
+    displayName: "Build Desarrollo"
+    jobs:
+      - job: Job_1
+        displayName: Agent job 1
+        pool:
+          name: DockerAgents
+        variables:
+          - group: ReleaseClusterDev
+        steps:
+          - checkout: self
+            clean: False
+          - task: Docker@0
+            displayName: Build an image (dev)
+            inputs:
+              containerregistrytype: Container Registry
+              dockerRegistryEndpoint: 1e4b3efa-7470-42f8-b9b0-5ce504bd922d
+              dockerFile: Dockerfile
+              buildArguments: >-
+                AMBIENTE=desarrollo
+
+                MODE=development
+              defaultContext: false
+              context: .
+              includeLatestTag: true
+          - task: Docker@0
+            displayName: Push an image
+            inputs:
+              containerregistrytype: Container Registry
+              dockerRegistryEndpoint: 1e4b3efa-7470-42f8-b9b0-5ce504bd922d
+              azureSubscriptionEndpoint: 9e840d54-c346-48e2-91e3-10356e7a739c
+              action: Push an image
+              includeLatestTag: true
+          - task: replacetokens@4
+            displayName: Replace tokens
+            inputs:
+              rootDirectory: ./
+              targetFiles: >-
+                deployment.yaml
+
+                Ingress.yaml
+
+                service.yaml
+              tokenPattern: azpipelines
+              tokenPrefix: ""
+              tokenSuffix: ""
+              writeBOM: false
+              verbosity: detailed
+              actionOnMissing: fail
+              actionOnNoFiles: fail
+          - task: KubectlInstaller@0
+            displayName: Instalar Kubectl latest
+          - task: KubernetesManifest@0
+            displayName: deploy Api
+            inputs:
+              kubernetesServiceConnection: 3449154a-8a88-40a8-80fd-2d4ecc81ce27
+              namespace: default
+              manifests: deployment.yaml
+          - task: Kubernetes@1
+            displayName: kubectl rollout
+            inputs:
+              kubernetesServiceEndpoint: 3449154a-8a88-40a8-80fd-2d4ecc81ce27
+              namespace: default
+              command: rollout
+              arguments: restart deployment app-gestor-solicitudes
+          - task: KubernetesManifest@0
+            displayName: deploy Servicio
+            inputs:
+              kubernetesServiceConnection: 3449154a-8a88-40a8-80fd-2d4ecc81ce27
+              namespace: default
+              manifests: service.yaml
+          - task: KubernetesManifest@0
+            displayName: deploy Ingress
+            inputs:
+              kubernetesServiceConnection: 3449154a-8a88-40a8-80fd-2d4ecc81ce27
+              namespace: default
+              manifests: Ingress.yaml
+      - job: Aprobacion
+        dependsOn: Job_1
+        condition: succeeded()
+        displayName: Esperando por aprobaciones
+        pool: server
+        timeoutInMinutes: 4320
+        steps:
+          - task: ManualValidation@0
+            timeoutInMinutes: 1440
+            inputs:
+              notifyUsers: |
+                angelo.bernardi@consalud.cl
+              instructions: "Su aprobación porfa para DES"
+              onTimeout: "resume"
+  - stage: BuildTes
+    displayName: "Build Testing"
+    jobs:
+      - job: Job_2
+        displayName: Agent job 1
+        pool:
+          name: DockerAgents
+        variables:
+          - group: ReleaseClusterTes         
+        steps:
+          - checkout: self
+            clean: False
+          - task: Docker@0
+            displayName: Build an image (dev)
+            inputs:
+              containerregistrytype: Container Registry
+              dockerRegistryEndpoint: 1e4b3efa-7470-42f8-b9b0-5ce504bd922d
+              dockerFile: Dockerfile
+              buildArguments: >-
+                AMBIENTE=testing
+
+                MODE=test
+              defaultContext: false
+              context: .
+              includeLatestTag: true
+          - task: Docker@0
+            displayName: Push an image
+            inputs:
+              containerregistrytype: Container Registry
+              dockerRegistryEndpoint: 1e4b3efa-7470-42f8-b9b0-5ce504bd922d
+              azureSubscriptionEndpoint: 9e840d54-c346-48e2-91e3-10356e7a739c
+              action: Push an image
+              includeLatestTag: true
+          - task: replacetokens@4
+            displayName: Replace tokens
+            inputs:
+              rootDirectory: ./
+              targetFiles: >-
+                deployment.yaml
+
+                Ingress.yaml
+
+                service.yaml
+              tokenPattern: azpipelines
+              tokenPrefix: ""
+              tokenSuffix: ""
+              writeBOM: false
+              verbosity: detailed
+              actionOnMissing: fail
+              actionOnNoFiles: fail
+          - task: KubectlInstaller@0
+            displayName: Instalar Kubectl latest
+          - task: KubernetesManifest@0
+            displayName: deploy Api
+            inputs:
+              kubernetesServiceConnection: bcb020a3-cbe9-423e-a6b3-113c33c16def
+              namespace: default
+              manifests: deployment.yaml
+          - task: Kubernetes@1
+            displayName: kubectl rollout
+            inputs:
+              kubernetesServiceEndpoint: bcb020a3-cbe9-423e-a6b3-113c33c16def
+              namespace: default
+              command: rollout
+              arguments: restart deployment app-gestor-solicitudes
+          - task: KubernetesManifest@0
+            displayName: deploy Servicio
+            inputs:
+              kubernetesServiceConnection: bcb020a3-cbe9-423e-a6b3-113c33c16def
+              namespace: default
+              manifests: service.yaml
+          - task: KubernetesManifest@0
+            displayName: deploy Ingress
+            inputs:
+              kubernetesServiceConnection: bcb020a3-cbe9-423e-a6b3-113c33c16def
+              namespace: default
+              manifests: Ingress.yaml
+      - job: Aprobacion
+        dependsOn: Job_2
+        condition: succeeded()
+        displayName: Esperando por aprobaciones
+        pool: server
+        timeoutInMinutes: 4320
+        steps:
+          - task: ManualValidation@0
+            timeoutInMinutes: 1440
+            inputs:
+              notifyUsers: |
+                angelo.bernardi@consalud.cl
+              instructions: "Su aprobación porfa para TES"
+              onTimeout: "resume"
