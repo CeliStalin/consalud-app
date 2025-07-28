@@ -15,7 +15,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
   error 
 }) => {
   const { rut, isValid: isValidRut, handleRutChange, setRut } = useRutChileno();
-  const { heredero } = useHeredero();
+  const { heredero, fieldsLocked } = useHeredero();
   const [showError, setShowError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [showForm, setShowForm] = useState<boolean>(false);
@@ -41,7 +41,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
     setLoading(true);
     try {
       await buscarHeredero(rutLimpio);
-      // Si la búsqueda es exitosa, mostrar el formulario
+      // Si la búsqueda es exitosa (incluyendo status 412), mostrar el formulario
       setShowForm(true);
     } finally {
       setLoading(false);
@@ -190,7 +190,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
         </form>
       </ConsaludCore.Card>
 
-      {/* Formulario que aparece debajo cuando la búsqueda es exitosa */}
+      {/* Formulario que aparece debajo cuando la búsqueda es exitosa o cuando hay status 412 */}
       {showForm && heredero && (
         <div style={{ marginTop: 24 }}>
           <FormIngresoHeredero showHeader={false} />

@@ -16,6 +16,61 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
   const { formatSimpleRut } = useRutChileno();
   const navigate = useNavigate();
   
+  // Función para crear un heredero vacío para el caso de status 412
+  const createEmptyHeredero = (rut: string): Heredero => {
+    return {
+      id: 0,
+      rut: rut,
+      fechaNacimiento: '',
+      nombre: '',
+      apellidoPat: '',
+      apellidoMat: '',
+      parentesco: 0,
+      Genero: '',
+      contactabilidad: {
+        direccion: {
+          calle: '',
+          numero: 0,
+          comunaId: 0,
+          comunaNombre: '',
+          regionId: 0,
+          regionNombre: '',
+          ciudadId: 0,
+          ciudadNombre: '',
+          villa: '',
+          departamento: ''
+        },
+        telefono: {
+          numero: '',
+          tipo: "CELULAR",
+          codPais: "56",
+          codCiudad: "2"
+        },
+        correo: [{
+          mail: '',
+          validacion: 1
+        }]
+      },
+      // Campos adicionales del BFF vacíos
+      codCiudad: 0,
+      codComuna: 0,
+      codRegion: 0,
+      codigoPostal: 0,
+      email: '',
+      descripcionCiudad: '',
+      descripcionComuna: '',
+      descripcionRegion: '',
+      numeroBloque: 0,
+      numeroDepartamento: 0,
+      nombreVillaCondominio: '',
+      nombreCalle: '',
+      numeroCalle: 0,
+      numeroCelular: 0,
+      numeroFijo: 0,
+      tipoDireccion: ''
+    };
+  };
+  
   // Función para buscar heredero por RUT usando BFF
   const buscarHeredero = useCallback(async (rut: string) => {
     setLoading(true);
@@ -31,69 +86,82 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         const rutSinDV = rutLimpio.slice(0, -1); // Remueve el último carácter (DV)
         // Obtener userName desde localStorage o sessionStorage si existe
         const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || '';
-        const response = await fetchSolicitanteMejorContactibilidad(Number(rutSinDV), userName);
         
-        // Mapear la respuesta del BFF al modelo Heredero
-        const herederoData: Heredero = {
-          id: response.SolicitanteInMae.IdPersona,
-          rut: `${response.SolicitanteInMae.RutPersona}-${response.SolicitanteInMae.RutDigito}`,
-          fechaNacimiento: response.SolicitanteInMae.FecNacimiento,
-          nombre: response.SolicitanteInMae.NomPersona,
-          apellidoPat: response.SolicitanteInMae.ApePaterno,
-          apellidoMat: response.SolicitanteInMae.ApeMaterno,
-          parentesco: 0, // Valor por defecto
-          Genero: "", // Valor por defecto
-          contactabilidad: {
-            direccion: {
-              calle: response.MejorContactibilidadSolicitante.nombreCalle,
-              numero: response.MejorContactibilidadSolicitante.numeroCalle,
-              comunaId: response.MejorContactibilidadSolicitante.CodComuna,
-              comunaNombre: response.MejorContactibilidadSolicitante.descripcionComuna,
-              regionId: response.MejorContactibilidadSolicitante.CodRegion,
-              regionNombre: response.MejorContactibilidadSolicitante.descripcionRegion,
-              ciudadId: response.MejorContactibilidadSolicitante.CodCiudad,
-              ciudadNombre: response.MejorContactibilidadSolicitante.descripcionCiudad,
-              villa: response.MejorContactibilidadSolicitante.nombreVillaCondominio,
-              departamento: response.MejorContactibilidadSolicitante.numeroDepartamento.toString()
+        try {
+          const response = await fetchSolicitanteMejorContactibilidad(Number(rutSinDV), userName);
+          
+          // Mapear la respuesta del BFF al modelo Heredero
+          const herederoData: Heredero = {
+            id: response.SolicitanteInMae.IdPersona,
+            rut: `${response.SolicitanteInMae.RutPersona}-${response.SolicitanteInMae.RutDigito}`,
+            fechaNacimiento: response.SolicitanteInMae.FecNacimiento,
+            nombre: response.SolicitanteInMae.NomPersona,
+            apellidoPat: response.SolicitanteInMae.ApePaterno,
+            apellidoMat: response.SolicitanteInMae.ApeMaterno,
+            parentesco: 0, // Valor por defecto
+            Genero: "", // Valor por defecto
+            contactabilidad: {
+              direccion: {
+                calle: response.MejorContactibilidadSolicitante.nombreCalle,
+                numero: response.MejorContactibilidadSolicitante.numeroCalle,
+                comunaId: response.MejorContactibilidadSolicitante.CodComuna,
+                comunaNombre: response.MejorContactibilidadSolicitante.descripcionComuna,
+                regionId: response.MejorContactibilidadSolicitante.CodRegion,
+                regionNombre: response.MejorContactibilidadSolicitante.descripcionRegion,
+                ciudadId: response.MejorContactibilidadSolicitante.CodCiudad,
+                ciudadNombre: response.MejorContactibilidadSolicitante.descripcionCiudad,
+                villa: response.MejorContactibilidadSolicitante.nombreVillaCondominio,
+                departamento: response.MejorContactibilidadSolicitante.numeroDepartamento.toString()
+              },
+              telefono: {
+                numero: response.MejorContactibilidadSolicitante.numeroCelular.toString(),
+                tipo: "CELULAR",
+                codPais: "56",
+                codCiudad: "2"
+              },
+              correo: [{
+                mail: response.MejorContactibilidadSolicitante.Email,
+                validacion: 1
+              }]
             },
-            telefono: {
-              numero: response.MejorContactibilidadSolicitante.numeroCelular.toString(),
-              tipo: "CELULAR",
-              codPais: "56",
-              codCiudad: "2"
-            },
-            correo: [{
-              mail: response.MejorContactibilidadSolicitante.Email,
-              validacion: 1
-            }]
-          },
-          // Campos adicionales del BFF
-          codCiudad: response.MejorContactibilidadSolicitante.CodCiudad,
-          codComuna: response.MejorContactibilidadSolicitante.CodComuna,
-          codRegion: response.MejorContactibilidadSolicitante.CodRegion,
-          codigoPostal: response.MejorContactibilidadSolicitante.CodigoPostal,
-          email: response.MejorContactibilidadSolicitante.Email,
-          descripcionCiudad: response.MejorContactibilidadSolicitante.descripcionCiudad,
-          descripcionComuna: response.MejorContactibilidadSolicitante.descripcionComuna,
-          descripcionRegion: response.MejorContactibilidadSolicitante.descripcionRegion,
-          numeroBloque: response.MejorContactibilidadSolicitante.numeroBloque,
-          numeroDepartamento: response.MejorContactibilidadSolicitante.numeroDepartamento,
-          nombreVillaCondominio: response.MejorContactibilidadSolicitante.nombreVillaCondominio,
-          nombreCalle: response.MejorContactibilidadSolicitante.nombreCalle,
-          numeroCalle: response.MejorContactibilidadSolicitante.numeroCalle,
-          numeroCelular: response.MejorContactibilidadSolicitante.numeroCelular,
-          numeroFijo: response.MejorContactibilidadSolicitante.numeroFijo,
-          tipoDireccion: response.MejorContactibilidadSolicitante.tipoDireccion
-        };
-        
-        setHeredero(herederoData);
-        
-        // Bloquear campos cuando la API devuelve 200 exitosamente
-        setFieldsLocked(true);
-        
-        // Comentado: Redirigir a IngresoHerederoFormPage cuando el status sea 200
-        // Ahora el formulario se muestra en la misma página
-        // navigate('/mnherederos/ingresoher/formingreso');
+            // Campos adicionales del BFF
+            codCiudad: response.MejorContactibilidadSolicitante.CodCiudad,
+            codComuna: response.MejorContactibilidadSolicitante.CodComuna,
+            codRegion: response.MejorContactibilidadSolicitante.CodRegion,
+            codigoPostal: response.MejorContactibilidadSolicitante.CodigoPostal,
+            email: response.MejorContactibilidadSolicitante.Email,
+            descripcionCiudad: response.MejorContactibilidadSolicitante.descripcionCiudad,
+            descripcionComuna: response.MejorContactibilidadSolicitante.descripcionComuna,
+            descripcionRegion: response.MejorContactibilidadSolicitante.descripcionRegion,
+            numeroBloque: response.MejorContactibilidadSolicitante.numeroBloque,
+            numeroDepartamento: response.MejorContactibilidadSolicitante.numeroDepartamento,
+            nombreVillaCondominio: response.MejorContactibilidadSolicitante.nombreVillaCondominio,
+            nombreCalle: response.MejorContactibilidadSolicitante.nombreCalle,
+            numeroCalle: response.MejorContactibilidadSolicitante.numeroCalle,
+            numeroCelular: response.MejorContactibilidadSolicitante.numeroCelular,
+            numeroFijo: response.MejorContactibilidadSolicitante.numeroFijo,
+            tipoDireccion: response.MejorContactibilidadSolicitante.tipoDireccion
+          };
+          
+          setHeredero(herederoData);
+          
+          // Bloquear campos cuando la API devuelve 200 exitosamente
+          setFieldsLocked(true);
+          
+        } catch (err: any) {
+          // Manejar específicamente el status 412
+          if (err.message && err.message.includes('412')) {
+            // Crear heredero vacío para status 412
+            const emptyHeredero = createEmptyHeredero(rutLimpio);
+            setHeredero(emptyHeredero);
+            setFieldsLocked(false); // No bloquear campos para formulario vacío
+            setError(null); // No mostrar error
+            return;
+          }
+          
+          // Para otros errores, propagar el error
+          throw err;
+        }
         
       } else {
         // Fallback a mock (para desarrollo)
@@ -109,8 +177,6 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         setHeredero(herederoEncontrado);
         // Para desarrollo, también bloquear campos
         setFieldsLocked(true);
-        // Comentado: navegación automática
-        // navigate('/mnherederos/ingresoher/formingreso');
       }
       
     } catch (err: any) {

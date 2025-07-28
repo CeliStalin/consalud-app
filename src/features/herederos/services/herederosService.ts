@@ -53,7 +53,16 @@ export class HerederosService {
    */
   async getSolicitanteMejorContactibilidad(rut: number, userName: string = ""): Promise<SolicitanteResponse> {
     const url = `${this.config.baseUrl}/api/Solicitante/mejorContactibilidad?IdentificadorUnico=${rut}&userName=${encodeURIComponent(userName)}`;
-    return apiGet<SolicitanteResponse>(url, this.config, 'obtener mejor contactibilidad del solicitante');
+    
+    try {
+      return await apiGet<SolicitanteResponse>(url, this.config, 'obtener mejor contactibilidad del solicitante');
+    } catch (error: any) {
+      // Manejo específico para status 412
+      if (error.message && error.message.includes('412')) {
+        throw new Error('412'); // Propagar el status 412 como error específico
+      }
+      throw error;
+    }
   }
 
   // ===== MÉTODOS DE PARÁMETROS GENERALES =====

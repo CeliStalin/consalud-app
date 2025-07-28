@@ -147,7 +147,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
 
   // Cargar datos de ubicación cuando se carga un heredero
   React.useEffect(() => {
-    if (heredero && heredero.codRegion) {
+    if (heredero && heredero.codRegion && fieldsLocked) {
       // Cargar ciudades de la región del heredero para tener las opciones disponibles
       setLoadingCiudades(true);
       fetchCiudades(heredero.codRegion)
@@ -176,37 +176,60 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         })
         .finally(() => setLoadingCiudades(false));
     }
-  }, [heredero]);
+  }, [heredero, fieldsLocked]);
 
   // Actualizar formData cuando cambie el heredero
   React.useEffect(() => {
     if (heredero) {
       setFormData(prevData => {
-        const newData = {
-          ...prevData,
-          fechaNacimiento: heredero.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
-          nombres: heredero.nombre || '',
-          apellidoPaterno: heredero.apellidoPat || '',
-          apellidoMaterno: heredero.apellidoMat || '',
-          telefono: heredero.contactabilidad.telefono.numero || '',
-          correoElectronico: heredero.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
-          ciudad: heredero.descripcionCiudad || '',
-          comuna: heredero.descripcionComuna || '',
-          calle: heredero.contactabilidad.direccion.calle || '',
-          numero: heredero.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
-          deptoBloqueOpcional: heredero.contactabilidad.direccion.departamento || '',
-          villaOpcional: heredero.contactabilidad.direccion.villa || ''
-          // La región se maneja en un useEffect separado
-        };
-        
-        return newData;
+        // Si los campos están bloqueados, usar los datos del heredero
+        if (fieldsLocked) {
+          const newData = {
+            ...prevData,
+            fechaNacimiento: heredero.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
+            nombres: heredero.nombre || '',
+            apellidoPaterno: heredero.apellidoPat || '',
+            apellidoMaterno: heredero.apellidoMat || '',
+            telefono: heredero.contactabilidad.telefono.numero || '',
+            correoElectronico: heredero.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
+            ciudad: heredero.descripcionCiudad || '',
+            comuna: heredero.descripcionComuna || '',
+            calle: heredero.contactabilidad.direccion.calle || '',
+            numero: heredero.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
+            deptoBloqueOpcional: heredero.contactabilidad.direccion.departamento || '',
+            villaOpcional: heredero.contactabilidad.direccion.villa || ''
+            // La región se maneja en un useEffect separado
+          };
+          return newData;
+        } else {
+          // Si los campos no están bloqueados (status 412), mantener solo el RUT y limpiar el resto
+          const newData = {
+            ...prevData,
+            fechaNacimiento: null,
+            nombres: '',
+            apellidoPaterno: '',
+            apellidoMaterno: '',
+            sexo: '',
+            parentesco: '',
+            telefono: '',
+            correoElectronico: '',
+            ciudad: '',
+            comuna: '',
+            calle: '',
+            numero: '',
+            deptoBloqueOpcional: '',
+            villaOpcional: '',
+            region: ''
+          };
+          return newData;
+        }
       });
     }
-  }, [heredero]); // Remover regiones de las dependencias
+  }, [heredero, fieldsLocked]); // Agregar fieldsLocked como dependencia
 
   // Actualizar región cuando se carguen las regiones y haya un heredero
   React.useEffect(() => {
-    if (regiones.length > 0 && heredero?.codRegion) {
+    if (regiones.length > 0 && heredero?.codRegion && fieldsLocked) {
       const descripcionRegion = obtenerDescripcionRegion(heredero.codRegion);
       if (descripcionRegion) {
         setFormData(prevData => ({
@@ -215,7 +238,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         }));
       }
     }
-  }, [regiones, heredero?.codRegion]);
+  }, [regiones, heredero?.codRegion, fieldsLocked]);
 
   const handleBackClick = useCallback((): void => {
     navigate(-1);
