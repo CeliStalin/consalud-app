@@ -69,7 +69,7 @@ import cartaPosesion from '../components/styles/img/posesion.png';
 
       const mostrarAlertaTitularHeredero = () => {
         Swal.fire({
-          title: 'EL TITULAR NO DEBE SER IGUAL AL HEREDERO',
+          title: 'El titular y el heredero es el mismo',
           text: 'El RUT ingresado corresponde al titular. Por favor, ingrese el RUT de una persona heredera diferente.',
           confirmButtonColor: '#04A59B',
           showCloseButton: true,
