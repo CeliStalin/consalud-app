@@ -7,7 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@consalud/core': path.resolve(__dirname, './node_modules/@consalud/core/dist/index.js')
+      '@consalud/core': path.resolve(__dirname, './node_modules/@consalud/core/dist')
     },
   },
   server: {

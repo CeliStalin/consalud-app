@@ -5,7 +5,6 @@ import { Stepper } from './Stepper';
 import { useHeredero } from '../contexts/HerederoContext';
 import * as ConsaludCore from '@consalud/core';
 import { fetchGeneros, fetchCiudades, fetchComunasPorCiudad, fetchRegiones, Genero, Ciudad, Comuna, Region } from '../services';
-import { CustomDatePicker } from './CustomDatePicker';
 import { CustomSelect } from './CustomSelect';
 import { AutoCompleteInput } from './AutoCompleteInput';
 import { useCallesAutocomplete } from '../hooks/useCallesAutocomplete';
@@ -272,6 +271,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
 
   // Manejar cambio de fecha
   const handleDateChange = (date: Date | null) => {
+    console.log('DatePicker del core - fecha seleccionada:', date);
     setFormData({
       ...formData,
       fechaNacimiento: date
@@ -558,14 +558,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
               <div className="form-row" style={{ display: 'flex', flexDirection: 'row', gap: '16px', marginBottom: '20px', width: '100%' }}>
                 {/* Fecha de nacimiento */}
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
-                  <CustomDatePicker
-                    selected={formData.fechaNacimiento}
+                  <ConsaludCore.DatePicker
+                    value={formData.fechaNacimiento}
                     onChange={handleDateChange}
-                    placeholder="DD/MM/AAAA"
-                    isError={!!errors.fechaNacimiento}
-                    maxDate={new Date()}
                     label="Fecha nacimiento"
+                    placeholder="DD/MM/AAAA"
+                    maxDate={new Date()}
                     disabled={fieldsLocked}
+                    error={!!errors.fechaNacimiento}
                   />
                   {errors.fechaNacimiento && (
                     <p className="help is-danger">{errors.fechaNacimiento}</p>

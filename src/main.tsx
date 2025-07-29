@@ -1,4 +1,5 @@
-import '@consalud/core';
+import '@consalud/core/index.js';
+import '@consalud/core/core.css';
 import 'bulma/css/bulma.min.css'
 import './styles/bulma-overrides.css'
 //import './styles/core-enhancements.css'

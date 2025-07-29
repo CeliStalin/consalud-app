@@ -15,7 +15,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
   error 
 }) => {
   const { rut, isValid: isValidRut, handleRutChange, setRut } = useRutChileno();
-  const { heredero, fieldsLocked } = useHeredero();
+  const { heredero } = useHeredero();
   const [showError, setShowError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [showForm, setShowForm] = useState<boolean>(false);

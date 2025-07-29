@@ -12,7 +12,7 @@ const IngresoHerederos: React.FC = () => {
   const [searchResult] = useState<SearchResult | null>(null);
 
   return (
-    <ConsaludCore.SecureLayout pageTitle="Ingreso Herederos">
+    <ConsaludCore.Layout pageTitle="Ingreso Herederos" logoSrc="/Logo.png">
       <div style={{ padding: '20px' }}>
         <div className="columns is-centered">
           <div className="column is-narrow">
@@ -31,7 +31,7 @@ const IngresoHerederos: React.FC = () => {
           </div>
         </div>
       </div>
-    </ConsaludCore.SecureLayout>
+    </ConsaludCore.Layout>
   );
 };
 

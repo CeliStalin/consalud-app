@@ -617,3 +617,347 @@
 .ingreso-card .button.is-primary.is-rounded:active {
   transform: translateY(1px) !important;
 }
+
+/* Estilos específicos para el DatePicker del core */
+.ingreso-card .form-column [data-testid="datepicker"],
+.ingreso-card .form-column .datepicker,
+.ingreso-card .form-column .DatePicker {
+  position: relative !important;
+  width: 100% !important;
+  z-index: 1 !important;
+}
+
+/* Contenedor del DatePicker del core */
+.ingreso-card .form-column [data-testid="datepicker"] > div,
+.ingreso-card .form-column .datepicker > div,
+.ingreso-card .form-column .DatePicker > div {
+  position: relative !important;
+  width: 100% !important;
+}
+
+/* Input del DatePicker del core */
+.ingreso-card .form-column [data-testid="datepicker"] input,
+.ingreso-card .form-column .datepicker input,
+.ingreso-card .form-column .DatePicker input {
+  width: 100% !important;
+  height: 42px !important;
+  border: 1.5px solid #e0e0e0 !important;
+  border-radius: 24px !important;
+  font-size: 16px !important;
+  padding: 12px 18px !important;
+  background: #f8f9fa !important;
+  box-shadow: 0 2px 8px rgba(4, 165, 155, 0.07) !important;
+  outline: none !important;
+  transition: border 0.2s !important;
+  color: #374151 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  box-sizing: border-box !important;
+}
+
+.ingreso-card .form-column [data-testid="datepicker"] input:focus,
+.ingreso-card .form-column .datepicker input:focus,
+.ingreso-card .form-column .DatePicker input:focus {
+  border-color: #04A59B !important;
+  box-shadow: 0 2px 8px rgba(4, 165, 155, 0.15) !important;
+  background: #f8f9fa !important;
+}
+
+.ingreso-card .form-column [data-testid="datepicker"] input[data-error="true"],
+.ingreso-card .form-column .datepicker input[data-error="true"],
+.ingreso-card .form-column .DatePicker input[data-error="true"] {
+  border-color: #E11D48 !important;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.15) !important;
+}
+
+/* Calendario del DatePicker del core */
+.ingreso-card .form-column [data-testid="datepicker"] [role="dialog"],
+.ingreso-card .form-column .datepicker [role="dialog"],
+.ingreso-card .form-column .DatePicker [role="dialog"],
+.ingreso-card .form-column [data-testid="datepicker"] .calendar,
+.ingreso-card .form-column .datepicker .calendar,
+.ingreso-card .form-column .DatePicker .calendar {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  z-index: 1000 !important;
+  background: white !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  max-width: 300px !important;
+  width: 300px !important;
+  overflow: hidden !important;
+  margin-top: 4px !important;
+}
+
+/* Estilos específicos para la cuadrícula del calendario del core */
+.ingreso-card .form-column [data-testid="datepicker"] table,
+.ingreso-card .form-column .datepicker table,
+.ingreso-card .form-column .DatePicker table,
+.ingreso-card .form-column [data-testid="datepicker"] .calendar-grid,
+.ingreso-card .form-column .datepicker .calendar-grid,
+.ingreso-card .form-column .DatePicker .calendar-grid {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  table-layout: fixed !important;
+}
+
+/* Estilos para las filas del calendario */
+.ingreso-card .form-column [data-testid="datepicker"] tr,
+.ingreso-card .form-column .datepicker tr,
+.ingreso-card .form-column .DatePicker tr,
+.ingreso-card .form-column [data-testid="datepicker"] .calendar-row,
+.ingreso-card .form-column .datepicker .calendar-row,
+.ingreso-card .form-column .DatePicker .calendar-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-bottom: 4px !important;
+}
+
+/* Estilos para las celdas del calendario */
+.ingreso-card .form-column [data-testid="datepicker"] td,
+.ingreso-card .form-column .datepicker td,
+.ingreso-card .form-column .DatePicker td,
+.ingreso-card .form-column [data-testid="datepicker"] .calendar-cell,
+.ingreso-card .form-column .datepicker .calendar-cell,
+.ingreso-card .form-column .DatePicker .calendar-cell {
+  flex: 1 !important;
+  text-align: center !important;
+  padding: 8px 4px !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #374151 !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+/* Estilos para los días del calendario */
+.ingreso-card .form-column [data-testid="datepicker"] button,
+.ingreso-card .form-column .datepicker button,
+.ingreso-card .form-column .DatePicker button,
+.ingreso-card .form-column [data-testid="datepicker"] .calendar-day,
+.ingreso-card .form-column .datepicker .calendar-day,
+.ingreso-card .form-column .DatePicker .calendar-day {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #374151 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+/* Hover para los días */
+.ingreso-card .form-column [data-testid="datepicker"] button:hover,
+.ingreso-card .form-column .datepicker button:hover,
+.ingreso-card .form-column .DatePicker button:hover,
+.ingreso-card .form-column [data-testid="datepicker"] .calendar-day:hover,
+.ingreso-card .form-column .datepicker .calendar-day:hover,
+.ingreso-card .form-column .DatePicker .calendar-day:hover {
+  background-color: rgba(4, 165, 155, 0.1) !important;
+  color: #04A59B !important;
+  transform: scale(1.1) !important;
+}
+
+/* Día seleccionado */
+.ingreso-card .form-column [data-testid="datepicker"] button[aria-selected="true"],
+.ingreso-card .form-column .datepicker button[aria-selected="true"],
+.ingreso-card .form-column .DatePicker button[aria-selected="true"],
+.ingreso-card .form-column [data-testid="datepicker"] .calendar-day.selected,
+.ingreso-card .form-column .datepicker .calendar-day.selected,
+.ingreso-card .form-column .DatePicker .calendar-day.selected {
+  background: linear-gradient(135deg, #04A59B 0%, #059669 100%) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(4, 165, 155, 0.3) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Día actual */
+.ingreso-card .form-column [data-testid="datepicker"] button[aria-current="date"],
+.ingreso-card .form-column .datepicker button[aria-current="date"],
+.ingreso-card .form-column .DatePicker button[aria-current="date"],
+.ingreso-card .form-column [data-testid="datepicker"] .calendar-day.today,
+.ingreso-card .form-column .datepicker .calendar-day.today,
+.ingreso-card .form-column .DatePicker .calendar-day.today {
+  border: 2px solid #04A59B !important;
+  font-weight: 600 !important;
+  color: #04A59B !important;
+}
+
+/* Días fuera del mes actual */
+.ingreso-card .form-column [data-testid="datepicker"] button[aria-disabled="true"],
+.ingreso-card .form-column .datepicker button[aria-disabled="true"],
+.ingreso-card .form-column .DatePicker button[aria-disabled="true"],
+.ingreso-card .form-column [data-testid="datepicker"] .calendar-day.outside,
+.ingreso-card .form-column .datepicker .calendar-day.outside,
+.ingreso-card .form-column .DatePicker .calendar-day.outside {
+  color: #9ca3af !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+/* Días deshabilitados */
+.ingreso-card .form-column [data-testid="datepicker"] button:disabled,
+.ingreso-card .form-column .datepicker button:disabled,
+.ingreso-card .form-column .DatePicker button:disabled,
+.ingreso-card .form-column [data-testid="datepicker"] .calendar-day.disabled,
+.ingreso-card .form-column .datepicker .calendar-day.disabled,
+.ingreso-card .form-column .DatePicker .calendar-day.disabled {
+  color: #d1d5db !important;
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}
+
+/* Estilos para los nombres de los días */
+.ingreso-card .form-column [data-testid="datepicker"] th,
+.ingreso-card .form-column .datepicker th,
+.ingreso-card .form-column .DatePicker th,
+.ingreso-card .form-column [data-testid="datepicker"] .calendar-header,
+.ingreso-card .form-column .datepicker .calendar-header,
+.ingreso-card .form-column .DatePicker .calendar-header {
+  flex: 1 !important;
+  text-align: center !important;
+  padding: 8px 4px !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #6b7280 !important;
+  text-transform: lowercase !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+/* Estilos para el header del calendario */
+.ingreso-card .form-column [data-testid="datepicker"] .calendar-header,
+.ingreso-card .form-column .datepicker .calendar-header,
+.ingreso-card .form-column .DatePicker .calendar-header {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  margin: 0 12px 12px 12px !important;
+  padding: 12px 0 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Estilos para el mes y año */
+.ingreso-card .form-column [data-testid="datepicker"] .calendar-title,
+.ingreso-card .form-column .datepicker .calendar-title,
+.ingreso-card .form-column .DatePicker .calendar-title {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #374151 !important;
+  text-align: center !important;
+  padding: 12px 16px !important;
+  background: #f9fafb !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* Estilos agresivos para forzar la cuadrícula del calendario */
+.ingreso-card .form-column [data-testid="datepicker"] *,
+.ingreso-card .form-column .datepicker *,
+.ingreso-card .form-column .DatePicker * {
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
+/* Forzar que los días se muestren en cuadrícula */
+.ingreso-card .form-column [data-testid="datepicker"] div[role="grid"],
+.ingreso-card .form-column .datepicker div[role="grid"],
+.ingreso-card .form-column .DatePicker div[role="grid"] {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  gap: 4px !important;
+  padding: 12px !important;
+}
+
+.ingreso-card .form-column [data-testid="datepicker"] div[role="gridcell"],
+.ingreso-card .form-column .datepicker div[role="gridcell"],
+.ingreso-card .form-column .DatePicker div[role="gridcell"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 36px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Estilos para el header de días de la semana */
+.ingreso-card .form-column [data-testid="datepicker"] div[role="row"]:first-child,
+.ingreso-card .form-column .datepicker div[role="row"]:first-child,
+.ingreso-card .form-column .DatePicker div[role="row"]:first-child {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  gap: 4px !important;
+  padding: 8px 12px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  margin: 0 12px 8px 12px !important;
+}
+
+.ingreso-card .form-column [data-testid="datepicker"] div[role="columnheader"],
+.ingreso-card .form-column .datepicker div[role="columnheader"],
+.ingreso-card .form-column .DatePicker div[role="columnheader"] {
+  text-align: center !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #6b7280 !important;
+  text-transform: lowercase !important;
+  padding: 8px 4px !important;
+}
+
+/* Asegurar que el calendario no se desborde */
+.ingreso-card .form-column [data-testid="datepicker"] [role="dialog"] *,
+.ingreso-card .form-column .datepicker [role="dialog"] *,
+.ingreso-card .form-column .DatePicker [role="dialog"] *,
+.ingreso-card .form-column [data-testid="datepicker"] .calendar *,
+.ingreso-card .form-column .datepicker .calendar *,
+.ingreso-card .form-column .DatePicker .calendar * {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Estilos para el contenedor del formulario para evitar desbordamiento */
+.ingreso-card {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.ingreso-card .form-column {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* Asegurar que el DatePicker del core tenga el z-index correcto */
+.ingreso-card .form-column [data-testid="datepicker"],
+.ingreso-card .form-column .datepicker,
+.ingreso-card .form-column .DatePicker {
+  z-index: 10 !important;
+}
+
+/* Estilos para el DatePicker */
