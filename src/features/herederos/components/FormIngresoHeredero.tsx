@@ -482,11 +482,9 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     }
   };
 
-  console.log(heredero);
-  console.log('rut en contexto:'+heredero?.rut);
-  
-  return (
-    <div className="route-container layout-stable">
+  // Contenido del formulario
+  const formContent = (
+    <>
       {showHeader && (
         <>
           {/* Header Section */}
@@ -873,7 +871,15 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
           </form>
         </ConsaludCore.Card>
       </div>
+    </>
+  );
+
+  return showHeader ? (
+    <div className="route-container layout-stable">
+      {formContent}
     </div>
+  ) : (
+    formContent
   );
 };
 export default FormIngresoHeredero;

@@ -1,6 +1,8 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useRutChileno } from "@/features/herederos/hooks/useRutChileno";
 import { useHeredero } from "@/features/herederos/contexts/HerederoContext";
+import { useTitular } from "@/features/herederos/contexts/TitularContext";
+import { UseAlert } from "@/features/herederos/hooks/Alert";
 import * as ConsaludCore from '@consalud/core';
 import FormIngresoHeredero from './FormIngresoHeredero';
 import RutErrorMessage from './RutErrorMessage';
@@ -15,38 +17,96 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
   error 
 }) => {
   const { rut, isValid: isValidRut, handleRutChange, setRut } = useRutChileno();
-  const { heredero } = useHeredero();
+  const { heredero, limpiarHeredero } = useHeredero();
+  const { titular } = useTitular();
+  const { mostrarAlertaTitularHeredero } = UseAlert();
   const [showError, setShowError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [showForm, setShowForm] = useState<boolean>(false);
+  const [validationPassed, setValidationPassed] = useState<boolean>(false);
+  const [isClearing, setIsClearing] = useState<boolean>(false);
 
-  // Si ya hay un heredero cargado, mostrar directamente el formulario y establecer el RUT
-  React.useEffect(() => {
-    if (heredero) {
+  // Limpiar estado al montar el componente
+  useEffect(() => {
+    setShowForm(false);
+    setValidationPassed(false);
+    setRut('');
+    setShowError(false);
+    if (limpiarHeredero) {
+      limpiarHeredero();
+    }
+  }, [limpiarHeredero, setRut]);
+
+  // Función para limpiar RUT del input y resetear estado completamente
+  const limpiarRut = useCallback(() => {
+    setIsClearing(true); // Marcar que estamos limpiando
+    setRut('');
+    setShowError(false);
+    setShowForm(false);
+    setValidationPassed(false);
+    // Limpiar también el heredero del contexto para resetear completamente
+    if (limpiarHeredero) {
+      limpiarHeredero();
+    }
+    // Resetear el flag de limpieza después de un breve delay
+    setTimeout(() => setIsClearing(false), 100);
+  }, [setRut, limpiarHeredero]);
+
+  // Función para comparar RUTs (ignorando formato)
+  const compararRuts = useCallback((rut1: string, rut2: string): boolean => {
+    const limpiarRut = (rut: string) => rut.replace(/[^0-9kK]/g, '').toLowerCase();
+    return limpiarRut(rut1) === limpiarRut(rut2);
+  }, []);
+
+  // Solo mostrar el formulario si hay heredero Y la validación pasó
+  useEffect(() => {
+    if (heredero && heredero.rut && validationPassed && !isClearing) {
       setShowForm(true);
-      // Establecer el RUT del heredero en el input
-      if (heredero.rut) {
+      // Solo establecer el RUT del heredero si el input está vacío o es diferente
+      if (!rut || rut !== heredero.rut) {
         setRut(heredero.rut);
       }
+    } else {
+      // Si no hay heredero o la validación no pasó, ocultar el formulario
+      setShowForm(false);
     }
-  }, [heredero, setRut]);
+  }, [heredero, validationPassed, setRut, rut, isClearing]);
 
   const handleNavigator = useCallback(async (): Promise<void> => {
     const rutLimpio = rut.replace(/[^0-9kK]/g, '');
+    
+    // No ejecutar si estamos limpiando o si el RUT está vacío
+    if (isClearing || !rutLimpio) {
+      return;
+    }
+    
     if (!isValidRut) {
       setShowError(true);
       return;
     }
+    
+    // Validar que el RUT del heredero no sea igual al del titular ANTES de buscar
+    if (titular && titular.rut && compararRuts(rutLimpio, titular.rut)) {
+      // Resetear validación INMEDIATAMENTE para evitar que se muestre el formulario
+      setValidationPassed(false);
+      setShowForm(false);
+      mostrarAlertaTitularHeredero();
+      limpiarRut();
+      return;
+    }
+    
     setShowError(false);
     setLoading(true);
+    setValidationPassed(false); // Resetear validación al iniciar nueva búsqueda
+    
     try {
       await buscarHeredero(rutLimpio);
-      // Si la búsqueda es exitosa (incluyendo status 412), mostrar el formulario
-      setShowForm(true);
+      // Si la búsqueda es exitosa (incluyendo status 412), marcar validación como pasada
+      setValidationPassed(true);
     } finally {
       setLoading(false);
     }
-  }, [rut, isValidRut, buscarHeredero]);
+  }, [rut, isValidRut, buscarHeredero, titular, compararRuts, mostrarAlertaTitularHeredero, limpiarRut, isClearing]);
 
   const handleBlur = useCallback((): void => {
     setShowError(rut.length > 0 && !isValidRut);
@@ -73,7 +133,12 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
       >
         <form
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', marginTop: 8 }}
-          onSubmit={e => { e.preventDefault(); handleNavigator(); }}
+          onSubmit={e => { 
+            e.preventDefault(); 
+            if (!isClearing) {
+              handleNavigator(); 
+            }
+          }}
           autoComplete="off"
           aria-labelledby="rut-heredero-label"
         >
@@ -120,7 +185,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
                   onFocus={handleFocus}
                   placeholder="Ingresar"
                   className="inputRut"
-                  disabled={loading || !!heredero}
+                  disabled={loading}
                   aria-invalid={showError}
                   aria-describedby={showError ? 'rut-error' : undefined}
                   style={{ 
@@ -140,8 +205,12 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
                 
                 <button
                   className={`button is-primary is-rounded proceso-button animate-fade-in-up${isValidRut ? ' buttonRut--valid' : ' buttonRut--invalid'}`}
-                  disabled={!isValidRut || loading || !!heredero}
-                  onClick={handleNavigator}
+                  disabled={!isValidRut || loading}
+                  onClick={() => {
+                    if (!isClearing) {
+                      handleNavigator();
+                    }
+                  }}
                   type="submit"
                   aria-label="Buscar heredero"
                   aria-busy={loading}
@@ -190,8 +259,10 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
         </form>
       </ConsaludCore.Card>
 
-      {/* Formulario que aparece debajo cuando la búsqueda es exitosa o cuando hay status 412 */}
-      {showForm && heredero && (
+      {/* Formulario que aparece debajo SOLO cuando la búsqueda es exitosa Y la validación pasó */}
+      {(() => {
+        return showForm && heredero && validationPassed;
+      })() && (
         <div style={{ marginTop: 24 }}>
           <FormIngresoHeredero showHeader={false} />
         </div>

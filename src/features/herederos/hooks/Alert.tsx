@@ -67,6 +67,23 @@ import cartaPosesion from '../components/styles/img/posesion.png';
         });
       };
 
+      const mostrarAlertaTitularHeredero = () => {
+        Swal.fire({
+          title: 'EL TITULAR NO DEBE SER IGUAL AL HEREDERO',
+          text: 'El RUT ingresado corresponde al titular. Por favor, ingrese el RUT de una persona heredera diferente.',
+          confirmButtonColor: '#04A59B',
+          showCloseButton: true,
+          confirmButtonText: 'Entendido',
+          customClass:{
+            confirmButton: 'boton-alerta',
+            title: 'titulo-alerta',
+            htmlContainer : 'sub-titulo-alerta',
+            closeButton: 'swal-close-button',
+            popup: 'swal2-modal'
+          }
+        });
+      };
+
       const ejemploCedula = () => {
         Swal.fire({
           title: 'Cédula de identidad',
@@ -159,6 +176,7 @@ import cartaPosesion from '../components/styles/img/posesion.png';
         mostrarAlerta2,
         mostrarAlerta3,
         mostrarAlerta4,
+        mostrarAlertaTitularHeredero,
         ejemploCedula,
         ejemploPoder,
         ejemploPosesion
