@@ -1,13 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './styles/FormHeredero.css';
 import { Stepper } from './Stepper';
 import { useHeredero } from '../contexts/HerederoContext';
+import { useFormHerederoData } from '../hooks/useFormHerederoData';
 import * as ConsaludCore from '@consalud/core';
 import { fetchGeneros, fetchCiudades, fetchComunasPorCiudad, fetchRegiones, Genero, Ciudad, Comuna, Region } from '../services';
 import { CustomSelect } from './CustomSelect';
 import { AutoCompleteInput } from './AutoCompleteInput';
 import { useCallesAutocomplete } from '../hooks/useCallesAutocomplete';
+import { FormData } from '../interfaces/FormData';
 
 interface BreadcrumbItem {
     label: string;
@@ -26,27 +28,19 @@ const PARENTESCO_OPTIONS = [
   { value: 'O', label: 'Otro' }
 ];
 
-interface FormData {
-  fechaNacimiento: Date | null;
-  nombres: string;
-  apellidoPaterno: string;
-  apellidoMaterno: string;
-  sexo: string;
-  parentesco: string;
-  telefono: string;
-  correoElectronico: string;
-  ciudad: string;
-  comuna: string;
-  calle: string;
-  numero: string;
-  deptoBloqueOpcional: string;
-  villaOpcional: string;
-  region?: string; // Added for the new form structure
-}
-
 const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = true }) => {
   const navigate = useNavigate();
   const {heredero, fieldsLocked} = useHeredero();
+  const { 
+    formData, 
+    loading: formLoading, 
+    error: formError, 
+    isDirty,
+    handleFieldChange, 
+    handleSaveForm, 
+    handleValidateForm,
+    handleReloadFromStorage
+  } = useFormHerederoData();
 
   // Función para obtener la descripción de región por código
   const obtenerDescripcionRegion = (codRegion: number): string => {
@@ -54,22 +48,27 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     return region ? region.nombreRegion : '';
   };
 
-  const [formData, setFormData] = useState<FormData>({
-    fechaNacimiento: heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
-    nombres: heredero?.nombre || '',
-    apellidoPaterno: heredero?.apellidoPat || '',
-    apellidoMaterno: heredero?.apellidoMat || '',
-    sexo:  '',
-    parentesco: '',
-    telefono: heredero?.contactabilidad.telefono.numero || '',
-    correoElectronico:heredero?.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
-    ciudad: heredero?.descripcionCiudad || '',
-    comuna: heredero?.descripcionComuna || '',
-    calle: heredero?.contactabilidad.direccion.calle || '',
-    numero: heredero?.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
-    deptoBloqueOpcional: heredero?.contactabilidad.direccion.departamento || '',
-    villaOpcional: heredero?.contactabilidad.direccion.villa || '',
-    region: '' // Inicializar vacío, se actualizará cuando se carguen las regiones
+  // Estado local para el formulario (se sincroniza con el contexto)
+  const [localFormData, setLocalFormData] = useState<FormData>({
+    fechaNacimiento: formData?.fechaNacimiento || (heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null),
+    nombres: formData?.nombres || heredero?.nombre || '',
+    apellidoPaterno: formData?.apellidoPaterno || heredero?.apellidoPat || '',
+    apellidoMaterno: formData?.apellidoMaterno || heredero?.apellidoMat || '',
+    sexo: formData?.sexo || '',
+    parentesco: formData?.parentesco || '',
+    telefono: formData?.telefono || heredero?.contactabilidad.telefono.numero || '',
+    correoElectronico: formData?.correoElectronico || heredero?.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
+    ciudad: formData?.ciudad || heredero?.descripcionCiudad || '',
+    comuna: formData?.comuna || heredero?.descripcionComuna || '',
+    calle: formData?.calle || heredero?.contactabilidad.direccion.calle || '',
+    numero: formData?.numero || (heredero?.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : ''),
+    deptoBloqueOpcional: formData?.deptoBloqueOpcional || heredero?.contactabilidad.direccion.departamento || '',
+    villaOpcional: formData?.villaOpcional || heredero?.contactabilidad.direccion.villa || '',
+    region: formData?.region || '',
+    // Códigos para cargar los combos correctamente
+    codRegion: formData?.codRegion || heredero?.codRegion || undefined,
+    codCiudad: formData?.codCiudad || heredero?.codCiudad || undefined,
+    codComuna: formData?.codComuna || undefined
   });
 
   // Estado para manejar errores de validación
@@ -96,7 +95,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   const [errorRegiones, setErrorRegiones] = useState<string | null>(null);
 
   // Hook para autocompletado de calles
-  const selectedComuna = comunas.find(comuna => comuna.NombreComuna === formData.comuna);
+  const selectedComuna = comunas.find(comuna => comuna.NombreComuna === localFormData.comuna);
   const { calles, loading: loadingCalles, error: errorCalles, searchCalles } = useCallesAutocomplete({
     idComuna: selectedComuna?.idComuna
   });
@@ -177,10 +176,64 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     }
   }, [heredero, fieldsLocked]);
 
-  // Actualizar formData cuando cambie el heredero
-  React.useEffect(() => {
+  // Inicializar el formulario solo una vez al montar
+  useEffect(() => {
+    // Recargar datos del sessionStorage al montar
+    handleReloadFromStorage();
+  }, [handleReloadFromStorage]);
+
+  // Sincronizar datos locales cuando cambie formData del contexto
+  useEffect(() => {
+    if (formData) {
+      console.log('🔄 Sincronizando datos del contexto:', formData);
+      setLocalFormData(prevData => {
+        // Solo actualizar si los datos son diferentes
+        if (JSON.stringify(prevData) !== JSON.stringify(formData)) {
+          console.log('📝 Actualizando localFormData con datos del contexto');
+          return formData;
+        }
+        return prevData;
+      });
+    }
+  }, [formData]);
+
+  // Cargar datos de ubicación cuando se restaura el formulario con códigos
+  useEffect(() => {
+    if (localFormData.codRegion && regiones.length > 0) {
+      // Cargar ciudades de la región guardada
+      setLoadingCiudades(true);
+      fetchCiudades(localFormData.codRegion)
+        .then((data) => {
+          setCiudades(data);
+          setErrorCiudades(null);
+          
+          // Si hay código de ciudad, cargar comunas
+          if (localFormData.codCiudad) {
+            setLoadingComunas(true);
+            fetchComunasPorCiudad(localFormData.codCiudad)
+              .then((comunasData) => {
+                setComunas(comunasData);
+                setErrorComunas(null);
+              })
+              .catch(() => {
+                setErrorComunas('No se pudieron cargar las comunas');
+                setComunas([]);
+              })
+              .finally(() => setLoadingComunas(false));
+          }
+        })
+        .catch(() => {
+          setErrorCiudades('No se pudieron cargar las ciudades');
+          setCiudades([]);
+        })
+        .finally(() => setLoadingCiudades(false));
+    }
+  }, [localFormData.codRegion, localFormData.codCiudad, regiones.length]);
+
+  // Actualizar datos cuando cambie el heredero
+  useEffect(() => {
     if (heredero) {
-      setFormData(prevData => {
+      setLocalFormData(prevData => {
         // Si los campos están bloqueados, usar los datos del heredero
         if (fieldsLocked) {
           const newData = {
@@ -196,8 +249,11 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
             calle: heredero.contactabilidad.direccion.calle || '',
             numero: heredero.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
             deptoBloqueOpcional: heredero.contactabilidad.direccion.departamento || '',
-            villaOpcional: heredero.contactabilidad.direccion.villa || ''
-            // La región se maneja en un useEffect separado
+            villaOpcional: heredero.contactabilidad.direccion.villa || '',
+            // Códigos del heredero
+            codRegion: heredero.codRegion || undefined,
+            codCiudad: heredero.codCiudad || undefined,
+            codComuna: undefined // No hay código de comuna en el heredero
           };
           return newData;
         } else {
@@ -218,26 +274,34 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
             numero: '',
             deptoBloqueOpcional: '',
             villaOpcional: '',
-            region: ''
+            region: '',
+            // Limpiar códigos
+            codRegion: undefined,
+            codCiudad: undefined,
+            codComuna: undefined
           };
           return newData;
         }
       });
     }
-  }, [heredero, fieldsLocked]); // Agregar fieldsLocked como dependencia
+  }, [heredero, fieldsLocked]);
 
   // Actualizar región cuando se carguen las regiones y haya un heredero
-  React.useEffect(() => {
+  useEffect(() => {
     if (regiones.length > 0 && heredero?.codRegion && fieldsLocked) {
       const descripcionRegion = obtenerDescripcionRegion(heredero.codRegion);
       if (descripcionRegion) {
-        setFormData(prevData => ({
+        setLocalFormData(prevData => ({
           ...prevData,
-          region: descripcionRegion
+          region: descripcionRegion,
+          codRegion: heredero.codRegion
         }));
       }
     }
   }, [regiones, heredero?.codRegion, fieldsLocked]);
+
+  // Eliminar la sincronización automática que causa el infinite loop
+  // Los cambios se guardarán solo cuando se envíe el formulario
 
   const handleBackClick = useCallback((): void => {
     navigate(-1);
@@ -255,8 +319,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Manejar cambios en campos de texto
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setLocalFormData({
+      ...localFormData,
       [name]: value
     });
 
@@ -272,8 +336,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Manejar cambio de fecha
   const handleDateChange = (date: Date | null) => {
     console.log('DatePicker del core - fecha seleccionada:', date);
-    setFormData({
-      ...formData,
+    setLocalFormData({
+      ...localFormData,
       fechaNacimiento: date
     });
 
@@ -288,11 +352,18 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Manejar cambio de región (resetea ciudad, comuna y carga ciudades)
   const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    setFormData({
-      ...formData,
+    
+    // Buscar la región seleccionada para obtener su código
+    const regionObj = regiones.find((r) => r.nombreRegion === value);
+    
+    setLocalFormData({
+      ...localFormData,
       region: value,
+      codRegion: regionObj?.idRegion || undefined,
       ciudad: '', // Resetear ciudad al cambiar región
-      comuna: '' // Resetear comuna al cambiar región
+      comuna: '', // Resetear comuna al cambiar región
+      codCiudad: undefined, // Resetear código de ciudad
+      codComuna: undefined // Resetear código de comuna
     });
 
     if (errors.region) {
@@ -302,8 +373,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       });
     }
 
-    // Buscar idRegion correspondiente
-    const regionObj = regiones.find((r) => r.nombreRegion === value);
+    // Cargar ciudades de la región seleccionada
     if (regionObj) {
       setLoadingCiudades(true);
       fetchCiudades(regionObj.idRegion)
@@ -324,10 +394,16 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Manejar cambio de ciudad (resetea comuna y carga comunas)
   const handleCiudadChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    setFormData({
-      ...formData,
+    
+    // Buscar la ciudad seleccionada para obtener su código
+    const ciudadObj = ciudades.find((c) => c.nombreCiudad === value);
+    
+    setLocalFormData({
+      ...localFormData,
       ciudad: value,
-      comuna: '' // Resetear comuna al cambiar ciudad
+      codCiudad: ciudadObj?.idCiudad || undefined,
+      comuna: '', // Resetear comuna al cambiar ciudad
+      codComuna: undefined // Resetear código de comuna
     });
 
     if (errors.ciudad) {
@@ -337,8 +413,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       });
     }
 
-    // Buscar idCiudad correspondiente
-    const ciudadObj = ciudades.find((c) => c.nombreCiudad === value);
+    // Cargar comunas de la ciudad seleccionada
     if (ciudadObj) {
       setLoadingComunas(true);
       fetchComunasPorCiudad(ciudadObj.idCiudad)
@@ -359,9 +434,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Manejar cambio de comuna (resetea calle y carga calles)
   const handleComunaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    setFormData({
-      ...formData,
+    
+    // Buscar la comuna seleccionada para obtener su código
+    const comunaObj = comunas.find((c) => c.NombreComuna === value);
+    
+    setLocalFormData({
+      ...localFormData,
       comuna: value,
+      codComuna: comunaObj?.idComuna || undefined,
       calle: '' // Resetear calle al cambiar comuna
     });
 
@@ -376,8 +456,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Manejar cambio de calle con autocompletado
   const handleCalleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    setFormData({
-      ...formData,
+    setLocalFormData({
+      ...localFormData,
       calle: value
     });
 
@@ -400,67 +480,67 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
 
     // Campos requeridos - solo validar si no están bloqueados
     if (!fieldsLocked) {
-      if (!formData.fechaNacimiento) {
+      if (!localFormData.fechaNacimiento) {
         newErrors.fechaNacimiento = 'La fecha de nacimiento es requerida';
         isValid = false;
       }
 
-      if (!formData.nombres.trim()) {
+      if (!localFormData.nombres.trim()) {
         newErrors.nombres = 'El nombre es requerido';
         isValid = false;
       }
 
-      if (!formData.apellidoPaterno.trim()) {
+      if (!localFormData.apellidoPaterno.trim()) {
         newErrors.apellidoPaterno = 'El apellido paterno es requerido';
         isValid = false;
       }
     }
 
     // Campos que siempre se validan (no están en la lista de bloqueados)
-    if (!formData.sexo) {
+    if (!localFormData.sexo) {
       newErrors.sexo = 'Seleccione un sexo';
       isValid = false;
     }
 
-    if (!formData.parentesco) {
+    if (!localFormData.parentesco) {
       newErrors.parentesco = 'Seleccione un parentesco';
       isValid = false;
     }
 
     // Validación de email si se proporciona
-    if (formData.correoElectronico && !/\S+@\S+\.\S+/.test(formData.correoElectronico)) {
+    if (localFormData.correoElectronico && !/\S+@\S+\.\S+/.test(localFormData.correoElectronico)) {
       newErrors.correoElectronico = 'Correo electrónico inválido';
       isValid = false;
     }
 
     // Validación de número de teléfono si se proporciona
-    if (formData.telefono && !/^\d{9}$/.test(formData.telefono)) {
+    if (localFormData.telefono && !/^\d{9}$/.test(localFormData.telefono)) {
       newErrors.telefono = 'Teléfono debe tener 9 dígitos';
       isValid = false;
     }
 
     // Validación de dirección
-    if (!formData.region) {
+    if (!localFormData.region) {
       newErrors.region = 'Seleccione una región';
       isValid = false;
     }
 
-    if (!formData.ciudad) {
+    if (!localFormData.ciudad) {
       newErrors.ciudad = 'Seleccione una ciudad';
       isValid = false;
     }
 
-    if (!formData.comuna) {
+    if (!localFormData.comuna) {
       newErrors.comuna = 'Seleccione una comuna';
       isValid = false;
     }
 
-    if (!formData.calle.trim()) {
+    if (!localFormData.calle.trim()) {
       newErrors.calle = 'La calle es requerida';
       isValid = false;
     }
 
-    if (!formData.numero.trim()) {
+    if (!localFormData.numero.trim()) {
       newErrors.numero = 'El número es requerido';
       isValid = false;
     }
@@ -474,11 +554,24 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     e.preventDefault();
     
     if (validateForm()) {
-      console.log('Datos del formulario:', formData);
-      // Aquí iría la lógica para enviar los datos al backend
+      console.log('✅ Formulario válido, guardando datos:', localFormData);
+      
+      // Guardar datos en el contexto
+      handleSaveForm(localFormData);
+      
+      // Verificar que se guardó correctamente
+      setTimeout(() => {
+        const stored = sessionStorage.getItem('formHerederoData');
+        console.log('🔍 Verificación después de guardar:', stored ? '✅ Datos en sessionStorage' : '❌ No hay datos en sessionStorage');
+        if (stored) {
+          console.log('📄 Datos guardados:', JSON.parse(stored));
+        }
+      }, 100);
       
       // Redirigir a la página de carga de documentos (stepper 3)
       navigate('/mnherederos/ingresoher/cargadoc');
+    } else {
+      console.log('❌ Formulario inválido, no se guardan datos');
     }
   };
 
@@ -557,7 +650,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 {/* Fecha de nacimiento */}
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                   <ConsaludCore.DatePicker
-                    value={formData.fechaNacimiento}
+                    value={localFormData.fechaNacimiento}
                     onChange={handleDateChange}
                     label="Fecha nacimiento"
                     placeholder="DD/MM/AAAA"
@@ -577,7 +670,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     className={`input ${errors.nombres ? 'is-danger' : ''} ${fieldsLocked ? 'is-static' : ''}`}
                     type="text"
                     name="nombres"
-                    value={formData.nombres}
+                    value={localFormData.nombres}
                     onChange={handleInputChange}
                     placeholder="Ingresar"
                     disabled={fieldsLocked}
@@ -597,7 +690,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     className={`input ${errors.apellidoPaterno ? 'is-danger' : ''} ${fieldsLocked ? 'is-static' : ''}`}
                     type="text"
                     name="apellidoPaterno"
-                    value={formData.apellidoPaterno}
+                    value={localFormData.apellidoPaterno}
                     onChange={handleInputChange}
                     placeholder="Ingresar"
                     disabled={fieldsLocked}
@@ -615,7 +708,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     className={`input ${errors.apellidoMaterno ? 'is-danger' : ''} ${fieldsLocked ? 'is-static' : ''}`}
                     type="text"
                     name="apellidoMaterno"
-                    value={formData.apellidoMaterno}
+                    value={localFormData.apellidoMaterno}
                     onChange={handleInputChange}
                     placeholder="Ingresar"
                     disabled={fieldsLocked}
@@ -633,7 +726,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                   <label>Sexo</label>
                   <CustomSelect
                     name="sexo"
-                    value={formData.sexo}
+                    value={localFormData.sexo}
                     onChange={handleInputChange}
                     options={generos.map((genero) => ({
                       value: genero.Codigo,
@@ -656,7 +749,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                   <label>Parentesco</label>
                   <CustomSelect
                     name="parentesco"
-                    value={formData.parentesco}
+                    value={localFormData.parentesco}
                     onChange={handleInputChange}
                     options={PARENTESCO_OPTIONS}
                     placeholder="Seleccionar"
@@ -676,7 +769,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     className={`input ${errors.telefono ? 'is-danger' : ''}`}
                     type="tel"
                     name="telefono"
-                    value={formData.telefono}
+                    value={localFormData.telefono}
                     onChange={handleInputChange}
                     placeholder="Ingresar"
                   />
@@ -692,7 +785,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     className={`input ${errors.correoElectronico ? 'is-danger' : ''}`}
                     type="email"
                     name="correoElectronico"
-                    value={formData.correoElectronico}
+                    value={localFormData.correoElectronico}
                     onChange={handleInputChange}
                     placeholder="Ingresar"
                   />
@@ -717,7 +810,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                   <label>Región</label>
                   <CustomSelect
                     name="region"
-                    value={formData.region || ''}
+                    value={localFormData.region || ''}
                     onChange={handleRegionChange}
                     options={regiones.map((region) => ({
                       value: region.nombreRegion,
@@ -742,14 +835,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                   <label>Ciudad</label>
                   <CustomSelect
                     name="ciudad"
-                    value={formData.ciudad}
+                    value={localFormData.ciudad}
                     onChange={handleCiudadChange}
                     options={ciudades.map((ciudad) => ({
                       value: ciudad.nombreCiudad,
                       label: ciudad.nombreCiudad
                     }))}
-                    placeholder={!formData.region ? 'Seleccione región primero' : loadingCiudades ? 'Cargando...' : errorCiudades ? 'Error al cargar' : 'Seleccionar'}
-                    disabled={!formData.region || loadingCiudades || !!errorCiudades}
+                    placeholder={!localFormData.region ? 'Seleccione región primero' : loadingCiudades ? 'Cargando...' : errorCiudades ? 'Error al cargar' : 'Seleccionar'}
+                    disabled={!localFormData.region || loadingCiudades || !!errorCiudades}
                     error={!!errors.ciudad}
                   />
                   {errors.ciudad && (
@@ -765,14 +858,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                   <label>Comuna</label>
                   <CustomSelect
                     name="comuna"
-                    value={formData.comuna}
+                    value={localFormData.comuna}
                     onChange={handleComunaChange}
                     options={comunas.map((comuna) => ({
                       value: comuna.NombreComuna,
                       label: comuna.NombreComuna
                     }))}
-                    placeholder={!formData.region ? 'Seleccione región primero' : !formData.ciudad ? 'Seleccione ciudad primero' : loadingComunas ? 'Cargando...' : errorComunas ? 'Error al cargar' : 'Seleccionar'}
-                    disabled={!formData.region || !formData.ciudad || loadingComunas || !!errorComunas}
+                    placeholder={!localFormData.region ? 'Seleccione región primero' : !localFormData.ciudad ? 'Seleccione ciudad primero' : loadingComunas ? 'Cargando...' : errorComunas ? 'Error al cargar' : 'Seleccionar'}
+                    disabled={!localFormData.region || !localFormData.ciudad || loadingComunas || !!errorComunas}
                     error={!!errors.comuna}
                   />
                   {errors.comuna && (
@@ -790,15 +883,15 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                   <label>Calle</label>
                   <AutoCompleteInput
                     name="calle"
-                    value={formData.calle}
+                    value={localFormData.calle}
                     onChange={handleCalleChange}
                     options={calles.map(calle => ({
                       value: calle.nombreCalle,
                       label: calle.nombreCalle,
                       id: calle.idCalle
                     }))}
-                    placeholder={!formData.region ? 'Seleccione región primero' : !formData.ciudad ? 'Seleccione ciudad primero' : !formData.comuna ? 'Seleccione comuna primero' : 'Buscar calle...'}
-                    disabled={!formData.region || !formData.ciudad || !formData.comuna}
+                    placeholder={!localFormData.region ? 'Seleccione región primero' : !localFormData.ciudad ? 'Seleccione ciudad primero' : !localFormData.comuna ? 'Seleccione comuna primero' : 'Buscar calle...'}
+                    disabled={!localFormData.region || !localFormData.ciudad || !localFormData.comuna}
                     loading={loadingCalles}
                     error={!!errors.calle}
                     minCharsToSearch={2}
@@ -819,7 +912,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     className={`input ${errors.numero ? 'is-danger' : ''}`}
                     type="text"
                     name="numero"
-                    value={formData.numero}
+                    value={localFormData.numero}
                     onChange={handleInputChange}
                     placeholder="Ingresar"
                   />
@@ -837,7 +930,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     className="input"
                     type="text"
                     name="deptoBloqueOpcional"
-                    value={formData.deptoBloqueOpcional}
+                    value={localFormData.deptoBloqueOpcional}
                     onChange={handleInputChange}
                     placeholder="Ingresar"
                   />
@@ -850,7 +943,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     className="input"
                     type="text"
                     name="villaOpcional"
-                    value={formData.villaOpcional}
+                    value={localFormData.villaOpcional}
                     onChange={handleInputChange}
                     placeholder="Ingresar"
                   />
@@ -879,7 +972,9 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       {formContent}
     </div>
   ) : (
-    formContent
+    <>
+      {formContent}
+    </>
   );
 };
 export default FormIngresoHeredero;

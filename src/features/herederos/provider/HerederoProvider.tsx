@@ -156,7 +156,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
             setHeredero(emptyHeredero);
             setFieldsLocked(false); // No bloquear campos para formulario vacío
             setError(null); // No mostrar error
-            return;
+            return; // IMPORTANTE: retornar aquí para evitar el catch general
           }
           
           // Para otros errores, propagar el error
@@ -180,11 +180,15 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       }
       
     } catch (err: any) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al buscar el heredero';
-      setError(errorMessage);
-      setHeredero(null);
-      setFieldsLocked(false); // No bloquear campos si hay error
-      console.error('Error en buscarHeredero:', err);
+      // Solo manejar errores que NO sean 412
+      if (!err.message || !err.message.includes('412')) {
+        const errorMessage = err instanceof Error ? err.message : 'Error al buscar el heredero';
+        setError(errorMessage);
+        setHeredero(null);
+        setFieldsLocked(false); // No bloquear campos si hay error
+        console.error('Error en buscarHeredero:', err);
+      }
+      // Si es error 412, no hacer nada (ya se manejó arriba)
     } finally {
       setLoading(false);
     }

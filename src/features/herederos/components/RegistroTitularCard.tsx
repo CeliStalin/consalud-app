@@ -17,7 +17,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
   error 
 }) => {
   const { rut, isValid: isValidRut, handleRutChange, setRut } = useRutChileno();
-  const { heredero, limpiarHeredero } = useHeredero();
+  const { heredero, limpiarHeredero, fieldsLocked } = useHeredero();
   const { titular } = useTitular();
   const { mostrarAlertaTitularHeredero } = UseAlert();
   const [showError, setShowError] = useState<boolean>(false);
@@ -26,16 +26,78 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
   const [validationPassed, setValidationPassed] = useState<boolean>(false);
   const [isClearing, setIsClearing] = useState<boolean>(false);
 
-  // Limpiar estado al montar el componente
+  // Limpiar datos de otros RUTs cuando cambie el heredero
   useEffect(() => {
-    setShowForm(false);
-    setValidationPassed(false);
-    setRut('');
-    setShowError(false);
-    if (limpiarHeredero) {
-      limpiarHeredero();
+    if (heredero?.rut) {
+      const currentRut = heredero.rut;
+      const currentKey = `formHerederoData_${currentRut.replace(/[^0-9kK]/g, '')}`;
+      
+      // Limpiar todas las claves que empiecen con formHerederoData_ excepto la actual
+      Object.keys(sessionStorage).forEach(key => {
+        if (key.startsWith('formHerederoData_') && key !== currentKey) {
+          sessionStorage.removeItem(key);
+          console.log('🗑️ Limpiado datos de RUT anterior:', key);
+        }
+      });
     }
-  }, [limpiarHeredero, setRut]);
+  }, [heredero?.rut]);
+
+  // Limpiar estado al montar el componente solo si no hay datos guardados
+  useEffect(() => {
+    // Verificar si hay datos guardados en sessionStorage para el RUT actual
+    const currentRut = heredero?.rut || '';
+    const storageKey = currentRut ? `formHerederoData_${currentRut.replace(/[^0-9kK]/g, '')}` : 'formHerederoData';
+    const storedData = sessionStorage.getItem(storageKey);
+    
+    if (!storedData && !heredero) {
+      // Solo limpiar si no hay datos guardados Y no hay heredero
+      setShowForm(false);
+      setValidationPassed(false);
+      setRut('');
+      setShowError(false);
+      if (limpiarHeredero) {
+        limpiarHeredero();
+      }
+    } else if (storedData) {
+      // Si hay datos guardados para este RUT, restaurar el estado
+      try {
+        const parsedData = JSON.parse(storedData);
+        // Restaurar el formulario si hay datos
+        setShowForm(true);
+        setValidationPassed(true);
+        // No limpiar el heredero para mantener el estado
+      } catch (error) {
+        console.error('Error al parsear datos guardados:', error);
+        // Si hay error, limpiar todo
+        setShowForm(false);
+        setValidationPassed(false);
+        setRut('');
+        setShowError(false);
+        if (limpiarHeredero) {
+          limpiarHeredero();
+        }
+      }
+    } else if (heredero) {
+      // Si hay heredero pero no hay datos guardados, mantener el heredero
+      setShowForm(true);
+      setValidationPassed(true);
+    }
+  }, [limpiarHeredero, setRut, heredero?.rut]);
+
+  // Marcar validación como pasada cuando se carga el heredero
+  useEffect(() => {
+    if (heredero && heredero.rut && !validationPassed) {
+      setValidationPassed(true);
+    }
+  }, [heredero, validationPassed]);
+
+  // Manejar específicamente el caso de error 412 (campos desbloqueados)
+  useEffect(() => {
+    if (heredero && heredero.rut && !fieldsLocked && !validationPassed) {
+      setValidationPassed(true);
+      setShowForm(true);
+    }
+  }, [heredero, fieldsLocked, validationPassed]);
 
   // Función para limpiar RUT del input y resetear estado completamente
   const limpiarRut = useCallback(() => {
@@ -103,6 +165,15 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
       await buscarHeredero(rutLimpio);
       // Si la búsqueda es exitosa (incluyendo status 412), marcar validación como pasada
       setValidationPassed(true);
+    } catch (error: any) {
+      console.error('❌ Error en búsqueda:', error);
+      
+      // Verificar si es un error 412 (Precondition Failed)
+      if (error.message && error.message.includes('412')) {
+        // El provider ya maneja el 412 y crea un heredero vacío
+        // Solo necesitamos marcar la validación como pasada
+        setValidationPassed(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -178,7 +249,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
                   id="RutHeredero"
                   type="text"
                   inputMode="text"
-                  pattern="[0-9kK.-]*"
+                  pattern="[0-9kK\.\-]*"
                   value={rut}
                   onChange={handleInputChange}
                   onBlur={handleBlur}
@@ -261,7 +332,9 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
 
       {/* Formulario que aparece debajo SOLO cuando la búsqueda es exitosa Y la validación pasó */}
       {(() => {
-        return showForm && heredero && validationPassed;
+        // Condición simplificada: mostrar cuando hay heredero
+        const shouldShow = heredero !== null && heredero !== undefined;
+        return shouldShow;
       })() && (
         <div style={{ marginTop: 24 }}>
           <FormIngresoHeredero showHeader={false} />

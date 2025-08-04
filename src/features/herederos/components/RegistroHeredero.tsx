@@ -1,111 +1,90 @@
-import { useNavigate } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
-import { useRutChileno } from "@/features/herederos/hooks/useRutChileno";
-import { Stepper } from "../components/Stepper";
-import { useHeredero } from "../contexts/HerederoContext";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
-import { RegistroTitularCard } from "./RegistroTitularCard";
-
-interface BreadcrumbItem {
-    label: string;
-}
+import { Stepper } from './Stepper';
+import { RegistroTitularCard } from './RegistroTitularCard';
+import FormIngresoHeredero from './FormIngresoHeredero';
+import { FormHerederoProvider } from '../provider/FormHerederoProvider';
+import { useHeredero } from '../contexts/HerederoContext';
+import { useRutChileno } from '../hooks/useRutChileno';
+import { UseAlert } from '../hooks/Alert';
 
 const RegistroHeredero: React.FC = () => {
     useRutChileno();
     const navigator = useNavigate();
-    const { buscarHeredero, error, heredero } = useHeredero();
+    const { heredero, buscarHeredero, error } = useHeredero();
+    const { mostrarAlertaTitularHeredero } = UseAlert();
 
-    // Eliminar loadingTransition
-    // const [loadingTransition, setLoadingTransition] = useState(true);
-    const [step, setStep] = useState(1);
-    
-    useEffect(() => {
-        // Si ya hay un heredero cargado, evitar las animaciones de carga
-        if (heredero) {
-            setStep(2);
-            return;
-        }
-        // Solo ejecutar animaciones si no hay heredero cargado
-        const timeout2 = setTimeout(() => setStep(2), 150); // Pequeño delay para animar el llenado
-        return () => {
-            clearTimeout(timeout2);
-        };
-    }, [heredero]);
-
-    const handleBackClick = useCallback((): void => {
-        setStep(1);
-        navigator(-1);
-    }, [navigator]);
-
-    const breadcrumbItems: BreadcrumbItem[] = [
+    const breadcrumbItems: ConsaludCore.BreadcrumbItem[] = [
         { label: 'Administración devolución herederos' }
     ];
-    
-    const cleanedBreadcrumbItems = breadcrumbItems.map(item => ({
+
+    const cleanedBreadcrumbItems = breadcrumbItems.filter(item => 
+        item.label !== 'undefined' && item.label !== 'null'
+    ).map(item => ({
         ...item,
-        label: typeof item.label === 'string' ? item.label.replace(/^\/+/, '') : item.label
+        label: item.label || 'Inicio'
     }));
 
+    // Obtener el RUT del heredero para el provider
+    const rutHeredero = heredero?.rut || '';
+
     return (
-        <div className="route-container layout-stable" style={{ overflowY: 'auto', height: '100vh', paddingBottom: 40 }}>
-            {/* Header Section */}
-            <div style={{ width: '100%', marginBottom: 24 }}>
-                <div style={{ marginLeft: 48 }}>
-                    {/* Breadcrumb */}
-                    <div style={{ marginBottom: 8 }}>
-                        <ConsaludCore.Breadcrumb 
-                            items={cleanedBreadcrumbItems} 
-                            separator={<span>{'>'}</span>}
-                            showHome={true}
-                            className="breadcrumb-custom"
-                        />
-                    </div>
-                    {/* Botón volver */}
-                    <div>
-                        <button
-                            className="back-button"
-                            onClick={handleBackClick}
-                            aria-label="Volver a la página anterior"
-                        >
-                            <span className="back-button-icon">←</span> Volver
-                        </button>
+        <FormHerederoProvider rutHeredero={rutHeredero}>
+            <div className="route-container layout-stable" style={{ overflowY: 'auto', height: '100vh', paddingBottom: 40 }}>
+                {/* Header Section */}
+                <div style={{ width: '100%', marginBottom: 24 }}>
+                    <div style={{ marginLeft: 48 }}>
+                        {/* Breadcrumb */}
+                        <div style={{ marginBottom: 8 }}>
+                            <ConsaludCore.Breadcrumb 
+                                items={cleanedBreadcrumbItems} 
+                                separator={<span>{'>'}</span>}
+                                showHome={true}
+                                className="breadcrumb-custom"
+                            />
+                        </div>
+                        {/* Botón volver */}
+                        <div>
+                            <button
+                                className="back-button"
+                                onClick={() => navigator(-1)}
+                                aria-label="Volver a la página anterior"
+                            >
+                                <span className="back-button-icon">←</span> Volver
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Main Content Section */}
-            {/* Título centrado y en negrita */}
-            <div className="mb-1" style={{ display: 'flex', justifyContent: 'center' }}>
-                <ConsaludCore.Typography
-                    variant="h5"
-                    component="h2"
-                    style={{ fontWeight: 700, textAlign: 'center', color: '#222', fontSize: '2rem' }}
-                >
-                    Registrar persona heredera
-                </ConsaludCore.Typography>
-            </div>
-            {/* Espacio entre título y Stepper */}
-            <div style={{ height: 24 }} />
-            {/* Stepper */}
-            <Stepper step={step} />
-            {/* Centered Card Container */}
-            <div className="container">
-                <div className="columns is-centered">
-                    <div className="column is-10-desktop is-12-tablet">
-                        <div className="card-center-container">
-                            <div className="card-responsive">
-                                <div className="generalContainer">
-                                    <RegistroTitularCard 
-                                        buscarHeredero={buscarHeredero} 
-                                        error={error} 
-                                    />
-                                </div>
-                            </div>
+                {/* Main Content Section */}
+                {/* Título centrado y en negrita */}
+                <div className="mb-1" style={{ display: 'flex', justifyContent: 'center' }}>
+                    <ConsaludCore.Typography
+                        variant="h5"
+                        component="h2"
+                        style={{ fontWeight: 700, textAlign: 'center', color: '#222', fontSize: '2rem' }}
+                    >
+                        Registrar persona heredera
+                    </ConsaludCore.Typography>
+                </div>
+                {/* Espacio entre título y Stepper */}
+                <div style={{ height: 24 }} />
+                {/* Stepper */}
+                <Stepper step={2} />
+                {/* Centered Card Container */}
+                <div className="container">
+                    <div className="card-center-container">
+                        <div className="card-responsive">
+                            <RegistroTitularCard 
+                                buscarHeredero={buscarHeredero}
+                                error={error}
+                            />
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </FormHerederoProvider>
     );
 };
 
