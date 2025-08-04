@@ -42,6 +42,22 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     handleReloadFromStorage
   } = useFormHerederoData();
 
+  // Función para calcular la edad
+  const calcularEdad = (fechaNacimiento: Date): number => {
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+    const mesActual = hoy.getMonth();
+    const mesNacimiento = fechaNacimiento.getMonth();
+    const diaActual = hoy.getDate();
+    const diaNacimiento = fechaNacimiento.getDate();
+    
+    if (mesActual < mesNacimiento || (mesActual === mesNacimiento && diaActual < diaNacimiento)) {
+      edad--;
+    }
+    
+    return edad;
+  };
+
   // Función para obtener la descripción de región por código
   const obtenerDescripcionRegion = (codRegion: number): string => {
     const region = regiones.find(r => r.codRegion === codRegion);
@@ -341,7 +357,21 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       fechaNacimiento: date
     });
 
-    if (errors.fechaNacimiento) {
+    // Validar edad en tiempo real
+    if (date) {
+      const edad = calcularEdad(date);
+      if (edad < 18) {
+        setErrors({
+          ...errors,
+          fechaNacimiento: 'La persona heredera debe tener al menos 18 años'
+        });
+      } else {
+        setErrors({
+          ...errors,
+          fechaNacimiento: ''
+        });
+      }
+    } else {
       setErrors({
         ...errors,
         fechaNacimiento: ''
@@ -483,6 +513,12 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       if (!localFormData.fechaNacimiento) {
         newErrors.fechaNacimiento = 'La fecha de nacimiento es requerida';
         isValid = false;
+      } else {
+        const edad = calcularEdad(localFormData.fechaNacimiento);
+        if (edad < 18) {
+          newErrors.fechaNacimiento = 'La persona heredera debe tener al menos 18 años';
+          isValid = false;
+        }
       }
 
       if (!localFormData.nombres.trim()) {
