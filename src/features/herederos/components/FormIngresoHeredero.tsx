@@ -33,12 +33,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   const {heredero, fieldsLocked} = useHeredero();
   const { 
     formData, 
-    loading: formLoading, 
-    error: formError, 
-    isDirty,
-    handleFieldChange, 
     handleSaveForm, 
-    handleValidateForm,
     handleReloadFromStorage
   } = useFormHerederoData();
 

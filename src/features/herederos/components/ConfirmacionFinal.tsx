@@ -14,7 +14,7 @@ interface ConfirmacionFinalProps {
 const ConfirmacionFinal: React.FC<ConfirmacionFinalProps> = ({ onSubmitSuccess }) => {
   const navigate = useNavigate();
   const { step, setStep } = useStepper();
-  const { formData, loading, error, isDirty, handleGetFormData, handleClearForm } = useFormHerederoData();
+  const { formData, error, isDirty, handleClearForm } = useFormHerederoData();
   const { titular } = useTitular();
   
   const [submitting, setSubmitting] = useState(false);

@@ -1,19 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
-import { Stepper } from './Stepper';
-import { RegistroTitularCard } from './RegistroTitularCard';
-import FormIngresoHeredero from './FormIngresoHeredero';
-import { FormHerederoProvider } from '../provider/FormHerederoProvider';
 import { useHeredero } from '../contexts/HerederoContext';
-import { useRutChileno } from '../hooks/useRutChileno';
-import { UseAlert } from '../hooks/Alert';
+import { FormHerederoProvider } from '../provider/FormHerederoProvider';
+import { RegistroTitularCard } from './RegistroTitularCard';
+import { Stepper } from './Stepper';
 
 const RegistroHeredero: React.FC = () => {
-    useRutChileno();
-    const navigator = useNavigate();
-    const { heredero, buscarHeredero, error } = useHeredero();
-    const { mostrarAlertaTitularHeredero } = UseAlert();
+  const { heredero, buscarHeredero, error } = useHeredero();
+  const navigate = useNavigate();
 
     const breadcrumbItems: ConsaludCore.BreadcrumbItem[] = [
         { label: 'Administración devolución herederos' }
@@ -48,7 +43,7 @@ const RegistroHeredero: React.FC = () => {
                         <div>
                             <button
                                 className="back-button"
-                                onClick={() => navigator(-1)}
+                                onClick={() => navigate(-1)}
                                 aria-label="Volver a la página anterior"
                             >
                                 <span className="back-button-icon">←</span> Volver

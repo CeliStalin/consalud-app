@@ -16,6 +16,29 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
   const { formatSimpleRut } = useRutChileno();
   const navigate = useNavigate();
   
+  // Función para calcular la edad
+  const calcularEdad = (fechaNacimiento: string): number => {
+    const fechaNac = new Date(fechaNacimiento);
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fechaNac.getFullYear();
+    const mesActual = hoy.getMonth();
+    const mesNacimiento = fechaNac.getMonth();
+    const diaActual = hoy.getDate();
+    const diaNacimiento = fechaNac.getDate();
+    
+    if (mesActual < mesNacimiento || (mesActual === mesNacimiento && diaActual < diaNacimiento)) {
+      edad--;
+    }
+    
+    return edad;
+  };
+
+  // Función para validar edad mayor de 18 años
+  const validarEdadMayorDe18 = (fechaNacimiento: string): boolean => {
+    const edad = calcularEdad(fechaNacimiento);
+    return edad >= 18;
+  };
+  
   // Función para crear un heredero vacío para el caso de status 412
   const createEmptyHeredero = (rut: string): Heredero => {
     return {
@@ -89,6 +112,17 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         
         try {
           const response = await fetchSolicitanteMejorContactibilidad(Number(rutSinDV), userName);
+          
+          // Validar edad mayor de 18 años
+          if (response.SolicitanteInMae.FecNacimiento && response.SolicitanteInMae.FecNacimiento.trim() !== '') {
+            const esMayorDeEdad = validarEdadMayorDe18(response.SolicitanteInMae.FecNacimiento);
+            if (!esMayorDeEdad) {
+              throw new Error('La persona heredera debe tener al menos 18 años');
+            }
+          } else {
+            // Si no hay fecha de nacimiento, también lanzar error
+            throw new Error('La fecha de nacimiento es requerida para continuar');
+          }
           
           // Mapear la respuesta del BFF al modelo Heredero
           const herederoData: Heredero = {

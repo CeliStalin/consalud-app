@@ -61,7 +61,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
     } else if (storedData) {
       // Si hay datos guardados para este RUT, restaurar el estado
       try {
-        const parsedData = JSON.parse(storedData);
+        JSON.parse(storedData);
         // Restaurar el formulario si hay datos
         setShowForm(true);
         setValidationPassed(true);
