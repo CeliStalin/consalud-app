@@ -148,7 +148,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
     }
     
     // Validar que el RUT del heredero no sea igual al del titular ANTES de buscar
-    if (titular && titular.rut && compararRuts(rutLimpio, titular.rut)) {
+    if (titular && titular.rut && !compararRuts(rutLimpio, titular.rut)) {
       // Resetear validación INMEDIATAMENTE para evitar que se muestre el formulario
       setValidationPassed(false);
       setShowForm(false);
