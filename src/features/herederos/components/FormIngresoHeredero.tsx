@@ -10,6 +10,7 @@ import { CustomSelect } from './CustomSelect';
 import { AutoCompleteInput } from './AutoCompleteInput';
 import { useCallesAutocomplete } from '../hooks/useCallesAutocomplete';
 import { FormData } from '../interfaces/FormData';
+import { validarEdadConMensaje } from '../../../utils/ageValidation';
 
 interface BreadcrumbItem {
     label: string;
@@ -36,22 +37,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     handleSaveForm, 
     handleReloadFromStorage
   } = useFormHerederoData();
-
-  // Función para calcular la edad
-  const calcularEdad = (fechaNacimiento: Date): number => {
-    const hoy = new Date();
-    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
-    const mesActual = hoy.getMonth();
-    const mesNacimiento = fechaNacimiento.getMonth();
-    const diaActual = hoy.getDate();
-    const diaNacimiento = fechaNacimiento.getDate();
-    
-    if (mesActual < mesNacimiento || (mesActual === mesNacimiento && diaActual < diaNacimiento)) {
-      edad--;
-    }
-    
-    return edad;
-  };
 
   // Función para obtener la descripción de región por código
   const obtenerDescripcionRegion = (codRegion: number): string => {
@@ -354,16 +339,16 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
 
     // Validar edad en tiempo real
     if (date) {
-      const edad = calcularEdad(date);
-      if (edad < 18) {
+      const validacion = validarEdadConMensaje(date, 'La persona heredera debe tener al menos 18 años');
+      if (validacion.esValido) {
         setErrors({
           ...errors,
-          fechaNacimiento: 'La persona heredera debe tener al menos 18 años'
+          fechaNacimiento: ''
         });
       } else {
         setErrors({
           ...errors,
-          fechaNacimiento: ''
+          fechaNacimiento: validacion.mensaje || ''
         });
       }
     } else {
@@ -505,15 +490,15 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
 
     // Campos requeridos - solo validar si no están bloqueados
     if (!fieldsLocked) {
-      if (!localFormData.fechaNacimiento) {
-        newErrors.fechaNacimiento = 'La fecha de nacimiento es requerida';
-        isValid = false;
-      } else {
-        const edad = calcularEdad(localFormData.fechaNacimiento);
-        if (edad < 18) {
-          newErrors.fechaNacimiento = 'La persona heredera debe tener al menos 18 años';
+      if (localFormData.fechaNacimiento) {
+        const validacion = validarEdadConMensaje(localFormData.fechaNacimiento, 'La persona heredera debe tener al menos 18 años');
+        if (!validacion.esValido) {
+          newErrors.fechaNacimiento = validacion.mensaje || '';
           isValid = false;
         }
+      } else {
+        newErrors.fechaNacimiento = 'La fecha de nacimiento es requerida';
+        isValid = false;
       }
 
       if (!localFormData.nombres.trim()) {

@@ -6,6 +6,7 @@ import { UseAlert } from "@/features/herederos/hooks/Alert";
 import * as ConsaludCore from '@consalud/core';
 import FormIngresoHeredero from './FormIngresoHeredero';
 import RutErrorMessage from './RutErrorMessage';
+import { validarRutsDiferentes } from '../../../utils/rutValidation';
 
 interface RegistroTitularCardProps {
   buscarHeredero: (rut: string) => Promise<void>;
@@ -116,8 +117,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
 
   // Función para comparar RUTs (ignorando formato)
   const compararRuts = useCallback((rut1: string, rut2: string): boolean => {
-    const limpiarRut = (rut: string) => rut.replace(/[^0-9kK]/g, '').toLowerCase();
-    return limpiarRut(rut1) === limpiarRut(rut2);
+    return validarRutsDiferentes(rut1, rut2);
   }, []);
 
   // Solo mostrar el formulario si hay heredero Y la validación pasó

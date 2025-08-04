@@ -1,51 +1,30 @@
-// Función para calcular la edad (copiada del provider)
-const calcularEdadProvider = (fechaNacimiento: string): number => {
-  const fechaNac = new Date(fechaNacimiento);
-  const hoy = new Date();
-  let edad = hoy.getFullYear() - fechaNac.getFullYear();
-  const mesActual = hoy.getMonth();
-  const mesNacimiento = fechaNac.getMonth();
-  const diaActual = hoy.getDate();
-  const diaNacimiento = fechaNac.getDate();
-  
-  if (mesActual < mesNacimiento || (mesActual === mesNacimiento && diaActual < diaNacimiento)) {
-    edad--;
-  }
-  
-  return edad;
-};
-
-// Función para validar edad mayor de 18 años (copiada del provider)
-const validarEdadMayorDe18Provider = (fechaNacimiento: string): boolean => {
-  const edad = calcularEdadProvider(fechaNacimiento);
-  return edad >= 18;
-};
+import { calcularEdad, validarEdadMayorDe18, validarEdadConMensaje } from '../../../utils/ageValidation';
 
 // Tests para verificar la validación de edad en el provider
 describe('Validación de edad en HerederoProvider', () => {
   test('debe validar correctamente que una persona mayor de 18 años pase la validación', () => {
     const fechaNacimiento = '1990-01-01';
-    const esMayorDeEdad = validarEdadMayorDe18Provider(fechaNacimiento);
+    const esMayorDeEdad = validarEdadMayorDe18(fechaNacimiento);
     expect(esMayorDeEdad).toBe(true);
   });
 
   test('debe validar correctamente que una persona menor de 18 años no pase la validación', () => {
     const fechaNacimiento = '2010-01-01';
-    const esMayorDeEdad = validarEdadMayorDe18Provider(fechaNacimiento);
+    const esMayorDeEdad = validarEdadMayorDe18(fechaNacimiento);
     expect(esMayorDeEdad).toBe(false);
   });
 
   test('debe validar correctamente que una persona de exactamente 18 años pase la validación', () => {
     const hoy = new Date();
     const fechaNacimiento = new Date(hoy.getFullYear() - 18, hoy.getMonth(), hoy.getDate());
-    const esMayorDeEdad = validarEdadMayorDe18Provider(fechaNacimiento.toISOString().split('T')[0]);
+    const esMayorDeEdad = validarEdadMayorDe18(fechaNacimiento.toISOString().split('T')[0]);
     expect(esMayorDeEdad).toBe(true);
   });
 
   test('debe validar correctamente que una persona que cumple 18 años mañana no pase la validación', () => {
     const hoy = new Date();
     const fechaNacimiento = new Date(hoy.getFullYear() - 18, hoy.getMonth(), hoy.getDate() + 1);
-    const esMayorDeEdad = validarEdadMayorDe18Provider(fechaNacimiento.toISOString().split('T')[0]);
+    const esMayorDeEdad = validarEdadMayorDe18(fechaNacimiento.toISOString().split('T')[0]);
     expect(esMayorDeEdad).toBe(false);
   });
 
@@ -57,7 +36,7 @@ describe('Validación de edad en HerederoProvider', () => {
     ];
 
     fechasValidas.forEach(fecha => {
-      const esMayorDeEdad = validarEdadMayorDe18Provider(fecha);
+      const esMayorDeEdad = validarEdadMayorDe18(fecha);
       expect(esMayorDeEdad).toBe(true);
     });
 
@@ -68,7 +47,7 @@ describe('Validación de edad en HerederoProvider', () => {
     ];
 
     fechasInvalidas.forEach(fecha => {
-      const esMayorDeEdad = validarEdadMayorDe18Provider(fecha);
+      const esMayorDeEdad = validarEdadMayorDe18(fecha);
       expect(esMayorDeEdad).toBe(false);
     });
   });
@@ -77,17 +56,17 @@ describe('Validación de edad en HerederoProvider', () => {
     // Test para persona que cumple 18 años hoy
     const hoy = new Date();
     const fechaHoy = new Date(hoy.getFullYear() - 18, hoy.getMonth(), hoy.getDate());
-    const esMayorDeEdadHoy = validarEdadMayorDe18Provider(fechaHoy.toISOString().split('T')[0]);
+    const esMayorDeEdadHoy = validarEdadMayorDe18(fechaHoy.toISOString().split('T')[0]);
     expect(esMayorDeEdadHoy).toBe(true);
 
     // Test para persona que cumple 18 años mañana
     const fechaManana = new Date(hoy.getFullYear() - 18, hoy.getMonth(), hoy.getDate() + 1);
-    const esMayorDeEdadManana = validarEdadMayorDe18Provider(fechaManana.toISOString().split('T')[0]);
+    const esMayorDeEdadManana = validarEdadMayorDe18(fechaManana.toISOString().split('T')[0]);
     expect(esMayorDeEdadManana).toBe(false);
 
     // Test para persona que cumplió 18 años ayer
     const fechaAyer = new Date(hoy.getFullYear() - 18, hoy.getMonth(), hoy.getDate() - 1);
-    const esMayorDeEdadAyer = validarEdadMayorDe18Provider(fechaAyer.toISOString().split('T')[0]);
+    const esMayorDeEdadAyer = validarEdadMayorDe18(fechaAyer.toISOString().split('T')[0]);
     expect(esMayorDeEdadAyer).toBe(true);
   });
 
@@ -96,14 +75,24 @@ describe('Validación de edad en HerederoProvider', () => {
     
     // Test para persona nacida en diciembre (mes anterior al actual)
     const fechaDiciembre = new Date(hoy.getFullYear() - 18, 11, 15); // 15 de diciembre
-    const edadDiciembre = calcularEdadProvider(fechaDiciembre.toISOString().split('T')[0]);
+    const edadDiciembre = calcularEdad(fechaDiciembre.toISOString().split('T')[0]);
     
     // Test para persona nacida en enero (mes posterior al actual si estamos en diciembre)
     const fechaEnero = new Date(hoy.getFullYear() - 18, 0, 15); // 15 de enero
-    const edadEnero = calcularEdadProvider(fechaEnero.toISOString().split('T')[0]);
+    const edadEnero = calcularEdad(fechaEnero.toISOString().split('T')[0]);
     
     // Verificar que el cálculo sea correcto
     expect(edadDiciembre).toBeGreaterThanOrEqual(18);
     expect(edadEnero).toBeGreaterThanOrEqual(18);
+  });
+
+  test('debe validar correctamente con mensajes personalizados', () => {
+    const fechaMenor = '2010-01-01';
+    const mensajePersonalizado = 'La persona heredera debe tener al menos 18 años';
+    
+    const validacion = validarEdadConMensaje(fechaMenor, mensajePersonalizado);
+    
+    expect(validacion.esValido).toBe(false);
+    expect(validacion.mensaje).toBe(mensajePersonalizado);
   });
 }); 
