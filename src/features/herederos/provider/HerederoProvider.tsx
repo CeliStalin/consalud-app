@@ -91,6 +91,11 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         try {
           const response = await fetchSolicitanteMejorContactibilidad(Number(rutSinDV), userName);
           
+          // Validar si la persona está fallecida
+          if (response.SolicitanteInMae.IndFallecido === 'S') {
+            throw new Error('El RUT ingresado corresponde a una persona fallecida');
+          }
+          
           // Validar edad mayor de 18 años
           if (response.SolicitanteInMae.FecNacimiento && response.SolicitanteInMae.FecNacimiento.trim() !== '') {
             const validacion = validarEdadConMensaje(response.SolicitanteInMae.FecNacimiento, 'La persona heredera debe tener al menos 18 años');
@@ -111,7 +116,8 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
             apellidoPat: response.SolicitanteInMae.ApePaterno,
             apellidoMat: response.SolicitanteInMae.ApeMaterno,
             parentesco: 0, // Valor por defecto
-            Genero: "", // Valor por defecto
+            Genero: response.SolicitanteInMae.CodSexo || '',
+            indFallecido: response.SolicitanteInMae.IndFallecido,
             contactabilidad: {
               direccion: {
                 calle: response.MejorContactibilidadSolicitante.nombreCalle,

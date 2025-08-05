@@ -44,13 +44,37 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     return region ? region.nombreRegion : '';
   };
 
+  // Función para mapear código de sexo del heredero a código compatible
+  const mapearCodigoSexo = (codigoHeredero: string): string => {
+    // Mapeo de códigos comunes
+    const mapeo: Record<string, string> = {
+      'M': 'M', // Masculino
+      'F': 'F', // Femenino
+      '1': 'M', // Código numérico para masculino
+      '2': 'F', // Código numérico para femenino
+      'MASCULINO': 'M',
+      'FEMENINO': 'F'
+    };
+    
+    const codigoMapeado = mapeo[codigoHeredero] || codigoHeredero;
+    
+    // Verificar si el código mapeado existe en los géneros disponibles
+    const generoExiste = generos.some(g => g.Codigo === codigoMapeado);
+    
+    if (!generoExiste && generos.length > 0) {
+      return generos[0].Codigo; // Usar el primer género disponible como fallback
+    }
+    
+    return codigoMapeado;
+  };
+
   // Estado local para el formulario (se sincroniza con el contexto)
   const [localFormData, setLocalFormData] = useState<FormData>({
     fechaNacimiento: formData?.fechaNacimiento || (heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null),
     nombres: formData?.nombres || heredero?.nombre || '',
     apellidoPaterno: formData?.apellidoPaterno || heredero?.apellidoPat || '',
     apellidoMaterno: formData?.apellidoMaterno || heredero?.apellidoMat || '',
-    sexo: formData?.sexo || '',
+    sexo: formData?.sexo || (heredero?.Genero ? heredero.Genero : ''),
     parentesco: formData?.parentesco || '',
     telefono: formData?.telefono || heredero?.contactabilidad.telefono.numero || '',
     correoElectronico: formData?.correoElectronico || heredero?.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
@@ -238,6 +262,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
             nombres: heredero.nombre || '',
             apellidoPaterno: heredero.apellidoPat || '',
             apellidoMaterno: heredero.apellidoMat || '',
+            sexo: heredero.Genero || '', // Usar el valor directo, el mapeo se hará en otro useEffect
             telefono: heredero.contactabilidad.telefono.numero || '',
             correoElectronico: heredero.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
             ciudad: heredero.descripcionCiudad || '',
@@ -281,6 +306,17 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       });
     }
   }, [heredero, fieldsLocked]);
+
+  // Actualizar sexo cuando se carguen los géneros y haya un heredero
+  useEffect(() => {
+    if (heredero?.Genero && generos.length > 0) {
+      const codigoMapeado = mapearCodigoSexo(heredero.Genero);
+      setLocalFormData(prevData => ({
+        ...prevData,
+        sexo: codigoMapeado
+      }));
+    }
+  }, [heredero?.Genero, generos]);
 
   // Actualizar región cuando se carguen las regiones y haya un heredero
   useEffect(() => {
@@ -488,31 +524,44 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     const newErrors: Partial<Record<keyof FormData, string>> = {};
     let isValid = true;
 
-    // Campos requeridos - solo validar si no están bloqueados
-    if (!fieldsLocked) {
-      if (localFormData.fechaNacimiento) {
-        const validacion = validarEdadConMensaje(localFormData.fechaNacimiento, 'La persona heredera debe tener al menos 18 años');
-        if (!validacion.esValido) {
-          newErrors.fechaNacimiento = validacion.mensaje || '';
-          isValid = false;
-        }
-      } else {
-        newErrors.fechaNacimiento = 'La fecha de nacimiento es requerida';
-        isValid = false;
-      }
-
-      if (!localFormData.nombres.trim()) {
-        newErrors.nombres = 'El nombre es requerido';
-        isValid = false;
-      }
-
-      if (!localFormData.apellidoPaterno.trim()) {
-        newErrors.apellidoPaterno = 'El apellido paterno es requerido';
+    // Campos requeridos según la especificación
+    if (!localFormData.fechaNacimiento) {
+      newErrors.fechaNacimiento = 'La fecha de nacimiento es requerida';
+      isValid = false;
+    } else {
+      // Validar edad si se proporciona fecha
+      const validacion = validarEdadConMensaje(localFormData.fechaNacimiento, 'La persona heredera debe tener al menos 18 años');
+      if (!validacion.esValido) {
+        newErrors.fechaNacimiento = validacion.mensaje || '';
         isValid = false;
       }
     }
 
-    // Campos que siempre se validan (no están en la lista de bloqueados)
+    if (!localFormData.nombres.trim()) {
+      newErrors.nombres = 'El nombre es requerido';
+      isValid = false;
+    }
+
+    if (!localFormData.apellidoPaterno.trim()) {
+      newErrors.apellidoPaterno = 'El apellido paterno es requerido';
+      isValid = false;
+    }
+
+    if (!localFormData.apellidoMaterno.trim()) {
+      newErrors.apellidoMaterno = 'El apellido materno es requerido';
+      isValid = false;
+    }
+
+    if (!localFormData.telefono.trim()) {
+      newErrors.telefono = 'El teléfono es requerido';
+      isValid = false;
+    }
+
+    if (!localFormData.correoElectronico.trim()) {
+      newErrors.correoElectronico = 'El correo electrónico es requerido';
+      isValid = false;
+    }
+
     if (!localFormData.sexo) {
       newErrors.sexo = 'Seleccione un sexo';
       isValid = false;
@@ -749,7 +798,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                       label: genero.Descripcion
                     }))}
                     placeholder={loadingGeneros ? 'Cargando...' : errorGeneros ? 'Error al cargar' : 'Seleccionar'}
-                    disabled={loadingGeneros || !!errorGeneros}
+                    disabled={loadingGeneros || !!errorGeneros || fieldsLocked}
                     error={!!errors.sexo}
                   />
                   {errors.sexo && (

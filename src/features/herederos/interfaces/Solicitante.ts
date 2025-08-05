@@ -6,6 +6,8 @@ interface SolicitanteInMae {
   ApePaterno: string;
   ApeMaterno: string;
   FecNacimiento: string;
+  IndFallecido: string; // "N" o "S" - indica si la persona está fallecida
+  CodSexo?: string;
 }
 
 interface MejorContactibilidadSolicitante {
@@ -25,6 +27,7 @@ interface MejorContactibilidadSolicitante {
   numeroCelular: number;
   numeroFijo: number;
   tipoDireccion: string;
+  CodSexo?: number;
 }
 
 interface SolicitanteResponse {

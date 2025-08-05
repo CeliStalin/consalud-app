@@ -169,10 +169,11 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
   const validateFormData = useCallback((): boolean => {
     if (!formData) return false;
 
-    // Validaciones básicas
+    // Validaciones básicas - todos los campos requeridos según la especificación
     const requiredFields: (keyof FormData)[] = [
       'nombres', 'apellidoPaterno', 'apellidoMaterno', 
-      'sexo', 'parentesco', 'telefono', 'correoElectronico'
+      'fechaNacimiento', 'telefono', 'correoElectronico',
+      'sexo', 'parentesco'
     ];
 
     for (const field of requiredFields) {
@@ -189,11 +190,6 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
 
     // Validar teléfono (al menos 8 dígitos)
     if (formData.telefono.replace(/\D/g, '').length < 8) {
-      return false;
-    }
-
-    // Validar fecha de nacimiento
-    if (!formData.fechaNacimiento) {
       return false;
     }
 

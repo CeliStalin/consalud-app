@@ -10,6 +10,7 @@ interface Heredero {
     parentesco: number;
     Genero: string;
     contactabilidad: Contactabilidad;
+    indFallecido?: string; // "N" o "S" - indica si la persona está fallecida
     // Campos adicionales para compatibilidad con BFF
     codCiudad?: number;
     codComuna?: number;
