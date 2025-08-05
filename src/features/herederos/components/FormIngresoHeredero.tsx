@@ -44,30 +44,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     return region ? region.nombreRegion : '';
   };
 
-  // Función para mapear código de sexo del heredero a código compatible
-  const mapearCodigoSexo = (codigoHeredero: string): string => {
-    // Mapeo de códigos comunes
-    const mapeo: Record<string, string> = {
-      'M': 'M', // Masculino
-      'F': 'F', // Femenino
-      '1': 'M', // Código numérico para masculino
-      '2': 'F', // Código numérico para femenino
-      'MASCULINO': 'M',
-      'FEMENINO': 'F'
-    };
-    
-    const codigoMapeado = mapeo[codigoHeredero] || codigoHeredero;
-    
-    // Verificar si el código mapeado existe en los géneros disponibles
-    const generoExiste = generos.some(g => g.Codigo === codigoMapeado);
-    
-    if (!generoExiste && generos.length > 0) {
-      return generos[0].Codigo; // Usar el primer género disponible como fallback
-    }
-    
-    return codigoMapeado;
-  };
-
   // Estado local para el formulario (se sincroniza con el contexto)
   const [localFormData, setLocalFormData] = useState<FormData>({
     fechaNacimiento: formData?.fechaNacimiento || (heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null),
@@ -310,10 +286,9 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Actualizar sexo cuando se carguen los géneros y haya un heredero
   useEffect(() => {
     if (heredero?.Genero && generos.length > 0) {
-      const codigoMapeado = mapearCodigoSexo(heredero.Genero);
       setLocalFormData(prevData => ({
         ...prevData,
-        sexo: codigoMapeado
+        sexo: heredero.Genero
       }));
     }
   }, [heredero?.Genero, generos]);
