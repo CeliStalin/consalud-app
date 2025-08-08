@@ -180,26 +180,18 @@ const CargaDocumento: React.FC = () => {
         gap: '16px',
         textAlign: 'center'
       }}>
-        {/* Cloud upload icon */}
-        <div style={{
-          width: '48px',
-          height: '48px',
-          borderRadius: '50%',
-          backgroundColor: '#E8F8F7',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '8px'
+        {/* File name or upload text with icon */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '8px'
         }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 20V14" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M14 16L12 14L10 16" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M16 20H19C19.5305 20.0001 20.0393 19.7895 20.4144 19.4144C20.7895 19.0393 21.0001 18.5305 21 18V8.94C21 7.83545 20.1045 6.94005 19 6.94H12.529C12.1978 6.93999 11.8881 6.77596 11.702 6.502L10.297 4.437C10.1109 4.16368 9.80166 4.00008 9.471 4H5C4.46952 3.99985 3.96073 4.21052 3.58563 4.58563C3.21052 4.96073 2.99985 5.46952 3 6V18C2.99985 18.5305 3.21052 19.0393 3.58563 19.4144C3.96073 19.7895 4.46952 20.0001 5 20H8" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3.5" y="3.94336" width="18" height="18" rx="5.55556" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M15.5 16.9434H9.5" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M10.498 10.9434L12.499 8.94336L14.5 10.9434" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M12.5 13.9434V8.94336" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-        </div>
-        
-        {/* File name or upload text */}
-        <div>
           {ConsaludCore.Typography ? (
             <ConsaludCore.Typography 
               variant="body" 
@@ -208,7 +200,7 @@ const CargaDocumento: React.FC = () => {
               style={{ 
                 fontSize: '1rem',
                 color: fileState.file ? '#00CBBF' : '#505050',
-                marginBottom: '8px'
+                margin: 0
               }}
             >
               {fileState.file ? fileState.file.name : 'Cargar archivos'}
@@ -218,7 +210,7 @@ const CargaDocumento: React.FC = () => {
               fontWeight: 500,
               fontSize: '16px',
               color: fileState.file ? '#00CBBF' : '#505050',
-              marginBottom: '8px'
+              margin: 0
             }}>
               {fileState.file ? fileState.file.name : 'Cargar archivos'}
             </p>
