@@ -4,7 +4,6 @@ export { default as FormIngresoHeredero } from './FormIngresoHeredero';
 export { AutoCompleteInput } from './AutoCompleteInput';
 
 // Componentes de UI
-export { CustomDatePicker } from './CustomDatePicker';
 export { CustomSelect } from './CustomSelect';
 export { Stepper } from './Stepper';
 export { default as RutErrorMessage } from './RutErrorMessage';
