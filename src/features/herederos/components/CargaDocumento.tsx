@@ -1,8 +1,11 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
 import { UseAlert } from "../hooks/Alert";
 import { useStepper } from "./Stepper";
+import { useTiposDocumento } from "../hooks/useTiposDocumento";
+import { DocumentUploadArea } from "./DocumentUploadArea";
+import { TipoDocumento } from "../interfaces/Pargen";
 import './styles/globalStyle.css';
 
 interface FileState {
@@ -10,33 +13,24 @@ interface FileState {
   error: string | null;
 }
 
+interface DocumentFileState {
+  [key: number]: FileState;
+}
+
 const CargaDocumento: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState(false);
-  
-  // Estados separados para cada tipo de documento
-  const [cedulaFile, setCedulaFile] = useState<FileState>({ file: null, error: null });
-  const [poderFile, setPoderFile] = useState<FileState>({ file: null, error: null });
-  const [posesionFile, setPosesionFile] = useState<FileState>({ file: null, error: null });
-  
-  // Refs separados para cada input
-  const cedulaInputRef = useRef<HTMLInputElement>(null);
-  const poderInputRef = useRef<HTMLInputElement>(null);
-  const posesionInputRef = useRef<HTMLInputElement>(null);
+  const [documentFiles, setDocumentFiles] = useState<DocumentFileState>({});
   
   const navigate = useNavigate();
-
+  const { tiposDocumento, loading: loadingTipos, error: errorTipos } = useTiposDocumento();
   const { ejemploCedula, ejemploPoder, ejemploPosesion } = UseAlert();
-  const { step, setStep } = useStepper();
+  const { setStep } = useStepper();
 
   useEffect(() => {
     setStep(3);
     return () => {};
   }, [setStep]);
-
-  const handleBack = () => {
-    navigate(-1);
-  };
 
   const validateFile = useCallback((file: File): string | null => {
     const maxSize = 6 * 1024 * 1024; // 6MB
@@ -53,65 +47,49 @@ const CargaDocumento: React.FC = () => {
     return null;
   }, []);
 
-  const handleFlow = useCallback(async (param: string) => {
+  const handleFlow = useCallback(async (tipoDocumento: TipoDocumento) => {
     try {
-      switch (param) {
-        case "cedula":
+      switch (tipoDocumento.valValor) {
+        case 1: // Cédula de Identidad
           ejemploCedula();
           break;
-        case "notarial":
+        case 2: // Poder Notarial
           ejemploPoder();
           break;
-        case "posesion":
+        case 3: // Posesión Efectiva
           ejemploPosesion();
           break;
         default:
-          console.warn(`Parámetro no reconocido: ${param}`);
+          console.warn(`Tipo de documento no reconocido: ${tipoDocumento.valValor}`);
       }
     } catch (err) {
       console.error('Error en handleFlow:', err);
     }
   }, [ejemploCedula, ejemploPoder, ejemploPosesion]);
 
-  const handleDivClick = useCallback((type: 'cedula' | 'poder' | 'posesion') => {
-    switch (type) {
-      case 'cedula':
-        cedulaInputRef.current?.click();
-        break;
-      case 'poder':
-        poderInputRef.current?.click();
-        break;
-      case 'posesion':
-        posesionInputRef.current?.click();
-        break;
-    }
-  }, []);
-
-  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, type: 'cedula' | 'poder' | 'posesion') => {
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, tipoId: number) => {
     const file = e.target.files?.[0];
     
     if (file) {
       const error = validateFile(file);
       const fileState: FileState = { file: error ? null : file, error };
       
-      switch (type) {
-        case 'cedula':
-          setCedulaFile(fileState);
-          break;
-        case 'poder':
-          setPoderFile(fileState);
-          break;
-        case 'posesion':
-          setPosesionFile(fileState);
-          break;
-      }
+      setDocumentFiles(prev => ({
+        ...prev,
+        [tipoId]: fileState
+      }));
     }
   }, [validateFile]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!cedulaFile.file || !poderFile.file || !posesionFile.file || !checked) {
+    // Verificar que todos los documentos requeridos estén cargados
+    const allDocumentsLoaded = tiposDocumento.every(tipo => 
+      documentFiles[tipo.valValor]?.file
+    );
+    
+    if (!allDocumentsLoaded || !checked) {
       return;
     }
     
@@ -119,11 +97,7 @@ const CargaDocumento: React.FC = () => {
     
     try {
       // Aquí iría la lógica de envío de archivos
-      console.log('Archivos a enviar:', {
-        cedula: cedulaFile.file,
-        poder: poderFile.file,
-        posesion: posesionFile.file
-      });
+      console.log('Archivos a enviar:', documentFiles);
       
       // Simular envío
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -135,207 +109,79 @@ const CargaDocumento: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [cedulaFile.file, poderFile.file, posesionFile.file, checked, navigate]);
+  }, [documentFiles, checked, navigate, tiposDocumento]);
 
-  const renderFileUpload = useCallback((
-    type: 'cedula' | 'poder' | 'posesion',
-    ref: React.RefObject<HTMLInputElement | null>,
-    fileState: FileState,
-    onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  ) => (
-    <div 
-      className="document-upload-area" 
-      onClick={() => handleDivClick(type)}
-      style={{ 
-        cursor: 'pointer',
-        border: '2px dashed #E0E0E0',
-        borderRadius: '12px',
-        padding: '32px 24px',
-        backgroundColor: '#FAFAFA',
-        transition: 'all 0.3s ease',
-        marginTop: '16px'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = '#00CBBF';
-        e.currentTarget.style.backgroundColor = '#F0FDFC';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = '#E0E0E0';
-        e.currentTarget.style.backgroundColor = '#FAFAFA';
-      }}
-    >
-      <input
-        type="file"
-        accept='.jpg,.png,.pdf' 
-        ref={ref}
-        onChange={onFileChange} 
-        style={{ display:'none' }} 
-        aria-label={`Cargar documento ${type}`}
-      />
-      
+  const getDescriptionForTipo = useCallback((tipo: TipoDocumento): string => {
+    switch (tipo.valValor) {
+      case 1: // Cédula de Identidad
+        return 'Copia legible del documento oficial por ambas caras, que acredita la identidad de la persona heredera.';
+      case 2: // Poder Notarial
+        return 'Documento legal que autoriza a la persona heredera para actuar en representación de terceros.';
+      case 3: // Posesión Efectiva
+        return 'Documento legal que otorga a la persona heredera el derecho de acceder y administrar los bienes y derechos del titular fallecido.';
+      default:
+        return 'Documento requerido para el proceso de herencia.';
+    }
+  }, []);
+
+  // Mostrar loading mientras se cargan los tipos de documento
+  if (loadingTipos) {
+    return (
       <div style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        gap: '16px',
-        textAlign: 'center'
+        padding: '60px 90px',
+        backgroundColor: '#FFFFFF',
+        borderRadius: '20px',
+        position: 'relative'
       }}>
-        {/* File name or upload text with icon */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '8px'
-        }}>
-          <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="3.5" y="3.94336" width="18" height="18" rx="5.55556" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M15.5 16.9434H9.5" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M10.498 10.9434L12.499 8.94336L14.5 10.9434" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M12.5 13.9434V8.94336" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          {ConsaludCore.Typography ? (
+        <div className="columns is-centered is-vcentered" style={{ minHeight: '60vh' }}>
+          <div className="column is-narrow has-text-centered">
+            <ConsaludCore.LoadingSpinner size="large" />
+            <span className="ml-3">Cargando tipos de documentos...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar error si no se pudieron cargar los tipos de documento
+  if (errorTipos) {
+    return (
+      <div style={{ 
+        padding: '60px 90px',
+        backgroundColor: '#FFFFFF',
+        borderRadius: '20px',
+        position: 'relative'
+      }}>
+        <div className="columns is-centered is-vcentered" style={{ minHeight: '60vh' }}>
+          <div className="column is-narrow has-text-centered">
             <ConsaludCore.Typography 
               variant="body" 
               component="p" 
-              weight="medium"
-              style={{ 
-                fontSize: '1rem',
-                color: fileState.file ? '#00CBBF' : '#505050',
-                margin: 0
+              style={{ color: '#FF5252' }}
+            >
+              {errorTipos}
+            </ConsaludCore.Typography>
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                backgroundColor: '#00CBBF',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '8px 16px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                marginTop: '16px'
               }}
             >
-              {fileState.file ? fileState.file.name : 'Cargar archivos'}
-            </ConsaludCore.Typography>
-          ) : (
-            <p style={{ 
-              fontWeight: 500,
-              fontSize: '16px',
-              color: fileState.file ? '#00CBBF' : '#505050',
-              margin: 0
-            }}>
-              {fileState.file ? fileState.file.name : 'Cargar archivos'}
-            </p>
-          )}
-        </div>
-        
-        {/* Instructions or error */}
-        <div>
-          {fileState.error ? (
-            <p style={{ 
-              color: '#FF5252', 
-              fontSize: '12px',
-              margin: 0
-            }}>
-              {fileState.error}
-            </p>
-          ) : (
-            <p style={{ 
-              fontSize: '12px',
-              color: '#656565',
-              margin: 0,
-              lineHeight: '1.4'
-            }}>
-              Puedes adjuntar imágenes o documentos en formato JPG, PNG o PDF con un peso máximo de 6MB.
-            </p>
-          )}
+              Reintentar
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  ), [handleDivClick]);
-
-  const renderDocumentSection = useCallback((
-    title: string,
-    description: string,
-    type: 'cedula' | 'poder' | 'posesion',
-    ref: React.RefObject<HTMLInputElement | null>,
-    fileState: FileState,
-    onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  ) => (
-    <div style={{ marginBottom: '32px' }}>
-      {/* Header with title and help icon */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start',
-        marginBottom: '12px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ConsaludCore.Typography 
-            variant="body" 
-            component="h3" 
-            weight="bold"
-            style={{ 
-              fontSize: '1rem',
-              color: '#505050',
-              margin: 0
-            }}
-          >
-            {title}
-          </ConsaludCore.Typography>
-          <span style={{ 
-            color: '#FF5252', 
-            fontSize: '12px',
-            fontWeight: 'bold'
-          }}>
-            Obligatorio
-          </span>
-        </div>
-        
-        {/* Help icon */}
-        <div 
-          onClick={() => handleFlow(type === 'cedula' ? 'cedula' : type === 'poder' ? 'notarial' : 'posesion')}
-          style={{ 
-            cursor: 'pointer', 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '4px',
-            padding: '4px 8px',
-            borderRadius: '6px',
-            transition: 'background-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#F0FDFC';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-          }}
-        >
-          <ConsaludCore.Typography 
-            variant="caption" 
-            component="span" 
-            weight="bold"
-            style={{ 
-              fontSize: '12px',
-              color: '#00CBBF'
-            }}
-          >
-            Ejemplo
-          </ConsaludCore.Typography>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="9" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M9.09 9C9.3251 8.33147 9.78915 7.76811 10.4 7.40921C11.0108 7.0503 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52252 14.2151 8.06398C14.6713 8.60543 14.9211 9.30197 14.92 10.02C14.92 12 11.92 13 11.92 13" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M12 17H12.01" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-      </div>
-      
-      {/* Description */}
-      <ConsaludCore.Typography 
-        variant="caption" 
-        component="p" 
-        style={{ 
-          fontSize: '12px',
-          color: '#656565',
-          marginBottom: '16px',
-          lineHeight: '1.4'
-        }}
-      >
-        {description}
-      </ConsaludCore.Typography>
-      
-      {/* Upload area */}
-      {renderFileUpload(type, ref, fileState, onFileChange)}
-    </div>
-  ), [handleFlow, renderFileUpload]);
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} style={{ width: '100%' }}>
@@ -381,33 +227,19 @@ const CargaDocumento: React.FC = () => {
           </ConsaludCore.Typography>
         </div>
         
-        {/* Document sections */}
-        {renderDocumentSection(
-          'Cédula de identidad',
-          'Copia legible del documento oficial por ambas caras, que acredita la identidad de la persona heredera.',
-          'cedula',
-          cedulaInputRef,
-          cedulaFile,
-          (e) => handleFileChange(e, 'cedula')
-        )}
-        
-        {renderDocumentSection(
-          'Poder notarial',
-          'Documento legal que autoriza a la persona heredera para actuar en representación de terceros.',
-          'poder',
-          poderInputRef,
-          poderFile,
-          (e) => handleFileChange(e, 'poder')
-        )}
-        
-        {renderDocumentSection(
-          'Posesión efectiva',
-          'Documento legal que otorga a la persona heredera el derecho de acceder y administrar los bienes y derechos del titular fallecido.',
-          'posesion',
-          posesionInputRef,
-          posesionFile,
-          (e) => handleFileChange(e, 'posesion')
-        )}
+        {/* Document sections - Renderizados dinámicamente */}
+        {tiposDocumento.map((tipo) => (
+          <DocumentUploadArea
+            key={tipo.valValor}
+            fileState={documentFiles[tipo.valValor] || { file: null, error: null }}
+            onFileChange={(e) => handleFileChange(e, tipo.valValor)}
+            onDivClick={() => {}} // El componente interno maneja el click
+            title={tipo.descripcion}
+            description={getDescriptionForTipo(tipo)}
+            onHelpClick={() => handleFlow(tipo)}
+            showHelp={true}
+          />
+        ))}
         
         {/* Declaration checkbox */}
         <div style={{ 
@@ -454,26 +286,26 @@ const CargaDocumento: React.FC = () => {
         }}>
           <button
             type="submit"
-            disabled={!checked || !cedulaFile.file || !poderFile.file || !posesionFile.file || loading}
+            disabled={!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading}
             style={{
-              backgroundColor: (!checked || !cedulaFile.file || !poderFile.file || !posesionFile.file || loading) ? '#E0E0E0' : '#00CBBF',
+              backgroundColor: (!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading) ? '#E0E0E0' : '#00CBBF',
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '8px',
               padding: '12px 32px',
               fontSize: '16px',
               fontWeight: '600',
-              cursor: (!checked || !cedulaFile.file || !poderFile.file || !posesionFile.file || loading) ? 'not-allowed' : 'pointer',
+              cursor: (!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading) ? 'not-allowed' : 'pointer',
               transition: 'all 0.3s ease',
               minWidth: '140px'
             }}
             onMouseEnter={(e) => {
-              if (!(!checked || !cedulaFile.file || !poderFile.file || !posesionFile.file || loading)) {
+              if (!(!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading)) {
                 e.currentTarget.style.backgroundColor = '#00A59B';
               }
             }}
             onMouseLeave={(e) => {
-              if (!(!checked || !cedulaFile.file || !poderFile.file || !posesionFile.file || loading)) {
+              if (!(!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading)) {
                 e.currentTarget.style.backgroundColor = '#00CBBF';
               }
             }}

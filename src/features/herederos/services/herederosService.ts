@@ -1,6 +1,6 @@
 import { Titular } from '../interfaces/Titular';
 import { SolicitanteResponse } from '../interfaces/Solicitante';
-import { Genero, Ciudad, Comuna, Calle, Region } from '../interfaces/Pargen';
+import { Genero, Ciudad, Comuna, Calle, Region, TipoDocumento } from '../interfaces/Pargen';
 import { apiGet, getHerederosApiConfig } from './apiUtils';
 
 /**
@@ -111,6 +111,14 @@ export class HerederosService {
     const url = `${this.config.baseUrl}/api/Pargen/CallesXygo?idComuna=${idComuna}`;
     return apiGet<Calle[]>(url, this.config, 'obtener calles por comuna');
   }
+
+  /**
+   * Obtiene la lista de tipos de documentos
+   */
+  async getTiposDocumento(): Promise<TipoDocumento[]> {
+    const url = `${this.config.baseUrl}/api/Pargen/TipoDocumento`;
+    return apiGet<TipoDocumento[]>(url, this.config, 'obtener tipos de documento');
+  }
 }
 
 // Exportar instancia única
@@ -128,3 +136,4 @@ export const fetchRegiones = () => herederosService.getRegiones();
 export const fetchCiudades = (idRegion?: number) => herederosService.getCiudades(idRegion);
 export const fetchComunasPorCiudad = (idCiudad: number) => herederosService.getComunasPorCiudad(idCiudad);
 export const fetchCallesPorComuna = (idComuna: number) => herederosService.getCallesPorComuna(idComuna); 
+export const fetchTiposDocumento = () => herederosService.getTiposDocumento(); 

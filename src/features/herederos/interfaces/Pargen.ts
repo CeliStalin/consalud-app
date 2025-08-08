@@ -37,4 +37,9 @@ export interface Calle {
   idCalle: number;
   nombreCalle: string;
   idComuna: number;
+}
+
+export interface TipoDocumento {
+  valValor: number;
+  descripcion: string;
 } 
