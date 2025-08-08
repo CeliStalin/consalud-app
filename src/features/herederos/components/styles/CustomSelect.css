@@ -1,0 +1,312 @@
+/* Estilos para CustomSelect con UX elegante y sutil - Siguiendo estándares del proyecto */
+
+.custom-select-container {
+  position: relative;
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Animación de entrada del dropdown */
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Animación de salida del dropdown */
+@keyframes dropdownSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+/* Estilos para el select visual - Siguiendo estándares del proyecto */
+.custom-select-visual {
+  width: 100%;
+  height: 42px;
+  padding: 8px 16px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 24px;
+  font-size: 16px;
+  background-color: #f8f9fa;
+  color: #495057;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(4, 165, 155, 0.07);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de hover sutil para el contenedor */
+.custom-select-container:hover .custom-select-visual {
+  box-shadow: 0 4px 12px rgba(4, 165, 155, 0.12);
+  border-color: #d1d5db;
+}
+
+/* Efecto de focus mejorado - Usando colores del proyecto */
+.custom-select-container:focus-within .custom-select-visual {
+  border-color: #04A59B;
+  box-shadow: 0 2px 8px rgba(4, 165, 155, 0.15), 0 0 0 3px rgba(4, 165, 155, 0.1);
+}
+
+/* Estilos para el dropdown - Fondo blanco como estándar del proyecto */
+.custom-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.15), 
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.8);
+  z-index: 1000;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: auto;
+  animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+  border-color: #04A59B;
+}
+
+.custom-select-option {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #495057;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  border-bottom: 1px solid #f0f0f0;
+  position: relative;
+  overflow: hidden;
+  background-color: white;
+  white-space: nowrap;
+  min-width: 100%;
+}
+
+.custom-select-option:last-child {
+  border-bottom: none;
+}
+
+.custom-select-option:hover {
+  background-color: #f8f9fa;
+  color: #04A59B;
+  transform: translateX(2px);
+}
+
+.custom-select-option.selected {
+  background-color: #f0f9ff;
+  color: #04A59B;
+  font-weight: 500;
+}
+
+.custom-select-option.selected:hover {
+  background-color: #e0f2fe;
+}
+
+/* Efecto de ripple sutil en las opciones */
+.custom-select-option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(4, 165, 155, 0.1), transparent);
+  transition: left 0.3s ease;
+}
+
+.custom-select-option:hover::before {
+  left: 100%;
+}
+
+/* Scrollbar personalizado para el dropdown - Más fino y elegante */
+.custom-select-dropdown::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.custom-select-dropdown::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+  margin: 2px 0;
+}
+
+.custom-select-dropdown::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+  transition: background 0.2s ease;
+}
+
+.custom-select-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Scrollbar horizontal específico */
+.custom-select-dropdown::-webkit-scrollbar:horizontal {
+  height: 4px;
+}
+
+.custom-select-dropdown::-webkit-scrollbar-track:horizontal {
+  background: #f1f1f1;
+  border-radius: 2px;
+  margin: 0 2px;
+}
+
+.custom-select-dropdown::-webkit-scrollbar-thumb:horizontal {
+  background: #c1c1c1;
+  border-radius: 2px;
+  transition: background 0.2s ease;
+}
+
+.custom-select-dropdown::-webkit-scrollbar-thumb:horizontal:hover {
+  background: #a8a8a8;
+}
+
+/* Estilos para el estado de error - Usando colores del proyecto */
+.custom-select-container.has-error .custom-select-visual {
+  border-color: #E11D48;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.1);
+}
+
+.custom-select-container.has-error:focus-within .custom-select-visual {
+  border-color: #E11D48;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.15), 0 0 0 3px rgba(225, 29, 72, 0.1);
+}
+
+/* Estilos para el estado deshabilitado */
+.custom-select-container.disabled .custom-select-visual {
+  background-color: #f5f5f5;
+  color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.custom-select-container.disabled .custom-select-arrow {
+  color: #6c757d;
+}
+
+/* Animación de la flecha */
+.custom-select-arrow {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-select-container.open .custom-select-arrow {
+  transform: rotate(180deg);
+}
+
+/* Efecto de pulso sutil en focus - Usando colores del proyecto */
+@keyframes subtlePulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(4, 165, 155, 0.15), 0 0 0 3px rgba(4, 165, 155, 0.1);
+  }
+  50% {
+    box-shadow: 0 2px 8px rgba(4, 165, 155, 0.2), 0 0 0 3px rgba(4, 165, 155, 0.15);
+  }
+}
+
+.custom-select-container:focus-within .custom-select-visual {
+  animation: subtlePulse 2s ease-in-out infinite;
+}
+
+/* Mejoras para el texto del placeholder */
+.custom-select-visual span {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 400;
+}
+
+.custom-select-visual span:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .custom-select-dropdown {
+    max-height: 150px;
+  }
+  
+  .custom-select-option {
+    padding: 14px 16px;
+    font-size: 16px;
+  }
+  
+  .custom-select-visual {
+    height: 44px;
+    font-size: 16px;
+  }
+}
+
+/* Mejoras de accesibilidad */
+.custom-select-container:focus-within {
+  outline: none;
+}
+
+.custom-select-option:focus {
+  outline: 2px solid #04A59B;
+  outline-offset: -2px;
+}
+
+/* Animación de carga sutil */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.custom-select-container.loading .custom-select-visual {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Estilos específicos para mantener consistencia con el proyecto */
+.custom-select-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.custom-select-option {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Mejoras para el estado activo */
+.custom-select-option:active {
+  background-color: #e0f2fe;
+  transform: translateX(1px);
+}
+
+/* Estilos para el placeholder cuando no hay selección */
+.custom-select-visual span:not(:empty) {
+  color: #495057;
+}
+
+.custom-select-visual span:empty {
+  color: #9ca3af;
+} 

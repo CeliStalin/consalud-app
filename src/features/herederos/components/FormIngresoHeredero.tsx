@@ -8,6 +8,7 @@ import * as ConsaludCore from '@consalud/core';
 import { fetchGeneros, fetchCiudades, fetchComunasPorCiudad, fetchRegiones, Genero, Ciudad, Comuna, Region } from '../services';
 import { CustomSelect } from './CustomSelect';
 import { AutoCompleteInput } from './AutoCompleteInput';
+import { NumberAutoCompleteInput } from './NumberAutoCompleteInput';
 import { useCallesAutocomplete } from '../hooks/useCallesAutocomplete';
 import { FormData } from '../interfaces/FormData';
 import { validarEdadConMensaje } from '../../../utils/ageValidation';
@@ -948,13 +949,16 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 {/* Número */}
                 <div className="form-column" style={{ flex: 1, width: 'calc(50% - 8px)', maxWidth: 'calc(50% - 8px)' }}>
                   <label>Número</label>
-                  <input
-                    className={`input ${errors.numero ? 'is-danger' : ''}`}
-                    type="text"
+                  <NumberAutoCompleteInput
                     name="numero"
                     value={localFormData.numero}
                     onChange={handleInputChange}
+                    options={[]} // Aquí se pueden agregar opciones de números si es necesario
                     placeholder="Ingresar"
+                    error={!!errors.numero}
+                    disabled={!localFormData.calle}
+                    minCharsToSearch={1}
+                    debounceMs={200}
                   />
                   {errors.numero && (
                     <p className="help is-danger">{errors.numero}</p>

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import './styles/CustomSelect.css';
 
 interface CustomSelectProps {
   name: string;
@@ -12,8 +13,8 @@ interface CustomSelectProps {
 }
 
 /**
- * Componente personalizado para selectores con flechita elegante
- * Mantiene la consistencia visual con el diseño del sistema
+ * Componente personalizado para selectores con UX elegante y sutil
+ * Siguiendo los estándares de diseño del proyecto
  */
 export const CustomSelect: React.FC<CustomSelectProps> = ({
   name,
@@ -25,47 +26,76 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   error = false,
   className = ""
 }) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const selectRef = useRef<HTMLSelectElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Manejar clic fuera del select para cerrarlo
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Simular el comportamiento del select nativo
+  const handleSelectClick = () => {
+    if (!disabled) {
+      setIsOpen(!isOpen);
+      selectRef.current?.focus();
+    }
+  };
+
+  const handleFocus = () => {
+    if (!disabled) {
+      setIsFocused(true);
+    }
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    // Delay para permitir que el clic en las opciones funcione
+    setTimeout(() => setIsOpen(false), 150);
+  };
+
+  const handleOptionClick = (optionValue: string) => {
+    const syntheticEvent = {
+      target: { name, value: optionValue }
+    } as React.ChangeEvent<HTMLSelectElement>;
+    
+    onChange(syntheticEvent);
+    setIsOpen(false);
+  };
+
+  const selectedOption = options.find(option => option.value === value);
+
   return (
     <div 
-      className={`custom-select-container ${error ? 'has-error' : ''} ${className}`}
-      style={{
-        position: 'relative',
-        width: '100%'
-      }}
+      ref={containerRef}
+      className={`custom-select-container ${error ? 'has-error' : ''} ${disabled ? 'disabled' : ''} ${isOpen ? 'open' : ''} ${className}`}
     >
+      {/* Select nativo oculto para mantener la funcionalidad */}
       <select
+        ref={selectRef}
         name={name}
         value={value}
         onChange={onChange}
         disabled={disabled}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         style={{
-          width: '100%',
-          height: '42px',
-          padding: '8px 16px',
-          border: error ? '1.5px solid #E11D48' : '1.5px solid #e0e0e0',
-          borderRadius: '24px',
-          fontSize: '16px',
-          backgroundColor: disabled ? '#f5f5f5' : '#f8f9fa',
-          color: disabled ? '#6c757d' : '#495057',
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          outline: 'none',
-          appearance: 'none',
-          WebkitAppearance: 'none',
-          MozAppearance: 'none',
-          boxShadow: '0 2px 8px rgba(4, 165, 155, 0.07)',
-          transition: 'border 0.2s, box-shadow 0.2s'
-        }}
-        onFocus={(e) => {
-          if (!disabled) {
-            e.target.style.borderColor = '#04A59B';
-            e.target.style.boxShadow = '0 2px 8px rgba(4, 165, 155, 0.15)';
-          }
-        }}
-        onBlur={(e) => {
-          if (!disabled) {
-            e.target.style.borderColor = error ? '#E11D48' : '#e0e0e0';
-            e.target.style.boxShadow = '0 2px 8px rgba(4, 165, 155, 0.07)';
-          }
+          position: 'absolute',
+          opacity: 0,
+          pointerEvents: 'none',
+          width: '1px',
+          height: '1px'
         }}
       >
         <option value="" disabled>
@@ -77,40 +107,60 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
           </option>
         ))}
       </select>
-      
-      {/* Flechita personalizada */}
+
+      {/* Select visual personalizado - Siguiendo estándares del proyecto */}
       <div
+        className="custom-select-visual"
+        onClick={handleSelectClick}
         style={{
-          position: 'absolute',
-          right: '16px',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          pointerEvents: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
+          borderColor: error ? '#E11D48' : isFocused ? '#04A59B' : '#e0e0e0',
+          backgroundColor: disabled ? '#f5f5f5' : '#f8f9fa',
+          color: disabled ? '#6c757d' : selectedOption ? '#495057' : '#9ca3af',
+          cursor: disabled ? 'not-allowed' : 'pointer'
         }}
       >
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{
-            color: disabled ? '#6c757d' : '#9ca3af',
-            transition: 'color 0.2s'
-          }}
-        >
-          <path
-            d="M6 9L12 15L18 9"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <span style={{ fontWeight: selectedOption ? '500' : '400' }}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        
+        {/* Flechita animada */}
+        <div className="custom-select-arrow">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{
+              color: disabled ? '#6c757d' : isFocused ? '#04A59B' : '#9ca3af',
+              transition: 'color 0.2s'
+            }}
+          >
+            <path
+              d="M6 9L12 15L18 9"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
       </div>
+
+      {/* Dropdown personalizado - Fondo blanco como estándar del proyecto */}
+      {isOpen && !disabled && (
+        <div className="custom-select-dropdown">
+          {options.map(option => (
+            <div
+              key={option.value}
+              className={`custom-select-option ${option.value === value ? 'selected' : ''}`}
+              onClick={() => handleOptionClick(option.value)}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }; 
