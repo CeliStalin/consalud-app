@@ -33,15 +33,15 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
   }, [onDivClick]);
 
   const validateFile = useCallback((file: File): string | null => {
-    const maxSize = 6 * 1024 * 1024; // 6MB
-    const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const allowedTypes = ['application/pdf'];
     
     if (file.size > maxSize) {
-      return 'El archivo debe ser menor a 6MB';
+      return 'El archivo debe ser menor a 10MB';
     }
     
     if (!allowedTypes.includes(file.type)) {
-      return 'Solo se permiten archivos JPG, PNG o PDF';
+      return 'Solo se permiten archivos PDF';
     }
     
     return null;
@@ -74,12 +74,12 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
           <ConsaludCore.Typography 
             variant="body" 
             component="h3" 
-            weight="bold"
             style={{ 
               fontSize: '1rem',
               color: '#505050',
               margin: 0,
-              lineHeight: '1.4'
+              lineHeight: '1.4',
+              fontWeight: 'bold'
             }}
           >
             {title}
@@ -173,7 +173,7 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
       >
         <input
           type="file"
-          accept='.jpg,.png,.pdf' 
+          accept='.pdf' 
           ref={inputRef}
           onChange={handleFileChange} 
           style={{ display:'none' }} 
@@ -203,19 +203,19 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
               <ConsaludCore.Typography 
                 variant="body" 
                 component="p" 
-                weight="medium"
                 style={{ 
                   fontSize: '1rem',
                   color: fileState.file ? '#00CBBF' : '#505050',
                   margin: 0,
-                  lineHeight: '1.4'
+                  lineHeight: '1.4',
+                  fontWeight: 'bold'
                 }}
               >
                 {fileState.file ? fileState.file.name : 'Cargar archivos'}
               </ConsaludCore.Typography>
             ) : (
               <p style={{ 
-                fontWeight: 500,
+                fontWeight: 'bold',
                 fontSize: '1rem',
                 color: fileState.file ? '#00CBBF' : '#505050',
                 margin: 0,
@@ -240,11 +240,11 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
             ) : (
               <p style={{ 
                 fontSize: '0.75rem',
-                color: '#656565',
+                color: '#505050',
                 margin: 0,
                 lineHeight: '1.5'
               }}>
-                Puedes adjuntar imágenes o documentos en formato JPG, PNG o PDF con un peso máximo de 6MB.
+                <span style={{ fontWeight: 'bold', color: '#333333' }}>Solo puedes adjuntar documentos</span> en formato PDF con un peso máximo de 10MB.
               </p>
             )}
           </div>

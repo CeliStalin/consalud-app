@@ -33,15 +33,15 @@ const CargaDocumento: React.FC = () => {
   }, [setStep]);
 
   const validateFile = useCallback((file: File): string | null => {
-    const maxSize = 6 * 1024 * 1024; // 6MB
-    const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'] ;
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const allowedTypes = ['application/pdf'];
     
     if (file.size > maxSize) {
-      return 'El archivo debe ser menor a 6MB';
+      return 'El archivo debe ser menor a 10MB';
     }
     
     if (!allowedTypes.includes(file.type)) {
-      return 'Solo se permiten archivos JPG, PNG o PDF';
+      return 'Solo se permiten archivos PDF';
     }
     
     return null;
