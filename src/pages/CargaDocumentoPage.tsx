@@ -45,15 +45,21 @@ const CargaDocumentoPageContent: React.FC = () => {
           <div className="mb-1" style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
             <ConsaludCore.Typography
               variant="h5"
-              component="h2"
-              style={{ fontWeight: 700, textAlign: 'center', color: '#222', fontSize: '2rem' }}
+              component="h1"
+              style={{ 
+                fontWeight: 700, 
+                textAlign: 'center', 
+                color: '#222', 
+                fontSize: '2rem',
+                marginBottom: '24px'
+              }}
             >
-              Carga Documentos
+              Carga de documentos
             </ConsaludCore.Typography>
           </div>
           
           {/* Stepper debajo del título */}
-          <div className="mb-5">
+          <div className="mb-5" style={{ marginBottom: '40px' }}>
             <Stepper step={step} />
           </div>
         </div>
@@ -63,15 +69,7 @@ const CargaDocumentoPageContent: React.FC = () => {
       <div className="card-center-container">
         <div className="card-responsive">
           <div className="generalContainer">
-            <ConsaludCore.Card
-              title={undefined}
-              subtitle={undefined}
-              variant="elevated"
-              padding="large"
-              className="ingreso-card animate-fade-in-up"
-            >
-              <CargaDocumento />
-            </ConsaludCore.Card>
+            <CargaDocumento />
           </div>
         </div>
       </div>
@@ -82,7 +80,12 @@ const CargaDocumentoPageContent: React.FC = () => {
 const CargaDocumentoPage: React.FC = () => {
   return (
     <StepperProvider>
-      <div className="route-container layout-stable" style={{ overflowY: 'auto', height: '100vh', paddingBottom: 40 }}>
+      <div className="route-container layout-stable" style={{ 
+        overflowY: 'auto', 
+        height: '100vh', 
+        paddingBottom: 40,
+        backgroundColor: '#F8F9FA'
+      }}>
         <CargaDocumentoPageContent />
       </div>
     </StepperProvider>

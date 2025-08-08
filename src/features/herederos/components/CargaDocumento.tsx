@@ -28,17 +28,13 @@ const CargaDocumento: React.FC = () => {
 
   const { ejemploCedula, ejemploPoder, ejemploPosesion } = UseAlert();
   const { step, setStep } = useStepper();
-  // Eliminar loadingTransition y su uso en useEffect
-  const [showOverlay] = useState(false);
 
   useEffect(() => {
     setStep(3);
-    // Eliminar setLoadingTransition(true) y setTimeout relacionado
     return () => {};
   }, [setStep]);
 
   const handleBack = () => {
-    // Usar navegación del historial para mantener el flujo correcto
     navigate(-1);
   };
 
@@ -147,7 +143,27 @@ const CargaDocumento: React.FC = () => {
     fileState: FileState,
     onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   ) => (
-    <div className="divCargaDocumento" onClick={() => handleDivClick(type)} style={{ cursor: 'pointer' }}>
+    <div 
+      className="document-upload-area" 
+      onClick={() => handleDivClick(type)}
+      style={{ 
+        cursor: 'pointer',
+        border: '2px dashed #E0E0E0',
+        borderRadius: '12px',
+        padding: '32px 24px',
+        backgroundColor: '#FAFAFA',
+        transition: 'all 0.3s ease',
+        marginTop: '16px'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = '#00CBBF';
+        e.currentTarget.style.backgroundColor = '#F0FDFC';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = '#E0E0E0';
+        e.currentTarget.style.backgroundColor = '#FAFAFA';
+      }}
+    >
       <input
         type="file"
         accept='.jpg,.png,.pdf' 
@@ -157,111 +173,33 @@ const CargaDocumento: React.FC = () => {
         aria-label={`Cargar documento ${type}`}
       />
       
-      <div className="tituloCargaDocumento">
-        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20" fill="none">
-          <rect x="1.5" y="1" width="18" height="18" rx="5.55556" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M13.5 14H7.5" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M8.49902 8L10.5 6L12.501 8" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M10.5 11V6" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-        {ConsaludCore.Typography ? (
-          <ConsaludCore.Typography 
-            variant="body" 
-            component="span" 
-            weight="medium"
-            style={{ 
-              fontSize: '1rem',
-              color: ConsaludCore.theme?.textColors?.primary || "#505050"
-            }}
-          >
-            {fileState.file ? fileState.file.name : 'Cargar Archivos'}
-          </ConsaludCore.Typography>
-        ) : (
-          <span style={{ 
-            fontWeight: 500,
-            fontSize: '16px',
-            color: "#505050"
-          }}>
-            {fileState.file ? fileState.file.name : 'Cargar Archivos'}
-          </span>
-        )}
-      </div>
-      
-      <div className="textoCargaDocumento">
-        {fileState.error ? (
-          <p style={{ 
-            color: ConsaludCore.theme?.colors?.danger || "#FF5252", 
-            fontSize: '12px',
-            margin: 0
-          }}>
-            {fileState.error}
-          </p>
-        ) : (
-          <>
-            {ConsaludCore.Typography ? (
-              <ConsaludCore.Typography 
-                variant="caption" 
-                component="p" 
-                style={{ 
-                  fontSize: '0.75rem',
-                  color: ConsaludCore.theme?.colors?.gray?.medium || "#656565",
-                  margin: 0
-                }}
-              >
-                <ConsaludCore.Typography 
-                  variant="caption" 
-                  component="strong" 
-                  weight="bold"
-                >
-                  Puedes adjuntar imágenes o documentos
-                </ConsaludCore.Typography> en formato
-              </ConsaludCore.Typography>
-            ) : (
-              <p style={{ 
-                fontSize: '12px',
-                color: "#656565",
-                margin: 0
-              }}>
-                <strong>Puedes adjuntar imágenes o documentos</strong> en formato
-              </p>
-            )}
-            {ConsaludCore.Typography ? (
-              <ConsaludCore.Typography 
-                variant="caption" 
-                component="p" 
-                style={{ 
-                  fontSize: '0.75rem',
-                  color: ConsaludCore.theme?.colors?.gray?.medium || "#656565",
-                  margin: 0
-                }}
-              >
-                JPG, PNG o PDF con un peso máximo de 6MB.
-              </ConsaludCore.Typography>
-            ) : (
-              <p style={{ 
-                fontSize: '12px',
-                color: "#656565",
-                margin: 0
-              }}>
-                JPG, PNG o PDF con un peso máximo de 6MB.
-              </p>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  ), [handleDivClick]);
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <div className="containerInfoHeredero">
-        <div className="iconoGenerico">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M12 20V14" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M14 16L12 14L10 16" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M16 20H19C19.5305 20.0001 20.0393 19.7895 20.4144 19.4144C20.7895 19.0393 21.0001 18.5305 21 18V8.94C21 7.83545 20.1045 6.94005 19 6.94H12.529C12.1978 6.93999 11.8881 6.77596 11.702 6.502L10.297 4.437C10.1109 4.16368 9.80166 4.00008 9.471 4H5C4.46952 3.99985 3.96073 4.21052 3.58563 4.58563C3.21052 4.96073 2.99985 5.46952 3 6V18C2.99985 18.5305 3.21052 19.0393 3.58563 19.4144C3.96073 19.7895 4.46952 20.0001 5 20H8" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        gap: '16px',
+        textAlign: 'center'
+      }}>
+        {/* Cloud upload icon */}
+        <div style={{
+          width: '48px',
+          height: '48px',
+          borderRadius: '50%',
+          backgroundColor: '#E8F8F7',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '8px'
+        }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 20V14" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M14 16L12 14L10 16" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M16 20H19C19.5305 20.0001 20.0393 19.7895 20.4144 19.4144C20.7895 19.0393 21.0001 18.5305 21 18V8.94C21 7.83545 20.1045 6.94005 19 6.94H12.529C12.1978 6.93999 11.8881 6.77596 11.702 6.502L10.297 4.437C10.1109 4.16368 9.80166 4.00008 9.471 4H5C4.46952 3.99985 3.96073 4.21052 3.58563 4.58563C3.21052 4.96073 2.99985 5.46952 3 6V18C2.99985 18.5305 3.21052 19.0393 3.58563 19.4144C3.96073 19.7895 4.46952 20.0001 5 20H8" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          
+        </div>
+        
+        {/* File name or upload text */}
+        <div>
           {ConsaludCore.Typography ? (
             <ConsaludCore.Typography 
               variant="body" 
@@ -269,334 +207,286 @@ const CargaDocumento: React.FC = () => {
               weight="medium"
               style={{ 
                 fontSize: '1rem',
-                color: ConsaludCore.theme?.textColors?.primary || "#505050"
+                color: fileState.file ? '#00CBBF' : '#505050',
+                marginBottom: '8px'
               }}
             >
-              Carga de documentos
+              {fileState.file ? fileState.file.name : 'Cargar archivos'}
             </ConsaludCore.Typography>
           ) : (
-            <p style={{ fontWeight: 500, color: ConsaludCore.theme?.textColors?.primary || "#505050" }}>Carga de documentos</p>
+            <p style={{ 
+              fontWeight: 500,
+              fontSize: '16px',
+              color: fileState.file ? '#00CBBF' : '#505050',
+              marginBottom: '8px'
+            }}>
+              {fileState.file ? fileState.file.name : 'Cargar archivos'}
+            </p>
           )}
         </div>
         
-        <div className='labelCargaDocumentoCargaDocumento'>
-          <div className="divTextoObligatorio">
-            {ConsaludCore.Typography ? (
-              <ConsaludCore.Typography 
-                component="span" 
-                weight="bold"
-                style={{ 
-                  fontSize: '0.875rem',
-                  color: ConsaludCore.theme?.textColors?.primary || "#505050"
-                }}
-                className='divTextoObligatorioCargaDocumento'
-              >
-                Cédula de identidad 
-              </ConsaludCore.Typography>
-            ) : (
-              <span style={{ fontWeight: 700, fontSize: '14px', color: ConsaludCore.theme?.textColors?.primary || "#505050" }}>Cédula de identidad </span>
-            )}
-            {ConsaludCore.Typography ? (
-              <ConsaludCore.Typography 
-                component="span" 
-                weight="bold"
-                style={{ 
-                  fontSize: '0.875rem',
-                  color: ConsaludCore.theme?.colors?.danger || "#FF5252"
-                }}
-                className='divTextoObligatorioRojoCargaDocumento'
-              >
-                Obligatorio
-              </ConsaludCore.Typography>
-            ) : (
-              <span style={{color: ConsaludCore.theme?.colors?.danger || "#FF5252", fontWeight: 700, fontSize: '14px'}}>Obligatorio</span>
-            )}
-          </div>
-          <div className='divObligatorioCargaDocumento'>
-            <div className='textoEjemploIconCargaDocumento'>
-              <div 
-                onClick={() => handleFlow("cedula")}
-                style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
-                className='textoEjemploCargaDocumento'
-              >
-                {ConsaludCore.Typography ? (
-                  <ConsaludCore.Typography 
-                    component="span" 
-                    weight="bold"
-                    style={{ 
-                      fontSize: '0.875rem',
-                      color: ConsaludCore.theme?.colors?.primary || "#04A59B"
-                    }}
-                  >
-                    Ejemplo
-                  </ConsaludCore.Typography>
-                ) : (
-                  <span 
-                    style={{ 
-                      color: ConsaludCore.theme?.colors?.primary || "#04A59B",
-                      fontWeight: 700,
-                      fontSize: '14px'
-                    }}
-                  >
-                    Ejemplo
-                  </span>
-                )}
-                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
-                  <circle cx="12.4998" cy="11.9998" r="9.00375" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M10.1846 9.68384C10.4216 8.66228 11.352 7.95398 12.3998 7.99747C13.5725 7.93252 14.5778 8.82611 14.6508 9.9983C14.6508 11.5028 12.4999 11.9991 12.4999 12.9996" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M12.6253 15.7502C12.6253 15.8193 12.5693 15.8753 12.5002 15.8753C12.4311 15.8753 12.3752 15.8193 12.3752 15.7502C12.3752 15.6811 12.4311 15.6252 12.5002 15.6252" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M12.5002 15.6252C12.5692 15.6252 12.6252 15.6812 12.6252 15.7502" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div> 
-        {ConsaludCore.Typography ? (
+        {/* Instructions or error */}
+        <div>
+          {fileState.error ? (
+            <p style={{ 
+              color: '#FF5252', 
+              fontSize: '12px',
+              margin: 0
+            }}>
+              {fileState.error}
+            </p>
+          ) : (
+            <p style={{ 
+              fontSize: '12px',
+              color: '#656565',
+              margin: 0,
+              lineHeight: '1.4'
+            }}>
+              Puedes adjuntar imágenes o documentos en formato JPG, PNG o PDF con un peso máximo de 6MB.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  ), [handleDivClick]);
+
+  const renderDocumentSection = useCallback((
+    title: string,
+    description: string,
+    type: 'cedula' | 'poder' | 'posesion',
+    ref: React.RefObject<HTMLInputElement | null>,
+    fileState: FileState,
+    onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  ) => (
+    <div style={{ marginBottom: '32px' }}>
+      {/* Header with title and help icon */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start',
+        marginBottom: '12px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <ConsaludCore.Typography 
-            component="p" 
+            variant="body" 
+            component="h3" 
+            weight="bold"
             style={{ 
-              fontSize: '0.75rem',
-              color: ConsaludCore.theme?.colors?.gray?.medium || "#656565"
+              fontSize: '1rem',
+              color: '#505050',
+              margin: 0
             }}
-            className="labelCargaDocumento"
           >
-            Copia legible del documento oficial por ambas caras, que acredita la identidad de la persona heredera.
+            {title}
           </ConsaludCore.Typography>
-        ) : (
-          <p className="labelCargaDocumento" style={{ fontSize: '14px', color: "#656565" }}>
-            Copia legible del documento oficial por ambas caras, que acredita la identidad de la persona heredera.
-          </p>
-        )}
-
-        {renderFileUpload('cedula', cedulaInputRef, cedulaFile, (e) => handleFileChange(e, 'cedula'))}
-
-        <div className='labelCargaDocumentoCargaDocumento'>
-          <div className="divTextoObligatorio">
-            {ConsaludCore.Typography ? (
-              <ConsaludCore.Typography 
-                component="span" 
-                weight="bold"
-                style={{ 
-                  fontSize: '0.875rem',
-                  color: ConsaludCore.theme?.textColors?.primary || "#505050"
-                }}
-                className='divTextoObligatorioCargaDocumento'
-              >
-                Poder notarial
-              </ConsaludCore.Typography>
-            ) : (
-              <span style={{ fontWeight: 700, fontSize: '14px', color: ConsaludCore.theme?.textColors?.primary || "#505050" }}>Poder notarial</span>
-            )}
-            {ConsaludCore.Typography ? (
-              <ConsaludCore.Typography 
-                component="span" 
-                weight="bold"
-                style={{ 
-                  fontSize: '0.875rem',
-                  color: ConsaludCore.theme?.colors?.danger || "#FF5252"
-                }}
-                className='divTextoObligatorioRojoCargaDocumento'
-              >
-                Obligatorio
-              </ConsaludCore.Typography>
-            ) : (
-              <span style={{color: ConsaludCore.theme?.colors?.danger || "#FF5252", fontWeight: 700, fontSize: '14px'}}>Obligatorio</span>
-            )}
-          </div>
-          <div className='divObligatorioCargaDocumento'>
-            <div className='textoEjemploIconCargaDocumento'>
-              <div 
-                onClick={() => handleFlow("notarial")}
-                style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
-                className='textoEjemploCargaDocumento'
-              >
-                {ConsaludCore.Typography ? (
-                  <ConsaludCore.Typography 
-                    component="span" 
-                    weight="bold"
-                    style={{ 
-                      fontSize: '0.875rem',
-                      color: ConsaludCore.theme?.colors?.primary || "#04A59B"
-                    }}
-                  >
-                    Ejemplo
-                  </ConsaludCore.Typography>
-                ) : (
-                  <span 
-                    style={{ 
-                      color: ConsaludCore.theme?.colors?.primary || "#04A59B",
-                      fontWeight: 700,
-                      fontSize: '14px'
-                    }}
-                  >
-                    Ejemplo
-                  </span>
-                )}
-                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
-                  <circle cx="12.4998" cy="11.9998" r="9.00375" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M10.1846 9.68384C10.4216 8.66228 11.352 7.95398 12.3998 7.99747C13.5725 7.93252 14.5778 8.82611 14.6508 9.9983C14.6508 11.5028 12.4999 11.9991 12.4999 12.9996" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M12.6253 15.7502C12.6253 15.8193 12.5693 15.8753 12.5002 15.8753C12.4311 15.8753 12.3752 15.8193 12.3752 15.7502C12.3752 15.6811 12.4311 15.6252 12.5002 15.6252" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M12.5002 15.6252C12.5692 15.6252 12.6252 15.6812 12.6252 15.7502" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div> 
-        {ConsaludCore.Typography ? (
-          <ConsaludCore.Typography 
-            component="p" 
-            style={{ 
-              fontSize: '0.75rem',
-              color: ConsaludCore.theme?.colors?.gray?.medium || "#656565"
-            }}
-            className="labelCargaDocumento"
-          >
-            Documento legal que autoriza a la persona heredera para actuar en representación de terceros.
-          </ConsaludCore.Typography>
-        ) : (
-          <p className="labelCargaDocumento" style={{ fontSize: '14px', color: "#656565" }}>
-            Documento legal que autoriza a la persona heredera para actuar en representación de terceros.
-          </p>
-        )}
-
-        {renderFileUpload('poder', poderInputRef, poderFile, (e) => handleFileChange(e, 'poder'))}
-
-        <div className='labelCargaDocumentoCargaDocumento'>
-          <div className="divTextoObligatorio">
-            {ConsaludCore.Typography ? (
-              <ConsaludCore.Typography 
-                component="span" 
-                weight="bold"
-                style={{ 
-                  fontSize: '0.875rem',
-                  color: ConsaludCore.theme?.textColors?.primary || "#505050"
-                }}
-                className='divTextoObligatorioCargaDocumento'
-              >
-                Posesión efectiva
-              </ConsaludCore.Typography>
-            ) : (
-              <span style={{ fontWeight: 700, fontSize: '14px', color: ConsaludCore.theme?.textColors?.primary || "#505050" }}>Posesión efectiva</span>
-            )}
-            {ConsaludCore.Typography ? (
-              <ConsaludCore.Typography 
-                component="span" 
-                weight="bold"
-                style={{ 
-                  fontSize: '0.875rem',
-                  color: ConsaludCore.theme?.colors?.danger || "#FF5252"
-                }}
-                className='divTextoObligatorioRojoCargaDocumento'
-              >
-                Obligatorio
-              </ConsaludCore.Typography>
-            ) : (
-              <span style={{color: ConsaludCore.theme?.colors?.danger || "#FF5252", fontWeight: 700, fontSize: '14px'}}>Obligatorio</span>
-            )}
-          </div>
-          <div className='divObligatorioCargaDocumento'>
-            <div className='textoEjemploIconCargaDocumento'>
-              <div 
-                onClick={() => handleFlow("posesion")}
-                style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
-                className='textoEjemploCargaDocumento'
-              >
-                {ConsaludCore.Typography ? (
-                  <ConsaludCore.Typography 
-                    component="span" 
-                    weight="bold"
-                    style={{ 
-                      fontSize: '0.875rem',
-                      color: ConsaludCore.theme?.colors?.primary || "#04A59B"
-                    }}
-                  >
-                    Ejemplo
-                  </ConsaludCore.Typography>
-                ) : (
-                  <span 
-                    style={{ 
-                      color: ConsaludCore.theme?.colors?.primary || "#04A59B",
-                      fontWeight: 700,
-                      fontSize: '14px'
-                    }}
-                  >
-                    Ejemplo
-                  </span>
-                )}
-                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
-                  <circle cx="12.4998" cy="11.9998" r="9.00375" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M10.1846 9.68384C10.4216 8.66228 11.352 7.95398 12.3998 7.99747C13.5725 7.93252 14.5778 8.82611 14.6508 9.9983C14.6508 11.5028 12.4999 11.9991 12.4999 12.9996" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M12.6253 15.7502C12.6253 15.8193 12.5693 15.8753 12.5002 15.8753C12.4311 15.8753 12.3752 15.8193 12.3752 15.7502C12.3752 15.6811 12.4311 15.6252 12.5002 15.6252" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M12.5002 15.6252C12.5692 15.6252 12.6252 15.6812 12.6252 15.7502" stroke="#04A59B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div> 
-        {ConsaludCore.Typography ? (
-          <ConsaludCore.Typography 
-            component="p" 
-            style={{ 
-              fontSize: '0.75rem',
-              color: ConsaludCore.theme?.colors?.gray?.medium || "#656565"
-            }}
-            className="labelCargaDocumento"
-          >
-            Documento legal que otorga a la persona heredera el derecho de acceder y administrar los bienes y derechos del titular fallecido
-          </ConsaludCore.Typography>
-        ) : (
-          <p className="labelCargaDocumento" style={{ fontSize: '14px', color: "#656565" }}>
-            Documento legal que otorga a la persona heredera el derecho de acceder y administrar los bienes y derechos del titular fallecido
-          </p>
-        )}
-
-        {renderFileUpload('posesion', posesionInputRef, posesionFile, (e) => handleFileChange(e, 'posesion'))}
+          <span style={{ 
+            color: '#FF5252', 
+            fontSize: '12px',
+            fontWeight: 'bold'
+          }}>
+            Obligatorio
+          </span>
+        </div>
         
-        <div className="divDeclaroCargaDocumento">
-          <div className="checkbox-wrapper">
+        {/* Help icon */}
+        <div 
+          onClick={() => handleFlow(type === 'cedula' ? 'cedula' : type === 'poder' ? 'notarial' : 'posesion')}
+          style={{ 
+            cursor: 'pointer', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '4px',
+            padding: '4px 8px',
+            borderRadius: '6px',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#F0FDFC';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
+        >
+          <ConsaludCore.Typography 
+            variant="caption" 
+            component="span" 
+            weight="bold"
+            style={{ 
+              fontSize: '12px',
+              color: '#00CBBF'
+            }}
+          >
+            Ejemplo
+          </ConsaludCore.Typography>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="9" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M9.09 9C9.3251 8.33147 9.78915 7.76811 10.4 7.40921C11.0108 7.0503 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52252 14.2151 8.06398C14.6713 8.60543 14.9211 9.30197 14.92 10.02C14.92 12 11.92 13 11.92 13" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M12 17H12.01" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      
+      {/* Description */}
+      <ConsaludCore.Typography 
+        variant="caption" 
+        component="p" 
+        style={{ 
+          fontSize: '12px',
+          color: '#656565',
+          marginBottom: '16px',
+          lineHeight: '1.4'
+        }}
+      >
+        {description}
+      </ConsaludCore.Typography>
+      
+      {/* Upload area */}
+      {renderFileUpload(type, ref, fileState, onFileChange)}
+    </div>
+  ), [handleFlow, renderFileUpload]);
+
+  return (
+    <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+      <div style={{ 
+        padding: '60px 90px',
+        backgroundColor: '#FFFFFF',
+        borderRadius: '20px',
+        position: 'relative'
+      }}>
+        {/* Title */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '12px',
+          marginBottom: '32px'
+        }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            backgroundColor: '#E8F8F7',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 20V14" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M14 16L12 14L10 16" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M16 20H19C19.5305 20.0001 20.0393 19.7895 20.4144 19.4144C20.7895 19.0393 21.0001 18.5305 21 18V8.94C21 7.83545 20.1045 6.94005 19 6.94H12.529C12.1978 6.93999 11.8881 6.77596 11.702 6.502L10.297 4.437C10.1109 4.16368 9.80166 4.00008 9.471 4H5C4.46952 3.99985 3.96073 4.21052 3.58563 4.58563C3.21052 4.96073 2.99985 5.46952 3 6V18C2.99985 18.5305 3.21052 19.0393 3.58563 19.4144C3.96073 19.7895 4.46952 20.0001 5 20H8" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <ConsaludCore.Typography 
+            variant="h6" 
+            component="h2" 
+            weight="bold"
+            style={{ 
+              fontSize: '1.25rem',
+              color: '#505050',
+              margin: 0
+            }}
+          >
+            Carga de documentos
+          </ConsaludCore.Typography>
+        </div>
+        
+        {/* Document sections */}
+        {renderDocumentSection(
+          'Cédula de identidad',
+          'Copia legible del documento oficial por ambas caras, que acredita la identidad de la persona heredera.',
+          'cedula',
+          cedulaInputRef,
+          cedulaFile,
+          (e) => handleFileChange(e, 'cedula')
+        )}
+        
+        {renderDocumentSection(
+          'Poder notarial',
+          'Documento legal que autoriza a la persona heredera para actuar en representación de terceros.',
+          'poder',
+          poderInputRef,
+          poderFile,
+          (e) => handleFileChange(e, 'poder')
+        )}
+        
+        {renderDocumentSection(
+          'Posesión efectiva',
+          'Documento legal que otorga a la persona heredera el derecho de acceder y administrar los bienes y derechos del titular fallecido.',
+          'posesion',
+          posesionInputRef,
+          posesionFile,
+          (e) => handleFileChange(e, 'posesion')
+        )}
+        
+        {/* Declaration checkbox */}
+        <div style={{ 
+          marginTop: '32px',
+          marginBottom: '32px'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'flex-start', 
+            gap: '12px'
+          }}>
             <input 
               type="checkbox" 
               id="confirmacion" 
-              className="custom-checkbox"
               checked={checked}
               onChange={(e) => setChecked(e.target.checked)}
+              style={{
+                width: '18px',
+                height: '18px',
+                marginTop: '2px',
+                accentColor: '#00CBBF'
+              }}
             />
-            <label htmlFor="confirmacion">
-              {ConsaludCore.Typography ? (
-                <ConsaludCore.Typography 
-                  component="span" 
-                  style={{ 
-                    fontSize: '0.875rem',
-                    color: ConsaludCore.theme?.textColors?.primary || "#333"
-                  }}
-                >
-                  Declaro que revisé los documentos cargados, los cuales son verídicos y cumplen con los requisitos solicitados.
-                </ConsaludCore.Typography>
-              ) : (
-                <span style={{ fontSize: '14px', color: ConsaludCore.theme?.textColors?.primary || "#333" }}>
-                  Declaro que revisé los documentos cargados, los cuales son verídicos y cumplen con los requisitos solicitados.
-                </span>
-              )}
+            <label htmlFor="confirmacion" style={{ cursor: 'pointer' }}>
+              <ConsaludCore.Typography 
+                variant="body" 
+                component="span" 
+                style={{ 
+                  fontSize: '14px',
+                  color: '#505050',
+                  lineHeight: '1.4'
+                }}
+              >
+                Declaro que revisé los documentos cargados, los cuales son verídicos y cumplen con los requisitos solicitados.
+              </ConsaludCore.Typography>
             </label>
           </div>
         </div>
         
-        <div className="continue-button">
+        {/* Continue button */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center'
+        }}>
           <button
             type="submit"
-            className="button is-primary is-rounded"
             disabled={!checked || !cedulaFile.file || !poderFile.file || !posesionFile.file || loading}
+            style={{
+              backgroundColor: (!checked || !cedulaFile.file || !poderFile.file || !posesionFile.file || loading) ? '#E0E0E0' : '#00CBBF',
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '12px 32px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: (!checked || !cedulaFile.file || !poderFile.file || !posesionFile.file || loading) ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s ease',
+              minWidth: '140px'
+            }}
+            onMouseEnter={(e) => {
+              if (!(!checked || !cedulaFile.file || !poderFile.file || !posesionFile.file || loading)) {
+                e.currentTarget.style.backgroundColor = '#00A59B';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!(!checked || !cedulaFile.file || !poderFile.file || !posesionFile.file || loading)) {
+                e.currentTarget.style.backgroundColor = '#00CBBF';
+              }
+            }}
           >
-            {ConsaludCore.Typography ? (
-              <ConsaludCore.Typography 
-                variant="button" 
-                style={{ color: ConsaludCore.theme?.colors?.white || "#FFFFFF" }}
-              >
-                {loading ? 'Enviando...' : 'Continuar'}
-              </ConsaludCore.Typography>
-            ) : (
-              loading ? 'Enviando...' : "Continuar"
-            )}
+            {loading ? 'Enviando...' : 'Continuar'}
           </button>
         </div>
       </div>
