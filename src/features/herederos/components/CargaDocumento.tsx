@@ -38,8 +38,8 @@ const CargaDocumento: React.FC = () => {
   }, [setStep]);
 
   const handleBack = () => {
-    // Navegar directamente sin animaciones para evitar que se quede la página
-    navigate('/mnherederos/ingresoher/RegistroTitular');
+    // Usar navegación del historial para mantener el flujo correcto
+    navigate(-1);
   };
 
   const validateFile = useCallback((file: File): string | null => {
