@@ -17,12 +17,18 @@ const CargaDocumentoPageContent: React.FC = () => {
   }));
 
   return (
-    <>
+    <div className="carga-documentos-page-container" style={{ 
+      width: '100%', 
+      maxWidth: '100%'
+    }}>
       {/* Header Section: Breadcrumb y botón volver */}
-      <div style={{ width: '100%', marginBottom: 24 }}>
-        <div style={{ marginLeft: 48 }}>
+      <div className="carga-documentos-header" style={{ 
+        width: '100%', 
+        marginBottom: '1.5rem'
+      }}>
+        <div style={{ marginLeft: '3rem' }}>
           {/* Breadcrumb */}
-          <div style={{ marginBottom: 8 }}>
+          <div style={{ marginBottom: '0.5rem' }}>
             <ConsaludCore.Breadcrumb
               items={cleanedBreadcrumbItems}
               separator={<span>{'>'}</span>}
@@ -42,7 +48,7 @@ const CargaDocumentoPageContent: React.FC = () => {
           </div>
           
           {/* Título arriba del stepper */}
-          <div className="mb-1" style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+          <div className="mb-1" style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
             <ConsaludCore.Typography
               variant="h5"
               component="h1"
@@ -51,7 +57,7 @@ const CargaDocumentoPageContent: React.FC = () => {
                 textAlign: 'center', 
                 color: '#222', 
                 fontSize: '2rem',
-                marginBottom: '24px'
+                marginBottom: '1.5rem'
               }}
             >
               Carga de documentos
@@ -59,7 +65,7 @@ const CargaDocumentoPageContent: React.FC = () => {
           </div>
           
           {/* Stepper debajo del título */}
-          <div className="mb-5" style={{ marginBottom: '40px' }}>
+          <div className="mb-5" style={{ marginBottom: '2.5rem' }}>
             <Stepper step={step} />
           </div>
         </div>
@@ -73,20 +79,25 @@ const CargaDocumentoPageContent: React.FC = () => {
           </div>
         </div>
       </div>
-    </>
+      
+      {/* Espacio adicional para asegurar scroll */}
+      <div style={{ height: '8rem' }}></div>
+    </div>
   );
 };
 
 const CargaDocumentoPage: React.FC = () => {
   return (
     <StepperProvider>
-      <div className="route-container layout-stable" style={{ 
+      <div className="route-container layout-stable instant-stable navigation-stable no-flash" style={{ 
         overflowY: 'auto', 
-        height: '100vh', 
-        paddingBottom: 40,
-        backgroundColor: '#F8F9FA'
+        backgroundColor: '#F8F9FA',
+        padding: '0',
+        height: '100vh'
       }}>
-        <CargaDocumentoPageContent />
+        <div style={{ minHeight: '120vh', paddingBottom: '4rem' }}>
+          <CargaDocumentoPageContent />
+        </div>
       </div>
     </StepperProvider>
   );

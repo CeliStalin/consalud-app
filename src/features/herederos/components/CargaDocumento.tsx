@@ -184,30 +184,37 @@ const CargaDocumento: React.FC = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-      <div style={{ 
-        padding: '60px 90px',
+    <form onSubmit={handleSubmit} className="carga-documentos-form" style={{ width: '100%' }}>
+      <div className="carga-documentos-card" style={{ 
+        padding: '2rem 3rem',
         backgroundColor: '#FFFFFF',
-        borderRadius: '20px',
-        position: 'relative'
+        borderRadius: '1.25rem',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: 'fit-content',
+        maxHeight: 'fit-content',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
       }}>
         {/* Title */}
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: '12px',
-          marginBottom: '32px'
+          gap: '0.75rem',
+          marginBottom: '2rem',
+          flexShrink: 0
         }}>
           <div style={{
-            width: '40px',
-            height: '40px',
+            width: '2.5rem',
+            height: '2.5rem',
             borderRadius: '50%',
             backgroundColor: '#E8F8F7',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            flexShrink: 0
           }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="1.25rem" height="1.25rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 20V14" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M14 16L12 14L10 16" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M16 20H19C19.5305 20.0001 20.0393 19.7895 20.4144 19.4144C20.7895 19.0393 21.0001 18.5305 21 18V8.94C21 7.83545 20.1045 6.94005 19 6.94H12.529C12.1978 6.93999 11.8881 6.77596 11.702 6.502L10.297 4.437C10.1109 4.16368 9.80166 4.00008 9.471 4H5C4.46952 3.99985 3.96073 4.21052 3.58563 4.58563C3.21052 4.96073 2.99985 5.46952 3 6V18C2.99985 18.5305 3.21052 19.0393 3.58563 19.4144C3.96073 19.7895 4.46952 20.0001 5 20H8" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -220,7 +227,8 @@ const CargaDocumento: React.FC = () => {
             style={{ 
               fontSize: '1.25rem',
               color: '#505050',
-              margin: 0
+              margin: 0,
+              lineHeight: '1.4'
             }}
           >
             Carga de documentos
@@ -228,28 +236,34 @@ const CargaDocumento: React.FC = () => {
         </div>
         
         {/* Document sections - Renderizados dinámicamente */}
-        {tiposDocumento.map((tipo) => (
-          <DocumentUploadArea
-            key={tipo.valValor}
-            fileState={documentFiles[tipo.valValor] || { file: null, error: null }}
-            onFileChange={(e) => handleFileChange(e, tipo.valValor)}
-            onDivClick={() => {}} // El componente interno maneja el click
-            title={tipo.descripcion}
-            description={getDescriptionForTipo(tipo)}
-            onHelpClick={() => handleFlow(tipo)}
-            showHelp={true}
-          />
-        ))}
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '2rem'
+        }}>
+          {tiposDocumento.map((tipo) => (
+            <DocumentUploadArea
+              key={tipo.valValor}
+              fileState={documentFiles[tipo.valValor] || { file: null, error: null }}
+              onFileChange={(e) => handleFileChange(e, tipo.valValor)}
+              onDivClick={() => {}} // El componente interno maneja el click
+              title={tipo.descripcion}
+              description={getDescriptionForTipo(tipo)}
+              onHelpClick={() => handleFlow(tipo)}
+              showHelp={true}
+            />
+          ))}
+        </div>
         
         {/* Declaration checkbox */}
         <div style={{ 
-          marginTop: '32px',
-          marginBottom: '32px'
+          marginTop: '2rem',
+          marginBottom: '2rem'
         }}>
           <div style={{ 
             display: 'flex', 
             alignItems: 'flex-start', 
-            gap: '12px'
+            gap: '0.75rem'
           }}>
             <input 
               type="checkbox" 
@@ -257,20 +271,20 @@ const CargaDocumento: React.FC = () => {
               checked={checked}
               onChange={(e) => setChecked(e.target.checked)}
               style={{
-                width: '18px',
-                height: '18px',
-                marginTop: '2px',
+                width: '1.125rem',
+                height: '1.125rem',
+                marginTop: '0.125rem',
                 accentColor: '#00CBBF'
               }}
             />
-            <label htmlFor="confirmacion" style={{ cursor: 'pointer' }}>
+            <label htmlFor="confirmacion" style={{ cursor: 'pointer', flex: 1 }}>
               <ConsaludCore.Typography 
                 variant="body" 
                 component="span" 
                 style={{ 
-                  fontSize: '14px',
+                  fontSize: '0.875rem',
                   color: '#505050',
-                  lineHeight: '1.4'
+                  lineHeight: '1.5'
                 }}
               >
                 Declaro que revisé los documentos cargados, los cuales son verídicos y cumplen con los requisitos solicitados.
@@ -280,9 +294,12 @@ const CargaDocumento: React.FC = () => {
         </div>
         
         {/* Continue button */}
-        <div style={{ 
+        <div className="carga-documentos-button-container" style={{ 
           display: 'flex', 
-          justifyContent: 'center'
+          justifyContent: 'center',
+          marginTop: '0px',
+          marginBottom: '2rem',
+          padding: '1rem 0'
         }}>
           <button
             type="submit"
@@ -291,22 +308,27 @@ const CargaDocumento: React.FC = () => {
               backgroundColor: (!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading) ? '#E0E0E0' : '#00CBBF',
               color: '#FFFFFF',
               border: 'none',
-              borderRadius: '8px',
-              padding: '12px 32px',
-              fontSize: '16px',
+              borderRadius: '0.5rem',
+              padding: '0.75rem 2rem',
+              fontSize: '1rem',
               fontWeight: '600',
               cursor: (!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading) ? 'not-allowed' : 'pointer',
               transition: 'all 0.3s ease',
-              minWidth: '140px'
+              minWidth: '8.75rem',
+              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
             }}
             onMouseEnter={(e) => {
               if (!(!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading)) {
                 e.currentTarget.style.backgroundColor = '#00A59B';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
               }
             }}
             onMouseLeave={(e) => {
               if (!(!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading)) {
                 e.currentTarget.style.backgroundColor = '#00CBBF';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';
               }
             }}
           >

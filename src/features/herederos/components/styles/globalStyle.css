@@ -422,3 +422,226 @@
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out;
 }
+
+/* NUEVO: Estilos específicos para mejorar el scroll en la página de carga de documentos */
+.carga-documentos-container {
+  min-height: 100vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 5rem;
+}
+
+/* CRÍTICO: Sobrescribir las restricciones de altura del navigation-optimizations.css */
+.route-container.layout-stable.instant-stable.navigation-stable.no-flash {
+  min-height: auto !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+}
+
+.carga-documentos-page-container {
+  width: 100%;
+  min-height: auto !important;
+}
+
+.carga-documentos-header {
+  width: 100%;
+  background: #F8F9FA;
+  z-index: 10;
+  padding-bottom: 1rem;
+}
+
+.carga-documentos-form {
+  width: 100%;
+}
+
+.carga-documentos-card {
+  min-height: fit-content;
+  max-height: fit-content;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  margin: 0 1rem 2rem 1rem;
+}
+
+.carga-documentos-button-container {
+  position: relative;
+  background: white;
+  padding: 1rem 0;
+  margin-top: 1.25rem;
+  z-index: 10;
+}
+
+/* Asegurar que el contenido del formulario sea accesible */
+.generalContainer {
+  padding: 0 1rem;
+}
+
+.card-responsive {
+  max-width: 50rem;
+  margin: 0 auto;
+}
+
+.card-center-container {
+  width: 100%;
+}
+
+/* Contenedor de documentos dinámicos */
+.carga-documentos-card > div:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Asegurar que el scroll funcione correctamente en dispositivos móviles */
+@media screen and (max-width: 768px) {
+  .carga-documentos-container {
+    padding-bottom: 3.75rem;
+  }
+  
+  .carga-documentos-card {
+    margin: 0 0.5rem;
+  }
+  
+  .carga-documentos-button-container {
+    padding: 0.75rem 0;
+  }
+  
+  .generalContainer {
+    padding: 0 0.5rem;
+  }
+  
+  .card-responsive {
+    max-width: 100%;
+  }
+  
+  .carga-documentos-header {
+    margin-bottom: 1rem;
+  }
+  
+  .carga-documentos-header > div {
+    margin-left: 1rem !important;
+  }
+}
+
+/* Optimizaciones para el scroll suave */
+.route-container.layout-stable.instant-stable.navigation-stable.no-flash {
+  scroll-behavior: smooth;
+  overflow-y: auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mejoras para el botón */
+.carga-documentos-button-container button {
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.carga-documentos-button-container button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.carga-documentos-button-container button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Mejoras para el área de upload */
+.document-upload-area {
+  transition: all 0.3s ease;
+  border: 2px dashed #E0E0E0;
+  border-radius: 0.75rem;
+  background-color: #FAFAFA;
+}
+
+.document-upload-area:hover {
+  border-color: #00CBBF !important;
+  background-color: #F0FDFC !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Responsive para pantallas pequeñas */
+@media screen and (max-width: 480px) {
+  .carga-documentos-card {
+    padding: 1.5rem 1rem !important;
+  }
+  
+  .carga-documentos-card > div:first-child {
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .carga-documentos-card > div:nth-child(2) {
+    gap: 1.5rem;
+  }
+  
+  .carga-documentos-button-container {
+    padding: 0.5rem 0;
+  }
+}
+
+/* Responsive para pantallas medianas */
+@media screen and (min-width: 481px) and (max-width: 1024px) {
+  .carga-documentos-card {
+    padding: 2rem 2rem !important;
+  }
+  
+  .card-responsive {
+    max-width: 40rem;
+  }
+}
+
+/* Responsive para pantallas grandes */
+@media screen and (min-width: 1025px) {
+  .carga-documentos-card {
+    padding: 2rem 3rem !important;
+  }
+  
+  .card-responsive {
+    max-width: 50rem;
+  }
+}
+
+/* Asegurar que el stepper no interfiera con el scroll */
+.carga-documentos-header .mb-5 {
+  margin-bottom: 2.5rem !important;
+}
+
+/* Optimizaciones específicas para el scroll principal */
+.carga-documentos-page-container {
+  contain: layout style;
+}
+
+.carga-documentos-header {
+  contain: layout style;
+}
+
+.card-center-container {
+  contain: layout style;
+}
+
+/* Asegurar que el scroll principal funcione correctamente */
+.route-container.layout-stable.instant-stable.navigation-stable.no-flash {
+  scrollbar-width: thin;
+  scrollbar-color: #00CBBF #f0f0f0;
+}
+
+.route-container.layout-stable.instant-stable.navigation-stable.no-flash::-webkit-scrollbar {
+  width: 8px;
+}
+
+.route-container.layout-stable.instant-stable.navigation-stable.no-flash::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.route-container.layout-stable.instant-stable.navigation-stable.no-flash::-webkit-scrollbar-thumb {
+  background: #00CBBF;
+  border-radius: 4px;
+}
+
+.route-container.layout-stable.instant-stable.navigation-stable.no-flash::-webkit-scrollbar-thumb:hover {
+  background: #00A59B;
+}

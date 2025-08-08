@@ -62,15 +62,15 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
   }, [validateFile, onFileChange]);
 
   return (
-    <div style={{ marginBottom: '32px' }}>
+    <div style={{ marginBottom: '0px', flexShrink: 0 }}>
       {/* Header with title and help icon */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'flex-start',
-        marginBottom: '12px'
+        marginBottom: '0.75rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1 }}>
           <ConsaludCore.Typography 
             variant="body" 
             component="h3" 
@@ -78,15 +78,17 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
             style={{ 
               fontSize: '1rem',
               color: '#505050',
-              margin: 0
+              margin: 0,
+              lineHeight: '1.4'
             }}
           >
             {title}
           </ConsaludCore.Typography>
           <span style={{ 
             color: '#FF5252', 
-            fontSize: '12px',
-            fontWeight: 'bold'
+            fontSize: '0.75rem',
+            fontWeight: 'bold',
+            flexShrink: 0
           }}>
             Obligatorio
           </span>
@@ -100,10 +102,11 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
               cursor: 'pointer', 
               display: 'flex', 
               alignItems: 'center', 
-              gap: '4px',
-              padding: '4px 8px',
-              borderRadius: '6px',
-              transition: 'background-color 0.2s ease'
+              gap: '0.25rem',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '0.375rem',
+              transition: 'background-color 0.2s ease',
+              flexShrink: 0
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#F0FDFC';
@@ -117,13 +120,13 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
               component="span" 
               weight="bold"
               style={{ 
-                fontSize: '12px',
+                fontSize: '0.75rem',
                 color: '#00CBBF'
               }}
             >
               Ejemplo
             </ConsaludCore.Typography>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="1rem" height="1rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="9" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M9.09 9C9.3251 8.33147 9.78915 7.76811 10.4 7.40921C11.0108 7.0503 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52252 14.2151 8.06398C14.6713 8.60543 14.9211 9.30197 14.92 10.02C14.92 12 11.92 13 11.92 13" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M12 17H12.01" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -137,10 +140,10 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
         variant="caption" 
         component="p" 
         style={{ 
-          fontSize: '12px',
+          fontSize: '0.75rem',
           color: '#656565',
-          marginBottom: '16px',
-          lineHeight: '1.4'
+          marginBottom: '1rem',
+          lineHeight: '1.5'
         }}
       >
         {description}
@@ -153,11 +156,11 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
         style={{ 
           cursor: 'pointer',
           border: '2px dashed #E0E0E0',
-          borderRadius: '12px',
-          padding: '32px 24px',
+          borderRadius: '0.75rem',
+          padding: '2rem 1.5rem',
           backgroundColor: '#FAFAFA',
           transition: 'all 0.3s ease',
-          marginTop: '16px'
+          marginTop: '1rem'
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.borderColor = '#00CBBF';
@@ -181,16 +184,16 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
           display: 'flex', 
           flexDirection: 'column', 
           alignItems: 'center', 
-          gap: '16px',
+          gap: '1rem',
           textAlign: 'center'
         }}>
           {/* File name or upload text with icon */}
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
-            gap: '8px'
+            gap: '0.5rem'
           }}>
-            <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="1.5625rem" height="1.5625rem" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="3.5" y="3.94336" width="18" height="18" rx="5.55556" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M15.5 16.9434H9.5" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M10.498 10.9434L12.499 8.94336L14.5 10.9434" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -204,7 +207,8 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
                 style={{ 
                   fontSize: '1rem',
                   color: fileState.file ? '#00CBBF' : '#505050',
-                  margin: 0
+                  margin: 0,
+                  lineHeight: '1.4'
                 }}
               >
                 {fileState.file ? fileState.file.name : 'Cargar archivos'}
@@ -212,9 +216,10 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
             ) : (
               <p style={{ 
                 fontWeight: 500,
-                fontSize: '16px',
+                fontSize: '1rem',
                 color: fileState.file ? '#00CBBF' : '#505050',
-                margin: 0
+                margin: 0,
+                lineHeight: '1.4'
               }}>
                 {fileState.file ? fileState.file.name : 'Cargar archivos'}
               </p>
@@ -226,17 +231,18 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
             {fileState.error ? (
               <p style={{ 
                 color: '#FF5252', 
-                fontSize: '12px',
-                margin: 0
+                fontSize: '0.75rem',
+                margin: 0,
+                lineHeight: '1.4'
               }}>
                 {fileState.error}
               </p>
             ) : (
               <p style={{ 
-                fontSize: '12px',
+                fontSize: '0.75rem',
                 color: '#656565',
                 margin: 0,
-                lineHeight: '1.4'
+                lineHeight: '1.5'
               }}>
                 Puedes adjuntar imágenes o documentos en formato JPG, PNG o PDF con un peso máximo de 6MB.
               </p>
