@@ -44,18 +44,25 @@ import cartaPosesion from '../components/styles/img/posesion.png';
           confirmButtonColor: '#04A59B',
           showCloseButton: true,
           confirmButtonText: 'Entendido',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
           customClass:{
             confirmButton: 'boton-alerta',
             title: 'titulo-alerta',
             htmlContainer : 'sub-titulo-alerta'
           } 
+        }).then((result) => {
+          // Asegurar que la alerta se cierre correctamente
+          if (result.isConfirmed) {
+            Swal.close();
+          }
         });
       };
 
       const mostrarAlertaTitularHeredero = () => {
         Swal.fire({
           title: 'El titular y el heredero es el mismo',
-          text: 'El RUT ingresado corresponde al titular. Por favor, ingrese el RUT de una persona heredera diferente.',
+          text: 'El RUT ingresado corresponde a<l titular. Por favor, ingrese el RUT de una persona heredera diferente.',
           confirmButtonColor: '#04A59B',
           showCloseButton: true,
           confirmButtonText: 'Entendido',

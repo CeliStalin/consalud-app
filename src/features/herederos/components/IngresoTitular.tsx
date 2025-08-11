@@ -78,7 +78,12 @@ const IngresoTitular: React.FC = () => {
                 return;
             }
         } catch (e) {
-            setShowStepperError(true);
+            // Si hay un error específico de "no encontrado", mostrar la alerta correspondiente
+            if (error === 'No hay solicitantes en maestro de contactibilidad') {
+                mostrarAlerta3();
+            } else {
+                setShowStepperError(true);
+            }
             return;
         }
         // Navega solo si el contexto se setea correctamente y la persona está fallecida y tiene devolución
@@ -92,7 +97,7 @@ const IngresoTitular: React.FC = () => {
                 console.log('NO NAVEGA: titular en contexto/sessionStorage no coincide o no cumple condiciones');
             }
         }, 0);
-    }, [isValidRut, rut, buscarTitular, goToRequisitosTitular, mostrarAlerta, mostrarAlerta2]);
+    }, [isValidRut, rut, buscarTitular, goToRequisitosTitular, mostrarAlerta, mostrarAlerta2, mostrarAlerta3, error]);
 
     // Feedback visual para error inesperado (modal)
     const renderStepperError = () => (
@@ -127,12 +132,12 @@ const IngresoTitular: React.FC = () => {
         </div>
     );
 
-    // Abrir modal cuando error 404 - solo cuando hay un error específico
-    useEffect(() => {
-        if (error === 'No hay solicitantes en maestro de contactibilidad') {
-            mostrarAlerta3();
-        }
-    }, [error, mostrarAlerta3]);
+    // Ya no necesitamos este useEffect porque la alerta se maneja en handleFlow
+    // useEffect(() => {
+    //     if (error === 'No hay solicitantes en maestro de contactibilidad' && !hasShownErrorAlert) {
+    //         mostrarAlerta3();
+    //     }
+    // }, [error, hasShownErrorAlert, mostrarAlerta3]);
 
     // --- RETURNS CONDICIONALES DESPUÉS DE LOS HOOKS ---
     // Render principal (formulario) + overlay modal si corresponde
