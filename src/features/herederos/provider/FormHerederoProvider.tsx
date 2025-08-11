@@ -171,7 +171,8 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
 
     // Validaciones básicas - todos los campos requeridos según la especificación
     const requiredFields: (keyof FormData)[] = [
-      'nombres', 'apellidoPaterno', 'apellidoMaterno', 
+      'nombres', 
+      // 'apellidoPaterno', 'apellidoMaterno', // Los apellidos ya no son requeridos
       'fechaNacimiento', 'telefono', 'correoElectronico',
       'sexo', 'parentesco'
     ];

@@ -49,8 +49,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   const [localFormData, setLocalFormData] = useState<FormData>({
     fechaNacimiento: formData?.fechaNacimiento || (heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null),
     nombres: formData?.nombres || heredero?.nombre || '',
-    apellidoPaterno: formData?.apellidoPaterno || heredero?.apellidoPat || '',
-    apellidoMaterno: formData?.apellidoMaterno || heredero?.apellidoMat || '',
+    apellidoPaterno: formData?.apellidoPaterno || heredero?.apellidoPat || undefined, // Campo opcional
+    apellidoMaterno: formData?.apellidoMaterno || heredero?.apellidoMat || undefined, // Campo opcional
     sexo: formData?.sexo || (heredero?.Genero ? heredero.Genero : ''),
     parentesco: formData?.parentesco || '',
     telefono: formData?.telefono || heredero?.contactabilidad.telefono.numero || '',
@@ -518,15 +518,16 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       isValid = false;
     }
 
-    if (!localFormData.apellidoPaterno.trim()) {
-      newErrors.apellidoPaterno = 'El apellido paterno es requerido';
-      isValid = false;
-    }
+    // Los campos de apellidos ya no son requeridos
+    // if (!localFormData.apellidoPaterno.trim()) {
+    //   newErrors.apellidoPaterno = 'El apellido paterno es requerido';
+    //   isValid = false;
+    // }
 
-    if (!localFormData.apellidoMaterno.trim()) {
-      newErrors.apellidoMaterno = 'El apellido materno es requerido';
-      isValid = false;
-    }
+    // if (!localFormData.apellidoMaterno.trim()) {
+    //   newErrors.apellidoMaterno = 'El apellido materno es requerido';
+    //   isValid = false;
+    // }
 
     if (!localFormData.telefono.trim()) {
       newErrors.telefono = 'El teléfono es requerido';

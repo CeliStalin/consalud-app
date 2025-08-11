@@ -1,8 +1,8 @@
 export interface FormData {
   fechaNacimiento: Date | null;
   nombres: string;
-  apellidoPaterno: string;
-  apellidoMaterno: string;
+  apellidoPaterno?: string; // Ya no es requerido
+  apellidoMaterno?: string; // Ya no es requerido
   sexo: string;
   parentesco: string;
   telefono: string;
