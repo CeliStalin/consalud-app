@@ -52,21 +52,6 @@ import cartaPosesion from '../components/styles/img/posesion.png';
         });
       };
 
-      const mostrarAlerta4 = () => {
-        Swal.fire({
-          title: 'RUT no encontrado en Consalud',
-          text: 'El RUT ingresado no esta asociado a ningún afiliado o exafiliado de Consalud.',
-          confirmButtonColor: '#04A59B',
-          showCloseButton: true,
-          confirmButtonText: 'Entendido',
-          customClass:{
-            confirmButton: 'boton-alerta',
-            title: 'titulo-alerta',
-            htmlContainer : 'sub-titulo-alerta'
-          } 
-        });
-      };
-
       const mostrarAlertaTitularHeredero = () => {
         Swal.fire({
           title: 'El titular y el heredero es el mismo',
@@ -175,7 +160,6 @@ import cartaPosesion from '../components/styles/img/posesion.png';
         mostrarAlerta,
         mostrarAlerta2,
         mostrarAlerta3,
-        mostrarAlerta4,
         mostrarAlertaTitularHeredero,
         ejemploCedula,
         ejemploPoder,

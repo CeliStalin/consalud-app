@@ -7,6 +7,7 @@ import '../../../pages/styles/IngresoHerederosPage.css';
 import { useTitular } from "../contexts/TitularContext";
 import UserProfileIcon from '@/assets/user-profile.svg';
 import RutErrorMessage from './RutErrorMessage';
+import { UseAlert } from "../hooks/Alert";
 
 /**
  * Componente robusto para el ingreso de RUT del titular.
@@ -17,8 +18,24 @@ const IngresoTitular: React.FC = () => {
     const { goToRequisitosTitular } = useHerederoNavigation();
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
-    const { buscarTitular, error, loading, titular, limpiarTitular } = useTitular();
+    const { buscarTitular, error, loading } = useTitular();
     const [showStepperError, setShowStepperError] = useState(false);
+    
+    // Hook de alertas - se ejecuta solo una vez
+    const alertFunctions = UseAlert();
+    
+    // Memoizar las funciones de alerta para evitar recreaciones
+    const mostrarAlerta = useCallback(() => {
+        alertFunctions.mostrarAlerta();
+    }, [alertFunctions]);
+    
+    const mostrarAlerta2 = useCallback(() => {
+        alertFunctions.mostrarAlerta2();
+    }, [alertFunctions]);
+    
+    const mostrarAlerta3 = useCallback(() => {
+        alertFunctions.mostrarAlerta3();
+    }, [alertFunctions]);
 
     // Resetear navegación y errores al cambiar el RUT
     useEffect(() => {
@@ -52,10 +69,12 @@ const IngresoTitular: React.FC = () => {
             const titularResult = await buscarTitular(rut);
             // Bloquear avance si la persona está vigente (no fallecida)
             if (titularResult && titularResult.indFallecido === 'N') {
+                mostrarAlerta();
                 return;
             }
             // Bloquear avance si la persona está fallecida pero no tiene devolución
             if (titularResult && titularResult.indFallecido === 'S' && !titularResult.poseeFondos) {
+                mostrarAlerta2();
                 return;
             }
         } catch (e) {
@@ -73,9 +92,7 @@ const IngresoTitular: React.FC = () => {
                 console.log('NO NAVEGA: titular en contexto/sessionStorage no coincide o no cumple condiciones');
             }
         }, 0);
-    }, [isValidRut, rut, buscarTitular, goToRequisitosTitular]);
-
-    // Feedback visual para error de validación de RUT
+    }, [isValidRut, rut, buscarTitular, goToRequisitosTitular, mostrarAlerta, mostrarAlerta2]);
 
     // Feedback visual para error inesperado (modal)
     const renderStepperError = () => (
@@ -110,132 +127,17 @@ const IngresoTitular: React.FC = () => {
         </div>
     );
 
-    // Estados para animación avanzada del modal
-    const [isOpen, setIsOpen] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
-
-    // Abrir modal cuando error 404
+    // Abrir modal cuando error 404 - solo cuando hay un error específico
     useEffect(() => {
         if (error === 'No hay solicitantes en maestro de contactibilidad') {
-            setIsOpen(true);
-            setTimeout(() => setIsVisible(true), 10); // delay para animación
-        } else {
-            if (isOpen) {
-                setIsVisible(false);
-                setTimeout(() => setIsOpen(false), 350); // igual a duración animación CSS
-            }
+            mostrarAlerta3();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [error]);
-
-    // Handler para cerrar modal
-    const handleCloseModal = () => {
-        setIsVisible(false);
-        setTimeout(() => setIsOpen(false), 350);
-    };
-
-    // Nuevo modal: persona no fallecida
-    const [isOpenVigente, setIsOpenVigente] = useState(false);
-    const [isVisibleVigente, setIsVisibleVigente] = useState(false);
-
-    // Detectar si el titular está vigente (IndFallecido === 'N')
-    useEffect(() => {
-        if (titular && titular.indFallecido === 'N') {
-            setIsOpenVigente(true);
-            setTimeout(() => setIsVisibleVigente(true), 10);
-        } else {
-            if (isOpenVigente) {
-                setIsVisibleVigente(false);
-                setTimeout(() => setIsOpenVigente(false), 350);
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [titular]);
-
-    const handleCloseVigenteModal = () => {
-        setIsVisibleVigente(false);
-        setTimeout(() => setIsOpenVigente(false), 350);
-        limpiarTitular(); // Limpiar contexto para evitar loops
-    };
-
-    // Nuevo modal: fallecido sin devolución
-    const [isOpenSinDevolucion, setIsOpenSinDevolucion] = useState(false);
-    const [isVisibleSinDevolucion, setIsVisibleSinDevolucion] = useState(false);
-
-    useEffect(() => {
-        if (titular && titular.indFallecido === 'S' && !titular.poseeFondos) {
-            setIsOpenSinDevolucion(true);
-            setTimeout(() => setIsVisibleSinDevolucion(true), 10);
-        } else {
-            if (isOpenSinDevolucion) {
-                setIsVisibleSinDevolucion(false);
-                setTimeout(() => setIsOpenSinDevolucion(false), 350);
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [titular]);
-
-    const handleCloseSinDevolucionModal = () => {
-        setIsVisibleSinDevolucion(false);
-        setTimeout(() => setIsOpenSinDevolucion(false), 350);
-        limpiarTitular();
-    };
+    }, [error, mostrarAlerta3]);
 
     // --- RETURNS CONDICIONALES DESPUÉS DE LOS HOOKS ---
     // Render principal (formulario) + overlay modal si corresponde
     return (
         <>
-            {/* Modal de persona vigente (no fallecida) */}
-            {isOpenVigente && (
-                <div className="modal-overlay fade-in" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.08)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.3s' }}>
-                    <div className={`swal2-modal ${isVisibleVigente ? 'modal-zoom-in' : 'modal-zoom-out'}`} style={{ background: '#fff', borderRadius: 20, padding: '2rem', width: 400, maxWidth: '90%', boxShadow: '0 4px 24px rgba(0,0,0,0.10)', position: 'relative', transition: 'transform 0.35s, opacity 0.35s' }}>
-                        <button className="swal-close-button" style={{ position: 'absolute', top: 15, right: 15, background: '#f0f0f0', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 24, color: '#666', cursor: 'pointer' }} onClick={handleCloseVigenteModal} aria-label="Cerrar modal">×</button>
-                        <div className="titulo-alerta" style={{ color: '#222', fontWeight: 700, fontSize: 22, marginBottom: 16, textAlign: 'center' }}>No es posible continuar con este RUT</div>
-                        <div className="sub-titulo-alerta" style={{ color: '#555', fontSize: 16, marginBottom: 32, textAlign: 'center' }}>
-                            La persona sigue vigente en Consalud y no aparece como fallecida.
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <button className="boton-alerta" style={{ background: '#04A59B', color: '#fff', fontSize: 16, padding: '12px 45px', borderRadius: 50, fontWeight: 500, border: 'none', minWidth: 160, cursor: 'pointer' }} onClick={handleCloseVigenteModal}>
-                                Entendido
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            {/* Modal de RUT no encontrado */}
-            {isOpen && (
-                <div className="modal-overlay fade-in" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.08)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.3s' }}>
-                    <div className={`swal2-modal ${isVisible ? 'modal-zoom-in' : 'modal-zoom-out'}`} style={{ background: '#fff', borderRadius: 20, padding: '2rem', width: 400, maxWidth: '90%', boxShadow: '0 4px 24px rgba(0,0,0,0.10)', position: 'relative', transition: 'transform 0.35s, opacity 0.35s' }}>
-                        <button className="swal-close-button" style={{ position: 'absolute', top: 15, right: 15, background: '#f0f0f0', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 24, color: '#666', cursor: 'pointer' }} onClick={handleCloseModal} aria-label="Cerrar modal">×</button>
-                        <div className="titulo-alerta" style={{ color: '#222', fontWeight: 700, fontSize: 22, marginBottom: 16, textAlign: 'center' }}>RUT no encontrado en Consalud</div>
-                        <div className="sub-titulo-alerta" style={{ color: '#555', fontSize: 16, marginBottom: 32, textAlign: 'center' }}>
-                            El RUT ingresado no esta asociado a ningún afiliado o exafiliado de Consalud.
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <button className="boton-alerta" style={{ background: '#04A59B', color: '#fff', fontSize: 16, padding: '12px 45px', borderRadius: 50, fontWeight: 500, border: 'none', minWidth: 160, cursor: 'pointer' }} onClick={handleCloseModal}>
-                                Entendido
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            {/* Modal fallecido sin devolución */}
-            {isOpenSinDevolucion && (
-                <div className="modal-overlay fade-in" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.08)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.3s' }}>
-                    <div className={`swal2-modal ${isVisibleSinDevolucion ? 'modal-zoom-in' : 'modal-zoom-out'}`} style={{ background: '#fff', borderRadius: 20, padding: '2rem', width: 400, maxWidth: '90%', boxShadow: '0 4px 24px rgba(0,0,0,0.10)', position: 'relative', transition: 'transform 0.35s, opacity 0.35s' }}>
-                        <button className="swal-close-button" style={{ position: 'absolute', top: 15, right: 15, background: '#f0f0f0', border: 'none', borderRadius: '50%', width: 40, height: 40, fontSize: 24, color: '#666', cursor: 'pointer' }} onClick={handleCloseSinDevolucionModal} aria-label="Cerrar modal">×</button>
-                        <div className="titulo-alerta" style={{ color: '#222', fontWeight: 700, fontSize: 22, marginBottom: 16, textAlign: 'center' }}>EL RUT ingresado no tiene devolución</div>
-                        <div className="sub-titulo-alerta" style={{ color: '#555', fontSize: 16, marginBottom: 32, textAlign: 'center' }}>
-                            {/* Puedes agregar un subtítulo si lo deseas */}
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <button className="boton-alerta" style={{ background: '#04A59B', color: '#fff', fontSize: 16, padding: '12px 45px', borderRadius: 50, fontWeight: 500, border: 'none', minWidth: 160, cursor: 'pointer' }} onClick={handleCloseSinDevolucionModal}>
-                                Entendido
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
             <div className="route-container layout-stable" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
                 {showStepperError && renderStepperError()}
                 <ConsaludCore.Typography variant="h5" style={{ fontWeight: 700, color: '#222', marginBottom: 24, textAlign: 'center' }}>
