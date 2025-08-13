@@ -8,6 +8,7 @@ import { HerederoContext } from "../contexts/HerederoContext";
 import { useRutChileno } from "../hooks/useRutChileno";
 import { fetchSolicitanteMejorContactibilidad } from "../services";
 import { validarEdadConMensaje, MENSAJES_ERROR } from "../../../utils/ageValidation";
+import { formatearRut } from "../../../utils/rutValidation";
 
 export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) => {
   const [heredero, setHeredero] = useState<Heredero | null>(null);
@@ -21,7 +22,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
   const createEmptyHeredero = (rut: string): Heredero => {
     return {
       id: 0,
-      rut: rut,
+      rut: formatearRut(rut),
       fechaNacimiento: '',
       nombre: '',
       apellidoPat: '',
@@ -110,7 +111,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
           // Mapear la respuesta del BFF al modelo Heredero
           const herederoData: Heredero = {
             id: response.SolicitanteInMae.IdPersona,
-            rut: `${response.SolicitanteInMae.RutPersona}-${response.SolicitanteInMae.RutDigito}`,
+            rut: formatearRut(`${response.SolicitanteInMae.RutPersona}${response.SolicitanteInMae.RutDigito}`),
             fechaNacimiento: response.SolicitanteInMae.FecNacimiento,
             nombre: response.SolicitanteInMae.NomPersona,
             apellidoPat: response.SolicitanteInMae.ApePaterno,

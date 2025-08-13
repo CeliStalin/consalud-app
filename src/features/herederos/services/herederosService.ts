@@ -2,6 +2,7 @@ import { Titular } from '../interfaces/Titular';
 import { SolicitanteResponse } from '../interfaces/Solicitante';
 import { Genero, Ciudad, Comuna, Calle, Region, TipoDocumento } from '../interfaces/Pargen';
 import { apiGet, getHerederosApiConfig } from './apiUtils';
+import { formatearRut } from '../../../utils/rutValidation';
 
 /**
  * Servicio para gestión de herederos
@@ -26,7 +27,7 @@ export class HerederosService {
       // Mapear la respuesta del BFF al modelo Titular
       const titular: Titular = {
         id: data.IdPersona,
-        rut: `${data.RutPersona}-${data.RutDigito}`,
+        rut: formatearRut(`${data.RutPersona}${data.RutDigito}`),
         nombre: data.NomPersona,
         apellidoPat: data.ApePaterno,
         apellidoMat: data.ApeMaterno,
