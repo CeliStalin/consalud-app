@@ -1,6 +1,6 @@
 import { Titular } from '../interfaces/Titular';
 import { SolicitanteResponse } from '../interfaces/Solicitante';
-import { Genero, Ciudad, Comuna, Calle, Region, TipoDocumento } from '../interfaces/Pargen';
+import { Genero, Ciudad, Comuna, Calle, NumeroCalle, Region, TipoDocumento } from '../interfaces/Pargen';
 import { apiGet, getHerederosApiConfig, buildHeaders } from './apiUtils';
 import { formatearRut } from '../../../utils/rutValidation';
 
@@ -114,6 +114,16 @@ export class HerederosService {
   }
 
   /**
+   * Obtiene la lista de números para una calle específica en una comuna
+   * @param nombreCalle - Nombre de la calle
+   * @param idComuna - ID de la comuna
+   */
+  async getNumerosCalle(nombreCalle: string, idComuna: number): Promise<NumeroCalle[]> {
+    const url = `${this.config.baseUrl}/api/Pargen/numeroCalle?nombreCalle=${encodeURIComponent(nombreCalle)}&idComuna=${idComuna}`;
+    return apiGet<NumeroCalle[]>(url, this.config, 'obtener números de calle');
+  }
+
+  /**
    * Obtiene la lista de tipos de documentos
    */
   async getTiposDocumento(): Promise<TipoDocumento[]> {
@@ -209,6 +219,7 @@ export const fetchRegiones = () => herederosService.getRegiones();
 export const fetchCiudades = (idRegion?: number) => herederosService.getCiudades(idRegion);
 export const fetchComunasPorCiudad = (idCiudad: number) => herederosService.getComunasPorCiudad(idCiudad);
 export const fetchCallesPorComuna = (idComuna: number) => herederosService.getCallesPorComuna(idComuna); 
+export const fetchNumerosCalle = (nombreCalle: string, idComuna: number) => herederosService.getNumerosCalle(nombreCalle, idComuna); 
 export const fetchTiposDocumento = () => herederosService.getTiposDocumento(); 
 export const validarCorreoElectronico = (rut: number, email: string, userName: string = "") => 
   herederosService.validarCorreoElectronico(rut, email, userName);

@@ -1,23 +1,19 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './styles/AutoCompleteInput.css';
-
-interface NumberAutoCompleteOption {
-  value: string;
-  label: string;
-  id?: number;
-}
+import { useNumerosCalleAutocomplete } from '../hooks/useNumerosCalleAutocomplete';
+import { NumeroCalle } from '../interfaces/Pargen';
 
 interface NumberAutoCompleteInputProps {
   name: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onOptionSelect?: (option: NumberAutoCompleteOption) => void;
-  options: NumberAutoCompleteOption[];
+  onOptionSelect?: (option: NumeroCalle) => void;
+  nombreCalle?: string;
+  idComuna?: number;
   placeholder?: string;
   label?: string;
   error?: boolean;
   disabled?: boolean;
-  loading?: boolean;
   minCharsToSearch?: number;
   debounceMs?: number;
 }
@@ -27,40 +23,32 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
   value,
   onChange,
   onOptionSelect,
-  options,
+  nombreCalle,
+  idComuna,
   placeholder = 'Ingresar',
   label,
   error = false,
   disabled = false,
-  loading = false,
   minCharsToSearch = 1,
   debounceMs = 200
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [filteredOptions, setFilteredOptions] = useState<NumberAutoCompleteOption[]>([]);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [inputValue, setInputValue] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Hook para autocompletado de números
+  const { numeros, loading, error: apiError, searchNumeros, clearNumeros } = useNumerosCalleAutocomplete({
+    nombreCalle,
+    idComuna
+  });
+
   // Actualizar inputValue cuando cambia el value prop
   useEffect(() => {
     setInputValue(value);
   }, [value]);
-
-  // Filtrar opciones basado en el texto ingresado
-  const filterOptions = useCallback((searchText: string) => {
-    if (searchText.length < minCharsToSearch) {
-      setFilteredOptions([]);
-      return;
-    }
-
-    const filtered = options.filter(option =>
-      option.label.toLowerCase().includes(searchText.toLowerCase())
-    );
-    setFilteredOptions(filtered);
-  }, [options, minCharsToSearch]);
 
   // Debounce para la búsqueda
   useEffect(() => {
@@ -69,7 +57,11 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
     }
 
     debounceTimeoutRef.current = setTimeout(() => {
-      filterOptions(inputValue);
+      if (inputValue.length >= minCharsToSearch) {
+        searchNumeros(inputValue);
+      } else {
+        clearNumeros();
+      }
     }, debounceMs);
 
     return () => {
@@ -77,7 +69,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
         clearTimeout(debounceTimeoutRef.current);
       }
     };
-  }, [inputValue, filterOptions, debounceMs]);
+  }, [inputValue, searchNumeros, clearNumeros, minCharsToSearch, debounceMs]);
 
   // Manejar cambios en el input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,8 +83,8 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
   };
 
   // Manejar selección de opción
-  const handleOptionSelect = (option: NumberAutoCompleteOption) => {
-    setInputValue(option.label);
+  const handleOptionSelect = (numero: NumeroCalle) => {
+    setInputValue(numero.numeroCalle.toString());
     setIsOpen(false);
     setHighlightedIndex(-1);
     
@@ -100,38 +92,38 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
     const syntheticEvent = {
       target: {
         name,
-        value: option.label
+        value: numero.numeroCalle.toString()
       }
     } as React.ChangeEvent<HTMLInputElement>;
     
     onChange(syntheticEvent);
     
     if (onOptionSelect) {
-      onOptionSelect(option);
+      onOptionSelect(numero);
     }
   };
 
   // Manejar navegación con teclado
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen || filteredOptions.length === 0) return;
+    if (!isOpen || numeros.length === 0) return;
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
         setHighlightedIndex(prev => 
-          prev < filteredOptions.length - 1 ? prev + 1 : 0
+          prev < numeros.length - 1 ? prev + 1 : 0
         );
         break;
       case 'ArrowUp':
         e.preventDefault();
         setHighlightedIndex(prev => 
-          prev > 0 ? prev - 1 : filteredOptions.length - 1
+          prev > 0 ? prev - 1 : numeros.length - 1
         );
         break;
       case 'Enter':
         e.preventDefault();
         if (highlightedIndex >= 0) {
-          handleOptionSelect(filteredOptions[highlightedIndex]);
+          handleOptionSelect(numeros[highlightedIndex]);
         }
         break;
       case 'Escape':
@@ -162,7 +154,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
 
   // Manejar focus
   const handleFocus = () => {
-    if (inputValue.length >= minCharsToSearch && filteredOptions.length > 0) {
+    if (inputValue.length >= minCharsToSearch && numeros.length > 0) {
       setIsOpen(true);
     }
   };
@@ -176,6 +168,9 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
     }, 150);
   };
 
+  // Determinar si el campo debe estar deshabilitado
+  const isDisabled = disabled || !nombreCalle || !idComuna;
+
   return (
     <div className="autocomplete-container" ref={dropdownRef}>
       {label && (
@@ -186,7 +181,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
         <div className={`control has-icons-right ${loading ? 'is-loading' : ''}`}>
           <input
             ref={inputRef}
-            className={`input ${error ? 'is-danger' : ''} ${disabled ? 'is-static' : ''}`}
+            className={`input ${error ? 'is-danger' : ''} ${isDisabled ? 'is-static' : ''}`}
             type="text"
             name={name}
             value={inputValue}
@@ -194,8 +189,8 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
             onKeyDown={handleKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlur}
-            placeholder={placeholder}
-            disabled={disabled}
+            placeholder={!nombreCalle || !idComuna ? 'Seleccione calle primero' : placeholder}
+            disabled={isDisabled}
             autoComplete="off"
             aria-autocomplete="list"
             aria-expanded={isOpen}
@@ -212,18 +207,18 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
       </div>
 
       {/* Dropdown de opciones */}
-      {isOpen && filteredOptions.length > 0 && (
+      {isOpen && numeros.length > 0 && (
         <div className="autocomplete-dropdown">
           <ul className="autocomplete-list" role="listbox">
-            {filteredOptions.map((option, index) => (
+            {numeros.map((numero, index) => (
               <li
-                key={option.id || index}
+                key={numero.idDireccion || index}
                 className={`autocomplete-item ${index === highlightedIndex ? 'is-highlighted' : ''}`}
-                onClick={() => handleOptionSelect(option)}
+                onClick={() => handleOptionSelect(numero)}
                 role="option"
                 aria-selected={index === highlightedIndex}
               >
-                {option.label}
+                {numero.numeroCalle}
               </li>
             ))}
           </ul>
@@ -231,12 +226,17 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
       )}
 
       {/* Mensaje cuando no hay resultados */}
-      {isOpen && inputValue.length >= minCharsToSearch && filteredOptions.length === 0 && !loading && (
+      {isOpen && inputValue.length >= minCharsToSearch && numeros.length === 0 && !loading && (
         <div className="autocomplete-dropdown">
           <div className="autocomplete-no-results">
-            <p className="has-text-grey">No se encontraron resultados</p>
+            <p className="has-text-grey">No se encontraron números</p>
           </div>
         </div>
+      )}
+
+      {/* Mostrar error de API si existe */}
+      {apiError && (
+        <p className="help is-danger">{apiError}</p>
       )}
     </div>
   );

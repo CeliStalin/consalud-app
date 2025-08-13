@@ -2,6 +2,7 @@
 export { RegistroTitularCard } from './RegistroTitularCard';
 export { default as FormIngresoHeredero } from './FormIngresoHeredero';
 export { AutoCompleteInput } from './AutoCompleteInput';
+export { NumberAutoCompleteInput } from './NumberAutoCompleteInput';
 
 // Componentes de UI
 export { CustomSelect } from './CustomSelect';

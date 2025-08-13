@@ -1069,7 +1069,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     name="numero"
                     value={localFormData.numero}
                     onChange={handleInputChange}
-                    options={[]} // Aquí se pueden agregar opciones de números si es necesario
+                    nombreCalle={localFormData.calle}
+                    idComuna={selectedComuna?.idComuna}
                     placeholder="Ingresar"
                     error={!!errors.numero}
                     disabled={!localFormData.calle}
