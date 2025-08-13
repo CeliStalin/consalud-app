@@ -1,7 +1,7 @@
 import { Titular } from '../interfaces/Titular';
 import { SolicitanteResponse } from '../interfaces/Solicitante';
 import { Genero, Ciudad, Comuna, Calle, Region, TipoDocumento } from '../interfaces/Pargen';
-import { apiGet, getHerederosApiConfig } from './apiUtils';
+import { apiGet, getHerederosApiConfig, buildHeaders } from './apiUtils';
 import { formatearRut } from '../../../utils/rutValidation';
 
 /**
@@ -120,6 +120,78 @@ export class HerederosService {
     const url = `${this.config.baseUrl}/api/Pargen/TipoDocumento`;
     return apiGet<TipoDocumento[]>(url, this.config, 'obtener tipos de documento');
   }
+
+  /**
+   * Valida el correo electrónico de un heredero
+   * @param rut - RUT del heredero (solo números, sin puntos ni DV)
+   * @param email - Correo electrónico a validar
+   * @param userName - Nombre de usuario para auditoría
+   */
+  async validarCorreoElectronico(rut: number, email: string, userName: string = ""): Promise<boolean> {
+    const url = `${this.config.baseUrl}/api/ValidacionContactibilidad/email?rut=${rut}&mail=${encodeURIComponent(email)}&userName=${encodeURIComponent(userName)}`;
+    
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: buildHeaders(this.config)
+      });
+
+      // Si la respuesta es 200, la validación es exitosa
+      if (response.status === 200) {
+        return true;
+      }
+      
+      // Si la respuesta es 422, la validación falló
+      if (response.status === 422) {
+        console.error('Validación de correo electrónico falló (422):', response.statusText);
+        return false;
+      }
+      
+      // Para cualquier otro código de respuesta, lanzar error
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      
+    } catch (error: any) {
+      // Si hay error de red u otro tipo, también considerar como fallo de validación
+      console.error('Error en validación de correo electrónico:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Valida el teléfono de un heredero
+   * @param rut - RUT del heredero (solo números, sin puntos ni DV)
+   * @param telefono - Teléfono a validar
+   * @param userName - Nombre de usuario para auditoría
+   */
+  async validarTelefono(rut: number, telefono: string, userName: string = ""): Promise<boolean> {
+    const url = `${this.config.baseUrl}/api/ValidacionContactibilidad/telefono?rut=${rut}&telefono=${encodeURIComponent(telefono)}&userName=${encodeURIComponent(userName)}`;
+    
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: buildHeaders(this.config)
+      });
+
+      // Si la respuesta es 200, la validación es exitosa
+      if (response.status === 200) {
+        return true;
+      }
+      
+      // Si la respuesta es 422, la validación falló
+      if (response.status === 422) {
+        console.error('Validación de teléfono falló (422):', response.statusText);
+        return false;
+      }
+      
+      // Para cualquier otro código de respuesta, lanzar error
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      
+    } catch (error: any) {
+      // Si hay error de red u otro tipo, también considerar como fallo de validación
+      console.error('Error en validación de teléfono:', error);
+      return false;
+    }
+  }
 }
 
 // Exportar instancia única
@@ -138,3 +210,7 @@ export const fetchCiudades = (idRegion?: number) => herederosService.getCiudades
 export const fetchComunasPorCiudad = (idCiudad: number) => herederosService.getComunasPorCiudad(idCiudad);
 export const fetchCallesPorComuna = (idComuna: number) => herederosService.getCallesPorComuna(idComuna); 
 export const fetchTiposDocumento = () => herederosService.getTiposDocumento(); 
+export const validarCorreoElectronico = (rut: number, email: string, userName: string = "") => 
+  herederosService.validarCorreoElectronico(rut, email, userName);
+export const validarTelefono = (rut: number, telefono: string, userName: string = "") => 
+  herederosService.validarTelefono(rut, telefono, userName); 
