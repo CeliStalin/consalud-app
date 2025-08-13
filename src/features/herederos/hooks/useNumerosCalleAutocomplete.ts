@@ -25,7 +25,14 @@ export const useNumerosCalleAutocomplete = ({
 
   // Cargar todos los números de la calle cuando cambia la calle o comuna
   useEffect(() => {
-    if (!nombreCalle || !idComuna) {
+    if (!idComuna) {
+      setAllNumeros([]);
+      setNumeros([]);
+      return;
+    }
+
+    // Si no hay calle seleccionada, limpiar los números pero no hacer la llamada a la API
+    if (!nombreCalle) {
       setAllNumeros([]);
       setNumeros([]);
       return;

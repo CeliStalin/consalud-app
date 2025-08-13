@@ -542,7 +542,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       ...localFormData,
       comuna: value,
       codComuna: comunaObj?.idComuna || undefined,
-      calle: '' // Resetear calle al cambiar comuna
+      calle: '', // Resetear calle al cambiar comuna
+      numero: '' // Resetear número al cambiar comuna
     });
 
     if (errors.comuna) {

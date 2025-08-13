@@ -169,7 +169,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
   };
 
   // Determinar si el campo debe estar deshabilitado
-  const isDisabled = disabled || !nombreCalle || !idComuna;
+  const isDisabled = disabled || !idComuna;
 
   return (
     <div className="autocomplete-container" ref={dropdownRef}>
@@ -189,7 +189,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
             onKeyDown={handleKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlur}
-            placeholder={!nombreCalle || !idComuna ? 'Seleccione calle primero' : placeholder}
+            placeholder={!idComuna ? 'Seleccione comuna primero' : !nombreCalle ? 'Seleccione calle primero' : placeholder}
             disabled={isDisabled}
             autoComplete="off"
             aria-autocomplete="list"
