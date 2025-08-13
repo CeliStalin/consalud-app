@@ -151,40 +151,23 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Cargar datos de ubicación cuando se carga un heredero
   React.useEffect(() => {
     if (heredero && heredero.codRegion && fieldsLocked) {
-      console.log('🔄 Cargando datos de ubicación para heredero:', {
-        codRegion: heredero.codRegion,
-        codCiudad: heredero.codCiudad,
-        codComuna: heredero.codComuna,
-        descripcionCiudad: heredero.descripcionCiudad,
-        descripcionComuna: heredero.descripcionComuna
-      });
-      
       // Cargar ciudades de la región del heredero para tener las opciones disponibles
       setLoadingCiudades(true);
       fetchCiudades(heredero.codRegion)
         .then((data) => {
-          console.log('✅ Ciudades cargadas:', data.length);
           setCiudades(data);
           setErrorCiudades(null);
           
           // Si hay ciudad del heredero, cargar comunas para tener las opciones disponibles
           if (heredero.codCiudad) {
-            console.log('🔄 Cargando comunas para ciudad:', heredero.codCiudad);
             setLoadingComunas(true);
             fetchComunasPorCiudad(heredero.codCiudad)
               .then((comunasData) => {
-                console.log('✅ Comunas cargadas:', comunasData.length);
-                console.log('📋 Datos de comunas recibidos:', comunasData.slice(0, 3).map(c => ({
-                  idComuna: c.idComuna,
-                  NombreComuna: c.NombreComuna
-                })));
                 setComunas(comunasData);
                 setErrorComunas(null);
                 
                 // IMPORTANTE: Establecer el valor de comuna DESPUÉS de cargar las opciones
                 if (heredero.descripcionComuna) {
-                  console.log('🔄 Estableciendo valor de comuna después de cargar opciones:', heredero.descripcionComuna);
-                  
                   // Encontrar la comuna exacta para usar su formato original
                   const comunaExacta = comunasData.find(comuna => {
                     const comunaNormalizada = comuna.NombreComuna.trim().toUpperCase();
@@ -197,8 +180,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     comuna: comunaExacta?.NombreComuna || heredero.descripcionComuna || '',
                     codComuna: heredero.codComuna || undefined
                   }));
-                  
-                  console.log('✅ Valor de comuna establecido con formato correcto:', comunaExacta?.NombreComuna);
                 }
               })
               .catch((error) => {
@@ -227,11 +208,9 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Sincronizar datos locales cuando cambie formData del contexto
   useEffect(() => {
     if (formData) {
-      console.log('🔄 Sincronizando datos del contexto:', formData);
       setLocalFormData(prevData => {
         // Solo actualizar si los datos son diferentes
         if (JSON.stringify(prevData) !== JSON.stringify(formData)) {
-          console.log('📝 Actualizando localFormData con datos del contexto');
           return formData;
         }
         return prevData;
@@ -275,14 +254,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Actualizar datos cuando cambie el heredero
   useEffect(() => {
     if (heredero) {
-      console.log('🔄 Actualizando datos del formulario con heredero:', {
-        fieldsLocked,
-        descripcionComuna: heredero.descripcionComuna,
-        codComuna: heredero.codComuna,
-        descripcionCiudad: heredero.descripcionCiudad,
-        codCiudad: heredero.codCiudad
-      });
-      
       setLocalFormData(prevData => {
         // Si los campos están bloqueados, usar los datos del heredero
         if (fieldsLocked) {
@@ -306,13 +277,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
             codCiudad: heredero.codCiudad || undefined,
             codComuna: heredero.codComuna || undefined // Usar el código de comuna del heredero
           };
-          
-          console.log('✅ Datos actualizados del heredero:', {
-            comuna: newData.comuna,
-            codComuna: newData.codComuna,
-            ciudad: newData.ciudad,
-            codCiudad: newData.codCiudad
-          });
           
           return newData;
         } else {
@@ -340,7 +304,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
             codComuna: undefined
           };
           
-          console.log('🔄 Limpiando datos del formulario (status 412)');
           return newData;
         }
       });
@@ -374,34 +337,12 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Sincronizar valor de comuna cuando se carguen las comunas y haya un heredero
   useEffect(() => {
     if (comunas.length > 0 && heredero?.descripcionComuna && fieldsLocked) {
-      console.log('🔄 Sincronizando valor de comuna con opciones cargadas:', {
-        comunasDisponibles: comunas.length,
-        descripcionComuna: heredero.descripcionComuna,
-        codComuna: heredero.codComuna
-      });
-      
-      // Mostrar las primeras 5 comunas para debugging
-      console.log('📋 Primeras 5 comunas cargadas:', comunas.slice(0, 5).map(c => c.NombreComuna));
-      
       // Verificar que la comuna existe en las opciones cargadas (comparación más robusta)
       const comunaExiste = comunas.some(comuna => {
         const comunaNormalizada = comuna.NombreComuna.trim().toUpperCase();
         const descripcionNormalizada = (heredero.descripcionComuna || '').trim().toUpperCase();
-        const coincide = comunaNormalizada === descripcionNormalizada;
-        
-        if (coincide) {
-          console.log('✅ Coincidencia encontrada:', {
-            original: comuna.NombreComuna,
-            normalizada: comunaNormalizada,
-            descripcionOriginal: heredero.descripcionComuna,
-            descripcionNormalizada: descripcionNormalizada
-          });
-        }
-        
-        return coincide;
+        return comunaNormalizada === descripcionNormalizada;
       });
-      
-      console.log('🔍 Comuna existe en opciones:', comunaExiste);
       
       if (comunaExiste) {
         // Encontrar la comuna exacta para usar su formato original
@@ -416,24 +357,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
           comuna: comunaExacta?.NombreComuna || heredero.descripcionComuna || '',
           codComuna: heredero.codComuna || undefined
         }));
-        console.log('✅ Valor de comuna establecido correctamente con formato:', comunaExacta?.NombreComuna);
       } else {
         console.warn('⚠️ La comuna del heredero no existe en las opciones cargadas');
-        console.log('🔍 Buscando coincidencias parciales...');
-        
-        // Buscar coincidencias parciales para debugging
-        const coincidenciasParciales = comunas.filter(comuna => {
-          const comunaNormalizada = comuna.NombreComuna.trim().toUpperCase();
-          const descripcionNormalizada = (heredero.descripcionComuna || '').trim().toUpperCase();
-          return comunaNormalizada.includes(descripcionNormalizada) || 
-                 descripcionNormalizada.includes(comunaNormalizada);
-        });
-        
-        if (coincidenciasParciales.length > 0) {
-          console.log('🔍 Coincidencias parciales encontradas:', coincidenciasParciales.map(c => c.NombreComuna));
-        } else {
-          console.log('❌ No se encontraron coincidencias parciales');
-        }
       }
     }
   }, [comunas, heredero?.descripcionComuna, heredero?.codComuna, fieldsLocked]);
@@ -497,7 +422,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
 
   // Manejar cambio de fecha
   const handleDateChange = (date: Date | null) => {
-    console.log('DatePicker del core - fecha seleccionada:', date);
     setLocalFormData({
       ...localFormData,
       fechaNacimiento: date
@@ -750,8 +674,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     e.preventDefault();
     
     if (validateForm()) {
-      console.log('✅ Formulario válido, validando correo electrónico y teléfono...');
-      
       // Limpiar errores anteriores
       setEmailValidationError(null);
       setPhoneValidationError(null);
@@ -787,19 +709,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
           return;
         }
         
-        console.log('✅ Correo electrónico y teléfono válidos, guardando datos:', localFormData);
-        
         // Guardar datos en el contexto
         handleSaveForm(localFormData);
-        
-        // Verificar que se guardó correctamente
-        setTimeout(() => {
-          const stored = sessionStorage.getItem('formHerederoData');
-          console.log('🔍 Verificación después de guardar:', stored ? '✅ Datos en sessionStorage' : '❌ No hay datos en sessionStorage');
-          if (stored) {
-            console.log('📄 Datos guardados:', JSON.parse(stored));
-          }
-        }, 100);
         
         // Redirigir a la página de carga de documentos (stepper 3)
         navigate('/mnherederos/ingresoher/cargadoc');
@@ -812,8 +723,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         setValidatingEmail(false);
         setValidatingPhone(false);
       }
-    } else {
-      console.log('❌ Formulario inválido, no se guardan datos');
     }
   };
 
