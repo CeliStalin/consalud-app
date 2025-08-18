@@ -6,45 +6,59 @@ import { useStepper } from "./Stepper";
 import { useTiposDocumento } from "../hooks/useTiposDocumento";
 import { DocumentUploadArea } from "./DocumentUploadArea";
 import { TipoDocumento } from "../interfaces/Pargen";
+import { useFileStorage } from "../hooks/useFileStorage";
+import { useHeredero } from "../contexts/HerederoContext";
+import { StorageCleanup } from "./StorageCleanup";
 import './styles/globalStyle.css';
-
-interface FileState {
-  file: File | null;
-  error: string | null;
-}
-
-interface DocumentFileState {
-  [key: number]: FileState;
-}
 
 const CargaDocumento: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState(false);
-  const [documentFiles, setDocumentFiles] = useState<DocumentFileState>({});
   
   const navigate = useNavigate();
   const { tiposDocumento, loading: loadingTipos, error: errorTipos } = useTiposDocumento();
   const { ejemploCedula, ejemploPoder, ejemploPosesion } = UseAlert();
   const { setStep } = useStepper();
+  const { heredero } = useHeredero();
+  
+  // Usar el hook de almacenamiento de archivos
+  const {
+    documentFiles,
+    loading: fileLoading,
+    error: fileError,
+    handleFileChange,
+    loadFilesFromStorage
+  } = useFileStorage();
 
   useEffect(() => {
     setStep(3);
     return () => {};
   }, [setStep]);
 
-  const validateFile = useCallback((file: File): string | null => {
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    const allowedTypes = ['application/pdf'];
-    
-    if (file.size > maxSize) {
-      return 'El archivo debe ser menor a 10MB';
+  // Cargar archivos desde sessionStorage cuando se monta el componente
+  useEffect(() => {
+    if (heredero?.rut) {
+      // Agregar un pequeño retraso para asegurar que el contexto esté completamente cargado
+      const timer = setTimeout(() => {
+        loadFilesFromStorage(heredero.rut);
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
-    
-    if (!allowedTypes.includes(file.type)) {
-      return 'Solo se permiten archivos PDF';
-    }
-    
-    return null;
+  }, [heredero?.rut, loadFilesFromStorage]);
+
+
+
+  // Estado para controlar si se están cargando los archivos inicialmente
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+  // Marcar como cargado inicialmente después de un tiempo
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setInitialLoadComplete(true);
+    }, 500); // Dar tiempo para que se carguen los archivos
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handleFlow = useCallback(async (tipoDocumento: TipoDocumento) => {
@@ -67,26 +81,21 @@ const CargaDocumento: React.FC = () => {
     }
   }, [ejemploCedula, ejemploPoder, ejemploPosesion]);
 
-  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, tipoId: number) => {
+  const handleFileInputChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>, tipoId: number) => {
     const file = e.target.files?.[0];
     
-    if (file) {
-      const error = validateFile(file);
-      const fileState: FileState = { file: error ? null : file, error };
-      
-      setDocumentFiles(prev => ({
-        ...prev,
-        [tipoId]: fileState
-      }));
+    if (file && heredero?.rut) {
+      const tipo = tiposDocumento.find(t => t.valValor === tipoId)?.nombre || '';
+      await handleFileChange(file, tipoId, tipo, heredero.rut);
     }
-  }, [validateFile]);
+  }, [handleFileChange, heredero?.rut, tiposDocumento]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Verificar que todos los documentos requeridos estén cargados
     const allDocumentsLoaded = tiposDocumento.every(tipo => 
-      documentFiles[tipo.valValor]?.file
+      documentFiles[tipo.valValor]?.file || documentFiles[tipo.valValor]?.documento
     );
     
     if (!allDocumentsLoaded || !checked) {
@@ -96,23 +105,22 @@ const CargaDocumento: React.FC = () => {
     setLoading(true);
     
     try {
-      // Aquí iría la lógica de envío de archivos
-      console.log('Archivos a enviar:', documentFiles);
+             // Aquí iría la lógica de envío de archivos
       
       // Simular envío
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Navegar a la siguiente página
       navigate('/mnherederos/ingresoher/cuenta');
-    } catch (error) {
-      console.error('Error al enviar archivos:', error);
-    } finally {
+         } catch (error) {
+       // Manejar error de envío
+     } finally {
       setLoading(false);
     }
   }, [documentFiles, checked, navigate, tiposDocumento]);
 
-  // Mostrar loading mientras se cargan los tipos de documento
-  if (loadingTipos) {
+  // Mostrar loading mientras se cargan los tipos de documento o los archivos inicialmente
+  if (loadingTipos || (!initialLoadComplete && heredero?.rut)) {
     return (
       <div style={{ 
         padding: '60px 90px',
@@ -123,7 +131,9 @@ const CargaDocumento: React.FC = () => {
         <div className="columns is-centered is-vcentered" style={{ minHeight: '60vh' }}>
           <div className="column is-narrow has-text-centered">
             <ConsaludCore.LoadingSpinner size="large" />
-            <span className="ml-3">Cargando tipos de documentos...</span>
+            <span className="ml-3">
+              {loadingTipos ? 'Cargando tipos de documentos...' : 'Cargando archivos guardados...'}
+            </span>
           </div>
         </div>
       </div>
@@ -171,7 +181,19 @@ const CargaDocumento: React.FC = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="carga-documentos-form" style={{ width: '100%' }}>
+    <>
+      {/* Componente de limpieza automática */}
+      {heredero?.rut && (
+        <StorageCleanup 
+          rut={heredero.rut} 
+          onCleanup={() => {
+            // Recargar archivos después de la limpieza
+            loadFilesFromStorage(heredero.rut);
+          }}
+        />
+      )}
+      
+      <form onSubmit={handleSubmit} className="carga-documentos-form" style={{ width: '100%' }}>
       <div className="carga-documentos-card" style={{ 
         padding: '2rem 3rem',
         backgroundColor: '#FFFFFF',
@@ -221,6 +243,29 @@ const CargaDocumento: React.FC = () => {
             Carga de documentos
           </ConsaludCore.Typography>
         </div>
+
+
+
+        {/* Error Display */}
+        {fileError && (
+          <div style={{
+            backgroundColor: '#F8D7DA',
+            border: '1px solid #F5C6CB',
+            borderRadius: '0.5rem',
+            padding: '0.75rem 1rem',
+            marginBottom: '1.5rem'
+          }}>
+            <ConsaludCore.Typography 
+              variant="body" 
+              component="p"
+              style={{ color: '#721C24', fontSize: '0.875rem', margin: 0 }}
+            >
+              {fileError}
+            </ConsaludCore.Typography>
+          </div>
+        )}
+
+
         
         {/* Document sections - Renderizados dinámicamente */}
         <div style={{ 
@@ -232,7 +277,7 @@ const CargaDocumento: React.FC = () => {
             <DocumentUploadArea
               key={tipo.valValor}
               fileState={documentFiles[tipo.valValor] || { file: null, error: null }}
-              onFileChange={(e) => handleFileChange(e, tipo.valValor)}
+              onFileChange={(e) => handleFileInputChange(e, tipo.valValor)}
               onDivClick={() => {}} // El componente interno maneja el click
               title={tipo.nombre}
               description={tipo.descripcion}
@@ -290,40 +335,41 @@ const CargaDocumento: React.FC = () => {
         }}>
           <button
             type="submit"
-            disabled={!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading}
+            disabled={!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file || documentFiles[tipo.valValor]?.documento) || loading || fileLoading}
             style={{
-              backgroundColor: (!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading) ? '#E0E0E0' : '#00CBBF',
+              backgroundColor: (!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file || documentFiles[tipo.valValor]?.documento) || loading || fileLoading) ? '#E0E0E0' : '#00CBBF',
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '0.5rem',
               padding: '0.75rem 2rem',
               fontSize: '1rem',
               fontWeight: '600',
-              cursor: (!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading) ? 'not-allowed' : 'pointer',
+              cursor: (!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file || documentFiles[tipo.valValor]?.documento) || loading || fileLoading) ? 'not-allowed' : 'pointer',
               transition: 'all 0.3s ease',
               minWidth: '8.75rem',
               boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
             }}
             onMouseEnter={(e) => {
-              if (!(!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading)) {
+              if (!(!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file || documentFiles[tipo.valValor]?.documento) || loading || fileLoading)) {
                 e.currentTarget.style.backgroundColor = '#00A59B';
                 e.currentTarget.style.transform = 'translateY(-1px)';
                 e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
               }
             }}
             onMouseLeave={(e) => {
-              if (!(!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file) || loading)) {
+              if (!(!checked || !tiposDocumento.every(tipo => documentFiles[tipo.valValor]?.file || documentFiles[tipo.valValor]?.documento) || loading || fileLoading)) {
                 e.currentTarget.style.backgroundColor = '#00CBBF';
                 e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';
               }
             }}
           >
-            {loading ? 'Enviando...' : 'Continuar'}
+            {loading || fileLoading ? 'Procesando...' : 'Continuar'}
           </button>
         </div>
       </div>
     </form>
+    </>
   );
 };
 

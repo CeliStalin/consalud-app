@@ -4,6 +4,23 @@ import * as ConsaludCore from '@consalud/core';
 interface FileState {
   file: File | null;
   error: string | null;
+  documento?: {
+    id: number;
+    nombre: string;
+    tamaño: number;
+    tipo: string;
+    tipoId: number;
+    fechaCarga: string;
+    hash?: string;
+    comprimido?: boolean;
+    url?: string;
+    metadata?: {
+      originalSize: number;
+      compressedSize?: number;
+      mimeType: string;
+      lastModified: number;
+    };
+  };
 }
 
 interface DocumentUploadAreaProps {
@@ -25,6 +42,7 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
   onHelpClick,
   showHelp = true
 }) => {
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDivClick = useCallback(() => {
@@ -155,10 +173,10 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
         onClick={handleDivClick}
         style={{ 
           cursor: 'pointer',
-          border: '2px dashed #E0E0E0',
+          border: `2px dashed ${(fileState.file || fileState.documento) ? '#00CBBF' : '#E0E0E0'}`,
           borderRadius: '0.75rem',
           padding: '2rem 1.5rem',
-          backgroundColor: '#FAFAFA',
+          backgroundColor: (fileState.file || fileState.documento) ? '#F0FDFC' : '#FAFAFA',
           transition: 'all 0.3s ease',
           marginTop: '1rem'
         }}
@@ -167,8 +185,8 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
           e.currentTarget.style.backgroundColor = '#F0FDFC';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = '#E0E0E0';
-          e.currentTarget.style.backgroundColor = '#FAFAFA';
+          e.currentTarget.style.borderColor = (fileState.file || fileState.documento) ? '#00CBBF' : '#E0E0E0';
+          e.currentTarget.style.backgroundColor = (fileState.file || fileState.documento) ? '#F0FDFC' : '#FAFAFA';
         }}
       >
         <input
@@ -193,40 +211,55 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
             alignItems: 'center', 
             gap: '0.5rem'
           }}>
-            <svg width="1.5625rem" height="1.5625rem" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="3.5" y="3.94336" width="18" height="18" rx="5.55556" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M15.5 16.9434H9.5" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M10.498 10.9434L12.499 8.94336L14.5 10.9434" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M12.5 13.9434V8.94336" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            {(fileState.file || fileState.documento) ? (
+              // Check icon for loaded files
+              <svg width="1.5625rem" height="1.5625rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" fill="#00CBBF" stroke="#00CBBF" strokeWidth="2"/>
+                <path d="M9 12L11 14L15 10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : (
+              // Upload icon for empty state
+              <svg width="1.5625rem" height="1.5625rem" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3.5" y="3.94336" width="18" height="18" rx="5.55556" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M15.5 16.9434H9.5" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M10.498 10.9434L12.499 8.94336L14.5 10.9434" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M12.5 13.9434V8.94336" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
             {ConsaludCore.Typography ? (
               <ConsaludCore.Typography 
                 variant="body" 
                 component="p" 
                 style={{ 
                   fontSize: '1rem',
-                  color: fileState.file ? '#00CBBF' : '#505050',
+                  color: (fileState.file || fileState.documento) ? '#00CBBF' : '#505050',
                   margin: 0,
                   lineHeight: '1.4',
                   fontWeight: 'bold'
                 }}
               >
-                {fileState.file ? fileState.file.name : 'Cargar archivos'}
+                {(fileState.file || fileState.documento) ? 
+                  (fileState.file?.name || fileState.documento?.nombre) : 
+                  'Cargar archivos'
+                }
               </ConsaludCore.Typography>
             ) : (
               <p style={{ 
                 fontWeight: 'bold',
                 fontSize: '1rem',
-                color: fileState.file ? '#00CBBF' : '#505050',
+                color: (fileState.file || fileState.documento) ? '#00CBBF' : '#505050',
                 margin: 0,
                 lineHeight: '1.4'
               }}>
-                {fileState.file ? fileState.file.name : 'Cargar archivos'}
+                {(fileState.file || fileState.documento) ? 
+                  (fileState.file?.name || fileState.documento?.nombre) : 
+                  'Cargar archivos'
+                }
               </p>
             )}
           </div>
           
-          {/* Instructions or error */}
+          {/* Instructions, error, or file info */}
           <div>
             {fileState.error ? (
               <p style={{ 
@@ -237,6 +270,29 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
               }}>
                 {fileState.error}
               </p>
+            ) : (fileState.file || fileState.documento) ? (
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ 
+                  fontSize: '0.75rem',
+                  color: '#00CBBF',
+                  margin: '0 0 0.25rem 0',
+                  lineHeight: '1.4',
+                  fontWeight: '500'
+                }}>
+                  Archivo cargado correctamente
+                </p>
+                <p style={{ 
+                  fontSize: '0.625rem',
+                  color: '#656565',
+                  margin: 0,
+                  lineHeight: '1.4'
+                }}>
+                  Tamaño: {((fileState.file?.size || fileState.documento?.tamaño || 0) / 1024).toFixed(1)} KB
+                  {fileState.documento && (
+                    <span> • Cargado: {new Date(fileState.documento.fechaCarga).toLocaleDateString('es-CL')}</span>
+                  )}
+                </p>
+              </div>
             ) : (
               <p style={{ 
                 fontSize: '0.75rem',

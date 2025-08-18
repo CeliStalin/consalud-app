@@ -3,6 +3,7 @@ import { useRutChileno } from "@/features/herederos/hooks/useRutChileno";
 import { useHeredero } from "@/features/herederos/contexts/HerederoContext";
 import { useTitular } from "@/features/herederos/contexts/TitularContext";
 import { UseAlert } from "@/features/herederos/hooks/Alert";
+import { useStorageCleanup } from "@/features/herederos/hooks/useStorageCleanup";
 import * as ConsaludCore from '@consalud/core';
 import FormIngresoHeredero from './FormIngresoHeredero';
 import RutErrorMessage from './RutErrorMessage';
@@ -21,6 +22,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
   const { heredero, limpiarHeredero, fieldsLocked } = useHeredero();
   const { titular } = useTitular();
   const { mostrarAlertaTitularHeredero } = UseAlert();
+  const { cleanupFormHerederoData } = useStorageCleanup();
   const [showError, setShowError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [showForm, setShowForm] = useState<boolean>(false);
@@ -30,18 +32,9 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
   // Limpiar datos de otros RUTs cuando cambie el heredero
   useEffect(() => {
     if (heredero?.rut) {
-      const currentRut = heredero.rut;
-      const currentKey = `formHerederoData_${currentRut.replace(/[^0-9kK]/g, '')}`;
-      
-      // Limpiar todas las claves que empiecen con formHerederoData_ excepto la actual
-      Object.keys(sessionStorage).forEach(key => {
-        if (key.startsWith('formHerederoData_') && key !== currentKey) {
-          sessionStorage.removeItem(key);
-          console.log('🗑️ Limpiado datos de RUT anterior:', key);
-        }
-      });
+      cleanupFormHerederoData(heredero.rut);
     }
-  }, [heredero?.rut]);
+  }, [heredero?.rut, cleanupFormHerederoData]);
 
   // Limpiar estado al montar el componente solo si no hay datos guardados
   useEffect(() => {

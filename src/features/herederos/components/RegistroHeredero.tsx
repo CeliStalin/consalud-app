@@ -9,6 +9,8 @@ import { Stepper } from './Stepper';
 const RegistroHeredero: React.FC = () => {
   const { heredero, buscarHeredero, error } = useHeredero();
   const navigate = useNavigate();
+  
+
 
     const breadcrumbItems: ConsaludCore.BreadcrumbItem[] = [
         { label: 'Administración devolución herederos' }

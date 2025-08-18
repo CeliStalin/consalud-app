@@ -6,4 +6,6 @@ export { useLockedFieldValidation } from './useLockedFieldValidation';
 export { useFieldLocking } from './useFieldLocking';
 export { useHerederoNavigation } from './useHerederoNavigation';
 export { useRutChileno } from './useRutChileno';
-export { useTiposDocumento } from './useTiposDocumento'; 
+export { useTiposDocumento } from './useTiposDocumento';
+export { useFileStorage } from './useFileStorage';
+export { useStorageCleanup } from './useStorageCleanup'; 

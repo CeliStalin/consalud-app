@@ -8,6 +8,7 @@ export { NumberAutoCompleteInput } from './NumberAutoCompleteInput';
 export { CustomSelect } from './CustomSelect';
 export { Stepper } from './Stepper';
 export { default as RutErrorMessage } from './RutErrorMessage';
+export { StorageCleanup } from './StorageCleanup';
 
 // Hooks
 export { useCallesAutocomplete } from '../hooks/useCallesAutocomplete';

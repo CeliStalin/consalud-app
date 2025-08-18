@@ -201,9 +201,12 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
 
   // Inicializar el formulario solo una vez al montar
   useEffect(() => {
-    // Recargar datos del sessionStorage al montar
-    handleReloadFromStorage();
-  }, [handleReloadFromStorage]);
+    // Solo recargar datos del sessionStorage si no hay heredero cargado
+    // Si hay heredero, los datos se cargarán desde el backend
+    if (!heredero) {
+      handleReloadFromStorage();
+    }
+  }, [handleReloadFromStorage, heredero]);
 
   // Sincronizar datos locales cuando cambie formData del contexto
   useEffect(() => {
@@ -257,25 +260,26 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       setLocalFormData(prevData => {
         // Si los campos están bloqueados, usar los datos del heredero
         if (fieldsLocked) {
+          // Siempre priorizar los datos del backend sobre los datos existentes
           const newData = {
             ...prevData,
+            // Usar datos del backend (prioridad absoluta)
             fechaNacimiento: heredero.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
             nombres: heredero.nombre || '',
             apellidoPaterno: heredero.apellidoPat || '',
             apellidoMaterno: heredero.apellidoMat || '',
-            sexo: heredero.Genero || '', // Usar el valor directo, el mapeo se hará en otro useEffect
+            sexo: heredero.Genero || '',
             telefono: heredero.contactabilidad.telefono.numero || '',
             correoElectronico: heredero.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
             ciudad: heredero.descripcionCiudad || '',
-            // NO establecer comuna aquí, se manejará en el useEffect de sincronización
             calle: heredero.contactabilidad.direccion.calle || '',
             numero: heredero.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
             deptoBloqueOpcional: heredero.contactabilidad.direccion.departamento || '',
             villaOpcional: heredero.contactabilidad.direccion.villa || '',
-            // Códigos del heredero
+            // Códigos del heredero (siempre actualizar)
             codRegion: heredero.codRegion || undefined,
             codCiudad: heredero.codCiudad || undefined,
-            codComuna: heredero.codComuna || undefined // Usar el código de comuna del heredero
+            codComuna: heredero.codComuna || undefined
           };
           
           return newData;

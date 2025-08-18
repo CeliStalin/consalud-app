@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback } from "react";
 import * as ConsaludCore from '@consalud/core'; 
 import { useRutChileno } from "../hooks/useRutChileno";
 import { useHerederoNavigation } from "../hooks/useHerederoNavigation";
+import { useStorageCleanup } from "../hooks/useStorageCleanup";
 import '../components/styles/ingresoTitular.css';
 import '../../../pages/styles/IngresoHerederosPage.css';
 import { useTitular } from "../contexts/TitularContext";
+import { useHeredero } from "../contexts/HerederoContext";
 import UserProfileIcon from '@/assets/user-profile.svg';
 import RutErrorMessage from './RutErrorMessage';
 import { UseAlert } from "../hooks/Alert";
@@ -19,10 +21,19 @@ const IngresoTitular: React.FC = () => {
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
     const { buscarTitular, error, loading } = useTitular();
+    const { limpiarHeredero } = useHeredero();
+    const { cleanupAllHerederoData } = useStorageCleanup();
     const [showStepperError, setShowStepperError] = useState(false);
     
     // Hook de alertas - se ejecuta solo una vez
     const alertFunctions = UseAlert();
+    
+    // Limpiar datos anteriores al iniciar un flujo nuevo
+    useEffect(() => {
+        cleanupAllHerederoData();
+        limpiarHeredero();
+        console.log('🧹 Datos anteriores limpiados al iniciar flujo nuevo');
+    }, [limpiarHeredero, cleanupAllHerederoData]);
     
     // Memoizar las funciones de alerta para evitar recreaciones
     const mostrarAlerta = useCallback(() => {

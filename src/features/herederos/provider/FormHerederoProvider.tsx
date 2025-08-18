@@ -11,11 +11,31 @@ interface FormHerederoProviderProps {
 const STORAGE_KEY_PREFIX = 'formHerederoData';
 
 export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ children, rutHeredero }) => {
-  // Generar clave única basada en el RUT
+  // Generar clave única basada en el RUT - SIEMPRE usar RUT para evitar duplicación
   const getStorageKey = useCallback(() => {
-    if (!rutHeredero) return STORAGE_KEY_PREFIX;
-    return `${STORAGE_KEY_PREFIX}_${rutHeredero.replace(/[^0-9kK]/g, '')}`;
+    // Si no hay RUT específico, usar un RUT temporal o generar uno
+    const rutToUse = rutHeredero || 'temp';
+    return `${STORAGE_KEY_PREFIX}_${rutToUse.replace(/[^0-9kK]/g, '')}`;
   }, [rutHeredero]);
+
+  // Limpiar claves antiguas sin RUT al inicializar
+  useEffect(() => {
+    // Limpiar la clave antigua sin RUT si existe
+    const oldKey = STORAGE_KEY_PREFIX;
+    const oldData = sessionStorage.getItem(oldKey);
+    
+    if (oldData && rutHeredero) {
+      // Migrar datos de la clave antigua a la nueva con RUT
+      const storageKey = getStorageKey();
+      sessionStorage.setItem(storageKey, oldData);
+      sessionStorage.removeItem(oldKey);
+      console.log('🔄 Migrado datos de clave antigua a nueva:', oldKey, '→', storageKey);
+    } else if (oldData && !rutHeredero) {
+      // Si no hay RUT pero hay datos antiguos, limpiarlos para evitar duplicación
+      sessionStorage.removeItem(oldKey);
+      console.log('🗑️ Limpiada clave antigua sin RUT:', oldKey);
+    }
+  }, [rutHeredero, getStorageKey]);
 
   const [formData, setFormData] = useState<FormData | null>(() => {
     const storageKey = getStorageKey();
@@ -42,6 +62,29 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
     const storageKey = getStorageKey();
     return sessionStorage.getItem(storageKey) !== null;
   });
+
+  // Limpiar formulario cuando cambie el rutHeredero (solo si hay un valor previo)
+  useEffect(() => {
+    if (rutHeredero) {
+      // Solo limpiar si hay un RUT específico, no en la carga inicial
+      const storageKey = getStorageKey();
+      const currentStored = sessionStorage.getItem(storageKey);
+      
+      // Si hay datos almacenados para un RUT diferente, limpiarlos
+      if (currentStored) {
+        try {
+          // Verificar si los datos son para un RUT diferente
+          // (esto se maneja en el componente FormIngresoHeredero)
+          JSON.parse(currentStored);
+        } catch {
+          // Si hay error al parsear, limpiar
+          setFormData(null);
+          setIsDirty(false);
+          sessionStorage.removeItem(storageKey);
+        }
+      }
+    }
+  }, [rutHeredero, getStorageKey]);
 
   // Guardar en sessionStorage cuando cambie formData
   useEffect(() => {

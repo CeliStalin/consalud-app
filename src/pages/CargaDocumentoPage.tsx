@@ -40,7 +40,7 @@ const CargaDocumentoPageContent: React.FC = () => {
           <div>
             <button
               className="back-button"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/mnherederos/ingresoher/RegistroTitular')}
               aria-label="Volver a la página anterior"
             >
               <span className="back-button-icon">←</span> Volver

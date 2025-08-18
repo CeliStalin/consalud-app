@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HerederoProviderProps } from "../interfaces/HerederoProviderProps";
 import { Heredero } from "../interfaces/Heredero";
@@ -217,7 +217,39 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
     setHeredero(null);
     setError(null);
     setFieldsLocked(false); // Limpiar también el estado de bloqueo
+    // Limpiar también el sessionStorage
+    sessionStorage.removeItem('herederoData');
   }, []);
+
+
+
+  // Cargar heredero desde sessionStorage al inicializar
+  useEffect(() => {
+    try {
+      const storedHeredero = sessionStorage.getItem('herederoData');
+      if (storedHeredero) {
+        const herederoData: Heredero = JSON.parse(storedHeredero);
+        setHeredero(herederoData);
+        setFieldsLocked(true); // Los campos están bloqueados si hay datos guardados
+      }
+    } catch (error) {
+      console.error('Error al cargar heredero desde sessionStorage:', error);
+    }
+  }, []);
+
+  // Guardar heredero en sessionStorage cuando cambie
+  useEffect(() => {
+    if (heredero) {
+      try {
+        sessionStorage.setItem('herederoData', JSON.stringify(heredero));
+      } catch (error) {
+        console.error('Error al guardar heredero en sessionStorage:', error);
+      }
+    } else {
+      // Si no hay heredero, limpiar sessionStorage
+      sessionStorage.removeItem('herederoData');
+    }
+  }, [heredero]);
 
   // Valor del contexto
   const value: HerederoContextType = {
