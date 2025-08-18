@@ -1,5 +1,102 @@
+variables:
+  - name: BuildParameters.RestoreBuildProjects
+    value: "**/*.csproj"
+  - name: BuildParameters.TestProjects
+    value: "**/*[Tt]ests/*.csproj"
+  - name: Aprobadores
+    value: '[Consalud]\CS_Pandora'
+  - name: Explotacion
+    value: '[Consalud]\CS_Explotacion'
 name: $(date:yyyyMMdd)$(rev:.r)
 stages:
+  # - stage: SonarQube
+  #   displayName: "SonarQube"
+  #   jobs:
+  #     - job: Job_0
+  #       displayName: Análisis de Código Estático
+  #       pool:
+  #         name: Default
+  #       steps:
+  #         - checkout: self
+  #           clean: False
+  #         - task: SonarQubePrepare@5
+  #           displayName: Preparar Análisis en SonarQube
+  #           inputs:
+  #             SonarQube: "SonarQube-SolicitudesClientes"
+  #             projectKey: "$(Build.Repository.ID)"
+  #             projectName: "$(System.TeamProject)-$(Build.Repository.Name)"
+  #             projectVersion: "$(Build.BuildNumber)"
+  #             extraProperties: "sonar.cs.vscoveragexml.reportsPaths=$(Agent.TempDirectory)/**/*.coveragexml"
+  #         - task: PowerShell@2
+  #           displayName: Engañando a SQ
+  #           inputs:
+  #             targetType: "inline"
+  #             script: |
+  #               $params = "$env:SONARQUBE_SCANNER_PARAMS" -replace '"sonar.branch.name":"[\w,/,-]*"\,?'
+
+  #               Write-Host "##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]$params"
+  #         - task: DotNetCoreCLI@2
+  #           displayName: dotnet restore
+  #           inputs:
+  #             command: "restore"
+  #             projects: $(BuildParameters.RestoreBuildProjects)
+  #             feedsToUse: "select"
+  #             vstsFeed: "88c5667f-ba35-4a8a-8a4f-323f7520e2d8"
+  #             noCache: true
+  #         - task: DotNetCoreCLI@2
+  #           displayName: dotnet build
+  #           inputs:
+  #             command: "build"
+  #             projects: $(BuildParameters.RestoreBuildProjects)
+  #             arguments: "--configuration Debug"
+  #         - task: DotNetCoreCLI@2
+  #           displayName: dotnet test
+  #           inputs:
+  #             command: "test"
+  #             projects: $(BuildParameters.TestProjects)
+  #             arguments: '--collect "Code coverage"'
+  #         - task: PowerShell@2
+  #           displayName: Fix Cobertura SQ
+  #           inputs:
+  #             targetType: inline
+  #             script: >-
+  #               $ver = (Get-ChildItem $env:USERPROFILE\.nuget\packages\Microsoft.CodeCoverage | Select-Object -Property Name | Sort-Object -Descending | Select-Object -First 1).Name
+
+  #               $netstd = (Get-ChildItem $env:USERPROFILE\.nuget\packages\Microsoft.CodeCoverage\$ver\build\ | Select-Object -Property Name | Sort-Object -Descending | Select-Object -First 1).Name
+
+  #               Get-ChildItem -Recurse -Filter "*.coverage" | % {
+
+  #               $outfile = "$([System.IO.Path]::GetFileNameWithoutExtension($_.FullName)).coveragexml"
+
+  #               $output = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($_.FullName), $outfile)
+
+  #               "Analyse '$($_.FullName)' with output '$output'..."
+
+  #               . $env:USERPROFILE\.nuget\packages\microsoft.codecoverage\$ver\build\$netstd\CodeCoverage\CodeCoverage.exe analyze /output:$output $_.FullName
+
+  #               }
+  #             workingDirectory: $(Agent.TempDirectory)
+  #         - task: SonarQubeAnalyze@5
+  #           displayName: Ejecutar Análisis de Código
+  #         - task: SonarQubePublish@5
+  #           displayName: Publicar Resultado de SQ
+  #           condition: succeededOrFailed()
+  #     - job: Aprobacion
+  #       dependsOn: Job_0
+  #       condition: succeededOrFailed()
+  #       displayName: Esperando por aprobaciones
+  #       pool: server
+  #       timeoutInMinutes: 4320
+  #       steps:
+  #         - task: ManualValidation@0
+  #           timeoutInMinutes: 1440
+  #           inputs:
+  #             notifyUsers: |
+  #               $(Aprobadores)
+
+  #               angelo.bernardi@consalud.cl
+  #             instructions: "Su aprobación porfa para SQ"
+  #             onTimeout: "reject"
   - stage: BuildDev
     displayName: "Build Desarrollo"
     jobs:
@@ -16,10 +113,10 @@ stages:
             displayName: Build an image (dev)
             inputs:
               containerregistrytype: Container Registry
-              dockerRegistryEndpoint: 1e4b3efa-7470-42f8-b9b0-5ce504bd922d
+              dockerRegistryEndpoint: "azure-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
               dockerFile: Dockerfile
               buildArguments: >-
-                AMBIENTE=desarrollo
+                AMBIENTE=$(ambiente)
 
                 MODE=development
               defaultContext: false
@@ -29,8 +126,8 @@ stages:
             displayName: Push an image
             inputs:
               containerregistrytype: Container Registry
-              dockerRegistryEndpoint: 1e4b3efa-7470-42f8-b9b0-5ce504bd922d
-              azureSubscriptionEndpoint: 9e840d54-c346-48e2-91e3-10356e7a739c
+              dockerRegistryEndpoint: "azure-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
+              azureSubscriptionEndpoint: "Azure Vault-SolicitudesClientes"
               action: Push an image
               includeLatestTag: true
           - task: replacetokens@4
@@ -55,26 +152,26 @@ stages:
           - task: KubernetesManifest@0
             displayName: deploy Api
             inputs:
-              kubernetesServiceConnection: 3449154a-8a88-40a8-80fd-2d4ecc81ce27
+              kubernetesServiceConnection: "rke_des-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
               namespace: default
               manifests: deployment.yaml
           - task: Kubernetes@1
             displayName: kubectl rollout
             inputs:
-              kubernetesServiceEndpoint: 3449154a-8a88-40a8-80fd-2d4ecc81ce27
+              kubernetesServiceEndpoint: "rke_des-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
               namespace: default
               command: rollout
               arguments: restart deployment app-gestor-solicitudes
           - task: KubernetesManifest@0
             displayName: deploy Servicio
             inputs:
-              kubernetesServiceConnection: 3449154a-8a88-40a8-80fd-2d4ecc81ce27
+              kubernetesServiceConnection: "rke_des-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
               namespace: default
               manifests: service.yaml
           - task: KubernetesManifest@0
             displayName: deploy Ingress
             inputs:
-              kubernetesServiceConnection: 3449154a-8a88-40a8-80fd-2d4ecc81ce27
+              kubernetesServiceConnection: "rke_des-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
               namespace: default
               manifests: Ingress.yaml
       - job: Aprobacion
@@ -88,6 +185,8 @@ stages:
             timeoutInMinutes: 1440
             inputs:
               notifyUsers: |
+                $(Aprobadores)
+
                 angelo.bernardi@consalud.cl
               instructions: "Su aprobación porfa para DES"
               onTimeout: "resume"
@@ -99,7 +198,7 @@ stages:
         pool:
           name: DockerAgents
         variables:
-          - group: ReleaseClusterTes         
+          - group: ReleaseClusterTes
         steps:
           - checkout: self
             clean: False
@@ -107,10 +206,10 @@ stages:
             displayName: Build an image (dev)
             inputs:
               containerregistrytype: Container Registry
-              dockerRegistryEndpoint: 1e4b3efa-7470-42f8-b9b0-5ce504bd922d
+              dockerRegistryEndpoint: "azure-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
               dockerFile: Dockerfile
               buildArguments: >-
-                AMBIENTE=testing
+                AMBIENTE=$(ambiente)
 
                 MODE=test
               defaultContext: false
@@ -120,8 +219,8 @@ stages:
             displayName: Push an image
             inputs:
               containerregistrytype: Container Registry
-              dockerRegistryEndpoint: 1e4b3efa-7470-42f8-b9b0-5ce504bd922d
-              azureSubscriptionEndpoint: 9e840d54-c346-48e2-91e3-10356e7a739c
+              dockerRegistryEndpoint: "azure-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
+              azureSubscriptionEndpoint: "Azure Vault-SolicitudesClientes"
               action: Push an image
               includeLatestTag: true
           - task: replacetokens@4
@@ -146,26 +245,26 @@ stages:
           - task: KubernetesManifest@0
             displayName: deploy Api
             inputs:
-              kubernetesServiceConnection: bcb020a3-cbe9-423e-a6b3-113c33c16def
+              kubernetesServiceConnection: "rke-tes-Utilitarios-Transversales-SolicitudesClientes"
               namespace: default
               manifests: deployment.yaml
           - task: Kubernetes@1
             displayName: kubectl rollout
             inputs:
-              kubernetesServiceEndpoint: bcb020a3-cbe9-423e-a6b3-113c33c16def
+              kubernetesServiceEndpoint: "rke-tes-Utilitarios-Transversales-SolicitudesClientes"
               namespace: default
               command: rollout
               arguments: restart deployment app-gestor-solicitudes
           - task: KubernetesManifest@0
             displayName: deploy Servicio
             inputs:
-              kubernetesServiceConnection: bcb020a3-cbe9-423e-a6b3-113c33c16def
+              kubernetesServiceConnection: "rke-tes-Utilitarios-Transversales-SolicitudesClientes"
               namespace: default
               manifests: service.yaml
           - task: KubernetesManifest@0
             displayName: deploy Ingress
             inputs:
-              kubernetesServiceConnection: bcb020a3-cbe9-423e-a6b3-113c33c16def
+              kubernetesServiceConnection: "rke-tes-Utilitarios-Transversales-SolicitudesClientes"
               namespace: default
               manifests: Ingress.yaml
       - job: Aprobacion
@@ -179,6 +278,8 @@ stages:
             timeoutInMinutes: 1440
             inputs:
               notifyUsers: |
+                $(Aprobadores)
+
                 angelo.bernardi@consalud.cl
               instructions: "Su aprobación porfa para TES"
               onTimeout: "resume"
