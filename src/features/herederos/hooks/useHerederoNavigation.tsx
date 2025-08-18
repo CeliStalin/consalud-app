@@ -68,6 +68,15 @@ export const useHerederoNavigation = () => {
     navigateToStep(HEREDEROS_ROUTES.REGISTRO_TITULAR, options);
   }, [navigateToStep]);
 
+  // Nueva función para volver al formulario limpio
+  const goToRegistroTitularClean = useCallback((options?: HerederoNavigationOptions) => {
+    // Usar replace para evitar entradas duplicadas en el historial
+    navigateToStep(HEREDEROS_ROUTES.REGISTRO_TITULAR, { 
+      replace: true, 
+      ...options 
+    });
+  }, [navigateToStep]);
+
   const goToRegistroHeredero = useCallback((options?: HerederoNavigationOptions) => {
     navigateToStep(HEREDEROS_ROUTES.REGISTRO_HEREDERO, options);
   }, [navigateToStep]);
@@ -127,6 +136,7 @@ export const useHerederoNavigation = () => {
     goToRequisitosTitular,
     goToDatosTitular,
     goToRegistroTitular,
+    goToRegistroTitularClean, // Nueva función
     goToRegistroHeredero,
     goToFormIngreso,
     goToCargaDocumentos,

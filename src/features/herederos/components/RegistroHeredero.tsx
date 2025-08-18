@@ -1,15 +1,29 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
 import { useHeredero } from '../contexts/HerederoContext';
+import { useHerederoNavigation } from '../hooks/useHerederoNavigation';
 import { FormHerederoProvider } from '../provider/FormHerederoProvider';
 import { RegistroTitularCard } from './RegistroTitularCard';
 import { Stepper } from './Stepper';
 
 const RegistroHeredero: React.FC = () => {
-  const { heredero, buscarHeredero, error } = useHeredero();
-  const navigate = useNavigate();
+  const { heredero, buscarHeredero, error, limpiarHeredero } = useHeredero();
+  const { goToRegistroTitularClean } = useHerederoNavigation();
   
+  /**
+   * Función para manejar el botón volver
+   * - Limpia el formulario del heredero del contexto
+   * - Navega a la misma ruta usando replace para evitar entradas duplicadas en el historial
+   * - Esto permite que el usuario vuelva a buscar un heredero con el formulario limpio
+   */
+  const handleVolver = () => {
+    // Limpiar el heredero del contexto para resetear el formulario
+    if (limpiarHeredero) {
+      limpiarHeredero();
+    }
+    // Navegar a la misma ruta pero con el formulario limpio usando replace
+    goToRegistroTitularClean();
+  };
 
 
     const breadcrumbItems: ConsaludCore.BreadcrumbItem[] = [
@@ -45,7 +59,7 @@ const RegistroHeredero: React.FC = () => {
                         <div>
                             <button
                                 className="back-button"
-                                onClick={() => navigate(-1)}
+                                onClick={handleVolver}
                                 aria-label="Volver a la página anterior"
                             >
                                 <span className="back-button-icon">←</span> Volver

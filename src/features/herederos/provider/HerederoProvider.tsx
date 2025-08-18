@@ -214,8 +214,10 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
   }, [formatSimpleRut, navigate]);
 
   const limpiarHeredero = useCallback(() => {
+    console.log('HerederoProvider - limpiarHeredero llamado');
     setHeredero(null);
     setError(null);
+    setLoading(false); // Asegurar que loading se resetee
     setFieldsLocked(false); // Limpiar también el estado de bloqueo
     // Limpiar también el sessionStorage
     sessionStorage.removeItem('herederoData');
