@@ -20,10 +20,11 @@ const IngresoTitular: React.FC = () => {
     const { goToRequisitosTitular } = useHerederoNavigation();
     const { rut, isValid: isValidRut, handleRutChange } = useRutChileno();
     const [showError, setShowError] = useState(false);
-    const { buscarTitular, error, loading } = useTitular();
+    const { buscarTitular, error, loading, limpiarTitular } = useTitular();
     const { limpiarHeredero } = useHeredero();
     const { cleanupAllHerederoData } = useStorageCleanup();
     const [showStepperError, setShowStepperError] = useState(false);
+    const [hasShown404Alert, setHasShown404Alert] = useState(false);
     
     // Hook de alertas - se ejecuta solo una vez
     const alertFunctions = UseAlert();
@@ -44,15 +45,20 @@ const IngresoTitular: React.FC = () => {
         alertFunctions.mostrarAlerta2();
     }, [alertFunctions]);
     
-    const mostrarAlerta3 = useCallback(() => {
-        alertFunctions.mostrarAlerta3();
+    const mostrarAlerta3 = useCallback((onClose?: () => void) => {
+        alertFunctions.mostrarAlerta3(onClose);
     }, [alertFunctions]);
 
     // Resetear navegación y errores al cambiar el RUT
     useEffect(() => {
         setShowError(false);
         setShowStepperError(false);
-    }, [rut]);
+        setHasShown404Alert(false);
+        // Limpiar error del contexto cuando cambie el RUT
+        if (error) {
+            limpiarTitular();
+        }
+    }, [rut, error, limpiarTitular]);
 
     // Lógica de validación y envío
     const handleBlur = useCallback(() => {
@@ -90,8 +96,9 @@ const IngresoTitular: React.FC = () => {
             }
         } catch (e) {
             // Si hay un error específico de "no encontrado", mostrar la alerta correspondiente
-            if (error === 'No hay solicitantes en maestro de contactibilidad') {
-                mostrarAlerta3();
+            if (error === '404_NOT_FOUND') {
+                // No mostrar la alerta aquí, ya se maneja en el useEffect
+                return; // Detener el flujo inmediatamente
             } else {
                 setShowStepperError(true);
             }
@@ -143,12 +150,17 @@ const IngresoTitular: React.FC = () => {
         </div>
     );
 
-    // Ya no necesitamos este useEffect porque la alerta se maneja en handleFlow
-    // useEffect(() => {
-    //     if (error === 'No hay solicitantes en maestro de contactibilidad' && !hasShownErrorAlert) {
-    //         mostrarAlerta3();
-    //     }
-    // }, [error, hasShownErrorAlert, mostrarAlerta3]);
+    // useEffect para manejar errores específicos del contexto
+    useEffect(() => {
+        if (error === '404_NOT_FOUND' && !hasShown404Alert) {
+            setHasShown404Alert(true);
+            mostrarAlerta3(() => {
+                // Limpiar el error cuando el usuario cierre la alerta
+                limpiarTitular();
+                setHasShown404Alert(false);
+            });
+        }
+    }, [error, limpiarTitular, hasShown404Alert]);
 
     // --- RETURNS CONDICIONALES DESPUÉS DE LOS HOOKS ---
     // Render principal (formulario) + overlay modal si corresponde

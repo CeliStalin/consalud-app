@@ -44,8 +44,8 @@ export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) =>
         } catch (err: any) {
           if (err.message === '500') {
             setError('BFF_ERROR_500');
-          } else if (err.message === 'No hay solicitantes en maestro de contactibilidad') {
-            setError('No hay solicitantes en maestro de contactibilidad');
+          } else if (err.message === '404_NOT_FOUND') {
+            setError('404_NOT_FOUND');
           } else {
             setError('Error al buscar el titular en BFF');
           }

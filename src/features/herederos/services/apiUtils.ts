@@ -61,7 +61,8 @@ export async function apiGet<T>(url: string, config: ApiConfig, context: string)
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      // Lanzar error con el código de estado específico para mejor manejo
+      throw new Error(`${response.status}`);
     }
 
     return await response.json();
@@ -84,7 +85,8 @@ export async function apiPost<T>(url: string, data: any, config: ApiConfig, cont
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      // Lanzar error con el código de estado específico para mejor manejo
+      throw new Error(`${response.status}`);
     }
 
     return await response.json();

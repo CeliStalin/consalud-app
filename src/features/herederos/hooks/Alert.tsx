@@ -37,7 +37,7 @@ import cartaPosesion from '../components/styles/img/posesion.png';
         });
       };
 
-      const mostrarAlerta3 = () => {
+      const mostrarAlerta3 = (onClose?: () => void) => {
         Swal.fire({
           title: 'RUT no encontrado en Consalud',
           text: 'El RUT ingresado no esta asociado a ningún afiliado o exafiliado de Consalud.',
@@ -55,6 +55,10 @@ import cartaPosesion from '../components/styles/img/posesion.png';
           // Asegurar que la alerta se cierre correctamente
           if (result.isConfirmed) {
             Swal.close();
+            // Ejecutar callback si existe
+            if (onClose) {
+              onClose();
+            }
           }
         });
       };

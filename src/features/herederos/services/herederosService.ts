@@ -40,8 +40,8 @@ export class HerederosService {
       return titular;
     } catch (error: any) {
       // Manejo específico para errores de titular
-      if (error.message?.includes('404')) {
-        throw new Error('No hay solicitantes en maestro de contactibilidad');
+      if (error.message === '404') {
+        throw new Error('404_NOT_FOUND');
       }
       throw error;
     }
