@@ -9,7 +9,7 @@ import cartaPosesion from '../components/styles/img/posesion.png';
     const mostrarAlerta = () => {
         Swal.fire({
           title: 'No es posible continuar con este RUT',
-          text: 'La persona sigue vigente en Consalud y no aparece como fallecida.',
+          text: 'El RUT asociado no corresponde a una persona fallecida.',
           confirmButtonColor: '#04A59B',
           showCloseButton: true,
           confirmButtonText: 'Entendido',
