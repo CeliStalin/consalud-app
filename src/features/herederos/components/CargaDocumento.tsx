@@ -111,19 +111,6 @@ const CargaDocumento: React.FC = () => {
     }
   }, [documentFiles, checked, navigate, tiposDocumento]);
 
-  const getDescriptionForTipo = useCallback((tipo: TipoDocumento): string => {
-    switch (tipo.valValor) {
-      case 1: // Cédula de Identidad
-        return 'Copia legible del documento oficial por ambas caras, que acredita la identidad de la persona heredera.';
-      case 2: // Poder Notarial
-        return 'Documento legal que autoriza a la persona heredera para actuar en representación de terceros.';
-      case 3: // Posesión Efectiva
-        return 'Documento legal que otorga a la persona heredera el derecho de acceder y administrar los bienes y derechos del titular fallecido.';
-      default:
-        return 'Documento requerido para el proceso de herencia.';
-    }
-  }, []);
-
   // Mostrar loading mientras se cargan los tipos de documento
   if (loadingTipos) {
     return (
@@ -247,8 +234,8 @@ const CargaDocumento: React.FC = () => {
               fileState={documentFiles[tipo.valValor] || { file: null, error: null }}
               onFileChange={(e) => handleFileChange(e, tipo.valValor)}
               onDivClick={() => {}} // El componente interno maneja el click
-              title={tipo.descripcion}
-              description={getDescriptionForTipo(tipo)}
+              title={tipo.nombre}
+              description={tipo.descripcion}
               onHelpClick={() => handleFlow(tipo)}
               showHelp={true}
             />

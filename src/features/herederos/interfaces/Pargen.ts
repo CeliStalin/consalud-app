@@ -49,5 +49,6 @@ export interface NumeroCalle {
 
 export interface TipoDocumento {
   valValor: number;
+  nombre: string;
   descripcion: string;
 } 
