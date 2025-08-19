@@ -1,33 +1,40 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { useRutChileno } from "@/features/herederos/hooks/useRutChileno";
 import { useHeredero } from "@/features/herederos/contexts/HerederoContext";
 import { useTitular } from "@/features/herederos/contexts/TitularContext";
 import { UseAlert } from "@/features/herederos/hooks/Alert";
+import { useRutChileno } from "@/features/herederos/hooks/useRutChileno";
 import { useStorageCleanup } from "@/features/herederos/hooks/useStorageCleanup";
 import * as ConsaludCore from '@consalud/core';
+import React, { useCallback, useEffect, useState } from "react";
+import { validarRutsDiferentes } from '../../../utils/rutValidation';
 import FormIngresoHeredero from './FormIngresoHeredero';
 import RutErrorMessage from './RutErrorMessage';
-import { validarRutsDiferentes } from '../../../utils/rutValidation';
 
 interface RegistroTitularCardProps {
   buscarHeredero: (rut: string) => Promise<void>;
   error: string | null;
 }
 
-export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({ 
-  buscarHeredero, 
-  error 
+/**
+ * Componente para el registro de titular con funcionalidad mejorada:
+ * - El input de RUT permanece habilitado después de cargar el formulario
+ * - Al cambiar el RUT, se limpian automáticamente los datos del formulario y documentos
+ * - Se actualiza el session storage para mantener la consistencia de datos
+ */
+export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
+  buscarHeredero,
+  error
 }) => {
   const { rut, isValid: isValidRut, handleRutChange, setRut } = useRutChileno();
   const { heredero, limpiarHeredero } = useHeredero();
   const { titular } = useTitular();
   const { mostrarAlertaTitularHeredero } = UseAlert();
-  const { cleanupFormHerederoData } = useStorageCleanup();
-  
+  const { cleanupFormHerederoData, cleanupDocumentsByRut } = useStorageCleanup();
+
   // Estados simplificados
   const [showError, setShowError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [showForm, setShowForm] = useState<boolean>(false);
+  const [lastSearchedRut, setLastSearchedRut] = useState<string>('');
 
   // Limpiar datos de otros RUTs cuando cambie el heredero
   useEffect(() => {
@@ -40,10 +47,11 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
   useEffect(() => {
     const hasHeredero = heredero !== null && heredero !== undefined;
     setShowForm(hasHeredero);
-    
+
     // Si hay heredero, establecer el RUT en el input
     if (hasHeredero && heredero.rut && rut !== heredero.rut) {
       setRut(heredero.rut);
+      setLastSearchedRut(heredero.rut);
     }
   }, [heredero, setRut, rut]);
 
@@ -56,12 +64,45 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
     }
   }, [heredero]);
 
+  // Función para limpiar datos cuando cambie el RUT
+  const limpiarDatosPorCambioRut = useCallback((nuevoRut: string) => {
+    const rutLimpio = nuevoRut.replace(/[^0-9kK]/g, '');
+    const lastRutLimpio = lastSearchedRut.replace(/[^0-9kK]/g, '');
+
+    // Si el RUT cambió y es diferente al último buscado, limpiar datos
+    if (lastSearchedRut && rutLimpio !== lastRutLimpio) {
+      console.log('🔄 RUT cambiado, limpiando datos anteriores:', lastRutLimpio, '→', rutLimpio);
+
+      // Limpiar heredero actual
+      if (limpiarHeredero) {
+        limpiarHeredero();
+      }
+
+      // Limpiar formulario y documentos del RUT anterior
+      if (lastRutLimpio) {
+        cleanupFormHerederoData(lastRutLimpio);
+        cleanupDocumentsByRut(lastRutLimpio);
+      }
+
+      // Limpiar formulario y documentos del nuevo RUT si es diferente
+      if (rutLimpio && rutLimpio !== lastRutLimpio) {
+        cleanupFormHerederoData(rutLimpio);
+        cleanupDocumentsByRut(rutLimpio);
+      }
+
+      setShowForm(false);
+      setShowError(false);
+      setLoading(false);
+    }
+  }, [lastSearchedRut, limpiarHeredero, cleanupFormHerederoData, cleanupDocumentsByRut]);
+
   // Función simplificada para limpiar el estado
   const limpiarEstado = useCallback(() => {
     setRut('');
     setShowError(false);
     setShowForm(false);
     setLoading(false);
+    setLastSearchedRut('');
     if (limpiarHeredero) {
       limpiarHeredero();
     }
@@ -75,35 +116,37 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
   // Función principal para buscar heredero
   const handleBuscarHeredero = useCallback(async (): Promise<void> => {
     const rutLimpio = rut.replace(/[^0-9kK]/g, '');
-    
+
     if (!rutLimpio) {
       return;
     }
-    
+
     if (!isValidRut) {
       setShowError(true);
       return;
     }
-    
+
     // Validar que el RUT del heredero no sea igual al del titular
     if (titular && titular.rut && !compararRuts(rutLimpio, titular.rut)) {
       mostrarAlertaTitularHeredero();
       limpiarEstado();
       return;
     }
-    
+
     setShowError(false);
     setLoading(true);
-    
+
     try {
       await buscarHeredero(rutLimpio);
+      setLastSearchedRut(rutLimpio);
     } catch (error: any) {
       console.error('❌ Error en búsqueda:', error);
-      
+
       // Manejar error 412 (Precondition Failed) - heredero no encontrado
       if (error.message && error.message.includes('412')) {
         // El provider ya maneja el 412 y crea un heredero vacío
         // No necesitamos hacer nada adicional aquí
+        setLastSearchedRut(rutLimpio);
       }
     } finally {
       setLoading(false);
@@ -120,8 +163,12 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
   }, []);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>): void => {
+    const nuevoRut = e.target.value;
     handleRutChange(e);
-  }, [handleRutChange]);
+
+    // Verificar si el RUT cambió significativamente
+    limpiarDatosPorCambioRut(nuevoRut);
+  }, [handleRutChange, limpiarDatosPorCambioRut]);
 
   const handleSubmit = useCallback((e: React.FormEvent): void => {
     e.preventDefault();
@@ -163,14 +210,14 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
                   Registrar persona heredera
                 </ConsaludCore.Typography>
               </div>
-              <ConsaludCore.Typography
-                variant="body2"
-                style={{ color: '#656565', fontSize: 15, textAlign: 'left' }}
-              >
-                Ingresa los datos de la persona heredera para la devolución.
-              </ConsaludCore.Typography>
+                             <ConsaludCore.Typography
+                 variant="body2"
+                 style={{ color: '#656565', fontSize: 15, textAlign: 'left' }}
+               >
+                 Ingresa los datos de la persona heredera para la devolución.
+               </ConsaludCore.Typography>
             </div>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8, width: '100%' }}>
               <ConsaludCore.Typography
                 variant="body2"
@@ -193,21 +240,21 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
                   disabled={loading}
                   aria-invalid={showError}
                   aria-describedby={showError ? 'rut-error' : undefined}
-                  style={{ 
-                    width: 378, 
-                    height: 42, 
-                    flexShrink: 0, 
-                    border: showError ? '1.5px solid #E11D48' : '1.5px solid #e0e0e0', 
-                    borderRadius: 24, 
-                    fontSize: 16, 
-                    paddingLeft: 18, 
-                    background: '#f8f9fa', 
-                    boxShadow: '0 2px 8px rgba(4, 165, 155, 0.07)', 
-                    outline: 'none', 
-                    transition: 'border 0.2s' 
+                  style={{
+                    width: 378,
+                    height: 42,
+                    flexShrink: 0,
+                    border: showError ? '1.5px solid #E11D48' : '1.5px solid #e0e0e0',
+                    borderRadius: 24,
+                    fontSize: 16,
+                    paddingLeft: 18,
+                    background: '#f8f9fa',
+                    boxShadow: '0 2px 8px rgba(4, 165, 155, 0.07)',
+                    outline: 'none',
+                    transition: 'border 0.2s'
                   }}
                 />
-                
+
                 <button
                   className={`button is-primary is-rounded proceso-button animate-fade-in-up${isValidRut ? ' buttonRut--valid' : ' buttonRut--invalid'}`}
                   disabled={!isValidRut || loading}
@@ -248,9 +295,9 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
                 </button>
               </div>
             </div>
-            
+
             {showError && <RutErrorMessage id="rut-error" />}
-            
+
             {error && (
               <div style={{ color: '#E11D48', fontSize: 12, marginTop: 4, textAlign: 'left' }}>
                 {error}
@@ -268,4 +315,4 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
       )}
     </div>
   );
-}; 
+};
