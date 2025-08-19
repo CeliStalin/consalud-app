@@ -6,6 +6,7 @@ import { TitularContextType } from "../interfaces/TitularContext";
 import { TitularContext } from "../contexts/TitularContext";
 import { useRutChileno } from "../hooks/useRutChileno";
 import { fetchTitularByRut } from '../services';
+import { extraerNumerosRut } from '../../../utils/rutValidation';
 
 export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) => {
   const [titular, setTitular] = useState<Titular | null>(() => {
@@ -30,8 +31,7 @@ export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) =>
       const bffDns = import.meta.env.VITE_BFF_HEREDEROS_DNS;
       if (bffDns) {
         try {
-          const rutNumeros = rut.replace(/[^0-9]/g, '');
-          const rutSinDV = rutNumeros.slice(0, -1);
+          const rutSinDV = extraerNumerosRut(rut);
           // Obtener userName desde localStorage o sessionStorage si existe
           const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || '';
           const titularData = await fetchTitularByRut(Number(rutSinDV), userName);

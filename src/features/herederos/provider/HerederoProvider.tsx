@@ -8,7 +8,7 @@ import { HerederoContext } from "../contexts/HerederoContext";
 import { useRutChileno } from "../hooks/useRutChileno";
 import { fetchSolicitanteMejorContactibilidad } from "../services";
 import { validarEdadConMensaje, MENSAJES_ERROR } from "../../../utils/ageValidation";
-import { formatearRut } from "../../../utils/rutValidation";
+import { formatearRut, extraerNumerosRut } from "../../../utils/rutValidation";
 
 export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) => {
   const [heredero, setHeredero] = useState<Heredero | null>(null);
@@ -83,9 +83,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       const bffDns = import.meta.env.VITE_BFF_HEREDEROS_DNS;
       if (bffDns) {
         // Usar BFF
-        const rutLimpio = rut.replace(/[^0-9kK]/g, '');
-        // Extraer solo la parte numérica del RUT (sin DV) para el BFF
-        const rutSinDV = rutLimpio.slice(0, -1); // Remueve el último carácter (DV)
+        const rutSinDV = extraerNumerosRut(rut);
         // Obtener userName desde localStorage o sessionStorage si existe
         const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || '';
         
@@ -171,7 +169,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
           // Manejar específicamente el status 412
           if (err.message && err.message.includes('412')) {
             // Crear heredero vacío para status 412
-            const emptyHeredero = createEmptyHeredero(rutLimpio);
+            const emptyHeredero = createEmptyHeredero(rut);
             setHeredero(emptyHeredero);
             setFieldsLocked(false); // No bloquear campos para formulario vacío
             setError(null); // No mostrar error
