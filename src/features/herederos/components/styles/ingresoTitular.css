@@ -4,7 +4,7 @@
     width: 500px !important;
     max-width: 90% !important;
   }
-  
+
   /* Botón de cierre (X) */
   .swal-close-button {
     background-color: #f0f0f0 !important;
@@ -18,7 +18,7 @@
     color: #666 !important;
     box-shadow: none !important;
   }
-  
+
   /* Título del modal */
   .titulo-alerta {
     color: #424242 !important;
@@ -29,7 +29,7 @@
     padding: 0 30px !important;
     line-height: 1.3 !important;
   }
-  
+
   /* Texto del modal */
   .sub-titulo-alerta {
     color: #555 !important;
@@ -38,7 +38,7 @@
     line-height: 1.5 !important;
     text-align: center !important;
   }
-  
+
   /* Botón de confirmación */
   .boton-alerta {
     background-color: #04A59B !important;
@@ -52,28 +52,46 @@
     width: auto !important;
     min-width: 200px !important;
   }
-  
- 
+
+
   .swal2-html-container {
     margin-top: 0 !important;
   }
-  
+
   .swal2-icon {
     display: none !important;
   }
-  
+
   .swal2-actions {
     margin-top: 0 !important;
   }
-  
-  
+
+
   .swal2-close:hover {
     background-color: #e6e6e6 !important;
     color: #333 !important;
   }
-  
+
   .boton-alerta:hover {
     background-color: #039389 !important;
+  }
+
+  /* Botón cancelar */
+  .boton-alerta-cancelar {
+    background-color: white !important;
+    color: #04A59B !important;
+    font-size: 18px !important;
+    padding: 12px 45px !important;
+    border-radius: 50px !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+    border: 2px solid #04A59B !important;
+    width: auto !important;
+    min-width: 200px !important;
+  }
+
+  .boton-alerta-cancelar:hover {
+    background-color: #f0f9f8 !important;
   }
 
 /* Animación de overlay y modal con blur y zoom */

@@ -1,15 +1,15 @@
-import { useState, useEffect, useCallback } from "react";
-import * as ConsaludCore from '@consalud/core'; 
-import { useRutChileno } from "../hooks/useRutChileno";
-import { useHerederoNavigation } from "../hooks/useHerederoNavigation";
-import { useStorageCleanup } from "../hooks/useStorageCleanup";
-import '../components/styles/ingresoTitular.css';
-import '../../../pages/styles/IngresoHerederosPage.css';
-import { useTitular } from "../contexts/TitularContext";
-import { useHeredero } from "../contexts/HerederoContext";
 import UserProfileIcon from '@/assets/user-profile.svg';
-import RutErrorMessage from './RutErrorMessage';
+import * as ConsaludCore from '@consalud/core';
+import { useCallback, useEffect, useState } from "react";
+import '../../../pages/styles/IngresoHerederosPage.css';
+import '../components/styles/ingresoTitular.css';
+import { useHeredero } from "../contexts/HerederoContext";
+import { useTitular } from "../contexts/TitularContext";
 import { UseAlert } from "../hooks/Alert";
+import { useHerederoNavigation } from "../hooks/useHerederoNavigation";
+import { useRutChileno } from "../hooks/useRutChileno";
+import { useStorageCleanup } from "../hooks/useStorageCleanup";
+import RutErrorMessage from './RutErrorMessage';
 
 /**
  * Componente robusto para el ingreso de RUT del titular.
@@ -25,28 +25,32 @@ const IngresoTitular: React.FC = () => {
     const { cleanupAllHerederoData } = useStorageCleanup();
     const [showStepperError, setShowStepperError] = useState(false);
     const [hasShown404Alert, setHasShown404Alert] = useState(false);
-    
+
     // Hook de alertas - se ejecuta solo una vez
     const alertFunctions = UseAlert();
-    
+
     // Limpiar datos anteriores al iniciar un flujo nuevo
     useEffect(() => {
         cleanupAllHerederoData();
         limpiarHeredero();
         console.log('🧹 Datos anteriores limpiados al iniciar flujo nuevo');
     }, [limpiarHeredero, cleanupAllHerederoData]);
-    
+
     // Memoizar las funciones de alerta para evitar recreaciones
     const mostrarAlerta = useCallback(() => {
         alertFunctions.mostrarAlerta();
     }, [alertFunctions]);
-    
+
     const mostrarAlerta2 = useCallback(() => {
         alertFunctions.mostrarAlerta2();
     }, [alertFunctions]);
-    
+
     const mostrarAlerta3 = useCallback((onClose?: () => void) => {
         alertFunctions.mostrarAlerta3(onClose);
+    }, [alertFunctions]);
+
+    const mostrarAlertaHerederoRegistrado = useCallback((onModificar?: () => void) => {
+        alertFunctions.mostrarAlertaHerederoRegistrado(onModificar);
     }, [alertFunctions]);
 
     // Resetear navegación y errores al cambiar el RUT
@@ -94,6 +98,23 @@ const IngresoTitular: React.FC = () => {
                 mostrarAlerta2();
                 return;
             }
+            // Validar si el titular posee fondos y solicitudes (nueva validación)
+            if (titularResult && titularResult.poseeFondos && titularResult.poseeSolicitud) {
+                mostrarAlertaHerederoRegistrado(() => {
+                    // Continuar con el flujo cuando el usuario hace clic en "Modificar"
+                    setTimeout(() => {
+                        const stored = sessionStorage.getItem('titularContext');
+                        const titularContext = stored ? JSON.parse(stored) : null;
+                        const titularOk = titularContext && titularContext.rut && titularContext.rut.replace(/\./g, '').toLowerCase() === rut.replace(/\./g, '').toLowerCase();
+                        if (titularOk && titularContext.indFallecido === 'S' && titularContext.poseeFondos) {
+                            goToRequisitosTitular();
+                        } else {
+                            console.log('NO NAVEGA: titular en contexto/sessionStorage no coincide o no cumple condiciones');
+                        }
+                    }, 0);
+                });
+                return;
+            }
         } catch (e) {
             // Si hay un error específico de "no encontrado", mostrar la alerta correspondiente
             if (error === '404_NOT_FOUND') {
@@ -115,7 +136,7 @@ const IngresoTitular: React.FC = () => {
                 console.log('NO NAVEGA: titular en contexto/sessionStorage no coincide o no cumple condiciones');
             }
         }, 0);
-    }, [isValidRut, rut, buscarTitular, goToRequisitosTitular, mostrarAlerta, mostrarAlerta2, mostrarAlerta3, error]);
+    }, [isValidRut, rut, buscarTitular, goToRequisitosTitular, mostrarAlerta, mostrarAlerta2, mostrarAlerta3, mostrarAlertaHerederoRegistrado, error]);
 
     // Feedback visual para error inesperado (modal)
     const renderStepperError = () => (
@@ -198,7 +219,7 @@ const IngresoTitular: React.FC = () => {
                                         variant="subtitle1"
                                         style={{ fontWeight: 700, color: '#505050', fontSize: 18 ,width: '100%'}}
                                     >
-                                        Rut del titular 
+                                        Rut del titular
                                     </ConsaludCore.Typography>
                                 </div>
                                 <ConsaludCore.Typography

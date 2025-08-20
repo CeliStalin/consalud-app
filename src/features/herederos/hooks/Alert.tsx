@@ -1,9 +1,9 @@
 import Swal from "sweetalert2";
-import'../components/styles/ingresoTitular.css'
-import cedulaFront from '../components/styles/img/front_cedula.png';
 import cedulaBack from '../components/styles/img/back_cedula.png';
 import cartaPoder from '../components/styles/img/carta_poder.png';
+import cedulaFront from '../components/styles/img/front_cedula.png';
 import cartaPosesion from '../components/styles/img/posesion.png';
+import '../components/styles/ingresoTitular.css';
 
  export const UseAlert = () => {
     const mostrarAlerta = () => {
@@ -22,7 +22,7 @@ import cartaPosesion from '../components/styles/img/posesion.png';
           }
         });
       };
-    
+
       const mostrarAlerta2 = () => {
         Swal.fire({
           title: 'El RUT ingresado no tiene devolución',
@@ -33,7 +33,7 @@ import cartaPosesion from '../components/styles/img/posesion.png';
             confirmButton: 'boton-alerta',
             title: 'titulo-alerta',
             htmlContainer : 'sub-titulo-alerta'
-          } 
+          }
         });
       };
 
@@ -50,7 +50,7 @@ import cartaPosesion from '../components/styles/img/posesion.png';
             confirmButton: 'boton-alerta',
             title: 'titulo-alerta',
             htmlContainer : 'sub-titulo-alerta'
-          } 
+          }
         }).then((result) => {
           // Asegurar que la alerta se cierre correctamente
           if (result.isConfirmed) {
@@ -76,6 +76,32 @@ import cartaPosesion from '../components/styles/img/posesion.png';
             htmlContainer : 'sub-titulo-alerta',
             closeButton: 'swal-close-button',
             popup: 'swal2-modal'
+          }
+        });
+      };
+
+      const mostrarAlertaHerederoRegistrado = (onModificar?: () => void) => {
+        Swal.fire({
+          title: 'Ya existe una persona heredera registrada',
+          text: 'Para modificar esta información, continúa con el proceso.',
+          showCancelButton: true,
+          confirmButtonText: 'Modificar',
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#04A59B',
+          cancelButtonColor: '#04A59B',
+          showCloseButton: true,
+          reverseButtons: true,
+          customClass: {
+            confirmButton: 'boton-alerta',
+            cancelButton: 'boton-alerta-cancelar',
+            title: 'titulo-alerta',
+            htmlContainer: 'sub-titulo-alerta',
+            closeButton: 'swal-close-button',
+            popup: 'swal2-modal'
+          }
+        }).then((result) => {
+          if (result.isConfirmed && onModificar) {
+            onModificar();
           }
         });
       };
@@ -109,7 +135,7 @@ import cartaPosesion from '../components/styles/img/posesion.png';
              title: 'titulo-alerta',
              htmlContainer : 'sub-titulo-alerta',
              popup: 'swal2-modal'
-          } 
+          }
         });
       };
 
@@ -136,10 +162,10 @@ import cartaPosesion from '../components/styles/img/posesion.png';
              confirmButton: 'boton-alerta',
              title: 'titulo-alerta',
              htmlContainer : 'sub-titulo-alerta'
-          } 
+          }
         });
       };
-      
+
       const ejemploPosesion = () => {
         Swal.fire({
           title: 'Posesión efectiva',
@@ -164,7 +190,7 @@ import cartaPosesion from '../components/styles/img/posesion.png';
              confirmButton: 'boton-alerta',
              title: 'titulo-alerta',
              htmlContainer : 'sub-titulo-alerta'
-          } 
+          }
         });
       };
       return{
@@ -172,6 +198,7 @@ import cartaPosesion from '../components/styles/img/posesion.png';
         mostrarAlerta2,
         mostrarAlerta3,
         mostrarAlertaTitularHeredero,
+        mostrarAlertaHerederoRegistrado,
         ejemploCedula,
         ejemploPoder,
         ejemploPosesion
