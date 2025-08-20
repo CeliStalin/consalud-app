@@ -49,8 +49,8 @@ const IngresoTitular: React.FC = () => {
         alertFunctions.mostrarAlerta3(onClose);
     }, [alertFunctions]);
 
-    const mostrarAlertaHerederoRegistrado = useCallback((onModificar?: () => void) => {
-        alertFunctions.mostrarAlertaHerederoRegistrado(onModificar);
+    const mostrarAlertaHerederoRegistrado = useCallback(() => {
+        alertFunctions.mostrarAlertaHerederoRegistrado();
     }, [alertFunctions]);
 
     // Resetear navegación y errores al cambiar el RUT
@@ -100,19 +100,7 @@ const IngresoTitular: React.FC = () => {
             }
             // Validar si el titular posee fondos y solicitudes (nueva validación)
             if (titularResult && titularResult.poseeFondos && titularResult.poseeSolicitud) {
-                mostrarAlertaHerederoRegistrado(() => {
-                    // Continuar con el flujo cuando el usuario hace clic en "Modificar"
-                    setTimeout(() => {
-                        const stored = sessionStorage.getItem('titularContext');
-                        const titularContext = stored ? JSON.parse(stored) : null;
-                        const titularOk = titularContext && titularContext.rut && titularContext.rut.replace(/\./g, '').toLowerCase() === rut.replace(/\./g, '').toLowerCase();
-                        if (titularOk && titularContext.indFallecido === 'S' && titularContext.poseeFondos) {
-                            goToRequisitosTitular();
-                        } else {
-                            console.log('NO NAVEGA: titular en contexto/sessionStorage no coincide o no cumple condiciones');
-                        }
-                    }, 0);
-                });
+                mostrarAlertaHerederoRegistrado();
                 return;
             }
         } catch (e) {
@@ -295,3 +283,4 @@ const IngresoTitular: React.FC = () => {
 };
 
 export { IngresoTitular };
+
