@@ -18,7 +18,7 @@ RUN npm ci --no-audit --no-fund
 COPY . .
 
 # Selecciona el archivo de entorno según el ambiente
-RUN if [ "$AMBIENTE" = "desarrollo" ]; then \
+RUN if [ "$AMBIENTE" = "development" ]; then \
       cp .env.development .env ; \
     elif [ "$AMBIENTE" = "testing" ]; then \
       cp .env.test .env ; \
