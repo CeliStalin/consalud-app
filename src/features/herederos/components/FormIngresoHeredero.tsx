@@ -433,6 +433,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       codRegion: regionObj?.idRegion || undefined,
       ciudad: '', // Resetear ciudad al cambiar región
       comuna: '', // Resetear comuna al cambiar región
+      calle: '', // Resetear calle al cambiar región
+      numero: '', // Resetear número al cambiar región
       codCiudad: undefined, // Resetear código de ciudad
       codComuna: undefined // Resetear código de comuna
     };
@@ -450,6 +452,12 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       });
     }
 
+    // Limpiar listas dependientes
+    setCiudades([]);
+    setComunas([]);
+    setErrorCiudades(null);
+    setErrorComunas(null);
+
     // Cargar ciudades de la región seleccionada
     if (regionObj) {
       setLoadingCiudades(true);
@@ -463,8 +471,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
           setCiudades([]);
         })
         .finally(() => setLoadingCiudades(false));
-    } else {
-      setCiudades([]);
     }
   };
 
@@ -480,6 +486,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       ciudad: value,
       codCiudad: ciudadObj?.idCiudad || undefined,
       comuna: '', // Resetear comuna al cambiar ciudad
+      calle: '', // Resetear calle al cambiar ciudad
+      numero: '', // Resetear número al cambiar ciudad
       codComuna: undefined // Resetear código de comuna
     };
 
@@ -496,6 +504,10 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       });
     }
 
+    // Limpiar lista de comunas
+    setComunas([]);
+    setErrorComunas(null);
+
     // Cargar comunas de la ciudad seleccionada
     if (ciudadObj) {
       setLoadingComunas(true);
@@ -509,8 +521,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
           setComunas([]);
         })
         .finally(() => setLoadingComunas(false));
-    } else {
-      setComunas([]);
     }
   };
 
