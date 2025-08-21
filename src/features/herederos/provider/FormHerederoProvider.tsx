@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { FormHerederoContext } from "../contexts/FormHerederoContext";
 import { FormData } from "../interfaces/FormData";
 import { FormHerederoContextType } from "../interfaces/FormHerederoContext";
-import { FormHerederoContext } from "../contexts/FormHerederoContext";
 
 interface FormHerederoProviderProps {
   children: React.ReactNode;
@@ -18,89 +18,68 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
     return `${STORAGE_KEY_PREFIX}_${rutToUse.replace(/[^0-9kK]/g, '')}`;
   }, [rutHeredero]);
 
+  const [formData, setFormData] = useState<FormData | null>(() => {
+    // Inicializar desde storage si hay datos
+    if (rutHeredero) {
+      const storageKey = `${STORAGE_KEY_PREFIX}_${rutHeredero.replace(/[^0-9kK]/g, '')}`;
+      const stored = sessionStorage.getItem(storageKey);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed.fechaNacimiento) {
+            parsed.fechaNacimiento = new Date(parsed.fechaNacimiento);
+          }
+          return parsed as FormData;
+        } catch {
+          return null;
+        }
+      }
+    }
+    return null;
+  });
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState<boolean>(() => {
+    if (rutHeredero) {
+      const storageKey = `${STORAGE_KEY_PREFIX}_${rutHeredero.replace(/[^0-9kK]/g, '')}`;
+      return sessionStorage.getItem(storageKey) !== null;
+    }
+    return false;
+  });
+
   // Limpiar claves antiguas sin RUT al inicializar
   useEffect(() => {
     // Limpiar la clave antigua sin RUT si existe
     const oldKey = STORAGE_KEY_PREFIX;
     const oldData = sessionStorage.getItem(oldKey);
-    
+
     if (oldData && rutHeredero) {
       // Migrar datos de la clave antigua a la nueva con RUT
       const storageKey = getStorageKey();
       sessionStorage.setItem(storageKey, oldData);
       sessionStorage.removeItem(oldKey);
-      console.log('🔄 Migrado datos de clave antigua a nueva:', oldKey, '→', storageKey);
     } else if (oldData && !rutHeredero) {
       // Si no hay RUT pero hay datos antiguos, limpiarlos para evitar duplicación
       sessionStorage.removeItem(oldKey);
-      console.log('🗑️ Limpiada clave antigua sin RUT:', oldKey);
-    }
-  }, [rutHeredero, getStorageKey]);
-
-  const [formData, setFormData] = useState<FormData | null>(() => {
-    const storageKey = getStorageKey();
-    const stored = sessionStorage.getItem(storageKey);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        // Convertir la fecha de vuelta a objeto Date si existe
-        if (parsed.fechaNacimiento) {
-          parsed.fechaNacimiento = new Date(parsed.fechaNacimiento);
-        }
-        return parsed as FormData;
-      } catch {
-        return null;
-      }
-    }
-    return null;
-  });
-  
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isDirty, setIsDirty] = useState<boolean>(() => {
-    // Verificar si hay datos en sessionStorage para determinar si está dirty
-    const storageKey = getStorageKey();
-    return sessionStorage.getItem(storageKey) !== null;
-  });
-
-  // Limpiar formulario cuando cambie el rutHeredero (solo si hay un valor previo)
-  useEffect(() => {
-    if (rutHeredero) {
-      // Solo limpiar si hay un RUT específico, no en la carga inicial
-      const storageKey = getStorageKey();
-      const currentStored = sessionStorage.getItem(storageKey);
-      
-      // Si hay datos almacenados para un RUT diferente, limpiarlos
-      if (currentStored) {
-        try {
-          // Verificar si los datos son para un RUT diferente
-          // (esto se maneja en el componente FormIngresoHeredero)
-          JSON.parse(currentStored);
-        } catch {
-          // Si hay error al parsear, limpiar
-          setFormData(null);
-          setIsDirty(false);
-          sessionStorage.removeItem(storageKey);
-        }
-      }
     }
   }, [rutHeredero, getStorageKey]);
 
   // Guardar en sessionStorage cuando cambie formData
   useEffect(() => {
     const storageKey = getStorageKey();
-    if (formData) {
+    if (formData && rutHeredero) {
       const dataToStore = {
         ...formData,
         fechaNacimiento: formData.fechaNacimiento ? formData.fechaNacimiento.toISOString() : null
       };
       sessionStorage.setItem(storageKey, JSON.stringify(dataToStore));
       setIsDirty(true);
-    } else {
+    } else if (!formData && rutHeredero) {
       sessionStorage.removeItem(storageKey);
       setIsDirty(false);
     }
-  }, [formData, getStorageKey]);
+  }, [formData, getStorageKey, rutHeredero]);
 
   // Escuchar cambios en sessionStorage para sincronización entre tabs
   useEffect(() => {
@@ -124,7 +103,6 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
         setIsDirty(false);
       }
     };
-
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
   }, [getStorageKey]);
@@ -149,30 +127,19 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
   }, [getStorageKey]);
 
   const saveFormData = useCallback((data: FormData) => {
-    console.log('💾 Guardando datos en provider:', data);
     setLoading(true);
     setError(null);
     try {
-      // Guardar inmediatamente en sessionStorage
-      const storageKey = getStorageKey();
-      const dataToStore = {
-        ...data,
-        fechaNacimiento: data.fechaNacimiento ? data.fechaNacimiento.toISOString() : null
-      };
-      sessionStorage.setItem(storageKey, JSON.stringify(dataToStore));
-      console.log('✅ Datos guardados en sessionStorage');
-      
-      // Actualizar el estado del contexto
+      // Actualizar el estado del contexto (el efecto se encarga del storage)
       setFormData(data);
       setIsDirty(true);
-      console.log('✅ Estado del contexto actualizado');
     } catch (err) {
-      console.error('❌ Error al guardar datos:', err);
+      console.error('Error al guardar datos:', err);
       setError('Error al guardar los datos del formulario');
     } finally {
       setLoading(false);
     }
-  }, [getStorageKey]);
+  }, []);
 
   const updateFormData = useCallback((field: string | number | symbol, value: any) => {
     setFormData(prev => {
@@ -214,7 +181,7 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
 
     // Validaciones básicas - todos los campos requeridos según la especificación
     const requiredFields: (keyof FormData)[] = [
-      'nombres', 
+      'nombres',
       // 'apellidoPaterno', 'apellidoMaterno', // Los apellidos ya no son requeridos
       'fechaNacimiento', 'telefono', 'correoElectronico',
       'sexo', 'parentesco'
@@ -245,7 +212,6 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
   }, [formData]);
 
   const forceSyncFromStorage = useCallback(() => {
-    console.log('🔄 Forzando sincronización desde sessionStorage');
     const storageKey = getStorageKey();
     const stored = sessionStorage.getItem(storageKey);
     if (stored) {
@@ -256,9 +222,8 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
         }
         setFormData(parsed as FormData);
         setIsDirty(true);
-        console.log('✅ Sincronización forzada completada');
       } catch (error) {
-        console.error('❌ Error en sincronización forzada:', error);
+        console.error('Error en sincronización forzada:', error);
       }
     }
   }, [getStorageKey]);
@@ -282,4 +247,4 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
       {children}
     </FormHerederoContext.Provider>
   );
-}; 
+};

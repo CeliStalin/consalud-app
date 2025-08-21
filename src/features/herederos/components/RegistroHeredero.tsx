@@ -1,5 +1,5 @@
-import React from 'react';
 import * as ConsaludCore from '@consalud/core';
+import React from 'react';
 import { useHeredero } from '../contexts/HerederoContext';
 import { useHerederoNavigation } from '../hooks/useHerederoNavigation';
 import { FormHerederoProvider } from '../provider/FormHerederoProvider';
@@ -9,7 +9,7 @@ import { Stepper } from './Stepper';
 const RegistroHeredero: React.FC = () => {
   const { heredero, buscarHeredero, error, limpiarHeredero } = useHeredero();
   const { goToRegistroTitularClean } = useHerederoNavigation();
-  
+
   /**
    * Función para manejar el botón volver
    * - Limpia el formulario del heredero del contexto
@@ -30,7 +30,7 @@ const RegistroHeredero: React.FC = () => {
         { label: 'Administración devolución herederos' }
     ];
 
-    const cleanedBreadcrumbItems = breadcrumbItems.filter(item => 
+    const cleanedBreadcrumbItems = breadcrumbItems.filter(item =>
         item.label !== 'undefined' && item.label !== 'null'
     ).map(item => ({
         ...item,
@@ -48,8 +48,8 @@ const RegistroHeredero: React.FC = () => {
                     <div style={{ marginLeft: 48 }}>
                         {/* Breadcrumb */}
                         <div style={{ marginBottom: 8 }}>
-                            <ConsaludCore.Breadcrumb 
-                                items={cleanedBreadcrumbItems} 
+                            <ConsaludCore.Breadcrumb
+                                items={cleanedBreadcrumbItems}
                                 separator={<span>{'>'}</span>}
                                 showHome={true}
                                 className="breadcrumb-custom"
@@ -80,14 +80,14 @@ const RegistroHeredero: React.FC = () => {
                     </ConsaludCore.Typography>
                 </div>
                 {/* Espacio entre título y Stepper */}
-                <div style={{ height: 24 }} />
+
                 {/* Stepper */}
                 <Stepper step={2} />
                 {/* Centered Card Container */}
                 <div className="container">
                     <div className="card-center-container">
                         <div className="card-responsive">
-                            <RegistroTitularCard 
+                            <RegistroTitularCard
                                 buscarHeredero={buscarHeredero}
                                 error={error}
                             />
@@ -100,3 +100,4 @@ const RegistroHeredero: React.FC = () => {
 };
 
 export { RegistroHeredero };
+

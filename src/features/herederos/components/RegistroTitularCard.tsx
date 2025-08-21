@@ -55,6 +55,20 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
     }
   }, [heredero, setRut, rut]);
 
+  // Efecto para mantener el formulario visible cuando se vuelve desde otra página
+  useEffect(() => {
+    // Verificar si hay datos en session storage para el RUT actual
+    if (heredero?.rut) {
+      const storageKey = `formHerederoData_${heredero.rut.replace(/[^0-9kK]/g, '')}`;
+      const storedData = sessionStorage.getItem(storageKey);
+
+      if (storedData) {
+        setShowForm(true);
+        setLastSearchedRut(heredero.rut);
+      }
+    }
+  }, [heredero?.rut]);
+
   // Efecto para limpiar el formulario cuando no hay heredero
   useEffect(() => {
     if (!heredero) {
@@ -71,8 +85,6 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
 
     // Si el RUT cambió y es diferente al último buscado, limpiar datos
     if (lastSearchedRut && rutLimpio !== lastRutLimpio) {
-      console.log('🔄 RUT cambiado, limpiando datos anteriores:', lastRutLimpio, '→', rutLimpio);
-
       // Limpiar heredero actual
       if (limpiarHeredero) {
         limpiarHeredero();
@@ -140,7 +152,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
       await buscarHeredero(rutLimpio);
       setLastSearchedRut(rutLimpio);
     } catch (error: any) {
-      console.error('❌ Error en búsqueda:', error);
+      console.error('Error en búsqueda:', error);
 
       // Manejar error 412 (Precondition Failed) - heredero no encontrado
       if (error.message && error.message.includes('412')) {

@@ -39,34 +39,35 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     handleReloadFromStorage
   } = useFormHerederoData();
 
-  // Función para obtener la descripción de región por código
-  const obtenerDescripcionRegion = (codRegion: number): string => {
-    const region = regiones.find(r => r.codRegion === codRegion);
-    return region ? region.nombreRegion : '';
-  };
-
-  // Estado local para el formulario (se sincroniza con el contexto)
-  const [localFormData, setLocalFormData] = useState<FormData>({
-    fechaNacimiento: formData?.fechaNacimiento || (heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null),
-    nombres: formData?.nombres || heredero?.nombre || '',
-    apellidoPaterno: formData?.apellidoPaterno || heredero?.apellidoPat || undefined, // Campo opcional
-    apellidoMaterno: formData?.apellidoMaterno || heredero?.apellidoMat || undefined, // Campo opcional
-    sexo: formData?.sexo || (heredero?.Genero ? heredero.Genero : ''),
-    parentesco: formData?.parentesco || '',
-    telefono: formData?.telefono || heredero?.contactabilidad.telefono.numero || '',
-    correoElectronico: formData?.correoElectronico || heredero?.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
-    ciudad: formData?.ciudad || heredero?.descripcionCiudad || '',
-    comuna: formData?.comuna || heredero?.descripcionComuna || '',
-    calle: formData?.calle || heredero?.contactabilidad.direccion.calle || '',
-    numero: formData?.numero || (heredero?.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : ''),
-    deptoBloqueOpcional: formData?.deptoBloqueOpcional || heredero?.contactabilidad.direccion.departamento || '',
-    villaOpcional: formData?.villaOpcional || heredero?.contactabilidad.direccion.villa || '',
-    region: formData?.region || '',
-    // Códigos para cargar los combos correctamente
-    codRegion: formData?.codRegion || heredero?.codRegion || undefined,
-    codCiudad: formData?.codCiudad || heredero?.codCiudad || undefined,
-    codComuna: formData?.codComuna || undefined
+      // Estado local para el formulario (se sincroniza con el contexto)
+  const [localFormData, setLocalFormData] = useState<FormData>(() => {
+    // Inicializar con datos del heredero como fallback
+    // Los datos del storage se cargarán después en el useEffect
+    return {
+      fechaNacimiento: heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
+      nombres: heredero?.nombre || '',
+      apellidoPaterno: heredero?.apellidoPat || undefined,
+      apellidoMaterno: heredero?.apellidoMat || undefined,
+      sexo: heredero?.Genero ? heredero.Genero : '',
+      parentesco: '',
+      telefono: heredero?.contactabilidad.telefono.numero || '',
+      correoElectronico: heredero?.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
+      ciudad: heredero?.descripcionCiudad || '',
+      comuna: heredero?.descripcionComuna || '',
+      calle: heredero?.contactabilidad.direccion.calle || '',
+      numero: heredero?.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
+      deptoBloqueOpcional: heredero?.contactabilidad.direccion.departamento || '',
+      villaOpcional: heredero?.contactabilidad.direccion.villa || '',
+      region: heredero?.descripcionRegion || '',
+      // Códigos para cargar los combos correctamente
+      codRegion: heredero?.codRegion || undefined,
+      codCiudad: heredero?.codCiudad || undefined,
+      codComuna: undefined
+    };
   });
+
+
+
 
   // Estado para manejar errores de validación
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
@@ -138,6 +139,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     setLoadingRegiones(true);
     fetchRegiones()
       .then((data) => {
+
         setRegiones(data);
         setErrorRegiones(null);
       })
@@ -151,6 +153,13 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Cargar datos de ubicación cuando se carga un heredero
   React.useEffect(() => {
     if (heredero && heredero.codRegion && fieldsLocked) {
+      // Establecer la región del heredero
+      setLocalFormData(prevData => ({
+        ...prevData,
+        region: heredero.descripcionRegion || '',
+        codRegion: heredero.codRegion || undefined
+      }));
+
       // Cargar ciudades de la región del heredero para tener las opciones disponibles
       setLoadingCiudades(true);
       fetchCiudades(heredero.codRegion)
@@ -199,21 +208,28 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     }
   }, [heredero, fieldsLocked]);
 
-  // Inicializar el formulario solo una vez al montar
+    // Inicializar el formulario solo una vez al montar
   useEffect(() => {
-    // Solo recargar datos del sessionStorage si no hay heredero cargado
-    // Si hay heredero, los datos se cargarán desde el backend
-    if (!heredero) {
-      handleReloadFromStorage();
-    }
-  }, [handleReloadFromStorage, heredero]);
+
+
+    // SIEMPRE recargar datos del sessionStorage al montar
+    // Esto asegura que los datos del storage tengan prioridad absoluta
+    handleReloadFromStorage();
+  }, [handleReloadFromStorage]);
 
   // Sincronizar datos locales cuando cambie formData del contexto
   useEffect(() => {
-    if (formData) {
+    if (formData && Object.keys(formData).length > 0) {
+
+
+      // SIEMPRE priorizar datos del storage sobre datos del heredero
       setLocalFormData(prevData => {
         // Solo actualizar si los datos son diferentes
-        if (JSON.stringify(prevData) !== JSON.stringify(formData)) {
+        const currentDataString = JSON.stringify(prevData);
+        const newDataString = JSON.stringify(formData);
+
+        if (currentDataString !== newDataString) {
+
           return formData;
         }
         return prevData;
@@ -221,15 +237,25 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     }
   }, [formData]);
 
-  // Cargar datos de ubicación cuando se restaura el formulario con códigos
+        // Cargar datos de ubicación cuando se restaura el formulario con códigos
   useEffect(() => {
     if (localFormData.codRegion && regiones.length > 0) {
+
+
       // Cargar ciudades de la región guardada
       setLoadingCiudades(true);
       fetchCiudades(localFormData.codRegion)
         .then((data) => {
           setCiudades(data);
           setErrorCiudades(null);
+
+          // IMPORTANTE: Establecer la ciudad del storage DESPUÉS de cargar las opciones
+          if (formData?.ciudad && formData.ciudad !== localFormData.ciudad) {
+            setLocalFormData(prevData => ({
+              ...prevData,
+              ciudad: formData.ciudad
+            }));
+          }
 
           // Si hay código de ciudad, cargar comunas
           if (localFormData.codCiudad) {
@@ -238,6 +264,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
               .then((comunasData) => {
                 setComunas(comunasData);
                 setErrorComunas(null);
+
+                // IMPORTANTE: Establecer la comuna del storage DESPUÉS de cargar las opciones
+                if (formData?.comuna && formData.comuna !== localFormData.comuna) {
+                  setLocalFormData(prevData => ({
+                    ...prevData,
+                    comuna: formData.comuna
+                  }));
+                }
               })
               .catch(() => {
                 setErrorComunas('No se pudieron cargar las comunas');
@@ -252,147 +286,68 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         })
         .finally(() => setLoadingCiudades(false));
     }
-  }, [localFormData.codRegion, localFormData.codCiudad, regiones.length]);
+  }, [localFormData.codRegion, regiones.length, formData]);
 
-  // Actualizar datos cuando cambie el heredero
+    // Efecto para establecer el valor de región cuando se cargan datos desde storage
   useEffect(() => {
-    if (heredero) {
-      setLocalFormData(prevData => {
-        // Si los campos están bloqueados, usar los datos del heredero
-        if (fieldsLocked) {
-          // Siempre priorizar los datos del backend sobre los datos existentes
-          const newData = {
-            ...prevData,
-            // Usar datos del backend (prioridad absoluta)
-            fechaNacimiento: heredero.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
-            nombres: heredero.nombre || '',
-            apellidoPaterno: heredero.apellidoPat || '',
-            apellidoMaterno: heredero.apellidoMat || '',
-            sexo: heredero.Genero || '',
-            telefono: heredero.contactabilidad.telefono.numero || '',
-            correoElectronico: heredero.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
-            ciudad: heredero.descripcionCiudad || '',
-            calle: heredero.contactabilidad.direccion.calle || '',
-            numero: heredero.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
-            deptoBloqueOpcional: heredero.contactabilidad.direccion.departamento || '',
-            villaOpcional: heredero.contactabilidad.direccion.villa || '',
-            // Códigos del heredero (siempre actualizar)
-            codRegion: heredero.codRegion || undefined,
-            codCiudad: heredero.codCiudad || undefined,
-            codComuna: heredero.codComuna || undefined
-          };
+    if (localFormData.region && regiones.length > 0) {
 
-          return newData;
-        } else {
-          // Si los campos no están bloqueados (status 412), mantener solo el RUT y limpiar el resto
-          const newData = {
-            ...prevData,
-            fechaNacimiento: null,
-            nombres: '',
-            apellidoPaterno: '',
-            apellidoMaterno: '',
-            sexo: '',
-            parentesco: '',
-            telefono: '',
-            correoElectronico: '',
-            ciudad: '',
-            comuna: '',
-            calle: '',
-            numero: '',
-            deptoBloqueOpcional: '',
-            villaOpcional: '',
-            region: '',
-            // Limpiar códigos
-            codRegion: undefined,
-            codCiudad: undefined,
-            codComuna: undefined
-          };
 
-          return newData;
-        }
-      });
+      // Buscar la región en la lista cargada para asegurar que existe
+      const regionEncontrada = regiones.find(r => r.nombreRegion === localFormData.region);
+      if (regionEncontrada) {
+        // Si la región existe en la lista, establecer el código
+        setLocalFormData(prevData => ({
+          ...prevData,
+          codRegion: regionEncontrada.idRegion
+        }));
+
+      }
     }
-  }, [heredero, fieldsLocked]);
+  }, [localFormData.region, regiones.length]);
 
-  // Actualizar sexo cuando se carguen los géneros y haya un heredero
+  // Efecto específico para establecer la comuna del storage cuando se carguen las opciones
   useEffect(() => {
-    if (heredero?.Genero && generos.length > 0) {
+    if (comunas.length > 0 && formData?.comuna && formData.comuna !== localFormData.comuna) {
+
       setLocalFormData(prevData => ({
         ...prevData,
-        sexo: heredero.Genero
+        comuna: formData.comuna
       }));
     }
-  }, [heredero?.Genero, generos]);
+  }, [comunas.length, formData?.comuna, localFormData.comuna]);
 
-  // Actualizar región cuando se carguen las regiones y haya un heredero
+    // Efecto para establecer la región cuando se cargan las regiones y hay heredero
+  // SOLO si NO hay datos del storage
   useEffect(() => {
-    if (regiones.length > 0 && heredero?.codRegion && fieldsLocked) {
-      const descripcionRegion = obtenerDescripcionRegion(heredero.codRegion);
-      if (descripcionRegion) {
+    const hasStorageData = formData && Object.keys(formData).length > 0;
+
+
+
+    // SOLO establecer región del heredero si NO hay datos del storage
+    if (heredero && heredero.descripcionRegion && regiones.length > 0 && fieldsLocked && !hasStorageData) {
+
+
+      // Buscar por código de región (método más confiable)
+      const regionEncontradaVariaciones = regiones.find(r => r.idRegion === heredero.codRegion);
+
+
+
+      if (regionEncontradaVariaciones) {
+        // Siempre usar el nombre de la API, no el del backend
         setLocalFormData(prevData => ({
           ...prevData,
-          region: descripcionRegion,
-          codRegion: heredero.codRegion
+          region: regionEncontradaVariaciones.nombreRegion, // Usar el nombre exacto de la lista
+          codRegion: heredero.codRegion || undefined
         }));
       }
     }
-  }, [regiones, heredero?.codRegion, fieldsLocked]);
-
-  // Sincronizar valor de comuna cuando se carguen las comunas y haya un heredero
-  useEffect(() => {
-    if (comunas.length > 0 && heredero?.descripcionComuna && fieldsLocked) {
-      // Verificar que la comuna existe en las opciones cargadas (comparación más robusta)
-      const comunaExiste = comunas.some(comuna => {
-        const comunaNormalizada = comuna.NombreComuna.trim().toUpperCase();
-        const descripcionNormalizada = (heredero.descripcionComuna || '').trim().toUpperCase();
-        return comunaNormalizada === descripcionNormalizada;
-      });
-
-      if (comunaExiste) {
-        // Encontrar la comuna exacta para usar su formato original
-        const comunaExacta = comunas.find(comuna => {
-          const comunaNormalizada = comuna.NombreComuna.trim().toUpperCase();
-          const descripcionNormalizada = (heredero.descripcionComuna || '').trim().toUpperCase();
-          return comunaNormalizada === descripcionNormalizada;
-        });
-
-        setLocalFormData(prevData => ({
-          ...prevData,
-          comuna: comunaExacta?.NombreComuna || heredero.descripcionComuna || '',
-          codComuna: heredero.codComuna || undefined
-        }));
-      } else {
-        console.warn('⚠️ La comuna del heredero no existe en las opciones cargadas');
-      }
-    }
-  }, [comunas, heredero?.descripcionComuna, heredero?.codComuna, fieldsLocked]);
-
-  // Debug: Verificar estado actual del formulario
-  useEffect(() => {
-    console.log('🔍 Estado actual del formulario:', {
-      localFormData: {
-        comuna: localFormData.comuna,
-        codComuna: localFormData.codComuna,
-        ciudad: localFormData.ciudad,
-        codCiudad: localFormData.codCiudad,
-        region: localFormData.region,
-        codRegion: localFormData.codRegion
-      },
-      heredero: heredero ? {
-        descripcionComuna: heredero.descripcionComuna,
-        codComuna: heredero.codComuna,
-        descripcionCiudad: heredero.descripcionCiudad,
-        codCiudad: heredero.codCiudad,
-        codRegion: heredero.codRegion
-      } : null,
-      fieldsLocked,
-      comunasCargadas: comunas.length,
-      ciudadesCargadas: ciudades.length
-    });
-  }, [localFormData, heredero, fieldsLocked, comunas.length, ciudades.length]);
+  }, [heredero, regiones.length, fieldsLocked, formData]);
 
   // Eliminar la sincronización automática que causa el infinite loop
   // Los cambios se guardarán solo cuando se envíe el formulario
+
+
 
   const handleBackClick = useCallback((): void => {
     navigate(-1);
@@ -410,10 +365,16 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Manejar cambios en campos de texto
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setLocalFormData({
+    const newFormData = {
       ...localFormData,
       [name]: value
-    });
+    };
+
+    setLocalFormData(newFormData);
+
+    // Guardar en el contexto inmediatamente
+
+    handleSaveForm(newFormData);
 
     // Limpiar error cuando el usuario comienza a escribir
     if (errors[name as keyof FormData]) {
@@ -426,10 +387,16 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
 
   // Manejar cambio de fecha
   const handleDateChange = (date: Date | null) => {
-    setLocalFormData({
+    const newFormData = {
       ...localFormData,
       fechaNacimiento: date
-    });
+    };
+
+    setLocalFormData(newFormData);
+
+    // Guardar en el contexto inmediatamente
+
+    handleSaveForm(newFormData);
 
     // Validar edad en tiempo real
     if (date) {
@@ -460,7 +427,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     // Buscar la región seleccionada para obtener su código
     const regionObj = regiones.find((r) => r.nombreRegion === value);
 
-    setLocalFormData({
+    const newFormData = {
       ...localFormData,
       region: value,
       codRegion: regionObj?.idRegion || undefined,
@@ -468,7 +435,13 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       comuna: '', // Resetear comuna al cambiar región
       codCiudad: undefined, // Resetear código de ciudad
       codComuna: undefined // Resetear código de comuna
-    });
+    };
+
+    setLocalFormData(newFormData);
+
+    // Guardar en el contexto inmediatamente
+
+    handleSaveForm(newFormData);
 
     if (errors.region) {
       setErrors({
@@ -502,13 +475,19 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     // Buscar la ciudad seleccionada para obtener su código
     const ciudadObj = ciudades.find((c) => c.nombreCiudad === value);
 
-    setLocalFormData({
+    const newFormData = {
       ...localFormData,
       ciudad: value,
       codCiudad: ciudadObj?.idCiudad || undefined,
       comuna: '', // Resetear comuna al cambiar ciudad
       codComuna: undefined // Resetear código de comuna
-    });
+    };
+
+    setLocalFormData(newFormData);
+
+    // Guardar en el contexto inmediatamente
+
+    handleSaveForm(newFormData);
 
     if (errors.ciudad) {
       setErrors({
@@ -542,13 +521,19 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     // Buscar la comuna seleccionada para obtener su código
     const comunaObj = comunas.find((c) => c.NombreComuna === value);
 
-    setLocalFormData({
+    const newFormData = {
       ...localFormData,
       comuna: value,
       codComuna: comunaObj?.idComuna || undefined,
       calle: '', // Resetear calle al cambiar comuna
       numero: '' // Resetear número al cambiar comuna
-    });
+    };
+
+    setLocalFormData(newFormData);
+
+    // Guardar en el contexto inmediatamente
+
+    handleSaveForm(newFormData);
 
     if (errors.comuna) {
       setErrors({
@@ -561,11 +546,17 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Manejar cambio de calle con autocompletado
   const handleCalleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    setLocalFormData({
+    const newFormData = {
       ...localFormData,
       calle: value,
       numero: '' // Limpiar número cuando cambia la calle
-    });
+    };
+
+    setLocalFormData(newFormData);
+
+    // Guardar en el contexto inmediatamente
+
+    handleSaveForm(newFormData);
 
     // Actualizar búsqueda de calles
     searchCalles(value);
@@ -580,11 +571,17 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
 
   // Manejar selección de calle desde el autocompletado
   const handleCalleSelect = (option: { value: string; label: string; id?: number }) => {
-    setLocalFormData({
+    const newFormData = {
       ...localFormData,
       calle: option.label,
       numero: '' // Limpiar número cuando se selecciona una nueva calle
-    });
+    };
+
+    setLocalFormData(newFormData);
+
+    // Guardar en el contexto inmediatamente
+
+    handleSaveForm(newFormData);
 
     // Limpiar error de calle si existe
     if (errors.calle) {

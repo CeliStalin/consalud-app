@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './styles/CustomSelect.css';
 
 interface CustomSelectProps {
@@ -61,23 +61,26 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
 
   const handleBlur = () => {
     setIsFocused(false);
-    // Delay para permitir que el clic en las opciones funcione
-    setTimeout(() => setIsOpen(false), 150);
+    // Delay más largo para permitir que el clic en las opciones funcione
+    setTimeout(() => setIsOpen(false), 300);
   };
 
   const handleOptionClick = (optionValue: string) => {
     const syntheticEvent = {
       target: { name, value: optionValue }
     } as React.ChangeEvent<HTMLSelectElement>;
-    
+
     onChange(syntheticEvent);
     setIsOpen(false);
+    setIsFocused(false);
   };
 
   const selectedOption = options.find(option => option.value === value);
 
+
+
   return (
-    <div 
+    <div
       ref={containerRef}
       className={`custom-select-container ${error ? 'has-error' : ''} ${disabled ? 'disabled' : ''} ${isOpen ? 'open' : ''} ${className}`}
     >
@@ -122,7 +125,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
         <span style={{ fontWeight: selectedOption ? '500' : '400' }}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        
+
         {/* Flechita animada */}
         <div className="custom-select-arrow">
           <svg
@@ -163,4 +166,4 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
       )}
     </div>
   );
-}; 
+};

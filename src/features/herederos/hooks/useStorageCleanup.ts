@@ -20,14 +20,25 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
         const oldData = sessionStorage.getItem(oldKey);
         if (oldData) {
           sessionStorage.removeItem(oldKey);
-          console.log('🗑️ Limpiada clave antigua sin RUT:', oldKey);
         }
 
         // Limpiar otras claves de formHerederoData que no correspondan al RUT actual
         Object.keys(sessionStorage).forEach(key => {
           if (key.startsWith('formHerederoData_') && key !== currentKey) {
-            sessionStorage.removeItem(key);
-            console.log('🗑️ Limpiada clave de RUT anterior:', key);
+            const storedData = sessionStorage.getItem(key);
+            if (storedData) {
+              try {
+                const parsedData = JSON.parse(storedData);
+                // Solo limpiar si los datos no están completos o son muy antiguos
+                const isCompleteData = parsedData.nombres && parsedData.fechaNacimiento && parsedData.telefono;
+                if (!isCompleteData) {
+                  sessionStorage.removeItem(key);
+                }
+              } catch {
+                // Si hay error al parsear, limpiar
+                sessionStorage.removeItem(key);
+              }
+            }
           }
         });
       } else {
@@ -35,7 +46,6 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
         Object.keys(sessionStorage).forEach(key => {
           if (key.startsWith('formHerederoData')) {
             sessionStorage.removeItem(key);
-            console.log('🗑️ Limpiada clave de formulario heredero:', key);
           }
         });
       }
@@ -56,11 +66,8 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
         Object.keys(sessionStorage).forEach(key => {
           if (key.startsWith('fileStorage_') && !key.includes(rutLimpio)) {
             sessionStorage.removeItem(key);
-            console.log('🗑️ Limpiada clave de documentos de RUT anterior:', key);
           }
         });
-
-        console.log('🗑️ Documentos limpiados para RUT:', rutLimpio);
       }
     } catch (error) {
       console.error('Error al limpiar documentos por RUT:', error);
@@ -77,7 +84,6 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
       Object.keys(sessionStorage).forEach(key => {
         if (key.startsWith('formHerederoData')) {
           sessionStorage.removeItem(key);
-          console.log('🗑️ Limpiada clave de formulario heredero:', key);
         }
       });
 
@@ -85,11 +91,8 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
       Object.keys(sessionStorage).forEach(key => {
         if (key.startsWith('fileStorage_')) {
           sessionStorage.removeItem(key);
-          console.log('🗑️ Limpiada clave de documentos:', key);
         }
       });
-
-      console.log('🧹 Todos los datos de herederos limpiados');
     } catch (error) {
       console.error('Error al limpiar todos los datos de herederos:', error);
     }
@@ -109,11 +112,9 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
         // Migrar datos de la clave antigua a la nueva
         sessionStorage.setItem(currentKey, oldData);
         sessionStorage.removeItem(oldKey);
-        console.log('🔄 Migrado datos de clave antigua a nueva:', oldKey, '→', currentKey);
       } else if (oldData && currentData) {
         // Si ambas claves existen, mantener solo la nueva y limpiar la antigua
         sessionStorage.removeItem(oldKey);
-        console.log('🗑️ Limpiada clave duplicada sin RUT:', oldKey);
       }
     } catch (error) {
       console.error('Error al migrar claves:', error);
