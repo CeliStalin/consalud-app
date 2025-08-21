@@ -1,17 +1,17 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './styles/FormHeredero.css';
-import { Stepper } from './Stepper';
-import { useHeredero } from '../contexts/HerederoContext';
-import { useFormHerederoData } from '../hooks/useFormHerederoData';
 import * as ConsaludCore from '@consalud/core';
-import { fetchGeneros, fetchCiudades, fetchComunasPorCiudad, fetchRegiones, validarCorreoElectronico, validarTelefono, Genero, Ciudad, Comuna, Region } from '../services';
-import { CustomSelect } from './CustomSelect';
-import { AutoCompleteInput } from './AutoCompleteInput';
-import { NumberAutoCompleteInput } from './NumberAutoCompleteInput';
-import { useCallesAutocomplete } from '../hooks/useCallesAutocomplete';
-import { FormData } from '../interfaces/FormData';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { validarEdadConMensaje } from '../../../utils/ageValidation';
+import { useHeredero } from '../contexts/HerederoContext';
+import { useCallesAutocomplete } from '../hooks/useCallesAutocomplete';
+import { useFormHerederoData } from '../hooks/useFormHerederoData';
+import { FormData } from '../interfaces/FormData';
+import { Ciudad, Comuna, fetchCiudades, fetchComunasPorCiudad, fetchGeneros, fetchRegiones, Genero, Region, validarCorreoElectronico, validarTelefono } from '../services';
+import { AutoCompleteInput } from './AutoCompleteInput';
+import { CustomSelect } from './CustomSelect';
+import { NumberAutoCompleteInput } from './NumberAutoCompleteInput';
+import { Stepper } from './Stepper';
+import './styles/FormHeredero.css';
 
 interface BreadcrumbItem {
     label: string;
@@ -33,9 +33,9 @@ const PARENTESCO_OPTIONS = [
 const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = true }) => {
   const navigate = useNavigate();
   const {heredero, fieldsLocked} = useHeredero();
-  const { 
-    formData, 
-    handleSaveForm, 
+  const {
+    formData,
+    handleSaveForm,
     handleReloadFromStorage
   } = useFormHerederoData();
 
@@ -157,7 +157,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         .then((data) => {
           setCiudades(data);
           setErrorCiudades(null);
-          
+
           // Si hay ciudad del heredero, cargar comunas para tener las opciones disponibles
           if (heredero.codCiudad) {
             setLoadingComunas(true);
@@ -165,7 +165,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
               .then((comunasData) => {
                 setComunas(comunasData);
                 setErrorComunas(null);
-                
+
                 // IMPORTANTE: Establecer el valor de comuna DESPUÉS de cargar las opciones
                 if (heredero.descripcionComuna) {
                   // Encontrar la comuna exacta para usar su formato original
@@ -174,7 +174,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     const descripcionNormalizada = (heredero.descripcionComuna || '').trim().toUpperCase();
                     return comunaNormalizada === descripcionNormalizada;
                   });
-                  
+
                   setLocalFormData(prevData => ({
                     ...prevData,
                     comuna: comunaExacta?.NombreComuna || heredero.descripcionComuna || '',
@@ -230,7 +230,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         .then((data) => {
           setCiudades(data);
           setErrorCiudades(null);
-          
+
           // Si hay código de ciudad, cargar comunas
           if (localFormData.codCiudad) {
             setLoadingComunas(true);
@@ -281,7 +281,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
             codCiudad: heredero.codCiudad || undefined,
             codComuna: heredero.codComuna || undefined
           };
-          
+
           return newData;
         } else {
           // Si los campos no están bloqueados (status 412), mantener solo el RUT y limpiar el resto
@@ -307,7 +307,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
             codCiudad: undefined,
             codComuna: undefined
           };
-          
+
           return newData;
         }
       });
@@ -347,7 +347,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         const descripcionNormalizada = (heredero.descripcionComuna || '').trim().toUpperCase();
         return comunaNormalizada === descripcionNormalizada;
       });
-      
+
       if (comunaExiste) {
         // Encontrar la comuna exacta para usar su formato original
         const comunaExacta = comunas.find(comuna => {
@@ -355,7 +355,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
           const descripcionNormalizada = (heredero.descripcionComuna || '').trim().toUpperCase();
           return comunaNormalizada === descripcionNormalizada;
         });
-        
+
         setLocalFormData(prevData => ({
           ...prevData,
           comuna: comunaExacta?.NombreComuna || heredero.descripcionComuna || '',
@@ -401,7 +401,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   const breadcrumbItems: BreadcrumbItem[] = [
     { label: 'Administración devolución herederos' }
   ];
-  
+
   const cleanedBreadcrumbItems = breadcrumbItems.map(item => ({
     ...item,
     label: typeof item.label === 'string' ? item.label.replace(/^\/+/, '') : item.label
@@ -456,10 +456,10 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Manejar cambio de región (resetea ciudad, comuna y carga ciudades)
   const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    
+
     // Buscar la región seleccionada para obtener su código
     const regionObj = regiones.find((r) => r.nombreRegion === value);
-    
+
     setLocalFormData({
       ...localFormData,
       region: value,
@@ -498,10 +498,10 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Manejar cambio de ciudad (resetea comuna y carga comunas)
   const handleCiudadChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    
+
     // Buscar la ciudad seleccionada para obtener su código
     const ciudadObj = ciudades.find((c) => c.nombreCiudad === value);
-    
+
     setLocalFormData({
       ...localFormData,
       ciudad: value,
@@ -538,10 +538,10 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Manejar cambio de comuna (resetea calle y carga calles)
   const handleComunaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    
+
     // Buscar la comuna seleccionada para obtener su código
     const comunaObj = comunas.find((c) => c.NombreComuna === value);
-    
+
     setLocalFormData({
       ...localFormData,
       comuna: value,
@@ -563,7 +563,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     const { value } = e.target;
     setLocalFormData({
       ...localFormData,
-      calle: value
+      calle: value,
+      numero: '' // Limpiar número cuando cambia la calle
     });
 
     // Actualizar búsqueda de calles
@@ -577,9 +578,26 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     }
   };
 
+  // Manejar selección de calle desde el autocompletado
+  const handleCalleSelect = (option: { value: string; label: string; id?: number }) => {
+    setLocalFormData({
+      ...localFormData,
+      calle: option.label,
+      numero: '' // Limpiar número cuando se selecciona una nueva calle
+    });
+
+    // Limpiar error de calle si existe
+    if (errors.calle) {
+      setErrors({
+        ...errors,
+        calle: ''
+      });
+    }
+  };
+
   // Validar formulario
   const validateForm = (): boolean => {
-    
+
     const newErrors: Partial<Record<keyof FormData, string>> = {};
     let isValid = true;
 
@@ -677,28 +695,28 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Manejar envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       // Limpiar errores anteriores
       setEmailValidationError(null);
       setPhoneValidationError(null);
       setValidatingEmail(true);
       setValidatingPhone(true);
-      
+
       try {
         // Obtener RUT del heredero sin puntos ni DV
         const rutHeredero = heredero?.rut ? parseInt(heredero.rut.replace(/[^0-9]/g, '')) : null;
-        
+
         if (!rutHeredero) {
           throw new Error('No se pudo obtener el RUT del heredero');
         }
-        
+
         // Validar correo electrónico y teléfono en paralelo
         const [emailValido, telefonoValido] = await Promise.all([
           validarCorreoElectronico(rutHeredero, localFormData.correoElectronico, ''),
           validarTelefono(rutHeredero, localFormData.telefono, '')
         ]);
-        
+
         // Verificar si ambas validaciones fueron exitosas
         if (!emailValido) {
           setEmailValidationError('El correo electrónico no es válido');
@@ -706,20 +724,20 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
           setValidatingPhone(false);
           return;
         }
-        
+
         if (!telefonoValido) {
           setPhoneValidationError('El teléfono no es válido');
           setValidatingEmail(false);
           setValidatingPhone(false);
           return;
         }
-        
+
         // Guardar datos en el contexto
         handleSaveForm(localFormData);
-        
+
         // Redirigir a la página de carga de documentos (stepper 3)
         navigate('/mnherederos/ingresoher/cargadoc');
-        
+
       } catch (error) {
         console.error('❌ Error en validación de correo electrónico o teléfono:', error);
         setEmailValidationError('Error al validar los datos de contacto. Por favor, inténtelo nuevamente.');
@@ -741,8 +759,8 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
             <div style={{ marginLeft: 48 }}>
               {/* Breadcrumb */}
               <div style={{ marginBottom: 8 }}>
-                <ConsaludCore.Breadcrumb 
-                  items={cleanedBreadcrumbItems} 
+                <ConsaludCore.Breadcrumb
+                  items={cleanedBreadcrumbItems}
                   separator={<span>{'>'}</span>}
                   showHome={true}
                   className="breadcrumb-custom"
@@ -773,14 +791,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
             </span>
           </div>
         )}
-        
+
         {/* Stepper */}
         {showHeader && (
           <div className="mb-5">
             <Stepper step={2} />
           </div>
         )}
-        
+
         {/* Card */}
         <ConsaludCore.Card
           title={undefined}
@@ -1047,6 +1065,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     name="calle"
                     value={localFormData.calle}
                     onChange={handleCalleChange}
+                    onOptionSelect={handleCalleSelect}
                     options={calles.map(calle => ({
                       value: calle.nombreCalle,
                       label: calle.nombreCalle,
