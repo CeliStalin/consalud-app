@@ -48,6 +48,36 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
     return false;
   });
 
+  // Efecto para limpiar datos cuando cambie el RUT del heredero
+  useEffect(() => {
+    if (rutHeredero) {
+      const storageKey = getStorageKey();
+      const stored = sessionStorage.getItem(storageKey);
+
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed.fechaNacimiento) {
+            parsed.fechaNacimiento = new Date(parsed.fechaNacimiento);
+          }
+          setFormData(parsed as FormData);
+          setIsDirty(true);
+        } catch {
+          setFormData(null);
+          setIsDirty(false);
+        }
+      } else {
+        // Si no hay datos para este RUT, limpiar el estado
+        setFormData(null);
+        setIsDirty(false);
+      }
+    } else {
+      // Si no hay RUT, limpiar todo
+      setFormData(null);
+      setIsDirty(false);
+    }
+  }, [rutHeredero, getStorageKey]);
+
   // Limpiar claves antiguas sin RUT al inicializar
   useEffect(() => {
     // Limpiar la clave antigua sin RUT si existe

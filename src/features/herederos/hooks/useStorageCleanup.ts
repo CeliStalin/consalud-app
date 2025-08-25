@@ -6,6 +6,7 @@ interface UseStorageCleanupReturn {
   cleanupAllHerederoData: () => void;
   migrateOldKeys: (currentRut: string) => void;
   cleanupDocumentsByRut: (rut: string) => void;
+  cleanupOnBackNavigation: (currentRut: string) => void;
 }
 
 export const useStorageCleanup = (): UseStorageCleanupReturn => {
@@ -25,20 +26,7 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
         // Limpiar otras claves de formHerederoData que no correspondan al RUT actual
         Object.keys(sessionStorage).forEach(key => {
           if (key.startsWith('formHerederoData_') && key !== currentKey) {
-            const storedData = sessionStorage.getItem(key);
-            if (storedData) {
-              try {
-                const parsedData = JSON.parse(storedData);
-                // Solo limpiar si los datos no están completos o son muy antiguos
-                const isCompleteData = parsedData.nombres && parsedData.fechaNacimiento && parsedData.telefono;
-                if (!isCompleteData) {
-                  sessionStorage.removeItem(key);
-                }
-              } catch {
-                // Si hay error al parsear, limpiar
-                sessionStorage.removeItem(key);
-              }
-            }
+            sessionStorage.removeItem(key);
           }
         });
       } else {
@@ -121,10 +109,36 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
     }
   }, []);
 
+  // Función específica para limpiar datos cuando se navega hacia atrás
+  const cleanupOnBackNavigation = useCallback((currentRut: string) => {
+    try {
+      const rutLimpio = currentRut.replace(/[^0-9kK]/g, '');
+
+      // Limpiar datos del formulario del RUT actual para forzar recarga
+      const currentKey = `formHerederoData_${rutLimpio}`;
+      sessionStorage.removeItem(currentKey);
+
+      // Limpiar documentos del RUT actual
+      clearAllFiles(rutLimpio);
+
+      // Limpiar otras claves de documentos que no correspondan al RUT actual
+      Object.keys(sessionStorage).forEach(key => {
+        if (key.startsWith('fileStorage_') && !key.includes(rutLimpio)) {
+          sessionStorage.removeItem(key);
+        }
+      });
+
+      console.log('🧹 Datos limpiados al navegar hacia atrás para RUT:', rutLimpio);
+    } catch (error) {
+      console.error('Error al limpiar datos en navegación hacia atrás:', error);
+    }
+  }, []);
+
   return {
     cleanupFormHerederoData,
     cleanupAllHerederoData,
     migrateOldKeys,
-    cleanupDocumentsByRut
+    cleanupDocumentsByRut,
+    cleanupOnBackNavigation
   };
 };

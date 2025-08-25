@@ -38,7 +38,7 @@ export const useHerederoNavigation = () => {
   // Navegación simplificada - el Core se encarga de las transiciones automáticamente
   const navigateToStep = useCallback((route: string, options?: HerederoNavigationOptions) => {
     const { replace = false, state } = options || {};
-    
+
     // Navegación directa y simple - el PageTransition del Core maneja todo
     if (replace) {
       navigate(route, { replace: true, state });
@@ -71,9 +71,9 @@ export const useHerederoNavigation = () => {
   // Nueva función para volver al formulario limpio
   const goToRegistroTitularClean = useCallback((options?: HerederoNavigationOptions) => {
     // Usar replace para evitar entradas duplicadas en el historial
-    navigateToStep(HEREDEROS_ROUTES.REGISTRO_TITULAR, { 
-      replace: true, 
-      ...options 
+    navigateToStep(HEREDEROS_ROUTES.REGISTRO_TITULAR, {
+      replace: true,
+      ...options
     });
   }, [navigateToStep]);
 
@@ -128,7 +128,7 @@ export const useHerederoNavigation = () => {
     // Rutas disponibles
     routes: HEREDEROS_ROUTES,
     steps: HEREDEROS_STEPS,
-    
+
     // Métodos de navegación simplificados
     goToHome, // Agregar nuevo método
     startProcess,

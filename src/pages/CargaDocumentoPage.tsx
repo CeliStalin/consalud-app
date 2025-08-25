@@ -1,7 +1,7 @@
-import React from 'react';
-import { CargaDocumento } from '@/features/herederos/components/CargaDocumento'
-import { StepperProvider, useStepper, Stepper } from '@/features/herederos/components/Stepper';
+import { CargaDocumento } from '@/features/herederos/components/CargaDocumento';
+import { Stepper, StepperProvider, useStepper } from '@/features/herederos/components/Stepper';
 import * as ConsaludCore from '@consalud/core';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const CargaDocumentoPageContent: React.FC = () => {
@@ -17,13 +17,13 @@ const CargaDocumentoPageContent: React.FC = () => {
   }));
 
   return (
-    <div className="carga-documentos-page-container" style={{ 
-      width: '100%', 
+    <div className="carga-documentos-page-container" style={{
+      width: '100%',
       maxWidth: '100%'
     }}>
       {/* Header Section: Breadcrumb y botón volver */}
-      <div className="carga-documentos-header" style={{ 
-        width: '100%', 
+      <div className="carga-documentos-header" style={{
+        width: '100%',
         marginBottom: '1.5rem'
       }}>
         <div style={{ marginLeft: '3rem' }}>
@@ -46,16 +46,16 @@ const CargaDocumentoPageContent: React.FC = () => {
               <span className="back-button-icon">←</span> Volver
             </button>
           </div>
-          
+
           {/* Título arriba del stepper */}
           <div className="mb-1" style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
             <ConsaludCore.Typography
               variant="h5"
               component="h1"
-              style={{ 
-                fontWeight: 700, 
-                textAlign: 'center', 
-                color: '#222', 
+              style={{
+                fontWeight: 700,
+                textAlign: 'center',
+                color: '#222',
                 fontSize: '2rem',
                 marginBottom: '1.5rem'
               }}
@@ -63,14 +63,14 @@ const CargaDocumentoPageContent: React.FC = () => {
               Carga de documentos
             </ConsaludCore.Typography>
           </div>
-          
+
           {/* Stepper debajo del título */}
           <div className="mb-5" style={{ marginBottom: '2.5rem' }}>
             <Stepper step={step} />
           </div>
         </div>
       </div>
-      
+
       {/* Card principal */}
       <div className="card-center-container">
         <div className="card-responsive">
@@ -79,7 +79,7 @@ const CargaDocumentoPageContent: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Espacio adicional para asegurar scroll */}
       <div style={{ height: '8rem' }}></div>
     </div>
@@ -89,8 +89,8 @@ const CargaDocumentoPageContent: React.FC = () => {
 const CargaDocumentoPage: React.FC = () => {
   return (
     <StepperProvider>
-      <div className="route-container layout-stable instant-stable navigation-stable no-flash" style={{ 
-        overflowY: 'auto', 
+      <div className="route-container layout-stable instant-stable navigation-stable no-flash" style={{
+        overflowY: 'auto',
         backgroundColor: '#F8F9FA',
         padding: '0',
         height: '100vh'

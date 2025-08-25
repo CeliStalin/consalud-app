@@ -149,6 +149,13 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
     setLoading(true);
 
     try {
+      // Limpiar datos del RUT anterior antes de buscar el nuevo
+      if (lastSearchedRut && lastSearchedRut !== rutLimpio) {
+        const lastRutLimpio = lastSearchedRut.replace(/[^0-9kK]/g, '');
+        cleanupFormHerederoData(lastRutLimpio);
+        cleanupDocumentsByRut(lastRutLimpio);
+      }
+
       await buscarHeredero(rutLimpio);
       setLastSearchedRut(rutLimpio);
     } catch (error: any) {
@@ -163,7 +170,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [rut, isValidRut, buscarHeredero, titular, compararRuts, mostrarAlertaTitularHeredero, limpiarEstado]);
+  }, [rut, isValidRut, buscarHeredero, titular, compararRuts, mostrarAlertaTitularHeredero, limpiarEstado, lastSearchedRut, cleanupFormHerederoData, cleanupDocumentsByRut]);
 
   // Manejadores de eventos del input
   const handleBlur = useCallback((): void => {

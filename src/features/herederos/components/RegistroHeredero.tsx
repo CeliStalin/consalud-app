@@ -2,6 +2,7 @@ import * as ConsaludCore from '@consalud/core';
 import React from 'react';
 import { useHeredero } from '../contexts/HerederoContext';
 import { useHerederoNavigation } from '../hooks/useHerederoNavigation';
+import { useStorageCleanup } from '../hooks/useStorageCleanup';
 import { FormHerederoProvider } from '../provider/FormHerederoProvider';
 import { RegistroTitularCard } from './RegistroTitularCard';
 import { Stepper } from './Stepper';
@@ -9,18 +10,26 @@ import { Stepper } from './Stepper';
 const RegistroHeredero: React.FC = () => {
   const { heredero, buscarHeredero, error, limpiarHeredero } = useHeredero();
   const { goToRegistroTitularClean } = useHerederoNavigation();
+  const { cleanupOnBackNavigation } = useStorageCleanup();
 
   /**
    * Función para manejar el botón volver
    * - Limpia el formulario del heredero del contexto
+   * - Limpia los datos del storage para forzar recarga
    * - Navega a la misma ruta usando replace para evitar entradas duplicadas en el historial
    * - Esto permite que el usuario vuelva a buscar un heredero con el formulario limpio
    */
   const handleVolver = () => {
+    // Limpiar datos del storage para el RUT actual
+    if (heredero?.rut) {
+      cleanupOnBackNavigation(heredero.rut);
+    }
+
     // Limpiar el heredero del contexto para resetear el formulario
     if (limpiarHeredero) {
       limpiarHeredero();
     }
+
     // Navegar a la misma ruta pero con el formulario limpio usando replace
     goToRegistroTitularClean();
   };

@@ -1,23 +1,24 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { HerederoProviderProps } from "../interfaces/HerederoProviderProps";
-import { Heredero } from "../interfaces/Heredero";
 import axios from "axios";
-import { HerederoContextType } from "../interfaces/HerederoContext";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { MENSAJES_ERROR, validarEdadConMensaje } from "../../../utils/ageValidation";
+import { extraerNumerosRut, formatearRut } from "../../../utils/rutValidation";
 import { HerederoContext } from "../contexts/HerederoContext";
 import { useRutChileno } from "../hooks/useRutChileno";
+import { Heredero } from "../interfaces/Heredero";
+import { HerederoContextType } from "../interfaces/HerederoContext";
+import { HerederoProviderProps } from "../interfaces/HerederoProviderProps";
 import { fetchSolicitanteMejorContactibilidad } from "../services";
-import { validarEdadConMensaje, MENSAJES_ERROR } from "../../../utils/ageValidation";
-import { formatearRut, extraerNumerosRut } from "../../../utils/rutValidation";
 
 export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) => {
   const [heredero, setHeredero] = useState<Heredero | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldsLocked, setFieldsLocked] = useState<boolean>(false);
+  const [lastSearchedRut, setLastSearchedRut] = useState<string>('');
   const { formatSimpleRut } = useRutChileno();
   const navigate = useNavigate();
-  
+
   // Función para crear un heredero vacío para el caso de status 412
   const createEmptyHeredero = (rut: string): Heredero => {
     return {
@@ -72,13 +73,20 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       tipoDireccion: ''
     };
   };
-  
+
   // Función para buscar heredero por RUT usando BFF
   const buscarHeredero = useCallback(async (rut: string) => {
     setLoading(true);
     setError(null);
     setFieldsLocked(false); // Resetear el estado de bloqueo al iniciar nueva búsqueda
-    
+
+    // Limpiar heredero anterior si el RUT cambió
+    if (lastSearchedRut && lastSearchedRut !== rut) {
+      setHeredero(null);
+      // Limpiar sessionStorage del heredero anterior
+      sessionStorage.removeItem('herederoData');
+    }
+
     try {
       const bffDns = import.meta.env.VITE_BFF_HEREDEROS_DNS;
       if (bffDns) {
@@ -86,15 +94,15 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         const rutSinDV = extraerNumerosRut(rut);
         // Obtener userName desde localStorage o sessionStorage si existe
         const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || '';
-        
+
         try {
           const response = await fetchSolicitanteMejorContactibilidad(Number(rutSinDV), userName);
-          
+
           // Validar si la persona está fallecida
           if (response.SolicitanteInMae.IndFallecido === 'S') {
             throw new Error('El RUT ingresado corresponde a una persona fallecida');
           }
-          
+
           // Validar edad mayor de 18 años
           if (response.SolicitanteInMae.FecNacimiento && response.SolicitanteInMae.FecNacimiento.trim() !== '') {
             const validacion = validarEdadConMensaje(response.SolicitanteInMae.FecNacimiento, 'La persona heredera debe tener al menos 18 años');
@@ -105,7 +113,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
             // Si no hay fecha de nacimiento, también lanzar error
             throw new Error(MENSAJES_ERROR.FECHA_REQUERIDA);
           }
-          
+
           // Mapear la respuesta del BFF al modelo Heredero
           const herederoData: Heredero = {
             id: response.SolicitanteInMae.IdPersona,
@@ -159,43 +167,46 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
             numeroFijo: response.MejorContactibilidadSolicitante.numeroFijo,
             tipoDireccion: response.MejorContactibilidadSolicitante.tipoDireccion
           };
-          
+
           setHeredero(herederoData);
-          
+          setLastSearchedRut(rut);
+
           // Bloquear campos cuando la API devuelve 200 exitosamente
           setFieldsLocked(true);
-          
+
         } catch (err: any) {
           // Manejar específicamente el status 412
           if (err.message && err.message.includes('412')) {
             // Crear heredero vacío para status 412
             const emptyHeredero = createEmptyHeredero(rut);
             setHeredero(emptyHeredero);
+            setLastSearchedRut(rut);
             setFieldsLocked(false); // No bloquear campos para formulario vacío
             setError(null); // No mostrar error
             return; // IMPORTANTE: retornar aquí para evitar el catch general
           }
-          
+
           // Para otros errores, propagar el error
           throw err;
         }
-        
+
       } else {
         // Fallback a mock (para desarrollo)
         const { data } = await axios.get('http://localhost:3001/Heredero');
         const formattedRut = formatSimpleRut(rut);
-        
+
         const herederoEncontrado = data.find((h: Heredero) => h.rut === formattedRut);
-        
+
         if (!herederoEncontrado) {
           throw new Error('Heredero no encontrado');
         }
-        
+
         setHeredero(herederoEncontrado);
+        setLastSearchedRut(rut);
         // Para desarrollo, también bloquear campos
         setFieldsLocked(true);
       }
-      
+
     } catch (err: any) {
       // Solo manejar errores que NO sean 412
       if (!err.message || !err.message.includes('412')) {
@@ -209,7 +220,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
     } finally {
       setLoading(false);
     }
-  }, [formatSimpleRut, navigate]);
+  }, [formatSimpleRut, navigate, lastSearchedRut]);
 
   const limpiarHeredero = useCallback(() => {
     console.log('HerederoProvider - limpiarHeredero llamado');
@@ -217,6 +228,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
     setError(null);
     setLoading(false); // Asegurar que loading se resetee
     setFieldsLocked(false); // Limpiar también el estado de bloqueo
+    setLastSearchedRut(''); // Limpiar el último RUT buscado
     // Limpiar también el sessionStorage
     sessionStorage.removeItem('herederoData');
   }, []);
@@ -230,6 +242,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       if (storedHeredero) {
         const herederoData: Heredero = JSON.parse(storedHeredero);
         setHeredero(herederoData);
+        setLastSearchedRut(herederoData.rut);
         setFieldsLocked(true); // Los campos están bloqueados si hay datos guardados
       }
     } catch (error) {

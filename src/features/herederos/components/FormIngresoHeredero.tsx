@@ -210,8 +210,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
 
     // Inicializar el formulario solo una vez al montar
   useEffect(() => {
-
-
     // SIEMPRE recargar datos del sessionStorage al montar
     // Esto asegura que los datos del storage tengan prioridad absoluta
     handleReloadFromStorage();
@@ -220,8 +218,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   // Sincronizar datos locales cuando cambie formData del contexto
   useEffect(() => {
     if (formData && Object.keys(formData).length > 0) {
-
-
       // SIEMPRE priorizar datos del storage sobre datos del heredero
       setLocalFormData(prevData => {
         // Solo actualizar si los datos son diferentes
@@ -229,13 +225,89 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         const newDataString = JSON.stringify(formData);
 
         if (currentDataString !== newDataString) {
-
           return formData;
         }
         return prevData;
       });
+    } else {
+      // Si no hay datos del storage, limpiar el formulario local
+      setLocalFormData({
+        fechaNacimiento: null,
+        nombres: '',
+        apellidoPaterno: '',
+        apellidoMaterno: '',
+        sexo: '',
+        parentesco: '',
+        telefono: '',
+        correoElectronico: '',
+        ciudad: '',
+        comuna: '',
+        calle: '',
+        numero: '',
+        deptoBloqueOpcional: '',
+        villaOpcional: '',
+        region: '',
+        codRegion: undefined,
+        codCiudad: undefined,
+        codComuna: undefined
+      });
     }
   }, [formData]);
+
+  // Efecto para limpiar el formulario cuando cambie el heredero
+  useEffect(() => {
+    if (heredero) {
+      // Si hay un heredero, verificar si hay datos del storage para este RUT
+      const storageKey = `formHerederoData_${heredero.rut.replace(/[^0-9kK]/g, '')}`;
+      const storedData = sessionStorage.getItem(storageKey);
+
+      if (!storedData) {
+        // Si no hay datos del storage para este RUT, limpiar el formulario
+        setLocalFormData({
+          fechaNacimiento: heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
+          nombres: heredero?.nombre || '',
+          apellidoPaterno: heredero?.apellidoPat || undefined,
+          apellidoMaterno: heredero?.apellidoMat || undefined,
+          sexo: heredero?.Genero ? heredero.Genero : '',
+          parentesco: '',
+          telefono: heredero?.contactabilidad.telefono.numero || '',
+          correoElectronico: heredero?.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
+          ciudad: heredero?.descripcionCiudad || '',
+          comuna: heredero?.descripcionComuna || '',
+          calle: heredero?.contactabilidad.direccion.calle || '',
+          numero: heredero?.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
+          deptoBloqueOpcional: heredero?.contactabilidad.direccion.departamento || '',
+          villaOpcional: heredero?.contactabilidad.direccion.villa || '',
+          region: heredero?.descripcionRegion || '',
+          codRegion: heredero?.codRegion || undefined,
+          codCiudad: heredero?.codCiudad || undefined,
+          codComuna: undefined
+        });
+      }
+    } else {
+      // Si no hay heredero, limpiar completamente el formulario
+      setLocalFormData({
+        fechaNacimiento: null,
+        nombres: '',
+        apellidoPaterno: '',
+        apellidoMaterno: '',
+        sexo: '',
+        parentesco: '',
+        telefono: '',
+        correoElectronico: '',
+        ciudad: '',
+        comuna: '',
+        calle: '',
+        numero: '',
+        deptoBloqueOpcional: '',
+        villaOpcional: '',
+        region: '',
+        codRegion: undefined,
+        codCiudad: undefined,
+        codComuna: undefined
+      });
+    }
+  }, [heredero]);
 
         // Cargar datos de ubicación cuando se restaura el formulario con códigos
   useEffect(() => {
