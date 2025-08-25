@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './styles/AutoCompleteInput.css';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNumerosCalleAutocomplete } from '../hooks/useNumerosCalleAutocomplete';
 import { NumeroCalle } from '../interfaces/Pargen';
+import './styles/AutoCompleteInput.css';
 
 interface NumberAutoCompleteInputProps {
   name: string;
@@ -40,15 +40,24 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Hook para autocompletado de números
-  const { numeros, loading, error: apiError, searchNumeros, clearNumeros } = useNumerosCalleAutocomplete({
+  const { numeros, loading, error: apiError, searchNumeros, clearNumeros, resetState } = useNumerosCalleAutocomplete({
     nombreCalle,
-    idComuna
+    idComuna,
+    hasExistingValue: Boolean(value && value.length > 0) // Evitar llamadas si ya hay un valor
   });
 
   // Actualizar inputValue cuando cambia el value prop
   useEffect(() => {
     setInputValue(value);
   }, [value]);
+
+  // Efecto para resetear el estado cuando cambian las dependencias principales
+  useEffect(() => {
+    // Solo resetear si no hay un valor válido
+    if (!value || value.length === 0) {
+      resetState();
+    }
+  }, [nombreCalle, idComuna, resetState, value]);
 
   // Debounce para la búsqueda
   useEffect(() => {
@@ -57,9 +66,10 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
     }
 
     debounceTimeoutRef.current = setTimeout(() => {
-      if (inputValue.length >= minCharsToSearch) {
+      // Solo buscar si hay un valor y cumple con el mínimo de caracteres
+      if (inputValue && inputValue.length >= minCharsToSearch) {
         searchNumeros(inputValue);
-      } else {
+      } else if (!inputValue || inputValue.length === 0) {
         clearNumeros();
       }
     }, debounceMs);
@@ -71,13 +81,29 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
     };
   }, [inputValue, searchNumeros, clearNumeros, minCharsToSearch, debounceMs]);
 
+  // Efecto para manejar la carga inicial de datos
+  useEffect(() => {
+    // Si tenemos un valor inicial y no hay error de API, no mostrar errores
+    if (value && value.length > 0 && !apiError) {
+      // El valor ya está presente, no necesitamos hacer nada especial
+    }
+  }, [value, apiError]);
+
+  // Efecto para limpiar errores cuando se recargan datos válidos
+  useEffect(() => {
+    // Si tenemos un valor válido y no hay error de API, limpiar cualquier error previo
+    if (value && value.length > 0 && !apiError) {
+      // El error se maneja en el hook, no necesitamos hacer nada aquí
+    }
+  }, [value, apiError]);
+
   // Manejar cambios en el input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
     setIsOpen(true);
     setHighlightedIndex(-1);
-    
+
     // Llamar al onChange del padre
     onChange(e);
   };
@@ -87,7 +113,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
     setInputValue(numero.numeroCalle.toString());
     setIsOpen(false);
     setHighlightedIndex(-1);
-    
+
     // Crear un evento sintético para el onChange
     const syntheticEvent = {
       target: {
@@ -95,9 +121,9 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
         value: numero.numeroCalle.toString()
       }
     } as React.ChangeEvent<HTMLInputElement>;
-    
+
     onChange(syntheticEvent);
-    
+
     if (onOptionSelect) {
       onOptionSelect(numero);
     }
@@ -110,13 +136,13 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlightedIndex(prev => 
+        setHighlightedIndex(prev =>
           prev < numeros.length - 1 ? prev + 1 : 0
         );
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setHighlightedIndex(prev => 
+        setHighlightedIndex(prev =>
           prev > 0 ? prev - 1 : numeros.length - 1
         );
         break;
@@ -138,9 +164,9 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        dropdownRef.current && 
+        dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node) &&
-        inputRef.current && 
+        inputRef.current &&
         !inputRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
@@ -176,7 +202,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
       {label && (
         <label className="label">{label}</label>
       )}
-      
+
       <div className="field">
         <div className={`control has-icons-right ${loading ? 'is-loading' : ''}`}>
           <input
@@ -197,7 +223,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
             aria-haspopup="listbox"
             role="combobox"
           />
-          
+
           {loading && (
             <span className="icon is-small is-right">
               <i className="fas fa-spinner fa-spin"></i>
@@ -240,4 +266,4 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
       )}
     </div>
   );
-}; 
+};
