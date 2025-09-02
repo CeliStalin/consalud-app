@@ -5,10 +5,11 @@ import { MENSAJES_ERROR, validarEdadConMensaje } from "../../../utils/ageValidat
 import { extraerNumerosRut, formatearRut } from "../../../utils/rutValidation";
 import { HerederoContext } from "../contexts/HerederoContext";
 import { useRutChileno } from "../hooks/useRutChileno";
+import { FormHerederoData } from '../interfaces/FormData';
 import { Heredero } from "../interfaces/Heredero";
 import { HerederoContextType } from "../interfaces/HerederoContext";
 import { HerederoProviderProps } from "../interfaces/HerederoProviderProps";
-import { fetchSolicitanteMejorContactibilidad } from "../services";
+import { fetchSolicitanteMejorContactibilidad } from '../services';
 
 export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) => {
   const [heredero, setHeredero] = useState<Heredero | null>(null);
@@ -19,60 +20,97 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
   const { formatSimpleRut } = useRutChileno();
   const navigate = useNavigate();
 
-  // Función para crear un heredero vacío para el caso de status 412
-  const createEmptyHeredero = (rut: string): Heredero => {
+  // Función para obtener la clave del storage basada en RUT
+  const getStorageKey = useCallback((rut: string) => {
+    return `formHerederoData_${rut.replace(/[^0-9kK]/g, '')}`;
+  }, []);
+
+  // Función para convertir Heredero a FormHerederoData
+  const herederoToFormHerederoData = useCallback((herederoData: Heredero): FormHerederoData => {
     return {
-      id: 0,
-      rut: formatearRut(rut),
-      fechaNacimiento: '',
-      nombre: '',
-      apellidoPat: '',
-      apellidoMat: '',
-      parentesco: 0,
-      Genero: '',
+      RutPersona: parseInt(herederoData.rut.replace(/[^0-9kK]/g, '').slice(0, -1)),
+      NombrePersona: herederoData.nombre || '',
+      ApellidoPaterno: herederoData.apellidoPat || '',
+      ApellidoMaterno: herederoData.apellidoMat || '',
+      RutCompleto: herederoData.rut,
+      RutDigito: herederoData.rut.slice(-1).toUpperCase(),
+      CodigoSexo: herederoData.Genero || '',
+      FechaNacimiento: herederoData.fechaNacimiento || new Date().toISOString(),
+      IdParentesco: 0, // Valor por defecto - se establecerá cuando el usuario seleccione
+      IdTipoSolicitante: 1, // Valor por defecto para heredero
+      EstadoRegistro: 'V', // Activo por defecto
+      NumTelef: parseInt(herederoData.contactabilidad?.telefono?.numero || '0') || 0,
+      Mail: herederoData.contactabilidad?.correo?.[0]?.mail || '',
+      IdRegion: herederoData.codRegion || 0,
+      DesRegion: herederoData.descripcionRegion || '',
+      IdCiudad: herederoData.codCiudad || 0,
+      DesCiudad: herederoData.descripcionCiudad || '',
+      IdComuna: herederoData.codComuna || 0,
+      DesComuna: herederoData.descripcionComuna || '',
+      Calle: herederoData.contactabilidad?.direccion?.calle || '',
+      NumCalle: herederoData.contactabilidad?.direccion?.numero || 0,
+      villa: herederoData.contactabilidad?.direccion?.villa || '',
+      DepBlock: herederoData.contactabilidad?.direccion?.departamento ? parseInt(herederoData.contactabilidad.direccion.departamento) : 0,
+      Usuario: ''
+    };
+  }, []);
+
+  // Función para convertir FormHerederoData a Heredero
+  const formHerederoDataToHeredero = useCallback((formData: FormHerederoData): Heredero => {
+    return {
+      id: formData.RutPersona,
+      rut: formData.RutCompleto,
+      fechaNacimiento: formData.FechaNacimiento,
+      nombre: formData.NombrePersona,
+      apellidoPat: formData.ApellidoPaterno,
+      apellidoMat: formData.ApellidoMaterno,
+      parentesco: formData.IdParentesco,
+      Genero: formData.CodigoSexo,
+      indFallecido: 'N',
       contactabilidad: {
         direccion: {
-          calle: '',
-          numero: 0,
-          comunaId: 0,
-          comunaNombre: '',
-          regionId: 0,
-          regionNombre: '',
-          ciudadId: 0,
-          ciudadNombre: '',
-          villa: '',
-          departamento: ''
+          calle: formData.Calle,
+          numero: formData.NumCalle,
+          comunaId: formData.IdComuna,
+          comunaNombre: formData.DesComuna,
+          regionId: formData.IdRegion,
+          regionNombre: formData.DesRegion,
+          ciudadId: formData.IdCiudad,
+          ciudadNombre: formData.DesCiudad,
+          villa: formData.villa,
+          departamento: formData.DepBlock.toString()
         },
         telefono: {
-          numero: '',
+          numero: formData.NumTelef.toString(),
           tipo: "CELULAR",
           codPais: "56",
           codCiudad: "2"
         },
         correo: [{
-          mail: '',
+          mail: formData.Mail,
           validacion: 1
         }]
       },
-      // Campos adicionales del BFF vacíos
-      codCiudad: 0,
-      codComuna: 0,
-      codRegion: 0,
+      codCiudad: formData.IdCiudad,
+      codComuna: formData.IdComuna,
+      codRegion: formData.IdRegion,
       codigoPostal: 0,
-      email: '',
-      descripcionCiudad: '',
-      descripcionComuna: '',
-      descripcionRegion: '',
+      email: formData.Mail,
+      descripcionCiudad: formData.DesCiudad,
+      descripcionComuna: formData.DesComuna,
+      descripcionRegion: formData.DesRegion,
       numeroBloque: 0,
-      numeroDepartamento: 0,
-      nombreVillaCondominio: '',
-      nombreCalle: '',
-      numeroCalle: 0,
-      numeroCelular: 0,
+      numeroDepartamento: formData.DepBlock,
+      nombreVillaCondominio: formData.villa,
+      nombreCalle: formData.Calle,
+      numeroCalle: formData.NumCalle,
+      numeroCelular: formData.NumTelef,
       numeroFijo: 0,
       tipoDireccion: ''
     };
-  };
+  }, []);
+
+
 
   // Función para buscar heredero por RUT usando BFF
   const buscarHeredero = useCallback(async (rut: string) => {
@@ -83,8 +121,9 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
     // Limpiar heredero anterior si el RUT cambió
     if (lastSearchedRut && lastSearchedRut !== rut) {
       setHeredero(null);
-      // Limpiar sessionStorage del heredero anterior
-      sessionStorage.removeItem('herederoData');
+      // Limpiar sessionStorage del heredero anterior usando la nueva estructura
+      const oldStorageKey = getStorageKey(lastSearchedRut);
+      sessionStorage.removeItem(oldStorageKey);
     }
 
     try {
@@ -95,8 +134,8 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         // Obtener userName desde localStorage o sessionStorage si existe
         const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || '';
 
-        try {
-          const response = await fetchSolicitanteMejorContactibilidad(Number(rutSinDV), userName);
+                  try {
+            const response = await fetchSolicitanteMejorContactibilidad(Number(rutSinDV), userName);
 
           // Validar si la persona está fallecida
           if (response.SolicitanteInMae.IndFallecido === 'S') {
@@ -171,18 +210,21 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
           setHeredero(herederoData);
           setLastSearchedRut(rut);
 
+          // NO guardar en session storage aquí - solo cuando el usuario modifique el formulario
+          // Esto permite que la primera carga muestre "SELECCIONAR" en los campos
+
           // Bloquear campos cuando la API devuelve 200 exitosamente
           setFieldsLocked(true);
 
         } catch (err: any) {
           // Manejar específicamente el status 412
           if (err.message && err.message.includes('412')) {
-            // Crear heredero vacío para status 412
-            const emptyHeredero = createEmptyHeredero(rut);
-            setHeredero(emptyHeredero);
-            setLastSearchedRut(rut);
-            setFieldsLocked(false); // No bloquear campos para formulario vacío
-            setError(null); // No mostrar error
+            // Para 412, mostrar alerta y navegar a la página de documentos
+            const mensaje = 'El titular ya tiene un mandato activo. Será redirigido a la página de documentos.';
+            console.warn(mensaje);
+            // Aquí podrías mostrar una alerta o notificación
+            // Por ahora, solo navegar
+            navigate('/documentos');
             return; // IMPORTANTE: retornar aquí para evitar el catch general
           }
 
@@ -201,8 +243,12 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
           throw new Error('Heredero no encontrado');
         }
 
-        setHeredero(herederoEncontrado);
+                setHeredero(herederoEncontrado);
         setLastSearchedRut(rut);
+
+        // NO guardar en session storage aquí - solo cuando el usuario modifique el formulario
+        // Esto permite que la primera carga muestre "SELECCIONAR" en los campos
+
         // Para desarrollo, también bloquear campos
         setFieldsLocked(true);
       }
@@ -220,7 +266,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
     } finally {
       setLoading(false);
     }
-  }, [formatSimpleRut, navigate, lastSearchedRut]);
+  }, [formatSimpleRut, navigate, lastSearchedRut, getStorageKey, herederoToFormHerederoData]);
 
   const limpiarHeredero = useCallback(() => {
     console.log('HerederoProvider - limpiarHeredero llamado');
@@ -229,40 +275,47 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
     setLoading(false); // Asegurar que loading se resetee
     setFieldsLocked(false); // Limpiar también el estado de bloqueo
     setLastSearchedRut(''); // Limpiar el último RUT buscado
-    // Limpiar también el sessionStorage
-    sessionStorage.removeItem('herederoData');
-  }, []);
 
-
+    // Limpiar session storage usando la nueva estructura
+    if (lastSearchedRut) {
+      const storageKey = getStorageKey(lastSearchedRut);
+      sessionStorage.removeItem(storageKey);
+    }
+  }, [lastSearchedRut, getStorageKey]);
 
   // Cargar heredero desde sessionStorage al inicializar
   useEffect(() => {
     try {
-      const storedHeredero = sessionStorage.getItem('herederoData');
-      if (storedHeredero) {
-        const herederoData: Heredero = JSON.parse(storedHeredero);
-        setHeredero(herederoData);
-        setLastSearchedRut(herederoData.rut);
-        setFieldsLocked(true); // Los campos están bloqueados si hay datos guardados
+      // Buscar en todas las claves de formHerederoData para encontrar datos del heredero
+      const storageKeys = Object.keys(sessionStorage).filter(key =>
+        key.startsWith('formHerederoData_')
+      );
+
+      if (storageKeys.length > 0) {
+        // Tomar la primera clave encontrada (asumiendo que solo hay un heredero activo)
+        const storageKey = storageKeys[0];
+        const storedData = sessionStorage.getItem(storageKey);
+
+        if (storedData) {
+          try {
+            const parsed = JSON.parse(storedData);
+
+            // Verificar si es la nueva estructura FormHerederoData
+            if (parsed.RutPersona) {
+              const herederoData = formHerederoDataToHeredero(parsed);
+              setHeredero(herederoData);
+              setLastSearchedRut(herederoData.rut);
+              setFieldsLocked(true); // Los campos están bloqueados si hay datos guardados
+            }
+          } catch (error) {
+            console.error('Error al parsear datos del heredero desde sessionStorage:', error);
+          }
+        }
       }
     } catch (error) {
       console.error('Error al cargar heredero desde sessionStorage:', error);
     }
-  }, []);
-
-  // Guardar heredero en sessionStorage cuando cambie
-  useEffect(() => {
-    if (heredero) {
-      try {
-        sessionStorage.setItem('herederoData', JSON.stringify(heredero));
-      } catch (error) {
-        console.error('Error al guardar heredero en sessionStorage:', error);
-      }
-    } else {
-      // Si no hay heredero, limpiar sessionStorage
-      sessionStorage.removeItem('herederoData');
-    }
-  }, [heredero]);
+  }, [formHerederoDataToHeredero]);
 
   // Valor del contexto
   const value: HerederoContextType = {

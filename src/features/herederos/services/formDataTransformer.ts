@@ -89,6 +89,11 @@ export class FormDataTransformer {
    * Mapea el ID del parentesco a string
    */
   private static mapIdToParentesco(id: number): string {
+    // Si el ID es 0, significa que no se ha seleccionado parentesco
+    if (id === 0) {
+      return '';
+    }
+
     const idMap: Record<number, string> = {
       1: 'P', // Padre
       2: 'M', // Madre
@@ -97,6 +102,6 @@ export class FormDataTransformer {
       5: 'B', // Hermano/a (cambiado de 'H' a 'B' para evitar duplicado)
       6: 'O'  // Otro
     };
-    return idMap[id] || 'O';
+    return idMap[id] || '';
   }
 }
