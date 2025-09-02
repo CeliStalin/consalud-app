@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { FormHerederoContext } from "../contexts/FormHerederoContext";
-import { FormData } from "../interfaces/FormData";
+import { FormData, FormHerederoData } from "../interfaces/FormData";
 import { FormHerederoContextType } from "../interfaces/FormHerederoContext";
+import { FormDataTransformer } from "../services/formDataTransformer";
 
 interface FormHerederoProviderProps {
   children: React.ReactNode;
@@ -18,21 +19,33 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
     return `${STORAGE_KEY_PREFIX}_${rutToUse.replace(/[^0-9kK]/g, '')}`;
   }, [rutHeredero]);
 
+  // Función helper para parsear datos del storage y evitar duplicación de código
+  const parseStorageData = useCallback((stored: string): FormData | null => {
+    try {
+      const parsed = JSON.parse(stored);
+
+      if (parsed.RutPersona) {
+        // Nueva estructura FormHerederoData
+        return FormDataTransformer.toFormData(parsed as FormHerederoData);
+      } else {
+        // Estructura antigua FormData
+        if (parsed.fechaNacimiento) {
+          parsed.fechaNacimiento = new Date(parsed.fechaNacimiento);
+        }
+        return parsed as FormData;
+      }
+    } catch {
+      return null;
+    }
+  }, []);
+
   const [formData, setFormData] = useState<FormData | null>(() => {
     // Inicializar desde storage si hay datos
     if (rutHeredero) {
       const storageKey = `${STORAGE_KEY_PREFIX}_${rutHeredero.replace(/[^0-9kK]/g, '')}`;
       const stored = sessionStorage.getItem(storageKey);
       if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          if (parsed.fechaNacimiento) {
-            parsed.fechaNacimiento = new Date(parsed.fechaNacimiento);
-          }
-          return parsed as FormData;
-        } catch {
-          return null;
-        }
+        return parseStorageData(stored);
       }
     }
     return null;
@@ -55,14 +68,11 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
       const stored = sessionStorage.getItem(storageKey);
 
       if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          if (parsed.fechaNacimiento) {
-            parsed.fechaNacimiento = new Date(parsed.fechaNacimiento);
-          }
-          setFormData(parsed as FormData);
+        const parsedData = parseStorageData(stored);
+        if (parsedData) {
+          setFormData(parsedData);
           setIsDirty(true);
-        } catch {
+        } else {
           setFormData(null);
           setIsDirty(false);
         }
@@ -76,7 +86,7 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
       setFormData(null);
       setIsDirty(false);
     }
-  }, [rutHeredero, getStorageKey]);
+  }, [rutHeredero, getStorageKey, parseStorageData]);
 
   // Limpiar claves antiguas sin RUT al inicializar
   useEffect(() => {
@@ -99,11 +109,9 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
   useEffect(() => {
     const storageKey = getStorageKey();
     if (formData && rutHeredero) {
-      const dataToStore = {
-        ...formData,
-        fechaNacimiento: formData.fechaNacimiento ? formData.fechaNacimiento.toISOString() : null
-      };
-      sessionStorage.setItem(storageKey, JSON.stringify(dataToStore));
+      // Convertir FormData a FormHerederoData para el storage
+      const formHerederoData = FormDataTransformer.toFormHerederoData(formData, rutHeredero);
+      sessionStorage.setItem(storageKey, JSON.stringify(formHerederoData));
       setIsDirty(true);
     } else if (!formData && rutHeredero) {
       sessionStorage.removeItem(storageKey);
@@ -117,14 +125,11 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
       const storageKey = getStorageKey();
       const stored = sessionStorage.getItem(storageKey);
       if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          if (parsed.fechaNacimiento) {
-            parsed.fechaNacimiento = new Date(parsed.fechaNacimiento);
-          }
-          setFormData(parsed as FormData);
+        const parsedData = parseStorageData(stored);
+        if (parsedData) {
+          setFormData(parsedData);
           setIsDirty(true);
-        } catch {
+        } else {
           setFormData(null);
           setIsDirty(false);
         }
@@ -135,26 +140,20 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
     };
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
-  }, [getStorageKey]);
+  }, [getStorageKey, parseStorageData]);
 
   // Función para recargar datos del sessionStorage
   const reloadFromStorage = useCallback(() => {
     const storageKey = getStorageKey();
     const stored = sessionStorage.getItem(storageKey);
     if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed.fechaNacimiento) {
-          parsed.fechaNacimiento = new Date(parsed.fechaNacimiento);
-        }
-        setFormData(parsed as FormData);
+      const parsedData = parseStorageData(stored);
+      if (parsedData) {
+        setFormData(parsedData);
         setIsDirty(true);
-      } catch {
-        setFormData(null);
-        setIsDirty(false);
       }
     }
-  }, [getStorageKey]);
+  }, [getStorageKey, parseStorageData]);
 
   const saveFormData = useCallback((data: FormData) => {
     setLoading(true);
@@ -245,18 +244,13 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
     const storageKey = getStorageKey();
     const stored = sessionStorage.getItem(storageKey);
     if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed.fechaNacimiento) {
-          parsed.fechaNacimiento = new Date(parsed.fechaNacimiento);
-        }
-        setFormData(parsed as FormData);
+      const parsedData = parseStorageData(stored);
+      if (parsedData) {
+        setFormData(parsedData);
         setIsDirty(true);
-      } catch (error) {
-        console.error('Error en sincronización forzada:', error);
       }
     }
-  }, [getStorageKey]);
+  }, [getStorageKey, parseStorageData]);
 
   const contextValue: FormHerederoContextType = {
     formData,

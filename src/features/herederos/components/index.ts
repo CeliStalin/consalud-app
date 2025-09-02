@@ -1,5 +1,6 @@
 // Componentes principales
 export { AutoCompleteInput } from './AutoCompleteInput';
+export { FormHerederoDataDisplay } from './FormHerederoDataDisplay';
 export { default as FormIngresoHeredero } from './FormIngresoHeredero';
 export { NumberAutoCompleteInput } from './NumberAutoCompleteInput';
 export { RegistroTitularCard } from './RegistroTitularCard';
