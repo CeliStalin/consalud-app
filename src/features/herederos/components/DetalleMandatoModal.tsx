@@ -1,6 +1,7 @@
 import * as ConsaludCore from '@consalud/core';
 import React, { useEffect, useState } from 'react';
 import { MandatoResult, mandatoSoapService } from '../../documentos/services/MandatoSoapService';
+import { createSolicitante } from '../services/herederosService';
 import { useStepper } from './Stepper';
 import './styles/DetalleMandatoModal.css';
 
@@ -18,6 +19,8 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [mandatoInfo, setMandatoInfo] = useState<MandatoResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const { setStep } = useStepper();
 
   // Obtener datos del mandato cuando se abre el modal
@@ -57,6 +60,101 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
     }
   }, [isOpen, setStep]);
 
+  // Función para manejar el guardado del solicitante
+  const handleSave = async () => {
+    if (!mandatoInfo) return;
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      // Buscar automáticamente en todas las claves del sessionStorage que contengan datos de herederos
+      const allKeys = Object.keys(sessionStorage);
+      const formKeys = allKeys.filter(key => key.includes('formHeredero') || key.includes('heredero'));
+
+      console.log('Claves disponibles en sessionStorage:', allKeys);
+      console.log('Claves relacionadas con herederos:', formKeys);
+
+      let storedData: string | null = null;
+
+      // Buscar en todas las claves de herederos hasta encontrar una con datos válidos
+      for (const key of formKeys) {
+        const data = sessionStorage.getItem(key);
+        if (data) {
+          try {
+            const parsed = JSON.parse(data);
+            // Verificar que tenga la estructura correcta (al menos RutPersona)
+            if (parsed && parsed.RutPersona) {
+              storedData = data;
+              console.log('Datos encontrados en clave:', key);
+              break;
+            }
+          } catch (parseError) {
+            console.log('Error al parsear datos de la clave:', key, parseError);
+            continue;
+          }
+        }
+      }
+
+      if (!storedData) {
+        throw new Error(`No se encontraron datos válidos del formulario en el sessionStorage. Claves revisadas: ${formKeys.join(', ')}`);
+      }
+
+      const formData = JSON.parse(storedData);
+      console.log('Datos del formulario parseados:', formData);
+
+      // Extraer el RUT del formulario encontrado
+      const rutFormulario = formData.RutPersona || formData.RutCompleto || '0';
+      console.log('RUT del formulario encontrado:', rutFormulario);
+
+      // Preparar datos para la API
+      const solicitanteData = {
+        RutPersona: formData.RutPersona || parseInt(rutFormulario.toString()),
+        NombrePersona: formData.NombrePersona || '',
+        ApellidoPaterno: formData.ApellidoPaterno || '',
+        ApellidoMaterno: formData.ApellidoMaterno || '',
+        RutCompleto: formData.RutCompleto || rutFormulario.toString(),
+        RutDigito: formData.RutDigito || '',
+        CodigoSexo: formData.CodigoSexo || '',
+        FechaNacimiento: formData.FechaNacimiento || new Date().toISOString(),
+        IdParentesco: formData.IdParentesco || 0,
+        IdTipoSolicitante: formData.IdTipoSolicitante || 0,
+        EstadoRegistro: formData.EstadoRegistro || 'A',
+        NumTelef: formData.NumTelef || 0,
+        Mail: formData.Mail || '',
+        IdCiudad: formData.IdCiudad || 0,
+        DesCiudad: formData.DesCiudad || '',
+        IdComuna: formData.IdComuna || 0,
+        DesComuna: formData.DesComuna || '',
+        Calle: formData.Calle || '',
+        NumCalle: formData.NumCalle || 0,
+        villa: formData.villa || '',
+        DepBlock: formData.DepBlock || 0,
+        Usuario: formData.Usuario || 'SISTEMA'
+      };
+
+      console.log('Datos preparados para la API:', solicitanteData);
+
+      // Llamar a la API
+      const result = await createSolicitante(solicitanteData, 'SISTEMA');
+
+      if (result.success && result.status === 201) {
+        setSaveSuccess(true);
+        // Cerrar el modal después de 2 segundos
+        setTimeout(() => {
+          onSave();
+        }, 2000);
+      } else {
+        throw new Error('Error al guardar el solicitante');
+      }
+    } catch (err: any) {
+      console.error('Error al guardar solicitante:', err);
+      setError(err.message || 'Error al guardar el solicitante');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -78,6 +176,17 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
                 <div className="loader"></div>
               </div>
               <p className="mt-4">Cargando información...</p>
+            </div>
+          ) : saveSuccess ? (
+            <div className="has-text-centered p-6">
+              <div className="notification is-success is-light">
+                <div className="has-text-centered">
+                  <i className="fas fa-check-circle" style={{ fontSize: '3rem', color: '#48c774' }}></i>
+                  <h3 className="title is-4 mt-3" style={{ color: '#48c774' }}>¡Guardado Exitoso!</h3>
+                  <p className="mt-2">El solicitante ha sido guardado correctamente.</p>
+                  <p className="is-size-7 mt-2">Cerrando modal en unos segundos...</p>
+                </div>
+              </div>
             </div>
           ) : error ? (
             <div className="notification is-danger">
@@ -198,10 +307,10 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
           </ConsaludCore.Button>
           <ConsaludCore.Button
             variant="primary"
-            onClick={onSave}
-            disabled={!mandatoInfo}
+            onClick={handleSave}
+            disabled={!mandatoInfo || saving}
           >
-            Guardar
+            {saving ? 'Guardando...' : 'Guardar'}
           </ConsaludCore.Button>
         </div>
       </div>

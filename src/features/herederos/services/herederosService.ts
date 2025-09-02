@@ -1,8 +1,8 @@
-import { Titular } from '../interfaces/Titular';
-import { SolicitanteResponse } from '../interfaces/Solicitante';
-import { Genero, Ciudad, Comuna, Calle, NumeroCalle, Region, TipoDocumento } from '../interfaces/Pargen';
-import { apiGet, getHerederosApiConfig, buildHeaders } from './apiUtils';
 import { formatearRut } from '../../../utils/rutValidation';
+import { Calle, Ciudad, Comuna, Genero, NumeroCalle, Region, TipoDocumento } from '../interfaces/Pargen';
+import { SolicitantePostRequest, SolicitanteResponse } from '../interfaces/Solicitante';
+import { Titular } from '../interfaces/Titular';
+import { apiGet, buildHeaders, getHerederosApiConfig } from './apiUtils';
 
 /**
  * Servicio para gestión de herederos
@@ -20,7 +20,7 @@ export class HerederosService {
    */
   async getTitularByRut(rut: number, userName: string = ""): Promise<Titular> {
     const url = `${this.config.baseUrl}/api/Titular/ByRut?IdentificadorUnico=${rut}&userName=${encodeURIComponent(userName)}`;
-    
+
     try {
       const data = await apiGet<any>(url, this.config, 'obtener titular por RUT');
 
@@ -54,7 +54,7 @@ export class HerederosService {
    */
   async getSolicitanteMejorContactibilidad(rut: number, userName: string = ""): Promise<SolicitanteResponse> {
     const url = `${this.config.baseUrl}/api/Solicitante/mejorContactibilidad?IdentificadorUnico=${rut}&userName=${encodeURIComponent(userName)}`;
-    
+
     try {
       return await apiGet<SolicitanteResponse>(url, this.config, 'obtener mejor contactibilidad del solicitante');
     } catch (error: any) {
@@ -89,7 +89,7 @@ export class HerederosService {
    * @param idRegion - ID de la región (opcional)
    */
   async getCiudades(idRegion?: number): Promise<Ciudad[]> {
-    const url = idRegion 
+    const url = idRegion
       ? `${this.config.baseUrl}/api/Pargen/CiudadesIsapre?idRegion=${idRegion}`
       : `${this.config.baseUrl}/api/Pargen/CiudadesIsapre`;
     return apiGet<Ciudad[]>(url, this.config, 'obtener ciudades');
@@ -139,7 +139,7 @@ export class HerederosService {
    */
   async validarCorreoElectronico(rut: number, email: string, userName: string = ""): Promise<boolean> {
     const url = `${this.config.baseUrl}/api/ValidacionContactibilidad/email?rut=${rut}&mail=${encodeURIComponent(email)}&userName=${encodeURIComponent(userName)}`;
-    
+
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -150,16 +150,16 @@ export class HerederosService {
       if (response.status === 200) {
         return true;
       }
-      
+
       // Si la respuesta es 422, la validación falló
       if (response.status === 422) {
         console.error('Validación de correo electrónico falló (422):', response.statusText);
         return false;
       }
-      
+
       // Para cualquier otro código de respuesta, lanzar error
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      
+
     } catch (error: any) {
       // Si hay error de red u otro tipo, también considerar como fallo de validación
       console.error('Error en validación de correo electrónico:', error);
@@ -175,7 +175,7 @@ export class HerederosService {
    */
   async validarTelefono(rut: number, telefono: string, userName: string = ""): Promise<boolean> {
     const url = `${this.config.baseUrl}/api/ValidacionContactibilidad/telefono?rut=${rut}&telefono=${encodeURIComponent(telefono)}&userName=${encodeURIComponent(userName)}`;
-    
+
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -186,20 +186,63 @@ export class HerederosService {
       if (response.status === 200) {
         return true;
       }
-      
+
       // Si la respuesta es 422, la validación falló
       if (response.status === 422) {
         console.error('Validación de teléfono falló (422):', response.statusText);
         return false;
       }
-      
+
       // Para cualquier otro código de respuesta, lanzar error
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      
+
     } catch (error: any) {
       // Si hay error de red u otro tipo, también considerar como fallo de validación
       console.error('Error en validación de teléfono:', error);
       return false;
+    }
+  }
+
+  /**
+   * Crea un nuevo solicitante
+   * @param solicitanteData - Datos del solicitante a crear
+   * @param userName - Nombre de usuario para auditoría
+   */
+  async createSolicitante(solicitanteData: SolicitantePostRequest, userName: string = ""): Promise<any> {
+    const url = `${this.config.baseUrl}/api/Solicitante`;
+
+    try {
+      // Agregar el userName a los datos si no está presente
+      const dataToSend = {
+        ...solicitanteData,
+        Usuario: userName || solicitanteData.Usuario
+      };
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: buildHeaders(this.config, {
+          'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(dataToSend)
+      });
+
+      // Si la respuesta es 201, la creación fue exitosa
+      if (response.status === 201) {
+        return { success: true, status: 201 };
+      }
+
+      // Si la respuesta no es exitosa, lanzar error
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error: any) {
+      // Manejo específico para errores de creación
+      if (error.message && error.message.includes('201')) {
+        return { success: true, status: 201 };
+      }
+      throw error;
     }
   }
 }
@@ -208,20 +251,23 @@ export class HerederosService {
 export const herederosService = new HerederosService();
 
 // Exportar funciones individuales para compatibilidad
-export const fetchTitularByRut = (rut: number, userName: string = "") => 
+export const fetchTitularByRut = (rut: number, userName: string = "") =>
   herederosService.getTitularByRut(rut, userName);
 
-export const fetchSolicitanteMejorContactibilidad = (rut: number, userName: string = "") => 
+export const fetchSolicitanteMejorContactibilidad = (rut: number, userName: string = "") =>
   herederosService.getSolicitanteMejorContactibilidad(rut, userName);
 
 export const fetchGeneros = () => herederosService.getGeneros();
 export const fetchRegiones = () => herederosService.getRegiones();
 export const fetchCiudades = (idRegion?: number) => herederosService.getCiudades(idRegion);
 export const fetchComunasPorCiudad = (idCiudad: number) => herederosService.getComunasPorCiudad(idCiudad);
-export const fetchCallesPorComuna = (idComuna: number) => herederosService.getCallesPorComuna(idComuna); 
-export const fetchNumerosCalle = (nombreCalle: string, idComuna: number) => herederosService.getNumerosCalle(nombreCalle, idComuna); 
-export const fetchTiposDocumento = () => herederosService.getTiposDocumento(); 
-export const validarCorreoElectronico = (rut: number, email: string, userName: string = "") => 
+export const fetchCallesPorComuna = (idComuna: number) => herederosService.getCallesPorComuna(idComuna);
+export const fetchNumerosCalle = (nombreCalle: string, idComuna: number) => herederosService.getNumerosCalle(nombreCalle, idComuna);
+export const fetchTiposDocumento = () => herederosService.getTiposDocumento();
+export const validarCorreoElectronico = (rut: number, email: string, userName: string = "") =>
   herederosService.validarCorreoElectronico(rut, email, userName);
-export const validarTelefono = (rut: number, telefono: string, userName: string = "") => 
-  herederosService.validarTelefono(rut, telefono, userName); 
+export const validarTelefono = (rut: number, telefono: string, userName: string = "") =>
+  herederosService.validarTelefono(rut, telefono, userName);
+
+export const createSolicitante = (solicitanteData: SolicitantePostRequest, userName: string = "") =>
+  herederosService.createSolicitante(solicitanteData, userName);

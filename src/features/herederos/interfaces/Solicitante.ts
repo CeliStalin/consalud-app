@@ -35,4 +35,30 @@ interface SolicitanteResponse {
   MejorContactibilidadSolicitante: MejorContactibilidadSolicitante;
 }
 
-export type { SolicitanteInMae, MejorContactibilidadSolicitante, SolicitanteResponse }; 
+// Nueva interfaz para la solicitud POST de Solicitante
+interface SolicitantePostRequest {
+  RutPersona: number;
+  NombrePersona: string;
+  ApellidoPaterno: string;
+  ApellidoMaterno: string;
+  RutCompleto: string;
+  RutDigito: string;
+  CodigoSexo: string;
+  FechaNacimiento: string;
+  IdParentesco: number;
+  IdTipoSolicitante: number;
+  EstadoRegistro: string;
+  NumTelef: number;
+  Mail: string;
+  IdCiudad: number;
+  DesCiudad: string;
+  IdComuna: number;
+  DesComuna: string;
+  Calle: string;
+  NumCalle: number;
+  villa: string;
+  DepBlock: number;
+  Usuario: string;
+}
+
+export type { MejorContactibilidadSolicitante, SolicitanteInMae, SolicitantePostRequest, SolicitanteResponse };
