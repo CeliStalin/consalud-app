@@ -1,8 +1,8 @@
-import { StepperProps } from "../interfaces/StepperProps";
-import * as ConsaludCore from '@consalud/core';
-import './styles/Stepper.css';
-import React, { createContext, useContext, useState, ReactNode } from 'react';
 import CheckIcon from '@/assets/check-icon.svg';
+import * as ConsaludCore from '@consalud/core';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
+import { StepperProps } from "../interfaces/StepperProps";
+import './styles/Stepper.css';
 
 interface StepperContextType {
   step: number;
@@ -35,13 +35,13 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
     { title: "Paso 1", description: "Datos del titular" },
     { title: "Paso 2", description: "Registrar persona heredera" },
     { title: "Paso 3", description: "Carga de documentos" },
-    { title: "Paso 4", description: "Cuenta bancaria" },
+    { title: "Paso 4", description: "Mandatos" },
   ];
 
   const renderCircle = (index: number) => {
     const isCompleted = index < step - 1;
     const isActive = index === step - 1;
-    
+
     return (
       <div
         className={`stepper-circle${isCompleted ? ' completed' : ''}${isActive ? ' active' : ''}`}
@@ -53,7 +53,7 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
 
   const renderProgressLine = (index: number) => {
     if (index >= steps.length - 1) return null;
-    
+
     return (
       <div className={`progressLine${index < step - 1 ? ' active' : ''}`} />
     );

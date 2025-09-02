@@ -1,26 +1,26 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
-import { UseAlert } from "../hooks/Alert";
-import { useStepper } from "./Stepper";
-import { useTiposDocumento } from "../hooks/useTiposDocumento";
-import { DocumentUploadArea } from "./DocumentUploadArea";
-import { TipoDocumento } from "../interfaces/Pargen";
-import { useFileStorage } from "../hooks/useFileStorage";
+import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useHeredero } from "../contexts/HerederoContext";
+import { UseAlert } from "../hooks/Alert";
+import { useFileStorage } from "../hooks/useFileStorage";
+import { useTiposDocumento } from "../hooks/useTiposDocumento";
+import { TipoDocumento } from "../interfaces/Pargen";
+import { DocumentUploadArea } from "./DocumentUploadArea";
+import { useStepper } from "./Stepper";
 import { StorageCleanup } from "./StorageCleanup";
 import './styles/globalStyle.css';
 
 const CargaDocumento: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState(false);
-  
+
   const navigate = useNavigate();
   const { tiposDocumento, loading: loadingTipos, error: errorTipos } = useTiposDocumento();
   const { ejemploCedula, ejemploPoder, ejemploPosesion } = UseAlert();
   const { setStep } = useStepper();
   const { heredero } = useHeredero();
-  
+
   // Usar el hook de almacenamiento de archivos
   const {
     documentFiles,
@@ -42,7 +42,7 @@ const CargaDocumento: React.FC = () => {
       const timer = setTimeout(() => {
         loadFilesFromStorage(heredero.rut);
       }, 100);
-      
+
       return () => clearTimeout(timer);
     }
   }, [heredero?.rut, loadFilesFromStorage]);
@@ -83,7 +83,7 @@ const CargaDocumento: React.FC = () => {
 
   const handleFileInputChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>, tipoId: number) => {
     const file = e.target.files?.[0];
-    
+
     if (file && heredero?.rut) {
       const tipo = tiposDocumento.find(t => t.valValor === tipoId)?.nombre || '';
       await handleFileChange(file, tipoId, tipo, heredero.rut);
@@ -92,26 +92,26 @@ const CargaDocumento: React.FC = () => {
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Verificar que todos los documentos requeridos estén cargados
-    const allDocumentsLoaded = tiposDocumento.every(tipo => 
+    const allDocumentsLoaded = tiposDocumento.every(tipo =>
       documentFiles[tipo.valValor]?.file || documentFiles[tipo.valValor]?.documento
     );
-    
+
     if (!allDocumentsLoaded || !checked) {
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
              // Aquí iría la lógica de envío de archivos
-      
+
       // Simular envío
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Navegar a la siguiente página
-      navigate('/mnherederos/ingresoher/cuenta');
+
+      // Navegar a la página de mandatos (paso 4)
+      navigate('/mnherederos/ingresoher/detallemandato');
          } catch (error) {
        // Manejar error de envío
      } finally {
@@ -122,7 +122,7 @@ const CargaDocumento: React.FC = () => {
   // Mostrar loading mientras se cargan los tipos de documento o los archivos inicialmente
   if (loadingTipos || (!initialLoadComplete && heredero?.rut)) {
     return (
-      <div style={{ 
+      <div style={{
         padding: '60px 90px',
         backgroundColor: '#FFFFFF',
         borderRadius: '20px',
@@ -143,7 +143,7 @@ const CargaDocumento: React.FC = () => {
   // Mostrar error si no se pudieron cargar los tipos de documento
   if (errorTipos) {
     return (
-      <div style={{ 
+      <div style={{
         padding: '60px 90px',
         backgroundColor: '#FFFFFF',
         borderRadius: '20px',
@@ -151,9 +151,9 @@ const CargaDocumento: React.FC = () => {
       }}>
         <div className="columns is-centered is-vcentered" style={{ minHeight: '60vh' }}>
           <div className="column is-narrow has-text-centered">
-            <ConsaludCore.Typography 
-              variant="body" 
-              component="p" 
+            <ConsaludCore.Typography
+              variant="body"
+              component="p"
               style={{ color: '#FF5252' }}
             >
               {errorTipos}
@@ -184,17 +184,17 @@ const CargaDocumento: React.FC = () => {
     <>
       {/* Componente de limpieza automática */}
       {heredero?.rut && (
-        <StorageCleanup 
-          rut={heredero.rut} 
+        <StorageCleanup
+          rut={heredero.rut}
           onCleanup={() => {
             // Recargar archivos después de la limpieza
             loadFilesFromStorage(heredero.rut);
           }}
         />
       )}
-      
+
       <form onSubmit={handleSubmit} className="carga-documentos-form" style={{ width: '100%' }}>
-      <div className="carga-documentos-card" style={{ 
+      <div className="carga-documentos-card" style={{
         padding: '2rem 3rem',
         backgroundColor: '#FFFFFF',
         borderRadius: '1.25rem',
@@ -206,9 +206,9 @@ const CargaDocumento: React.FC = () => {
         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
       }}>
         {/* Title */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
           gap: '0.75rem',
           marginBottom: '2rem',
           flexShrink: 0
@@ -229,11 +229,11 @@ const CargaDocumento: React.FC = () => {
               <path d="M16 20H19C19.5305 20.0001 20.0393 19.7895 20.4144 19.4144C20.7895 19.0393 21.0001 18.5305 21 18V8.94C21 7.83545 20.1045 6.94005 19 6.94H12.529C12.1978 6.93999 11.8881 6.77596 11.702 6.502L10.297 4.437C10.1109 4.16368 9.80166 4.00008 9.471 4H5C4.46952 3.99985 3.96073 4.21052 3.58563 4.58563C3.21052 4.96073 2.99985 5.46952 3 6V18C2.99985 18.5305 3.21052 19.0393 3.58563 19.4144C3.96073 19.7895 4.46952 20.0001 5 20H8" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <ConsaludCore.Typography 
-            variant="h6" 
-            component="h2" 
+          <ConsaludCore.Typography
+            variant="h6"
+            component="h2"
             weight="bold"
-            style={{ 
+            style={{
               fontSize: '1.25rem',
               color: '#505050',
               margin: 0,
@@ -255,8 +255,8 @@ const CargaDocumento: React.FC = () => {
             padding: '0.75rem 1rem',
             marginBottom: '1.5rem'
           }}>
-            <ConsaludCore.Typography 
-              variant="body" 
+            <ConsaludCore.Typography
+              variant="body"
               component="p"
               style={{ color: '#721C24', fontSize: '0.875rem', margin: 0 }}
             >
@@ -266,11 +266,11 @@ const CargaDocumento: React.FC = () => {
         )}
 
 
-        
+
         {/* Document sections - Renderizados dinámicamente */}
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
           gap: '2rem'
         }}>
           {tiposDocumento.map((tipo) => (
@@ -286,20 +286,20 @@ const CargaDocumento: React.FC = () => {
             />
           ))}
         </div>
-        
+
         {/* Declaration checkbox */}
-        <div style={{ 
+        <div style={{
           marginTop: '2rem',
           marginBottom: '2rem'
         }}>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'flex-start', 
+          <div style={{
+            display: 'flex',
+            alignItems: 'flex-start',
             gap: '0.75rem'
           }}>
-            <input 
-              type="checkbox" 
-              id="confirmacion" 
+            <input
+              type="checkbox"
+              id="confirmacion"
               checked={checked}
               onChange={(e) => setChecked(e.target.checked)}
               style={{
@@ -310,10 +310,10 @@ const CargaDocumento: React.FC = () => {
               }}
             />
             <label htmlFor="confirmacion" style={{ cursor: 'pointer', flex: 1 }}>
-              <ConsaludCore.Typography 
-                variant="body" 
-                component="span" 
-                style={{ 
+              <ConsaludCore.Typography
+                variant="body"
+                component="span"
+                style={{
                   fontSize: '0.875rem',
                   color: '#505050',
                   lineHeight: '1.5'
@@ -324,10 +324,10 @@ const CargaDocumento: React.FC = () => {
             </label>
           </div>
         </div>
-        
+
         {/* Continue button */}
-        <div className="carga-documentos-button-container" style={{ 
-          display: 'flex', 
+        <div className="carga-documentos-button-container" style={{
+          display: 'flex',
           justifyContent: 'center',
           marginTop: '0px',
           marginBottom: '2rem',
