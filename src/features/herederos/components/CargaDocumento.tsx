@@ -6,6 +6,7 @@ import { UseAlert } from "../hooks/Alert";
 import { useFileStorage } from "../hooks/useFileStorage";
 import { useTiposDocumento } from "../hooks/useTiposDocumento";
 import { TipoDocumento } from "../interfaces/Pargen";
+import { DetalleMandatoModal } from "./DetalleMandatoModal";
 import { DocumentUploadArea } from "./DocumentUploadArea";
 import { useStepper } from "./Stepper";
 import { StorageCleanup } from "./StorageCleanup";
@@ -14,6 +15,7 @@ import './styles/globalStyle.css';
 const CargaDocumento: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState(false);
+  const [showMandatoModal, setShowMandatoModal] = useState(false);
 
   const navigate = useNavigate();
   const { tiposDocumento, loading: loadingTipos, error: errorTipos } = useTiposDocumento();
@@ -105,19 +107,31 @@ const CargaDocumento: React.FC = () => {
     setLoading(true);
 
     try {
-             // Aquí iría la lógica de envío de archivos
+      // Aquí iría la lógica de envío de archivos
 
       // Simular envío
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Navegar a la página de mandatos (paso 4)
-      navigate('/mnherederos/ingresoher/detallemandato');
-         } catch (error) {
-       // Manejar error de envío
-     } finally {
+      // Mostrar el modal de mandatos en lugar de navegar
+      setShowMandatoModal(true);
+    } catch (error) {
+      // Manejar error de envío
+    } finally {
       setLoading(false);
     }
-  }, [documentFiles, checked, navigate, tiposDocumento]);
+  }, [documentFiles, checked, tiposDocumento]);
+
+  const handleMandatoSave = useCallback(() => {
+    // Cerrar el modal
+    setShowMandatoModal(false);
+
+    // Navegar a la página de éxito
+    navigate('/mnherederos/ingresoher/success');
+  }, [navigate]);
+
+  const handleMandatoClose = useCallback(() => {
+    setShowMandatoModal(false);
+  }, []);
 
   // Mostrar loading mientras se cargan los tipos de documento o los archivos inicialmente
   if (loadingTipos || (!initialLoadComplete && heredero?.rut)) {
@@ -369,7 +383,14 @@ const CargaDocumento: React.FC = () => {
         </div>
       </div>
     </form>
-    </>
+
+    {/* Modal de Detalle de Mandato */}
+    <DetalleMandatoModal
+      isOpen={showMandatoModal}
+      onClose={handleMandatoClose}
+      onSave={handleMandatoSave}
+    />
+  </>
   );
 };
 

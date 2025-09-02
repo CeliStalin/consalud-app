@@ -1,0 +1,237 @@
+/* Estilos para el modal de detalle del mandato */
+
+/* Overlay del modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeInOverlayBlur 0.3s ease-out;
+}
+
+@keyframes fadeInOverlayBlur {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+}
+
+/* Contenido del modal */
+.modal-content {
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 800px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: modalZoomIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Header del modal */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0;
+}
+
+.modal-close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modal-close-button:hover {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+/* Cuerpo del modal */
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  max-height: calc(90vh - 140px);
+}
+
+/* Footer del modal */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+/* Estilos reutilizados de DetalleMandatoPage */
+.mandato-detalle {
+  padding: 16px 0;
+}
+
+.field-group {
+  margin-bottom: 24px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #757575;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.field-value {
+  font-size: 16px;
+  color: #333333;
+  font-weight: 500;
+  padding: 4px 0;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.subtitle.is-6 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #04A59B;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #04A59B;
+}
+
+/* Estilos para el indicador de carga */
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #04A59B;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilos responsivos */
+@media screen and (max-width: 768px) {
+  .modal-content {
+    width: 95vw;
+    max-height: 95vh;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+  }
+
+  .columns {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .column {
+    width: 100%;
+    padding: 0;
+  }
+
+  .field-group {
+    margin-bottom: 16px;
+  }
+
+  .modal-footer {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .modal-footer .button {
+    width: 100%;
+    margin: 4px 0 !important;
+  }
+}
+
+/* Scrollbar personalizado para el modal */
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
