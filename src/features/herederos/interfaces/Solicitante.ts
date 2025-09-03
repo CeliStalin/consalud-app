@@ -50,6 +50,8 @@ interface SolicitantePostRequest {
   EstadoRegistro: string;
   NumTelef: number;
   Mail: string;
+  IdRegion: number;
+  DesRegion: string;
   IdCiudad: number;
   DesCiudad: string;
   IdComuna: number;

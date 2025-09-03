@@ -1,7 +1,7 @@
 import * as ConsaludCore from '@consalud/core';
 import React, { useEffect, useState } from 'react';
 import { MandatoResult, mandatoSoapService } from '../../documentos/services/MandatoSoapService';
-import { createSolicitante, createSolicitud } from '../services/herederosService';
+import { createSolicitante, createSolicitud, fetchTitularByRut } from '../services/herederosService';
 import { useStepper } from './Stepper';
 import './styles/DetalleMandatoModal.css';
 
@@ -103,6 +103,16 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
       const formData = JSON.parse(storedData);
       console.log('Datos del formulario parseados:', formData);
 
+      // Verificar datos del titular en sessionStorage
+      const titularContextData = sessionStorage.getItem('titularContext');
+      if (titularContextData) {
+        const titularData = JSON.parse(titularContextData);
+        console.log('Datos del titular en sessionStorage:', titularData);
+        console.log('IdPersona del titular disponible:', titularData.id);
+      } else {
+        console.warn('No se encontraron datos del titular en sessionStorage');
+      }
+
       // Extraer el RUT del formulario encontrado
       const rutFormulario = formData.RutPersona || formData.RutCompleto || '0';
       console.log('RUT del formulario encontrado:', rutFormulario);
@@ -122,6 +132,8 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
         EstadoRegistro: formData.EstadoRegistro || 'A',
         NumTelef: formData.NumTelef || 0,
         Mail: formData.Mail || '',
+        IdRegion: formData.IdRegion || 0,
+        DesRegion: formData.DesRegion || '',
         IdCiudad: formData.IdCiudad || 0,
         DesCiudad: formData.DesCiudad || '',
         IdComuna: formData.IdComuna || 0,
@@ -145,32 +157,64 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
 
         // Ahora crear la solicitud usando los datos del retorno del primer endpoint
         try {
-          // Obtener la fecha actual en formato ISO 8601 (como especifica la API)
-          const now = new Date();
-          const fechaISO = now.toISOString(); // Formato: "2025-09-02T18:03:04.123Z"
+          // Función helper para crear fecha ISO en zona horaria local
+          const getLocalISOString = () => {
+            const now = new Date();
+            const offset = now.getTimezoneOffset();
+            const localDate = new Date(now.getTime() - (offset * 60000));
+            return localDate.toISOString();
+          };
 
-          console.log('Fecha actual en formato ISO:', fechaISO);
+          // Obtener la fecha actual en formato local (sin conversión UTC)
+          const fechaISO = getLocalISOString();
 
-          // Extraer los IDs de la respuesta del primer endpoint
-          // Intentar diferentes propiedades que podría devolver la API
-          const newIdSolicitante = resultSolicitante.newIdSolicitante ||
+          console.log('Fecha actual en formato ISO (local):', fechaISO);
+          console.log('Hora local actual:', new Date().toLocaleString());
+          console.log('Offset de zona horaria (minutos):', new Date().getTimezoneOffset());
+
+          // Extraer el ID del solicitante de la respuesta del primer endpoint
+          // El campo correcto es 'newIdSolicitante' según la especificación
+          const newIdSolicitante = resultSolicitante.data?.newIdSolicitante ||
+                                  resultSolicitante.newIdSolicitante ||
+                                  resultSolicitante.data?.idSolicitante ||
+                                  resultSolicitante.data?.IdSolicitante ||
+                                  resultSolicitante.data?.id ||
                                   resultSolicitante.idSolicitante ||
                                   resultSolicitante.IdSolicitante ||
                                   resultSolicitante.id ||
                                   1001;
 
-          const newIdMae = resultSolicitante.newIdMae ||
-                           resultSolicitante.idMae ||
-                           resultSolicitante.IdMae ||
-                           resultSolicitante.maeId ||
-                           12345;
+                    // Obtener el IdPersona del titular desde sessionStorage
+          // Este ID se guarda cuando se consulta /api/Titular/ByRut en el paso de ingreso del titular
+          let idMae = 0;
+          try {
+            const titularContextData = sessionStorage.getItem('titularContext');
+            if (titularContextData) {
+              const titularData = JSON.parse(titularContextData);
+              idMae = titularData.id; // IdPersona del titular
+              console.log('IdPersona del titular obtenido desde sessionStorage:', idMae);
+            } else {
+              // Fallback: intentar obtener desde la API si no está en sessionStorage
+              const rutTitular = mandatoInfo.rutCliente;
+              console.log('IdPersona no encontrado en sessionStorage, consultando API con RUT:', rutTitular);
 
-          console.log('IDs extraídos de la respuesta:', { newIdSolicitante, newIdMae });
+              const titularInfo = await fetchTitularByRut(parseInt(rutTitular), 'SISTEMA');
+              idMae = titularInfo.id;
+              console.log('IdPersona del titular obtenido desde API:', idMae);
+            }
+          } catch (errorTitular: any) {
+            console.error('Error al obtener IdPersona del titular:', errorTitular);
+            // Fallback: usar un valor por defecto
+            idMae = formData.IdPersona || 12345;
+            console.warn('Usando IdPersona por defecto:', idMae);
+          }
+
+          console.log('IDs extraídos de la respuesta:', { newIdSolicitante, idMae });
 
           // Preparar datos para la solicitud
           const solicitudData = {
-            idSolicitante: newIdSolicitante,
-            idMae: newIdMae,
+            idSolicitante: newIdSolicitante, // newIdSolicitante del output de /api/Solicitante
+            idMae: idMae, // IdPersona del titular obtenido de /api/Titular/ByRut
             fechaIngreso: fechaISO,
             fechaDeterminacion: fechaISO,
             estadoSolicitud: 1,
@@ -208,6 +252,10 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
       }
     } catch (err: any) {
       console.error('Error al guardar solicitante:', err);
+
+      // Log del error para debugging
+      console.error('Error completo:', err);
+
       setError(err.message || 'Error al guardar el solicitante');
     } finally {
       setSaving(false);

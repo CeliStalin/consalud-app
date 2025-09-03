@@ -220,11 +220,22 @@ export class HerederosService {
     const url = `${this.config.baseUrl}/api/Solicitante`;
 
     try {
+      // Validar que la URL base esté configurada
+      if (!this.config.baseUrl) {
+        throw new Error('URL base de la API no configurada');
+      }
+
       // Agregar el userName a los datos si no está presente
       const dataToSend = {
         ...solicitanteData,
         Usuario: userName || solicitanteData.Usuario
       };
+
+      console.log('Enviando petición a:', url);
+      console.log('Headers:', buildHeaders(this.config, {
+        'Content-Type': 'application/json'
+      }));
+      console.log('Datos enviados:', dataToSend);
 
       const response = await fetch(url, {
         method: 'POST',
@@ -234,22 +245,57 @@ export class HerederosService {
         body: JSON.stringify(dataToSend)
       });
 
+      console.log('Respuesta de la API:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+
       // Si la respuesta es 201, la creación fue exitosa
       if (response.status === 201) {
-        return { success: true, status: 201 };
+        const responseData = await response.json().catch(() => ({}));
+        return {
+          success: true,
+          status: 201,
+          data: responseData
+        };
       }
 
-      // Si la respuesta no es exitosa, lanzar error
-      if (!response.ok) {
-        throw new Error(`${response.status}`);
+      // Si la respuesta no es exitosa, obtener más detalles del error
+      let errorDetails = '';
+      try {
+        const errorResponse = await response.json();
+        errorDetails = JSON.stringify(errorResponse);
+      } catch {
+        errorDetails = response.statusText || 'Sin detalles del error';
       }
 
-      return await response.json();
+      // Manejo específico para errores comunes
+      if (response.status === 503) {
+        throw new Error(`503_SERVICE_UNAVAILABLE: El servicio no está disponible temporalmente. Detalles: ${errorDetails}`);
+      }
+
+      if (response.status === 400) {
+        throw new Error(`400_BAD_REQUEST: Datos inválidos enviados a la API. Detalles: ${errorDetails}`);
+      }
+
+      if (response.status === 500) {
+        throw new Error(`500_INTERNAL_SERVER_ERROR: Error interno del servidor. Detalles: ${errorDetails}`);
+      }
+
+      // Para cualquier otro código de respuesta, lanzar error
+      throw new Error(`${response.status}_${response.statusText}: ${errorDetails}`);
     } catch (error: any) {
-      // Manejo específico para errores de creación
+      // Si es un error de red, proporcionar información más clara
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error('NETWORK_ERROR: Error de conexión con la API. Verifique la URL y la conectividad de red.');
+      }
+
+      // Manejo específico para errores de creación exitosa
       if (error.message && error.message.includes('201')) {
         return { success: true, status: 201 };
       }
+
       throw error;
     }
   }
@@ -263,11 +309,19 @@ export class HerederosService {
     const url = `${this.config.baseUrl}/api/Solicitud`;
 
     try {
+      // Validar que la URL base esté configurada
+      if (!this.config.baseUrl) {
+        throw new Error('URL base de la API no configurada');
+      }
+
       // Agregar el userName a los datos si no está presente
       const dataToSend = {
         ...solicitudData,
         usuarioCreacion: userName || solicitudData.usuarioCreacion
       };
+
+      console.log('Enviando petición de solicitud a:', url);
+      console.log('Datos de solicitud enviados:', dataToSend);
 
       const response = await fetch(url, {
         method: 'POST',
@@ -277,22 +331,56 @@ export class HerederosService {
         body: JSON.stringify(dataToSend)
       });
 
+      console.log('Respuesta de la API de solicitud:', {
+        status: response.status,
+        statusText: response.statusText
+      });
+
       // Si la respuesta es 201, la creación fue exitosa
       if (response.status === 201) {
-        return { success: true, status: 201 };
+        const responseData = await response.json().catch(() => ({}));
+        return {
+          success: true,
+          status: 201,
+          data: responseData
+        };
       }
 
-      // Si la respuesta no es exitosa, lanzar error
-      if (!response.ok) {
-        throw new Error(`${response.status}`);
+      // Si la respuesta no es exitosa, obtener más detalles del error
+      let errorDetails = '';
+      try {
+        const errorResponse = await response.json();
+        errorDetails = JSON.stringify(errorResponse);
+      } catch {
+        errorDetails = response.statusText || 'Sin detalles del error';
       }
 
-      return await response.json();
+      // Manejo específico para errores comunes
+      if (response.status === 503) {
+        throw new Error(`503_SERVICE_UNAVAILABLE: El servicio de solicitudes no está disponible temporalmente. Detalles: ${errorDetails}`);
+      }
+
+      if (response.status === 400) {
+        throw new Error(`400_BAD_REQUEST: Datos de solicitud inválidos. Detalles: ${errorDetails}`);
+      }
+
+      if (response.status === 500) {
+        throw new Error(`500_INTERNAL_SERVER_ERROR: Error interno del servidor de solicitudes. Detalles: ${errorDetails}`);
+      }
+
+      // Para cualquier otro código de respuesta, lanzar error
+      throw new Error(`${response.status}_${response.statusText}: ${errorDetails}`);
     } catch (error: any) {
-      // Manejo específico para errores de creación
+      // Si es un error de red, proporcionar información más clara
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error('NETWORK_ERROR: Error de conexión con la API de solicitudes. Verifique la URL y la conectividad de red.');
+      }
+
+      // Manejo específico para errores de creación exitosa
       if (error.message && error.message.includes('201')) {
         return { success: true, status: 201 };
       }
+
       throw error;
     }
   }
