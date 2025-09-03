@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: app-gestor-solicitudes
-          image: consaluddevops.azurecr.io/app-gestor-solicitudes
+          image: $(ECR)/app-gestor-solicitudes
           imagePullPolicy: Always
           ports:
             - containerPort: 80   

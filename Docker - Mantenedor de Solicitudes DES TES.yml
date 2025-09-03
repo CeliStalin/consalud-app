@@ -206,7 +206,7 @@ stages:
             displayName: Build an image (dev)
             inputs:
               containerregistrytype: Container Registry
-              dockerRegistryEndpoint: "azure-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
+              dockerRegistryEndpoint: "RegistryProdCSLD-SolicitudesClientes"
               dockerFile: Dockerfile
               buildArguments: >-
                 AMBIENTE=$(ambiente)
@@ -219,7 +219,7 @@ stages:
             displayName: Push an image
             inputs:
               containerregistrytype: Container Registry
-              dockerRegistryEndpoint: "azure-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
+              dockerRegistryEndpoint: "RegistryProdCSLD-SolicitudesClientes"
               azureSubscriptionEndpoint: "Azure Vault-SolicitudesClientes"
               action: Push an image
               includeLatestTag: true
