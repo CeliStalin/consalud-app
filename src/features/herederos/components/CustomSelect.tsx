@@ -30,12 +30,23 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLSelectElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Limpiar timeout al desmontar
+  useEffect(() => {
+    return () => {
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Manejar clic fuera del select para cerrarlo
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setIsFocused(false);
       }
     };
 
@@ -49,6 +60,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   const handleSelectClick = () => {
     if (!disabled) {
       setIsOpen(!isOpen);
+      setIsFocused(true);
       selectRef.current?.focus();
     }
   };
@@ -60,12 +72,25 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   };
 
   const handleBlur = () => {
-    setIsFocused(false);
-    // Delay más largo para permitir que el clic en las opciones funcione
-    setTimeout(() => setIsOpen(false), 300);
+    // Limpiar timeout anterior si existe
+    if (blurTimeoutRef.current) {
+      clearTimeout(blurTimeoutRef.current);
+    }
+
+    // Usar un timeout más largo para permitir que el clic en las opciones funcione
+    blurTimeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+      setIsFocused(false);
+    }, 150);
   };
 
   const handleOptionClick = (optionValue: string) => {
+    // Limpiar timeout de blur para evitar que se cierre inmediatamente
+    if (blurTimeoutRef.current) {
+      clearTimeout(blurTimeoutRef.current);
+      blurTimeoutRef.current = null;
+    }
+
     const syntheticEvent = {
       target: { name, value: optionValue }
     } as React.ChangeEvent<HTMLSelectElement>;
@@ -76,8 +101,6 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   };
 
   const selectedOption = options.find(option => option.value === value);
-
-
 
   return (
     <div

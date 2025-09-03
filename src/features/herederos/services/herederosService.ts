@@ -1,6 +1,6 @@
 import { formatearRut } from '../../../utils/rutValidation';
-import { Calle, Ciudad, Comuna, Genero, NumeroCalle, Region, TipoDocumento } from '../interfaces/Pargen';
-import { SolicitantePostRequest, SolicitanteResponse } from '../interfaces/Solicitante';
+import { Calle, Ciudad, Comuna, Genero, NumeroCalle, Region, TipoDocumento, TipoParentesco } from '../interfaces/Pargen';
+import { SolicitantePostRequest, SolicitanteResponse, SolicitudPostRequest } from '../interfaces/Solicitante';
 import { Titular } from '../interfaces/Titular';
 import { apiGet, buildHeaders, getHerederosApiConfig } from './apiUtils';
 
@@ -132,6 +132,14 @@ export class HerederosService {
   }
 
   /**
+   * Obtiene la lista de tipos de parentesco
+   */
+  async getTiposParentesco(): Promise<TipoParentesco[]> {
+    const url = `${this.config.baseUrl}/api/Pargen/TipoParentesco`;
+    return apiGet<TipoParentesco[]>(url, this.config, 'obtener tipos de parentesco');
+  }
+
+  /**
    * Valida el correo electrónico de un heredero
    * @param rut - RUT del heredero (solo números, sin puntos ni DV)
    * @param email - Correo electrónico a validar
@@ -245,6 +253,49 @@ export class HerederosService {
       throw error;
     }
   }
+
+  /**
+   * Crea una nueva solicitud
+   * @param solicitudData - Datos de la solicitud a crear
+   * @param userName - Nombre de usuario para auditoría
+   */
+  async createSolicitud(solicitudData: SolicitudPostRequest, userName: string = ""): Promise<any> {
+    const url = `${this.config.baseUrl}/api/Solicitud`;
+
+    try {
+      // Agregar el userName a los datos si no está presente
+      const dataToSend = {
+        ...solicitudData,
+        usuarioCreacion: userName || solicitudData.usuarioCreacion
+      };
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: buildHeaders(this.config, {
+          'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(dataToSend)
+      });
+
+      // Si la respuesta es 201, la creación fue exitosa
+      if (response.status === 201) {
+        return { success: true, status: 201 };
+      }
+
+      // Si la respuesta no es exitosa, lanzar error
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error: any) {
+      // Manejo específico para errores de creación
+      if (error.message && error.message.includes('201')) {
+        return { success: true, status: 201 };
+      }
+      throw error;
+    }
+  }
 }
 
 // Exportar instancia única
@@ -264,6 +315,7 @@ export const fetchComunasPorCiudad = (idCiudad: number) => herederosService.getC
 export const fetchCallesPorComuna = (idComuna: number) => herederosService.getCallesPorComuna(idComuna);
 export const fetchNumerosCalle = (nombreCalle: string, idComuna: number) => herederosService.getNumerosCalle(nombreCalle, idComuna);
 export const fetchTiposDocumento = () => herederosService.getTiposDocumento();
+export const fetchTiposParentesco = () => herederosService.getTiposParentesco();
 export const validarCorreoElectronico = (rut: number, email: string, userName: string = "") =>
   herederosService.validarCorreoElectronico(rut, email, userName);
 export const validarTelefono = (rut: number, telefono: string, userName: string = "") =>
@@ -271,3 +323,6 @@ export const validarTelefono = (rut: number, telefono: string, userName: string 
 
 export const createSolicitante = (solicitanteData: SolicitantePostRequest, userName: string = "") =>
   herederosService.createSolicitante(solicitanteData, userName);
+
+export const createSolicitud = (solicitudData: SolicitudPostRequest, userName: string = "") =>
+  herederosService.createSolicitud(solicitudData, userName);

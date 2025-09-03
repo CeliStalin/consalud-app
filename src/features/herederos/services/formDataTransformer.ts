@@ -72,21 +72,18 @@ export class FormDataTransformer {
 
   /**
    * Mapea el parentesco de string a ID numérico
+   * Ahora el valor del combo ya es el ID numérico del endpoint
    */
   private static mapParentescoToId(parentesco: string): number {
-    const parentescoMap: Record<string, number> = {
-      'P': 1, // Padre
-      'M': 2, // Madre
-      'H': 3, // Hijo
-      'E': 4, // Esposo/a
-      'B': 5, // Hermano/a (cambiado de 'H' a 'B' para evitar duplicado)
-      'O': 6  // Otro
-    };
-    return parentescoMap[parentesco] || 6;
+    // El valor del combo ya es el ID numérico del endpoint
+    // Solo necesitamos convertirlo a número
+    const id = parseInt(parentesco);
+    return isNaN(id) ? 0 : id;
   }
 
   /**
    * Mapea el ID del parentesco a string
+   * Ahora retornamos el ID como string para mantener compatibilidad
    */
   private static mapIdToParentesco(id: number): string {
     // Si el ID es 0, significa que no se ha seleccionado parentesco
@@ -94,14 +91,7 @@ export class FormDataTransformer {
       return '';
     }
 
-    const idMap: Record<number, string> = {
-      1: 'P', // Padre
-      2: 'M', // Madre
-      3: 'H', // Hijo
-      4: 'E', // Esposo/a
-      5: 'B', // Hermano/a (cambiado de 'H' a 'B' para evitar duplicado)
-      6: 'O'  // Otro
-    };
-    return idMap[id] || '';
+    // Retornamos el ID como string para que coincida con el valor del combo
+    return id.toString();
   }
 }

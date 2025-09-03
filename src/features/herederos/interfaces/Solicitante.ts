@@ -61,4 +61,19 @@ interface SolicitantePostRequest {
   Usuario: string;
 }
 
-export type { MejorContactibilidadSolicitante, SolicitanteInMae, SolicitantePostRequest, SolicitanteResponse };
+// Nueva interfaz para la solicitud POST de Solicitud
+interface SolicitudPostRequest {
+  idSolicitante: number;
+  idMae: number;
+  fechaIngreso: string;
+  fechaDeterminacion: string;
+  estadoSolicitud: number;
+  tipoSolicitud: number;
+  observaciones: string;
+  estadoRegistro: string;
+  usuarioCreacion: string;
+  fechaEstadoRegistro: string;
+}
+
+export type { MejorContactibilidadSolicitante, SolicitanteInMae, SolicitantePostRequest, SolicitanteResponse, SolicitudPostRequest };
+

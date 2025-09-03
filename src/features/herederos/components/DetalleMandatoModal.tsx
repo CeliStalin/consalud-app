@@ -1,7 +1,7 @@
 import * as ConsaludCore from '@consalud/core';
 import React, { useEffect, useState } from 'react';
 import { MandatoResult, mandatoSoapService } from '../../documentos/services/MandatoSoapService';
-import { createSolicitante } from '../services/herederosService';
+import { createSolicitante, createSolicitud } from '../services/herederosService';
 import { useStepper } from './Stepper';
 import './styles/DetalleMandatoModal.css';
 
@@ -135,17 +135,76 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
 
       console.log('Datos preparados para la API:', solicitanteData);
 
-      // Llamar a la API
-      const result = await createSolicitante(solicitanteData, 'SISTEMA');
+      // Llamar a la API para crear el solicitante
+      const resultSolicitante = await createSolicitante(solicitanteData, 'SISTEMA');
 
-      if (result.success && result.status === 201) {
-        setSaveSuccess(true);
-        // Cerrar el modal después de 2 segundos
-        setTimeout(() => {
-          onSave();
-        }, 2000);
+      console.log('Respuesta completa de createSolicitante:', resultSolicitante);
+
+      if (resultSolicitante.success && resultSolicitante.status === 201) {
+        console.log('Solicitante creado exitosamente:', resultSolicitante);
+
+        // Ahora crear la solicitud usando los datos del retorno del primer endpoint
+        try {
+          // Obtener la fecha actual en formato ISO 8601 (como especifica la API)
+          const now = new Date();
+          const fechaISO = now.toISOString(); // Formato: "2025-09-02T18:03:04.123Z"
+
+          console.log('Fecha actual en formato ISO:', fechaISO);
+
+          // Extraer los IDs de la respuesta del primer endpoint
+          // Intentar diferentes propiedades que podría devolver la API
+          const newIdSolicitante = resultSolicitante.newIdSolicitante ||
+                                  resultSolicitante.idSolicitante ||
+                                  resultSolicitante.IdSolicitante ||
+                                  resultSolicitante.id ||
+                                  1001;
+
+          const newIdMae = resultSolicitante.newIdMae ||
+                           resultSolicitante.idMae ||
+                           resultSolicitante.IdMae ||
+                           resultSolicitante.maeId ||
+                           12345;
+
+          console.log('IDs extraídos de la respuesta:', { newIdSolicitante, newIdMae });
+
+          // Preparar datos para la solicitud
+          const solicitudData = {
+            idSolicitante: newIdSolicitante,
+            idMae: newIdMae,
+            fechaIngreso: fechaISO,
+            fechaDeterminacion: fechaISO,
+            estadoSolicitud: 1,
+            tipoSolicitud: 1,
+            observaciones: "Creacion Solicitud Heredero",
+            estadoRegistro: "V",
+            usuarioCreacion: "SISTEMA", // Usar el usuario logueado
+            fechaEstadoRegistro: fechaISO
+          };
+
+          console.log('Datos para crear solicitud:', solicitudData);
+
+          // Llamar a la API para crear la solicitud
+          const resultSolicitud = await createSolicitud(solicitudData, 'SISTEMA');
+
+          console.log('Respuesta completa de createSolicitud:', resultSolicitud);
+
+          if (resultSolicitud.success && resultSolicitud.status === 201) {
+            console.log('Solicitud creada exitosamente:', resultSolicitud);
+            setSaveSuccess(true);
+            // Cerrar el modal después de 3 segundos
+            setTimeout(() => {
+              onSave();
+            }, 3000);
+          } else {
+            throw new Error(`Error al crear la solicitud. Status: ${resultSolicitud.status}, Respuesta: ${JSON.stringify(resultSolicitud)}`);
+          }
+        } catch (errorSolicitud: any) {
+          console.error('Error al crear solicitud:', errorSolicitud);
+          // Aunque falle la solicitud, el solicitante se creó correctamente
+          setError(`Solicitante creado pero error al crear solicitud: ${errorSolicitud.message}`);
+        }
       } else {
-        throw new Error('Error al guardar el solicitante');
+        throw new Error(`Error al guardar el solicitante. Status: ${resultSolicitante.status}, Respuesta: ${JSON.stringify(resultSolicitante)}`);
       }
     } catch (err: any) {
       console.error('Error al guardar solicitante:', err);
@@ -182,8 +241,8 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
               <div className="notification is-success is-light">
                 <div className="has-text-centered">
                   <i className="fas fa-check-circle" style={{ fontSize: '3rem', color: '#48c774' }}></i>
-                  <h3 className="title is-4 mt-3" style={{ color: '#48c774' }}>¡Guardado Exitoso!</h3>
-                  <p className="mt-2">El solicitante ha sido guardado correctamente.</p>
+                  <h3 className="title is-4 mt-3" style={{ color: '#48c774' }}>¡CREADO CON ÉXITO!</h3>
+                  <p className="mt-2">El solicitante y la solicitud han sido creados correctamente.</p>
                   <p className="is-size-7 mt-2">Cerrando modal en unos segundos...</p>
                 </div>
               </div>

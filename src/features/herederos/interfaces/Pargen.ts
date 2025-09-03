@@ -51,4 +51,9 @@ export interface TipoDocumento {
   valValor: number;
   nombre: string;
   descripcion: string;
-} 
+}
+
+export interface TipoParentesco {
+  valValor: number;
+  descripcion: string;
+}

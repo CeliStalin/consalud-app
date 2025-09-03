@@ -12,6 +12,7 @@ export * from './formDataTransformer';
 
 // Re-exportar interfaces para facilitar importaciones
 export type { DocumentFileState, Documento, FileState, FileStorageConfig } from '../interfaces/Documento';
-export type { Calle, Ciudad, Comuna, Genero, NumeroCalle, Region, TipoDocumento } from '../interfaces/Pargen';
+export type { Calle, Ciudad, Comuna, Genero, NumeroCalle, Region, TipoDocumento, TipoParentesco } from '../interfaces/Pargen';
 export type { SolicitanteResponse } from '../interfaces/Solicitante';
 export type { Titular } from '../interfaces/Titular';
+

@@ -6,7 +6,8 @@ import { useHeredero } from '../contexts/HerederoContext';
 import { useCallesAutocomplete } from '../hooks/useCallesAutocomplete';
 import { useFormHerederoData } from '../hooks/useFormHerederoData';
 import { FormData } from '../interfaces/FormData';
-import { Ciudad, Comuna, fetchCiudades, fetchComunasPorCiudad, fetchGeneros, fetchRegiones, Genero, Region, validarCorreoElectronico, validarTelefono } from '../services';
+import { TipoParentesco } from '../interfaces/Pargen';
+import { Ciudad, Comuna, fetchCiudades, fetchComunasPorCiudad, fetchGeneros, fetchRegiones, fetchTiposParentesco, Genero, Region, validarCorreoElectronico, validarTelefono } from '../services';
 import { AutoCompleteInput } from './AutoCompleteInput';
 import { CustomSelect } from './CustomSelect';
 import { NumberAutoCompleteInput } from './NumberAutoCompleteInput';
@@ -21,14 +22,13 @@ interface FormIngresoHerederoProps {
   showHeader?: boolean;
 }
 
-// Datos para los selectores
-const PARENTESCO_OPTIONS = [
-  { value: 'H', label: 'Hijo/a' },
-  { value: 'P', label: 'Padre' },
-  { value: 'M', label: 'Madre' },
-  { value: 'C', label: 'Cónyuge' },
-  { value: 'O', label: 'Otro' }
-];
+// Función para mapear tipos de parentesco del endpoint a opciones del select
+const mapTiposParentescoToOptions = (tipos: TipoParentesco[]) => {
+  return tipos.map(tipo => ({
+    value: tipo.valValor.toString(),
+    label: tipo.descripcion
+  }));
+};
 
 const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = true }) => {
   const navigate = useNavigate();
@@ -92,6 +92,11 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   const [loadingRegiones, setLoadingRegiones] = useState<boolean>(false);
   const [errorRegiones, setErrorRegiones] = useState<string | null>(null);
 
+  // Estado para tipos de parentesco
+  const [tiposParentesco, setTiposParentesco] = useState<TipoParentesco[]>([]);
+  const [loadingParentesco, setLoadingParentesco] = useState<boolean>(false);
+  const [errorParentesco, setErrorParentesco] = useState<string | null>(null);
+
   // Estado para validación de correo electrónico
   const [validatingEmail, setValidatingEmail] = useState<boolean>(false);
   const [emailValidationError, setEmailValidationError] = useState<string | null>(null);
@@ -118,6 +123,21 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         setGeneros([]);
       })
       .finally(() => setLoadingGeneros(false));
+  }, []);
+
+  // Cargar tipos de parentesco
+  React.useEffect(() => {
+    setLoadingParentesco(true);
+    fetchTiposParentesco()
+      .then((data) => {
+        setTiposParentesco(data);
+        setErrorParentesco(null);
+      })
+      .catch(() => {
+        setErrorParentesco('No se pudieron cargar los tipos de parentesco');
+        setTiposParentesco([]);
+      })
+      .finally(() => setLoadingParentesco(false));
   }, []);
 
   // Comentado: Ahora las ciudades se cargan cuando se selecciona una región
@@ -1004,12 +1024,16 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                     name="parentesco"
                     value={localFormData.parentesco}
                     onChange={handleInputChange}
-                    options={PARENTESCO_OPTIONS}
-                    placeholder="Seleccionar"
+                    options={mapTiposParentescoToOptions(tiposParentesco)}
+                    placeholder={loadingParentesco ? 'Cargando...' : errorParentesco ? 'Error al cargar' : 'Seleccionar'}
+                    disabled={loadingParentesco || !!errorParentesco}
                     error={!!errors.parentesco}
                   />
                   {errors.parentesco && (
                     <p className="help is-danger">{errors.parentesco}</p>
+                  )}
+                  {errorParentesco && (
+                    <p className="help is-danger">{errorParentesco}</p>
                   )}
                 </div>
               </div>
