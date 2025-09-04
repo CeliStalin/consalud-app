@@ -3,6 +3,7 @@ import { Documento, DocumentosResponse } from '../interfaces/Documento';
 import { Calle, Ciudad, Comuna, Genero, NumeroCalle, Region, TipoDocumento, TipoParentesco } from '../interfaces/Pargen';
 import { SolicitantePostRequest, SolicitanteResponse, SolicitudPostRequest } from '../interfaces/Solicitante';
 import { Titular } from '../interfaces/Titular';
+import { RETRY_CONFIGS, withRetry } from '../utils/retryUtils';
 import { apiGet, buildHeaders, getHerederosApiConfig } from './apiUtils';
 
 /**
@@ -220,23 +221,23 @@ export class HerederosService {
   async createSolicitante(solicitanteData: SolicitantePostRequest, userName: string = ""): Promise<any> {
     const url = `${this.config.baseUrl}/api/Solicitante`;
 
-    try {
-      // Validar que la URL base esté configurada
-      if (!this.config.baseUrl) {
-        throw new Error('URL base de la API no configurada');
-      }
+    // Validar que la URL base esté configurada
+    if (!this.config.baseUrl) {
+      throw new Error('URL base de la API no configurada');
+    }
 
-      // Agregar el userName a los datos si no está presente
-      const dataToSend = {
-        ...solicitanteData,
-        Usuario: userName || solicitanteData.Usuario
-      };
+    // Agregar el userName a los datos si no está presente
+    const dataToSend = {
+      ...solicitanteData,
+      Usuario: userName || solicitanteData.Usuario
+    };
 
-      console.log('Enviando petición a:', url);
-      console.log('Headers:', buildHeaders(this.config, {
-        'Content-Type': 'application/json'
-      }));
-      console.log('Datos enviados:', dataToSend);
+    console.log('🚀 Iniciando creación de solicitante con reintentos automáticos');
+    console.log('📡 URL:', url);
+    console.log('📋 Datos:', dataToSend);
+
+    return withRetry(async () => {
+      console.log('📤 Enviando petición a /api/Solicitante');
 
       const response = await fetch(url, {
         method: 'POST',
@@ -246,15 +247,15 @@ export class HerederosService {
         body: JSON.stringify(dataToSend)
       });
 
-      console.log('Respuesta de la API:', {
+      console.log('📥 Respuesta de /api/Solicitante:', {
         status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries())
+        statusText: response.statusText
       });
 
       // Si la respuesta es 201, la creación fue exitosa
       if (response.status === 201) {
         const responseData = await response.json().catch(() => ({}));
+        console.log('✅ Solicitante creado exitosamente');
         return {
           success: true,
           status: 201,
@@ -271,34 +272,12 @@ export class HerederosService {
         errorDetails = response.statusText || 'Sin detalles del error';
       }
 
-      // Manejo específico para errores comunes
-      if (response.status === 503) {
-        throw new Error(`503_SERVICE_UNAVAILABLE: El servicio no está disponible temporalmente. Detalles: ${errorDetails}`);
-      }
-
-      if (response.status === 400) {
-        throw new Error(`400_BAD_REQUEST: Datos inválidos enviados a la API. Detalles: ${errorDetails}`);
-      }
-
-      if (response.status === 500) {
-        throw new Error(`500_INTERNAL_SERVER_ERROR: Error interno del servidor. Detalles: ${errorDetails}`);
-      }
-
-      // Para cualquier otro código de respuesta, lanzar error
-      throw new Error(`${response.status}_${response.statusText}: ${errorDetails}`);
-    } catch (error: any) {
-      // Si es un error de red, proporcionar información más clara
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        throw new Error('NETWORK_ERROR: Error de conexión con la API. Verifique la URL y la conectividad de red.');
-      }
-
-      // Manejo específico para errores de creación exitosa
-      if (error.message && error.message.includes('201')) {
-        return { success: true, status: 201 };
-      }
-
+      // Crear error con status para que withRetry pueda evaluarlo
+      const error = new Error(`${response.status}_${response.statusText}: ${errorDetails}`);
+      (error as any).status = response.status;
       throw error;
-    }
+
+    }, RETRY_CONFIGS.CRITICAL, 'Creación de Solicitante');
   }
 
   /**
@@ -309,20 +288,23 @@ export class HerederosService {
   async createSolicitud(solicitudData: SolicitudPostRequest, userName: string = ""): Promise<any> {
     const url = `${this.config.baseUrl}/api/Solicitud`;
 
-    try {
-      // Validar que la URL base esté configurada
-      if (!this.config.baseUrl) {
-        throw new Error('URL base de la API no configurada');
-      }
+    // Validar que la URL base esté configurada
+    if (!this.config.baseUrl) {
+      throw new Error('URL base de la API no configurada');
+    }
 
-      // Agregar el userName a los datos si no está presente
-      const dataToSend = {
-        ...solicitudData,
-        usuarioCreacion: userName || solicitudData.usuarioCreacion
-      };
+    // Agregar el userName a los datos si no está presente
+    const dataToSend = {
+      ...solicitudData,
+      usuarioCreacion: userName || solicitudData.usuarioCreacion
+    };
 
-      console.log('Enviando petición de solicitud a:', url);
-      console.log('Datos de solicitud enviados:', dataToSend);
+    console.log('🚀 Iniciando creación de solicitud con reintentos automáticos');
+    console.log('📡 URL:', url);
+    console.log('📋 Datos:', dataToSend);
+
+    return withRetry(async () => {
+      console.log('📤 Enviando petición a /api/Solicitud');
 
       const response = await fetch(url, {
         method: 'POST',
@@ -332,7 +314,7 @@ export class HerederosService {
         body: JSON.stringify(dataToSend)
       });
 
-      console.log('Respuesta de la API de solicitud:', {
+      console.log('📥 Respuesta de /api/Solicitud:', {
         status: response.status,
         statusText: response.statusText
       });
@@ -340,6 +322,7 @@ export class HerederosService {
       // Si la respuesta es 201, la creación fue exitosa
       if (response.status === 201) {
         const responseData = await response.json().catch(() => ({}));
+        console.log('✅ Solicitud creada exitosamente');
         return {
           success: true,
           status: 201,
@@ -356,34 +339,12 @@ export class HerederosService {
         errorDetails = response.statusText || 'Sin detalles del error';
       }
 
-      // Manejo específico para errores comunes
-      if (response.status === 503) {
-        throw new Error(`503_SERVICE_UNAVAILABLE: El servicio de solicitudes no está disponible temporalmente. Detalles: ${errorDetails}`);
-      }
-
-      if (response.status === 400) {
-        throw new Error(`400_BAD_REQUEST: Datos de solicitud inválidos. Detalles: ${errorDetails}`);
-      }
-
-      if (response.status === 500) {
-        throw new Error(`500_INTERNAL_SERVER_ERROR: Error interno del servidor de solicitudes. Detalles: ${errorDetails}`);
-      }
-
-      // Para cualquier otro código de respuesta, lanzar error
-      throw new Error(`${response.status}_${response.statusText}: ${errorDetails}`);
-    } catch (error: any) {
-      // Si es un error de red, proporcionar información más clara
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        throw new Error('NETWORK_ERROR: Error de conexión con la API de solicitudes. Verifique la URL y la conectividad de red.');
-      }
-
-      // Manejo específico para errores de creación exitosa
-      if (error.message && error.message.includes('201')) {
-        return { success: true, status: 201 };
-      }
-
+      // Crear error con status para que withRetry pueda evaluarlo
+      const error = new Error(`${response.status}_${response.statusText}: ${errorDetails}`);
+      (error as any).status = response.status;
       throw error;
-    }
+
+    }, RETRY_CONFIGS.CRITICAL, 'Creación de Solicitud');
   }
 
   // ===== MÉTODOS DE DOCUMENTOS =====
@@ -406,7 +367,19 @@ export class HerederosService {
     console.log('📡 URL de la API:', url);
     console.log('📋 Parámetros recibidos:', { idSolicitud, usuarioCreacion, rutTitularFallecido, totalDocumentos: documentos.length });
 
-    try {
+    // Validar que hay documentos para enviar
+    if (!documentos || documentos.length === 0) {
+      console.error('❌ No se encontraron documentos para enviar');
+      throw new Error('No se encontraron documentos para enviar');
+    }
+
+    console.log('🚀 Iniciando envío de documentos con reintentos automáticos');
+    console.log('📡 URL:', url);
+    console.log('📋 Parámetros:', { idSolicitud, usuarioCreacion, rutTitularFallecido, totalDocumentos: documentos.length });
+
+    return withRetry(async () => {
+      console.log('📤 Enviando petición a /api/Documentos');
+
       // Crear FormData para enviar archivos
       const formData = new FormData();
 
@@ -414,14 +387,6 @@ export class HerederosService {
       formData.append('idSolicitud', idSolicitud.toString());
       formData.append('usuarioCreacion', usuarioCreacion);
       formData.append('rutTitularFallecido', rutTitularFallecido.toString());
-
-      // Usar los documentos que ya se pasaron como parámetro
-      console.log('📄 Documentos recibidos como parámetro:', documentos);
-
-      if (!documentos || documentos.length === 0) {
-        console.error('❌ No se encontraron documentos para enviar');
-        throw new Error('No se encontraron documentos para enviar');
-      }
 
       // Procesar cada documento de forma asíncrona
       const promises = documentos.map(async (documento, index) => {
@@ -461,9 +426,6 @@ export class HerederosService {
       console.log('Todos los documentos procesados, enviando a la API...');
 
       // Realizar la petición POST
-      console.log('🚀 Enviando petición POST a:', url);
-      console.log('📤 FormData preparado:', formData);
-
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -473,15 +435,20 @@ export class HerederosService {
         body: formData
       });
 
-      console.log('📥 Respuesta recibida:', response.status, response.statusText);
+      console.log('📥 Respuesta de /api/Documentos:', {
+        status: response.status,
+        statusText: response.statusText
+      });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
+        (error as any).status = response.status;
+        throw error;
       }
 
       const result = await response.json();
 
-      console.log('Documentos enviados exitosamente:', {
+      console.log('✅ Documentos enviados exitosamente:', {
         idSolicitud,
         totalDocumentos: documentos.length,
         response: result
@@ -493,22 +460,7 @@ export class HerederosService {
         data: result
       };
 
-    } catch (error: any) {
-      console.error('Error al enviar documentos:', error);
-
-      // Manejo específico de errores
-      if (error.message && error.message.includes('400')) {
-        throw new Error(`400_BAD_REQUEST: Error en los datos de los documentos. Detalles: ${error.message}`);
-      } else if (error.message && error.message.includes('500')) {
-        throw new Error(`500_INTERNAL_SERVER_ERROR: Error interno del servidor. Detalles: ${error.message}`);
-      } else if (error.message && error.message.includes('503')) {
-        throw new Error(`503_SERVICE_UNAVAILABLE: El servicio de documentos no está disponible temporalmente. Detalles: ${error.message}`);
-      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        throw new Error('NETWORK_ERROR: Error de conexión con la API de documentos. Verifique la URL y la conectividad de red.');
-      } else {
-        throw new Error(`UNKNOWN_ERROR: Error desconocido al enviar documentos. Detalles: ${error.message}`);
-      }
-    }
+    }, RETRY_CONFIGS.DOCUMENTS, 'Envío de Documentos');
   }
 
   /**
