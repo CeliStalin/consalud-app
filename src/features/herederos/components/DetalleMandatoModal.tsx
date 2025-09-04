@@ -1,7 +1,9 @@
 import * as ConsaludCore from '@consalud/core';
 import React, { useEffect, useState } from 'react';
 import { MandatoResult, mandatoSoapService } from '../../documentos/services/MandatoSoapService';
-import { createSolicitante, createSolicitud, fetchTitularByRut } from '../services/herederosService';
+import { DOCUMENTOS_MESSAGES } from '../constants';
+import { useDocumentos } from '../hooks/useDocumentos';
+import { createSolicitante, createSolicitud, fetchTitularByRut, obtenerDocumentosAlmacenados } from '../services/herederosService';
 import { useStepper } from './Stepper';
 import './styles/DetalleMandatoModal.css';
 
@@ -22,12 +24,21 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const { setStep } = useStepper();
+  const { enviarDocumentos, loading: documentosLoading, error: documentosError } = useDocumentos();
 
-  // Obtener datos del mandato cuando se abre el modal
-  useEffect(() => {
-    if (isOpen) {
-      // Avanzar al paso 4 del stepper cuando se abre el modal
-      setStep(4);
+     // Obtener datos del mandato cuando se abre el modal
+   useEffect(() => {
+     if (isOpen) {
+       // Avanzar al paso 4 del stepper cuando se abre el modal
+       setStep(4);
+
+       // Limpiar documentos de sesiones anteriores (opcional - comentar si no se desea)
+       // const allKeys = Object.keys(sessionStorage);
+       // const documentoKeys = allKeys.filter(key => key.includes('documentos'));
+       // documentoKeys.forEach(key => {
+       //   console.log('🧹 Limpiando documentos de sesión anterior:', key);
+       //   sessionStorage.removeItem(key);
+       // });
 
       const fetchMandatoData = async () => {
         setLoading(true);
@@ -187,26 +198,53 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
                     // Obtener el IdPersona del titular desde sessionStorage
           // Este ID se guarda cuando se consulta /api/Titular/ByRut en el paso de ingreso del titular
           let idMae = 0;
+          let rutTitular: string | number = 0; // Allow both string and number types
+
           try {
+            // Primero intentar obtener desde sessionStorage
             const titularContextData = sessionStorage.getItem('titularContext');
             if (titularContextData) {
               const titularData = JSON.parse(titularContextData);
               idMae = titularData.id; // IdPersona del titular
-              console.log('IdPersona del titular obtenido desde sessionStorage:', idMae);
-            } else {
-              // Fallback: intentar obtener desde la API si no está en sessionStorage
-              const rutTitular = mandatoInfo.rutCliente;
-              console.log('IdPersona no encontrado en sessionStorage, consultando API con RUT:', rutTitular);
+              console.log('✅ IdPersona del titular obtenido desde sessionStorage:', titularData.id);
 
-              const titularInfo = await fetchTitularByRut(parseInt(rutTitular), 'SISTEMA');
-              idMae = titularInfo.id;
-              console.log('IdPersona del titular obtenido desde API:', idMae);
+              // Obtener el RUT del titular desde sessionStorage
+              if (titularData.rut) {
+                rutTitular = titularData.rut;
+                console.log('✅ RUT del titular obtenido desde sessionStorage:', rutTitular);
+              } else if (titularData.rutPersona) {
+                rutTitular = titularData.rutPersona;
+                console.log('✅ RUT del titular obtenido desde sessionStorage (rutPersona):', rutTitular);
+              }
             }
+
+            // Si no se encontró en sessionStorage, usar el RUT del mandato
+            if (!rutTitular || rutTitular === 0) {
+              rutTitular = mandatoInfo.rutCliente;
+              console.log('🔍 RUT del titular obtenido del mandato (fallback):', rutTitular);
+
+              // Si tampoco tenemos idMae, consultar la API
+              if (!idMae || idMae === 0) {
+                const titularInfo = await fetchTitularByRut(parseInt(rutTitular), 'SISTEMA');
+                idMae = titularInfo.id;
+                console.log('✅ IdPersona del titular obtenido desde API:', idMae);
+              }
+            }
+
+            console.log('🔍 RUT del titular final para documentos:', rutTitular);
+            console.log('🔍 IdPersona del titular final:', idMae);
+
           } catch (errorTitular: any) {
-            console.error('Error al obtener IdPersona del titular:', errorTitular);
-            // Fallback: usar un valor por defecto
-            idMae = formData.IdPersona || 12345;
-            console.warn('Usando IdPersona por defecto:', idMae);
+            console.error('Error al obtener datos del titular:', errorTitular);
+            // Fallback: usar valores por defecto
+            if (!idMae || idMae === 0) {
+              idMae = formData.IdPersona || 12345;
+              console.warn('⚠️ Usando IdPersona por defecto:', idMae);
+            }
+            if (!rutTitular || rutTitular === 0) {
+              rutTitular = mandatoInfo.rutCliente;
+              console.warn('⚠️ Usando RUT del mandato por defecto:', rutTitular);
+            }
           }
 
           console.log('IDs extraídos de la respuesta:', { newIdSolicitante, idMae });
@@ -234,11 +272,150 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
 
           if (resultSolicitud.success && resultSolicitud.status === 201) {
             console.log('Solicitud creada exitosamente:', resultSolicitud);
-            setSaveSuccess(true);
-            // Cerrar el modal después de 3 segundos
-            setTimeout(() => {
-              onSave();
-            }, 3000);
+
+                         // Obtener el ID de la solicitud creada
+             console.log('🔍 Respuesta completa de createSolicitud para debugging:', JSON.stringify(resultSolicitud, null, 2));
+             console.log('🔍 Estructura de resultSolicitud.data:', resultSolicitud.data);
+
+                          const newIdSolicitud = resultSolicitud.data?.newId ||
+                                   resultSolicitud.data?.newIdSolicitud ||
+                                   resultSolicitud.data?.idSolicitud ||
+                                   resultSolicitud.data?.newIdSolicitante ||
+                                   resultSolicitud.data?.idSolicitante ||
+                                   resultSolicitud.data?.IdSolicitud ||
+                                   resultSolicitud.data?.IdSolicitante ||
+                                   resultSolicitud.newId ||
+                                   resultSolicitud.newIdSolicitud ||
+                                   resultSolicitud.idSolicitud ||
+                                   resultSolicitud.newIdSolicitante ||
+                                                                       resultSolicitud.idSolicitante;
+
+                          console.log('🔍 ID de solicitud extraído:', newIdSolicitud);
+
+             if (newIdSolicitud) {
+               console.log('✅ ID de solicitud obtenido exitosamente:', newIdSolicitud);
+
+                                            try {
+                 // Obtener el RUT del titular fallecido (sin DV, solo números)
+                 let rutTitularFallecido: number;
+
+                 if (typeof rutTitular === 'string') {
+                   // Extraer solo los números del RUT (sin puntos, guiones ni DV)
+                   const rutNumeros = rutTitular.replace(/[^0-9]/g, '');
+                   rutTitularFallecido = parseInt(rutNumeros);
+                   console.log('🔍 RUT original:', rutTitular);
+                   console.log('🔍 RUT solo números:', rutNumeros);
+                   console.log('🔍 RUT del titular fallecido (sin DV):', rutTitularFallecido);
+                 } else {
+                   rutTitularFallecido = rutTitular;
+                   console.log('🔍 RUT del titular fallecido (ya numérico):', rutTitularFallecido);
+                 }
+
+                 if (!rutTitularFallecido || rutTitularFallecido === 0) {
+                   console.error('❌ ERROR: rutTitularFallecido es 0 o inválido. No se pueden buscar documentos.');
+                   throw new Error('RUT del titular fallecido es 0 o inválido');
+                 }
+
+                                                  // Obtener documentos almacenados del session storage
+                 console.log('🔍 Buscando documentos en sessionStorage con RUT:', rutTitularFallecido);
+                 console.log('🔍 Claves disponibles en sessionStorage:', Object.keys(sessionStorage));
+
+                 // Verificar si existe la clave específica de documentos
+                 const expectedKey = `documentos_${rutTitularFallecido.toString().replace(/[^0-9kK]/g, '')}`;
+                 console.log('🔍 Clave esperada para documentos:', expectedKey);
+                 console.log('🔍 ¿Existe la clave en sessionStorage?', sessionStorage.getItem(expectedKey) ? 'SÍ' : 'NO');
+
+                 const documentos = obtenerDocumentosAlmacenados(rutTitularFallecido);
+                 console.log('📄 Documentos obtenidos del storage:', documentos);
+
+                 // Si no hay documentos, buscar manualmente en todas las claves que contengan "documentos"
+                 if (documentos.length === 0) {
+                   const allKeys = Object.keys(sessionStorage);
+                   const documentoKeys = allKeys.filter(key => key.includes('documentos'));
+                   console.log('🔍 Claves que contienen "documentos":', documentoKeys);
+
+                   // Buscar documentos en cualquier clave disponible
+                   for (const key of documentoKeys) {
+                     const data = sessionStorage.getItem(key);
+                     console.log(`🔍 Contenido de ${key}:`, data ? 'TIENE DATOS' : 'VACÍO');
+
+                     if (data) {
+                       try {
+                         const documentosAlternativos = JSON.parse(data);
+                         if (documentosAlternativos && documentosAlternativos.length > 0) {
+                           console.log('✅ Documentos encontrados en clave alternativa:', key);
+                           console.log('📄 Documentos alternativos:', documentosAlternativos);
+
+                           // Usar estos documentos como fallback
+                           documentos.push(...documentosAlternativos);
+                           break; // Usar el primer conjunto de documentos encontrados
+                         }
+                       } catch (parseError) {
+                         console.log('Error al parsear documentos de clave alternativa:', key, parseError);
+                       }
+                     }
+                   }
+
+                   console.log('📄 Total de documentos encontrados (incluyendo alternativos):', documentos.length);
+                 }
+
+                if (documentos.length > 0) {
+                    console.log('Documentos encontrados para enviar:', documentos);
+
+                    // Enviar documentos a la API usando el hook
+                    console.log('Iniciando envío de documentos con:', {
+                      newIdSolicitud,
+                      rutTitularFallecido,
+                      totalDocumentos: documentos.length
+                    });
+
+                    const resultDocumentos = await enviarDocumentos(
+                      newIdSolicitud,
+                      'SISTEMA',
+                      rutTitularFallecido,
+                      documentos
+                    );
+
+                    if (resultDocumentos.success) {
+                      console.log('Documentos enviados exitosamente:', resultDocumentos);
+                      setSaveSuccess(true);
+                      // Cerrar el modal después de 3 segundos
+                      setTimeout(() => {
+                        onSave();
+                      }, 3000);
+                    } else {
+                      console.warn(DOCUMENTOS_MESSAGES.ERROR.DOCUMENTS_SEND_FAILED, resultDocumentos.message);
+                      setSaveSuccess(true);
+                      // Cerrar el modal después de 3 segundos aunque fallen los documentos
+                      setTimeout(() => {
+                        onSave();
+                      }, 3000);
+                    }
+                  } else {
+                    console.log(DOCUMENTOS_MESSAGES.ERROR.NO_DOCUMENTS);
+                    setSaveSuccess(true);
+                    // Cerrar el modal después de 3 segundos
+                    setTimeout(() => {
+                      onSave();
+                    }, 3000);
+                  }
+              } catch (errorDocumentos: any) {
+                console.error('Error al enviar documentos:', errorDocumentos);
+                // Aunque fallen los documentos, la solicitud se creó correctamente
+                setSaveSuccess(true);
+                // Cerrar el modal después de 3 segundos
+                setTimeout(() => {
+                  onSave();
+                }, 3000);
+              }
+            } else {
+              console.warn('No se pudo obtener el ID de la solicitud de la respuesta');
+              setSaveSuccess(true);
+              // Cerrar el modal después de 3 segundos
+              setTimeout(() => {
+                onSave();
+              }, 3000);
+            }
           } else {
             throw new Error(`Error al crear la solicitud. Status: ${resultSolicitud.status}, Respuesta: ${JSON.stringify(resultSolicitud)}`);
           }
@@ -291,7 +468,12 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
                   <i className="fas fa-check-circle" style={{ fontSize: '3rem', color: '#48c774' }}></i>
                   <h3 className="title is-4 mt-3" style={{ color: '#48c774' }}>¡CREADO CON ÉXITO!</h3>
                   <p className="mt-2">El solicitante y la solicitud han sido creados correctamente.</p>
-                  <p className="is-size-7 mt-2">Cerrando modal en unos segundos...</p>
+                  <p className="mt-2">
+                    {documentosLoading ? DOCUMENTOS_MESSAGES.INFO.SENDING_DOCUMENTS :
+                     documentosError ? DOCUMENTOS_MESSAGES.ERROR.DOCUMENTS_SEND_FAILED :
+                     DOCUMENTOS_MESSAGES.SUCCESS.DOCUMENTS_SENT}
+                  </p>
+                  <p className="is-size-7 mt-2">{DOCUMENTOS_MESSAGES.INFO.CLOSING_MODAL}</p>
                 </div>
               </div>
             </div>
@@ -426,3 +608,4 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
 };
 
 export { DetalleMandatoModal };
+

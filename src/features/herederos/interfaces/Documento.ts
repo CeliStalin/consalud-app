@@ -37,9 +37,34 @@ interface FileStorageConfig {
     storageKeyPrefix: string; // prefijo para las claves de storage
 }
 
-export type {
-    Documento,
-    FileState,
-    DocumentFileState,
-    FileStorageConfig
+// Tipos para la API de documentos
+export interface DocumentosRequest {
+  idSolicitud: number;
+  usuarioCreacion: string;
+  rutTitularFallecido: number;
+  documentos: DocumentoItem[];
 }
+
+export interface DocumentoItem {
+  idTipoDocumento: number;
+  Documento: File;
+}
+
+export interface DocumentosResponse {
+  success: boolean;
+  message?: string;
+  data?: any;
+  errors?: string[];
+  status?: number;
+}
+
+export interface DocumentosApiError {
+  code: string;
+  message: string;
+  details?: string;
+}
+
+export type {
+    DocumentFileState, Documento,
+    FileState, FileStorageConfig
+};

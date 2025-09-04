@@ -1,4 +1,5 @@
 import { formatearRut } from '../../../utils/rutValidation';
+import { Documento, DocumentosResponse } from '../interfaces/Documento';
 import { Calle, Ciudad, Comuna, Genero, NumeroCalle, Region, TipoDocumento, TipoParentesco } from '../interfaces/Pargen';
 import { SolicitantePostRequest, SolicitanteResponse, SolicitudPostRequest } from '../interfaces/Solicitante';
 import { Titular } from '../interfaces/Titular';
@@ -384,6 +385,151 @@ export class HerederosService {
       throw error;
     }
   }
+
+  // ===== MÉTODOS DE DOCUMENTOS =====
+
+  /**
+   * Envía múltiples documentos a la API
+   * @param idSolicitud - ID de la solicitud creada
+   * @param usuarioCreacion - Usuario que crea los documentos
+   * @param rutTitularFallecido - RUT del titular fallecido
+   * @param documentos - Array de documentos a enviar (ya obtenidos del storage)
+   */
+  async enviarDocumentos(
+    idSolicitud: number,
+    usuarioCreacion: string,
+    rutTitularFallecido: number,
+    documentos: Documento[]
+  ): Promise<DocumentosResponse> {
+    const url = `${this.config.baseUrl}/api/Documentos`;
+    console.log('🔍 HerederosService.enviarDocumentos iniciado');
+    console.log('📡 URL de la API:', url);
+    console.log('📋 Parámetros recibidos:', { idSolicitud, usuarioCreacion, rutTitularFallecido, totalDocumentos: documentos.length });
+
+    try {
+      // Crear FormData para enviar archivos
+      const formData = new FormData();
+
+      // Agregar campos principales
+      formData.append('idSolicitud', idSolicitud.toString());
+      formData.append('usuarioCreacion', usuarioCreacion);
+      formData.append('rutTitularFallecido', rutTitularFallecido.toString());
+
+      // Usar los documentos que ya se pasaron como parámetro
+      console.log('📄 Documentos recibidos como parámetro:', documentos);
+
+      if (!documentos || documentos.length === 0) {
+        console.error('❌ No se encontraron documentos para enviar');
+        throw new Error('No se encontraron documentos para enviar');
+      }
+
+      // Procesar cada documento de forma asíncrona
+      const promises = documentos.map(async (documento, index) => {
+        if (!documento.url) {
+          throw new Error(`Documento con tipoId ${documento.tipoId} no tiene URL`);
+        }
+
+        try {
+          // Convertir la URL del blob a File
+          const response = await fetch(documento.url);
+          if (!response.ok) {
+            throw new Error(`Error al obtener archivo: ${response.statusText}`);
+          }
+
+          const blob = await response.blob();
+          const file = new File([blob], documento.nombre, { type: 'application/pdf' });
+
+          // Agregar campos del documento al FormData
+          formData.append(`documentos[${index}].idTipoDocumento`, documento.tipoId.toString());
+          formData.append(`documentos[${index}].Documento`, file);
+
+          console.log(`Documento ${index} procesado:`, {
+            tipoId: documento.tipoId,
+            nombre: documento.nombre,
+            tamaño: file.size
+          });
+
+        } catch (error) {
+          console.error(`Error al procesar documento ${index}:`, error);
+          throw error;
+        }
+      });
+
+      // Esperar a que todos los documentos se procesen
+      await Promise.all(promises);
+
+      console.log('Todos los documentos procesados, enviando a la API...');
+
+      // Realizar la petición POST
+      console.log('🚀 Enviando petición POST a:', url);
+      console.log('📤 FormData preparado:', formData);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          // No incluir Content-Type para FormData, el navegador lo establece automáticamente
+          ...buildHeaders(this.config),
+        },
+        body: formData
+      });
+
+      console.log('📥 Respuesta recibida:', response.status, response.statusText);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      console.log('Documentos enviados exitosamente:', {
+        idSolicitud,
+        totalDocumentos: documentos.length,
+        response: result
+      });
+
+      return {
+        success: true,
+        status: response.status,
+        data: result
+      };
+
+    } catch (error: any) {
+      console.error('Error al enviar documentos:', error);
+
+      // Manejo específico de errores
+      if (error.message && error.message.includes('400')) {
+        throw new Error(`400_BAD_REQUEST: Error en los datos de los documentos. Detalles: ${error.message}`);
+      } else if (error.message && error.message.includes('500')) {
+        throw new Error(`500_INTERNAL_SERVER_ERROR: Error interno del servidor. Detalles: ${error.message}`);
+      } else if (error.message && error.message.includes('503')) {
+        throw new Error(`503_SERVICE_UNAVAILABLE: El servicio de documentos no está disponible temporalmente. Detalles: ${error.message}`);
+      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error('NETWORK_ERROR: Error de conexión con la API de documentos. Verifique la URL y la conectividad de red.');
+      } else {
+        throw new Error(`UNKNOWN_ERROR: Error desconocido al enviar documentos. Detalles: ${error.message}`);
+      }
+    }
+  }
+
+  /**
+   * Obtiene los documentos almacenados en session storage para un RUT específico
+   * @param rutTitular - RUT del titular
+   */
+  obtenerDocumentosAlmacenados(rutTitular: number): Documento[] {
+    try {
+      const storageKey = `documentos_${rutTitular.toString().replace(/[^0-9kK]/g, '')}`;
+      const stored = sessionStorage.getItem(storageKey);
+
+      if (stored) {
+        return JSON.parse(stored);
+      }
+
+      return [];
+    } catch (error) {
+      console.error('Error al obtener documentos del storage:', error);
+      return [];
+    }
+  }
 }
 
 // Exportar instancia única
@@ -414,3 +560,14 @@ export const createSolicitante = (solicitanteData: SolicitantePostRequest, userN
 
 export const createSolicitud = (solicitudData: SolicitudPostRequest, userName: string = "") =>
   herederosService.createSolicitud(solicitudData, userName);
+
+// Exportar funciones de documentos
+export const enviarDocumentos = (
+  idSolicitud: number,
+  usuarioCreacion: string,
+  rutTitularFallecido: number,
+  documentos: Documento[]
+) => herederosService.enviarDocumentos(idSolicitud, usuarioCreacion, rutTitularFallecido, documentos);
+
+export const obtenerDocumentosAlmacenados = (rutTitular: number) =>
+  herederosService.obtenerDocumentosAlmacenados(rutTitular);
