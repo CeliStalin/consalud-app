@@ -1,4 +1,4 @@
-import { calcularEdad, validarEdadMayorDe18, validarEdadConMensaje } from '../../../utils/ageValidation';
+import { calcularEdad, validarEdadConMensaje, validarEdadMayorDe18 } from '../../../utils/ageValidation';
 
 // Tests para verificar la validación de edad en el provider
 describe('Validación de edad en HerederoProvider', () => {
@@ -72,27 +72,48 @@ describe('Validación de edad en HerederoProvider', () => {
 
   test('debe calcular correctamente la edad para fechas en diferentes meses', () => {
     const hoy = new Date();
-    
-    // Test para persona nacida en diciembre (mes anterior al actual)
-    const fechaDiciembre = new Date(hoy.getFullYear() - 18, 11, 15); // 15 de diciembre
-    const edadDiciembre = calcularEdad(fechaDiciembre.toISOString().split('T')[0]);
-    
-    // Test para persona nacida en enero (mes posterior al actual si estamos en diciembre)
-    const fechaEnero = new Date(hoy.getFullYear() - 18, 0, 15); // 15 de enero
-    const edadEnero = calcularEdad(fechaEnero.toISOString().split('T')[0]);
-    
+
+    // Test para persona nacida en un mes anterior al actual (ya cumplió años este año)
+    const mesAnterior = hoy.getMonth() === 0 ? 11 : hoy.getMonth() - 1; // mes anterior, o diciembre si estamos en enero
+    const fechaMesAnterior = new Date(hoy.getFullYear() - 18, mesAnterior, 15);
+    const edadMesAnterior = calcularEdad(fechaMesAnterior.toISOString().split('T')[0]);
+
+    // Test para persona nacida en un mes posterior al actual (aún no cumple años este año)
+    const mesPosterior = hoy.getMonth() === 11 ? 0 : hoy.getMonth() + 1; // mes posterior, o enero si estamos en diciembre
+    const fechaMesPosterior = new Date(hoy.getFullYear() - 18, mesPosterior, 15);
+    const edadMesPosterior = calcularEdad(fechaMesPosterior.toISOString().split('T')[0]);
+
     // Verificar que el cálculo sea correcto
-    expect(edadDiciembre).toBeGreaterThanOrEqual(18);
-    expect(edadEnero).toBeGreaterThanOrEqual(18);
+    // La persona del mes anterior ya cumplió 18 años
+    expect(edadMesAnterior).toBeGreaterThanOrEqual(18);
+    // La persona del mes posterior aún no cumple 18 años
+    expect(edadMesPosterior).toBeLessThan(18);
   });
 
   test('debe validar correctamente con mensajes personalizados', () => {
     const fechaMenor = '2010-01-01';
     const mensajePersonalizado = 'La persona heredera debe tener al menos 18 años';
-    
+
     const validacion = validarEdadConMensaje(fechaMenor, mensajePersonalizado);
-    
+
     expect(validacion.esValido).toBe(false);
     expect(validacion.mensaje).toBe(mensajePersonalizado);
   });
-}); 
+
+  test('debe manejar correctamente fechas ISO con hora del API', () => {
+    // Test con formato ISO que viene del API
+    const fechaISO = '1982-07-24T00:00:00';
+    const esMayorDeEdad = validarEdadMayorDe18(fechaISO);
+    expect(esMayorDeEdad).toBe(true);
+
+    // Test con fecha ISO de menor de edad
+    const fechaMenorISO = '2010-01-01T00:00:00';
+    const esMenorDeEdad = validarEdadMayorDe18(fechaMenorISO);
+    expect(esMenorDeEdad).toBe(false);
+
+    // Test con validarEdadConMensaje
+    const validacion = validarEdadConMensaje(fechaISO);
+    expect(validacion.esValido).toBe(true);
+    expect(validacion.mensaje).toBeNull();
+  });
+});
