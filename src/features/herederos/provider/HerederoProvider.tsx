@@ -219,12 +219,67 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         } catch (err: any) {
           // Manejar específicamente el status 412
           if (err.message && err.message.includes('412')) {
-            // Para 412, mostrar alerta y navegar a la página de documentos
-            const mensaje = 'El titular ya tiene un mandato activo. Será redirigido a la página de documentos.';
+            // Para 412, crear un heredero vacío con campos habilitados
+            const mensaje = 'No se encontró información del heredero. Puede llenar los datos manualmente.';
             console.warn(mensaje);
-            // Aquí podrías mostrar una alerta o notificación
-            // Por ahora, solo navegar
-            navigate('/documentos');
+
+            // Crear un heredero vacío con el RUT ingresado
+            const herederoVacio: Heredero = {
+              id: 0,
+              rut: formatearRut(rut),
+              fechaNacimiento: '',
+              nombre: '',
+              apellidoPat: '',
+              apellidoMat: '',
+              parentesco: 0,
+              Genero: '',
+              indFallecido: 'N',
+              contactabilidad: {
+                direccion: {
+                  calle: '',
+                  numero: 0,
+                  comunaId: 0,
+                  comunaNombre: '',
+                  regionId: 0,
+                  regionNombre: '',
+                  ciudadId: 0,
+                  ciudadNombre: '',
+                  villa: '',
+                  departamento: ''
+                },
+                telefono: {
+                  numero: '',
+                  tipo: "CELULAR",
+                  codPais: "56",
+                  codCiudad: "2"
+                },
+                correo: [{
+                  mail: '',
+                  validacion: 1
+                }]
+              },
+              codCiudad: 0,
+              codComuna: 0,
+              codRegion: 0,
+              codigoPostal: 0,
+              email: '',
+              descripcionCiudad: '',
+              descripcionComuna: '',
+              descripcionRegion: '',
+              numeroBloque: 0,
+              numeroDepartamento: 0,
+              nombreVillaCondominio: '',
+              nombreCalle: '',
+              numeroCalle: 0,
+              numeroCelular: 0,
+              numeroFijo: 0,
+              tipoDireccion: ''
+            };
+
+            setHeredero(herederoVacio);
+            setLastSearchedRut(rut);
+            // NO bloquear campos para permitir edición manual
+            setFieldsLocked(false);
             return; // IMPORTANTE: retornar aquí para evitar el catch general
           }
 

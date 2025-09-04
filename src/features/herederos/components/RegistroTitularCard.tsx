@@ -163,7 +163,7 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
 
       // Manejar error 412 (Precondition Failed) - heredero no encontrado
       if (error.message && error.message.includes('412')) {
-        // El provider ya maneja el 412 y crea un heredero vacío
+        // El provider ya maneja el 412 y crea un heredero vacío con campos habilitados
         // No necesitamos hacer nada adicional aquí
         setLastSearchedRut(rutLimpio);
       }

@@ -50,14 +50,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       apellidoMaterno: heredero?.apellidoMat || undefined,
       sexo: heredero?.Genero ? heredero.Genero : '',
       parentesco: '',
-      telefono: heredero?.contactabilidad.telefono.numero || '',
-      correoElectronico: heredero?.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
+      telefono: heredero?.contactabilidad?.telefono?.numero || '',
+      correoElectronico: heredero?.contactabilidad?.correo && heredero.contactabilidad.correo.length > 0 ? heredero.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '' : '',
       ciudad: heredero?.descripcionCiudad || '',
       comuna: heredero?.descripcionComuna || '',
-      calle: heredero?.contactabilidad.direccion.calle || '',
-      numero: heredero?.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
-      deptoBloqueOpcional: heredero?.contactabilidad.direccion.departamento || '',
-      villaOpcional: heredero?.contactabilidad.direccion.villa || '',
+      calle: heredero?.contactabilidad?.direccion?.calle || '',
+      numero: heredero?.contactabilidad?.direccion?.numero ? String(heredero.contactabilidad?.direccion?.numero) : '',
+      deptoBloqueOpcional: heredero?.contactabilidad?.direccion?.departamento || '',
+      villaOpcional: heredero?.contactabilidad?.direccion?.villa || '',
       region: heredero?.descripcionRegion || '',
       // Códigos para cargar los combos correctamente
       codRegion: heredero?.codRegion || undefined,
@@ -240,7 +240,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     if (formData && Object.keys(formData).length > 0) {
       // SIEMPRE priorizar datos del storage sobre datos del heredero
       setLocalFormData(prevData => {
-        // Solo actualizar si los datos son diferentes
+        // Solo actualizar si los datos son diferentes y no estamos en medio de una edición
         const currentDataString = JSON.stringify(prevData);
         const newDataString = JSON.stringify(formData);
 
@@ -249,27 +249,37 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         }
         return prevData;
       });
-    } else {
-      // Si no hay datos del storage, limpiar el formulario local
-      setLocalFormData({
-        fechaNacimiento: null,
-        nombres: '',
-        apellidoPaterno: '',
-        apellidoMaterno: '',
-        sexo: '',
-        parentesco: '',
-        telefono: '',
-        correoElectronico: '',
-        ciudad: '',
-        comuna: '',
-        calle: '',
-        numero: '',
-        deptoBloqueOpcional: '',
-        villaOpcional: '',
-        region: '',
-        codRegion: undefined,
-        codCiudad: undefined,
-        codComuna: undefined
+    } else if (!formData) {
+      // Solo limpiar si realmente no hay datos del storage
+      setLocalFormData(prevData => {
+        // Verificar si realmente necesitamos limpiar
+        const hasData = Object.values(prevData).some(value =>
+          value !== null && value !== undefined && value !== ''
+        );
+
+        if (hasData) {
+          return {
+            fechaNacimiento: null,
+            nombres: '',
+            apellidoPaterno: '',
+            apellidoMaterno: '',
+            sexo: '',
+            parentesco: '',
+            telefono: '',
+            correoElectronico: '',
+            ciudad: '',
+            comuna: '',
+            calle: '',
+            numero: '',
+            deptoBloqueOpcional: '',
+            villaOpcional: '',
+            region: '',
+            codRegion: undefined,
+            codCiudad: undefined,
+            codComuna: undefined
+          };
+        }
+        return prevData;
       });
     }
   }, [formData]);
@@ -290,14 +300,14 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
           apellidoMaterno: heredero?.apellidoMat || undefined,
           sexo: heredero?.Genero ? heredero.Genero : '',
           parentesco: '',
-          telefono: heredero?.contactabilidad.telefono.numero || '',
-          correoElectronico: heredero?.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '',
+          telefono: heredero?.contactabilidad?.telefono?.numero || '',
+          correoElectronico: heredero?.contactabilidad?.correo && heredero.contactabilidad.correo.length > 0 ? heredero.contactabilidad.correo.sort((a, b) => a.validacion - b.validacion)[0]?.mail || '' : '',
           ciudad: heredero?.descripcionCiudad || '',
           comuna: heredero?.descripcionComuna || '',
-          calle: heredero?.contactabilidad.direccion.calle || '',
-          numero: heredero?.contactabilidad.direccion.numero ? String(heredero.contactabilidad.direccion.numero) : '',
-          deptoBloqueOpcional: heredero?.contactabilidad.direccion.departamento || '',
-          villaOpcional: heredero?.contactabilidad.direccion.villa || '',
+          calle: heredero?.contactabilidad?.direccion?.calle || '',
+          numero: heredero?.contactabilidad?.direccion?.numero ? String(heredero.contactabilidad?.direccion?.numero) : '',
+          deptoBloqueOpcional: heredero?.contactabilidad?.direccion?.departamento || '',
+          villaOpcional: heredero?.contactabilidad?.direccion?.villa || '',
           region: heredero?.descripcionRegion || '',
           codRegion: heredero?.codRegion || undefined,
           codCiudad: heredero?.codCiudad || undefined,
@@ -464,10 +474,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
 
     setLocalFormData(newFormData);
 
-    // Guardar en el contexto inmediatamente
-
-    handleSaveForm(newFormData);
-
     // Limpiar error cuando el usuario comienza a escribir
     if (errors[name as keyof FormData]) {
       setErrors({
@@ -475,6 +481,11 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         [name]: ''
       });
     }
+
+    // Guardar en el contexto con un pequeño delay para evitar re-renders inmediatos
+    setTimeout(() => {
+      handleSaveForm(newFormData);
+    }, 0);
   };
 
   // Manejar cambio de fecha

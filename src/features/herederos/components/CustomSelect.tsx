@@ -81,10 +81,14 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
     blurTimeoutRef.current = setTimeout(() => {
       setIsOpen(false);
       setIsFocused(false);
-    }, 150);
+    }, 200);
   };
 
-  const handleOptionClick = (optionValue: string) => {
+  const handleOptionClick = (optionValue: string, event: React.MouseEvent) => {
+    // Prevenir que el evento se propague
+    event.preventDefault();
+    event.stopPropagation();
+
     // Limpiar timeout de blur para evitar que se cierre inmediatamente
     if (blurTimeoutRef.current) {
       clearTimeout(blurTimeoutRef.current);
@@ -96,8 +100,12 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
     } as React.ChangeEvent<HTMLSelectElement>;
 
     onChange(syntheticEvent);
-    setIsOpen(false);
-    setIsFocused(false);
+
+    // Cerrar el dropdown después de un pequeño delay
+    setTimeout(() => {
+      setIsOpen(false);
+      setIsFocused(false);
+    }, 50);
   };
 
   const selectedOption = options.find(option => option.value === value);
@@ -180,7 +188,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
             <div
               key={option.value}
               className={`custom-select-option ${option.value === value ? 'selected' : ''}`}
-              onClick={() => handleOptionClick(option.value)}
+              onClick={(e) => handleOptionClick(option.value, e)}
             >
               {option.label}
             </div>
