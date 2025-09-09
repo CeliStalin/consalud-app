@@ -7,96 +7,21 @@ variables:
     value: '[Consalud]\CS_Pandora'
   - name: Explotacion
     value: '[Consalud]\CS_Explotacion'
+  - name: Docker.Registry.Dev
+    value: "azure-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
+  - name: Docker.Registry.Prod
+    value: "RegistryProdCSLD-SolicitudesClientes"
 name: $(date:yyyyMMdd)$(rev:.r)
 stages:
-  # - stage: SonarQube
-  #   displayName: "SonarQube"
-  #   jobs:
-  #     - job: Job_0
-  #       displayName: Análisis de Código Estático
-  #       pool:
-  #         name: Default
-  #       steps:
-  #         - checkout: self
-  #           clean: False
-  #         - task: SonarQubePrepare@5
-  #           displayName: Preparar Análisis en SonarQube
-  #           inputs:
-  #             SonarQube: "SonarQube-SolicitudesClientes"
-  #             projectKey: "$(Build.Repository.ID)"
-  #             projectName: "$(System.TeamProject)-$(Build.Repository.Name)"
-  #             projectVersion: "$(Build.BuildNumber)"
-  #             extraProperties: "sonar.cs.vscoveragexml.reportsPaths=$(Agent.TempDirectory)/**/*.coveragexml"
-  #         - task: PowerShell@2
-  #           displayName: Engañando a SQ
-  #           inputs:
-  #             targetType: "inline"
-  #             script: |
-  #               $params = "$env:SONARQUBE_SCANNER_PARAMS" -replace '"sonar.branch.name":"[\w,/,-]*"\,?'
-
-  #               Write-Host "##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]$params"
-  #         - task: DotNetCoreCLI@2
-  #           displayName: dotnet restore
-  #           inputs:
-  #             command: "restore"
-  #             projects: $(BuildParameters.RestoreBuildProjects)
-  #             feedsToUse: "select"
-  #             vstsFeed: "88c5667f-ba35-4a8a-8a4f-323f7520e2d8"
-  #             noCache: true
-  #         - task: DotNetCoreCLI@2
-  #           displayName: dotnet build
-  #           inputs:
-  #             command: "build"
-  #             projects: $(BuildParameters.RestoreBuildProjects)
-  #             arguments: "--configuration Debug"
-  #         - task: DotNetCoreCLI@2
-  #           displayName: dotnet test
-  #           inputs:
-  #             command: "test"
-  #             projects: $(BuildParameters.TestProjects)
-  #             arguments: '--collect "Code coverage"'
-  #         - task: PowerShell@2
-  #           displayName: Fix Cobertura SQ
-  #           inputs:
-  #             targetType: inline
-  #             script: >-
-  #               $ver = (Get-ChildItem $env:USERPROFILE\.nuget\packages\Microsoft.CodeCoverage | Select-Object -Property Name | Sort-Object -Descending | Select-Object -First 1).Name
-
-  #               $netstd = (Get-ChildItem $env:USERPROFILE\.nuget\packages\Microsoft.CodeCoverage\$ver\build\ | Select-Object -Property Name | Sort-Object -Descending | Select-Object -First 1).Name
-
-  #               Get-ChildItem -Recurse -Filter "*.coverage" | % {
-
-  #               $outfile = "$([System.IO.Path]::GetFileNameWithoutExtension($_.FullName)).coveragexml"
-
-  #               $output = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($_.FullName), $outfile)
-
-  #               "Analyse '$($_.FullName)' with output '$output'..."
-
-  #               . $env:USERPROFILE\.nuget\packages\microsoft.codecoverage\$ver\build\$netstd\CodeCoverage\CodeCoverage.exe analyze /output:$output $_.FullName
-
-  #               }
-  #             workingDirectory: $(Agent.TempDirectory)
-  #         - task: SonarQubeAnalyze@5
-  #           displayName: Ejecutar Análisis de Código
-  #         - task: SonarQubePublish@5
-  #           displayName: Publicar Resultado de SQ
-  #           condition: succeededOrFailed()
-  #     - job: Aprobacion
-  #       dependsOn: Job_0
-  #       condition: succeededOrFailed()
-  #       displayName: Esperando por aprobaciones
-  #       pool: server
-  #       timeoutInMinutes: 4320
-  #       steps:
-  #         - task: ManualValidation@0
-  #           timeoutInMinutes: 1440
-  #           inputs:
-  #             notifyUsers: |
-  #               $(Aprobadores)
-
-  #               angelo.bernardi@consalud.cl
-  #             instructions: "Su aprobación porfa para SQ"
-  #             onTimeout: "reject"
+  - stage: SonarQube
+    displayName: "SonarQube"
+    jobs:
+      - job: RunSonarQube
+        displayName: Análisis de Código Estático
+        pool:
+          name: Default
+        steps:
+          - template: sonar-pipeline.yml
   - stage: BuildDev
     displayName: "Build Desarrollo"
     jobs:
@@ -113,7 +38,7 @@ stages:
             displayName: Build an image (dev)
             inputs:
               containerregistrytype: Container Registry
-              dockerRegistryEndpoint: "azure-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
+              dockerRegistryEndpoint: $(Docker.Registry.Dev)
               dockerFile: Dockerfile
               buildArguments: >-
                 AMBIENTE=$(ambiente)
@@ -121,15 +46,25 @@ stages:
                 MODE=development
               defaultContext: false
               context: .
+              tags: |
+                $(Build.BuildNumber)
+
+                dev
               includeLatestTag: true
+              imageName: $(BuildParameters.AppName)
           - task: Docker@0
             displayName: Push an image
             inputs:
               containerregistrytype: Container Registry
-              dockerRegistryEndpoint: "azure-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
+              dockerRegistryEndpoint: $(Docker.Registry.Dev)
               azureSubscriptionEndpoint: "Azure Vault-SolicitudesClientes"
               action: Push an image
               includeLatestTag: true
+              imageName: $(BuildParameters.AppName)
+              tags: |
+                $(Build.BuildNumber)
+
+                dev
           - task: replacetokens@4
             displayName: Replace tokens
             inputs:
@@ -206,7 +141,7 @@ stages:
             displayName: Build an image (dev)
             inputs:
               containerregistrytype: Container Registry
-              dockerRegistryEndpoint: "RegistryProdCSLD-SolicitudesClientes"
+              dockerRegistryEndpoint: $(Docker.Registry.Prod)
               dockerFile: Dockerfile
               buildArguments: >-
                 AMBIENTE=$(ambiente)
@@ -219,7 +154,7 @@ stages:
             displayName: Push an image
             inputs:
               containerregistrytype: Container Registry
-              dockerRegistryEndpoint: "RegistryProdCSLD-SolicitudesClientes"
+              dockerRegistryEndpoint: $(Docker.Registry.Prod)
               azureSubscriptionEndpoint: "Azure Vault-SolicitudesClientes"
               action: Push an image
               includeLatestTag: true
