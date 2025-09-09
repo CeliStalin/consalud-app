@@ -11,6 +11,8 @@ variables:
     value: "azure-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
   - name: Docker.Registry.Prod
     value: "RegistryProdCSLD-SolicitudesClientes"
+  - name: BuildParameters.AppName
+    value: "app-gestor-solicitudes"
 name: $(date:yyyyMMdd)$(rev:.r)
 stages:
   - stage: SonarQube
