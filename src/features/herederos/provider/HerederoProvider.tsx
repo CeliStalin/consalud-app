@@ -11,6 +11,41 @@ import { HerederoContextType } from "../interfaces/HerederoContext";
 import { HerederoProviderProps } from "../interfaces/HerederoProviderProps";
 import { fetchSolicitanteMejorContactibilidad } from '../services';
 
+/**
+ * Función helper para formatear fecha al formato esperado por la API (YYYY-MM-DD)
+ */
+const formatDateForAPI = (date: Date | string | null | undefined): string => {
+  // Si la fecha es null o undefined, usar fecha actual
+  if (!date) {
+    date = new Date();
+  }
+
+  let dateObj: Date;
+
+  if (typeof date === 'string') {
+    // Si ya está en formato YYYY-MM-DD, devolverlo tal como está
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return date;
+    }
+    // Si es un string de fecha en formato dd-MM-yyyy u otro formato, convertirlo a Date
+    dateObj = new Date(date);
+
+    // Verificar si la fecha es válida
+    if (isNaN(dateObj.getTime())) {
+      console.warn('Fecha inválida recibida:', date, 'usando fecha actual');
+      dateObj = new Date();
+    }
+  } else {
+    dateObj = date;
+  }
+
+  // Retornar en formato YYYY-MM-DD como espera la API
+  const year = dateObj.getFullYear();
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+  const day = dateObj.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) => {
   const [heredero, setHeredero] = useState<Heredero | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,7 +70,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       RutCompleto: herederoData.rut,
       RutDigito: herederoData.rut.slice(-1).toUpperCase(),
       CodigoSexo: herederoData.Genero || '',
-      FechaNacimiento: herederoData.fechaNacimiento || new Date().toISOString(),
+      FechaNacimiento: herederoData.fechaNacimiento ? formatDateForAPI(herederoData.fechaNacimiento) : formatDateForAPI(new Date()),
       IdParentesco: 0, // Valor por defecto - se establecerá cuando el usuario seleccione
       IdTipoSolicitante: 1, // Valor por defecto para heredero
       EstadoRegistro: 'V', // Activo por defecto

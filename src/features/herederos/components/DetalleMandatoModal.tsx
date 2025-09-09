@@ -7,6 +7,41 @@ import { createSolicitante, createSolicitud, fetchTitularByRut, obtenerDocumento
 import { useStepper } from './Stepper';
 import './styles/DetalleMandatoModal.css';
 
+/**
+ * Función helper para formatear fecha al formato esperado por la API (YYYY-MM-DD)
+ */
+const formatDateForAPI = (date: Date | string | null | undefined): string => {
+  // Si la fecha es null o undefined, usar fecha actual
+  if (!date) {
+    date = new Date();
+  }
+
+  let dateObj: Date;
+
+  if (typeof date === 'string') {
+    // Si ya está en formato YYYY-MM-DD, devolverlo tal como está
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return date;
+    }
+    // Si es un string de fecha en formato dd-MM-yyyy u otro formato, convertirlo a Date
+    dateObj = new Date(date);
+
+    // Verificar si la fecha es válida
+    if (isNaN(dateObj.getTime())) {
+      console.warn('Fecha inválida recibida:', date, 'usando fecha actual');
+      dateObj = new Date();
+    }
+  } else {
+    dateObj = date;
+  }
+
+  // Retornar en formato YYYY-MM-DD como espera la API
+  const year = dateObj.getFullYear();
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+  const day = dateObj.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 interface DetalleMandatoModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -137,7 +172,7 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
         RutCompleto: formData.RutCompleto || rutFormulario.toString(),
         RutDigito: formData.RutDigito || '',
         CodigoSexo: formData.CodigoSexo || '',
-        FechaNacimiento: formData.FechaNacimiento || new Date().toISOString(),
+        FechaNacimiento: formData.FechaNacimiento ? formatDateForAPI(formData.FechaNacimiento) : formatDateForAPI(new Date()),
         IdParentesco: formData.IdParentesco || 0,
         IdTipoSolicitante: formData.IdTipoSolicitante || 0,
         EstadoRegistro: formData.EstadoRegistro || 'A',

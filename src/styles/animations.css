@@ -137,7 +137,7 @@
 .page-container {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   background-color: #ffffff;
   opacity: 1;
   visibility: visible;

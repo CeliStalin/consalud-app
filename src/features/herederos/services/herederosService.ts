@@ -235,6 +235,8 @@ export class HerederosService {
     console.log('🚀 Iniciando creación de solicitante con reintentos automáticos');
     console.log('📡 URL:', url);
     console.log('📋 Datos:', dataToSend);
+    console.log('📅 FechaNacimiento específica:', dataToSend.FechaNacimiento);
+    console.log('📅 Tipo de FechaNacimiento:', typeof dataToSend.FechaNacimiento);
 
     return withRetry(async () => {
       console.log('📤 Enviando petición a /api/Solicitante');
