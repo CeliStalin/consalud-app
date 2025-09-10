@@ -922,6 +922,60 @@ app.post('/api/stop-proxy', (req, res) => {
   }, 1000);
 });
 
+// Endpoint para encriptar parámetros de mandatos
+app.get('/api/Pargen/encriptar', async (req, res) => {
+  try {
+    const { usuario, rutAfiliado, nombres, apellidoPaterno, apellidoMaterno } = req.query;
+
+    console.log('🔐 Proxying encriptación de parámetros:', {
+      usuario,
+      rutAfiliado,
+      nombres,
+      apellidoPaterno,
+      apellidoMaterno
+    });
+
+    // Construir URL del endpoint original
+    const baseUrl = 'http://mandatos.consalud.des/api/Pargen/encriptar';
+    const url = `${baseUrl}?usuario=${encodeURIComponent(usuario || 'SCELI')}&rutAfiliado=${encodeURIComponent(rutAfiliado || '')}&nombres=${encodeURIComponent(nombres || '')}&apellidoPaterno=${encodeURIComponent(apellidoPaterno || '')}&apellidoMaterno=${encodeURIComponent(apellidoMaterno || '')}`;
+
+    console.log('🔗 URL de encriptación:', url);
+
+    // Hacer la petición al servidor original
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+        'Accept-Encoding': 'gzip, deflate',
+        'Connection': 'keep-alive',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      timeout: 30000,
+      maxRedirects: 3
+    });
+
+    console.log('✅ Respuesta de encriptación recibida:', response.status);
+    console.log('📄 Contenido de respuesta:', response.data);
+
+    // Configurar headers CORS
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.header('Content-Type', 'text/plain');
+
+    // Enviar la respuesta
+    res.send(response.data);
+
+  } catch (error) {
+    console.error('❌ Error en proxy de encriptación:', error);
+    res.status(500).json({
+      error: 'Error al encriptar parámetros',
+      message: error.message
+    });
+  }
+});
+
 // Endpoint de prueba (para verificar si el servidor está funcionando)
 app.get('/api/test', (req, res) => {
   res.json({
@@ -933,6 +987,7 @@ app.get('/api/test', (req, res) => {
       port: PORT
     },
     endpoints: [
+      { method: 'GET', url: '/api/Pargen/encriptar', description: 'Proxy para encriptación de parámetros de mandatos' },
       { method: 'POST', url: '/api/mandato', description: 'Consulta de mandato (requiere cuerpo JSON)' },
       { method: 'GET', url: '/api/mandato?rutCliente=12345678', description: 'Consulta de mandato por GET (para pruebas)' },
       { method: 'GET', url: '/api/mandato/mock', description: 'Datos simulados de mandato' },

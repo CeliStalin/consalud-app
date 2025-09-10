@@ -528,11 +528,17 @@ export class HerederosService {
       console.log('✅ Tipo de resultado:', typeof result);
       console.log('✅ Longitud del resultado:', result.length);
 
-      // Limpiar comillas dobles si las hay
+      // Limpiar comillas dobles y símbolo @ si los hay
       let cleanResult = result;
       if (result.startsWith('"') && result.endsWith('"')) {
         cleanResult = result.slice(1, -1);
         console.log('🧹 URL limpiada de comillas:', cleanResult);
+      }
+
+      // Limpiar símbolo @ al inicio si existe
+      if (cleanResult.startsWith('@')) {
+        cleanResult = cleanResult.slice(1);
+        console.log('🧹 URL limpiada de símbolo @:', cleanResult);
       }
 
       // Verificar que la URL sea válida

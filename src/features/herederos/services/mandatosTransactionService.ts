@@ -94,11 +94,17 @@ export class MandatosTransactionService {
         throw new Error('La API de encriptación no devolvió una URL válida');
       }
 
-      // Limpiar comillas dobles adicionales si las hay
+      // Limpiar comillas dobles y símbolo @ si los hay
       let cleanUrl = encryptedUrl.trim();
       if (cleanUrl.startsWith('"') && cleanUrl.endsWith('"')) {
         cleanUrl = cleanUrl.slice(1, -1);
         console.log('🧹 URL limpiada de comillas en transacción:', cleanUrl);
+      }
+
+      // Limpiar símbolo @ al inicio si existe
+      if (cleanUrl.startsWith('@')) {
+        cleanUrl = cleanUrl.slice(1);
+        console.log('🧹 URL limpiada de símbolo @ en transacción:', cleanUrl);
       }
 
       // Verificar que la URL sea válida
