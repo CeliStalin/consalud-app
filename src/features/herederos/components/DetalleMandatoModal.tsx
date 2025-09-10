@@ -3,7 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { MandatoResult, mandatoSoapService } from '../../documentos/services/MandatoSoapService';
 import { DOCUMENTOS_MESSAGES } from '../constants';
 import { useDocumentos } from '../hooks/useDocumentos';
+import { useMandatosTransaction } from '../hooks/useMandatosTransaction';
 import { createSolicitante, createSolicitud, fetchTitularByRut, obtenerDocumentosAlmacenados } from '../services/herederosService';
+import MandatosIframeModal from './MandatosIframeModal';
 import { useStepper } from './Stepper';
 import './styles/DetalleMandatoModal.css';
 
@@ -60,6 +62,80 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
   const [saveSuccess, setSaveSuccess] = useState(false);
   const { setStep } = useStepper();
   const { enviarDocumentos, loading: documentosLoading, error: documentosError } = useDocumentos();
+
+  // Hook para manejar transacciones de mandatos con iframe
+  const {
+    isIframeModalOpen,
+    loading: iframeLoading,
+    error: iframeError,
+    openIframeModal,
+    closeIframeModal,
+    refreshMandatosData,
+    iframeUrl,
+    transactionId
+  } = useMandatosTransaction();
+
+  // Función para manejar el clic en "Actualizar Mandato"
+  const handleActualizarMandato = async () => {
+    try {
+      // Obtener RUT del session storage
+      const allKeys = Object.keys(sessionStorage);
+      const formKeys = allKeys.filter(key => key.includes('formHeredero'));
+
+      let rutHeredero = '';
+      for (const key of formKeys) {
+        const data = sessionStorage.getItem(key);
+        if (data) {
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed && parsed.RutCompleto) {
+              rutHeredero = parsed.RutCompleto;
+              break;
+            }
+          } catch (parseError) {
+            continue;
+          }
+        }
+      }
+
+      if (!rutHeredero) {
+        throw new Error('No se encontró RUT del heredero en el session storage');
+      }
+
+      console.log('🔄 Abriendo modal de actualización de mandatos para RUT:', rutHeredero);
+      await openIframeModal(rutHeredero);
+    } catch (err: any) {
+      console.error('❌ Error al abrir modal de actualización:', err);
+      setError(err.message || 'Error al abrir el formulario de actualización');
+    }
+  };
+
+  // Función para refrescar datos después de cerrar el iframe
+  const handleIframeClose = () => {
+    closeIframeModal();
+    refreshMandatosData();
+
+    // Recargar datos del mandato
+    const fetchMandatoData = async () => {
+      setLoading(true);
+      try {
+        const rutCliente = localStorage.getItem('currentRutCliente') || '17175966';
+        const mandatoId = localStorage.getItem('currentMandatoId') || '';
+
+        console.log(`🔄 Recargando detalles para RUT: ${rutCliente}, Mandato: ${mandatoId}`);
+
+        const resultado = await mandatoSoapService.getMandatoInfo(rutCliente, mandatoId);
+        setMandatoInfo(resultado);
+      } catch (err) {
+        console.error('Error al recargar detalles del mandato:', err);
+        setError('No se pudo recargar la información del mandato');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMandatoData();
+  };
 
      // Obtener datos del mandato cuando se abre el modal
    useEffect(() => {
@@ -629,6 +705,16 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
           >
             Cancelar
           </ConsaludCore.Button>
+          {mandatoInfo && (
+            <ConsaludCore.Button
+              variant="secondary"
+              onClick={handleActualizarMandato}
+              disabled={iframeLoading}
+              className="mr-3"
+            >
+              {iframeLoading ? 'Cargando...' : 'Actualizar Mandato'}
+            </ConsaludCore.Button>
+          )}
           <ConsaludCore.Button
             variant="primary"
             onClick={handleSave}
@@ -638,6 +724,16 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
           </ConsaludCore.Button>
         </div>
       </div>
+
+      {/* Modal de iframe para actualizar mandatos */}
+      <MandatosIframeModal
+        isOpen={isIframeModalOpen}
+        onClose={handleIframeClose}
+        iframeUrl={iframeUrl}
+        transactionId={transactionId}
+        loading={iframeLoading}
+        error={iframeError}
+      />
     </div>
   );
 };

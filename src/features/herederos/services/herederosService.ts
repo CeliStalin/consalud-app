@@ -484,6 +484,68 @@ export class HerederosService {
       return [];
     }
   }
+
+  /**
+   * Encripta parámetros para generar URL de mandatos
+   * @param usuario - Usuario del sistema (por defecto 'SISTEMA')
+   * @param rutAfiliado - RUT del afiliado sin puntos ni guiones
+   * @param nombres - Nombres del afiliado
+   * @param apellidoPaterno - Apellido paterno del afiliado
+   * @param apellidoMaterno - Apellido materno del afiliado
+   */
+  async encriptarParametrosMandatos(
+    usuario: string = 'SISTEMA',
+    rutAfiliado: string,
+    nombres: string,
+    apellidoPaterno: string,
+    apellidoMaterno: string
+  ): Promise<string> {
+    const url = `${this.config.baseUrl}/api/Pargen/encriptar?usuario=${encodeURIComponent(usuario)}&rutAfiliado=${encodeURIComponent(rutAfiliado)}&nombres=${encodeURIComponent(nombres)}&apellidoPaterno=${encodeURIComponent(apellidoPaterno)}&apellidoMaterno=${encodeURIComponent(apellidoMaterno)}`;
+
+    try {
+      console.log('🔐 Iniciando encriptación de parámetros para mandatos');
+      console.log('📡 URL:', url);
+      console.log('📋 Parámetros:', { usuario, rutAfiliado, nombres, apellidoPaterno, apellidoMaterno });
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: buildHeaders(this.config)
+      });
+
+      console.log('📥 Respuesta de /api/Pargen/encriptar:', {
+        status: response.status,
+        statusText: response.statusText
+      });
+
+      if (!response.ok) {
+        const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
+        (error as any).status = response.status;
+        throw error;
+      }
+
+      const result = await response.text();
+      console.log('✅ Parámetros encriptados exitosamente (raw):', result);
+      console.log('✅ Tipo de resultado:', typeof result);
+      console.log('✅ Longitud del resultado:', result.length);
+
+      // Limpiar comillas dobles si las hay
+      let cleanResult = result;
+      if (result.startsWith('"') && result.endsWith('"')) {
+        cleanResult = result.slice(1, -1);
+        console.log('🧹 URL limpiada de comillas:', cleanResult);
+      }
+
+      // Verificar que la URL sea válida
+      if (!cleanResult.startsWith('http')) {
+        throw new Error(`URL encriptada inválida: ${cleanResult}`);
+      }
+
+      return cleanResult;
+    } catch (error: any) {
+      console.error('❌ Error al encriptar parámetros:', error);
+      throw error;
+    }
+  }
 }
 
 // Exportar instancia única
@@ -525,3 +587,11 @@ export const enviarDocumentos = (
 
 export const obtenerDocumentosAlmacenados = (rutTitular: number) =>
   herederosService.obtenerDocumentosAlmacenados(rutTitular);
+
+export const encriptarParametrosMandatos = (
+  usuario: string = 'SISTEMA',
+  rutAfiliado: string,
+  nombres: string,
+  apellidoPaterno: string,
+  apellidoMaterno: string
+) => herederosService.encriptarParametrosMandatos(usuario, rutAfiliado, nombres, apellidoPaterno, apellidoMaterno);
