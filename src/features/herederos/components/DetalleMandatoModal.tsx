@@ -79,12 +79,38 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
     externalTabUrl,
     // Funcionalidad de bloqueo de botones
     isButtonsLocked,
-    lockReason
+    lockReason,
+    // Token de transacción
+    transactionToken,
+    hasActiveTransaction
   } = useMandatosTransaction();
+
+  // Debug: Log del estado de bloqueo
+  console.log('🔍 [DetalleMandatoModal] Estado completo:', {
+    isButtonsLocked,
+    lockReason,
+    isExternalTabOpen,
+    transactionToken,
+    hasActiveTransaction,
+    timestamp: Date.now()
+  });
+
+  // Verificar si los botones deberían estar bloqueados
+  const shouldBeLocked = isButtonsLocked || hasActiveTransaction;
+  console.log('🔍 [DetalleMandatoModal] ¿Deberían estar bloqueados?', {
+    isButtonsLocked,
+    hasActiveTransaction,
+    shouldBeLocked
+  });
 
   // Función para manejar el clic en "Actualizar Mandato"
   const handleActualizarMandato = async () => {
     try {
+      // Verificar si ya hay una pestaña externa abierta
+      if (isExternalTabOpen) {
+        throw new Error('Ya hay una pestaña externa abierta. Cierre la pestaña actual antes de abrir una nueva.');
+      }
+
       // Obtener RUT del session storage
       const allKeys = Object.keys(sessionStorage);
       const formKeys = allKeys.filter(key => key.includes('formHeredero'));

@@ -113,6 +113,21 @@ export const useExternalTab = (): UseExternalTabReturn => {
         return false;
       }
 
+      // Verificación adicional: intentar acceder a la propiedad location
+      // Si la pestaña está en un dominio diferente, esto puede fallar
+      try {
+        const location = tabRef.current.location;
+        if (!location) {
+          console.log('📋 Pestaña externa inaccesible (location null)');
+          closeExternalTab();
+          return false;
+        }
+      } catch (locationErr) {
+        // Si no podemos acceder a location, la pestaña puede estar cerrada
+        // o en un dominio diferente (lo cual es normal)
+        console.log('📋 Pestaña externa en dominio diferente o cerrada');
+      }
+
       return true;
     } catch (err) {
       console.log('📋 Pestaña externa cerrada (excepción):', err);

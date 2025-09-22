@@ -1,43 +1,44 @@
-import React, { useMemo } from 'react';
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { 
+import { CollapseOnRoute } from '@/features/herederos/components/CollapseOnRoute';
+import {
+  ProtectedRoute as CoreProtectedRoute,
   HomePage,
   Login,
-  ProtectedRoute as CoreProtectedRoute,
-  Unauthorized,
-  NotFound,
   MenuCollapseProvider,
+  NotFound,
+  Unauthorized,
   useMenuCollapse,
 } from '@consalud/core';
+import React, { useMemo } from 'react';
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { PageTransition } from '../components/PageTransition';
+import { ButtonLockingProviderWrapper } from '../features/herederos/provider/ButtonLockingProvider';
+import HerederoProvider from '../features/herederos/provider/HerederoProvider';
+import TitularProvider from '../features/herederos/provider/TitularProvider';
 import { useAuthWithRedirect } from '../hooks/useAuthWithRedirect';
 import CargaDocumentoPage from '../pages/CargaDocumentoPage';
-import { CollapseOnRoute } from '@/features/herederos/components/CollapseOnRoute';
 import { SyncedLayout as CoreSyncedLayout } from './SyncedLayout';
-import TitularProvider from '../features/herederos/provider/TitularProvider';
-import HerederoProvider from '../features/herederos/provider/HerederoProvider';
-import { PageTransition } from '../components/PageTransition';
 
 // Importaciones directas para evitar flash blanco
-import IngresoTitularPage from '../pages/IngresoTitularPage';
-import InfoRequisitosTitularPage from '../pages/InfoRequisitosTitularPage';
 import DatosTitularPage from '../pages/DatosTitularPage';
-import RegistroHerederoPage from '../pages/RegistroHerederoPage';
-import IngresoHerederoFormPage from '../pages/IngresoHerederoFormPage';
-import IngresoDocumentosPage from '../pages/IngresoDocumentosPage';
-import SuccessPage from '../pages/SuccessPage';
 import DetalleMandatoPage from '../pages/DetalleMandatoPage';
+import InfoRequisitosTitularPage from '../pages/InfoRequisitosTitularPage';
+import IngresoDocumentosPage from '../pages/IngresoDocumentosPage';
+import IngresoHerederoFormPage from '../pages/IngresoHerederoFormPage';
+import IngresoTitularPage from '../pages/IngresoTitularPage';
+import RegistroHerederoPage from '../pages/RegistroHerederoPage';
+import SuccessPage from '../pages/SuccessPage';
 
 // Loading optimizado para eliminar parpadeos
 const OptimizedLoading: React.FC = React.memo(() => (
   <div className="suspense-fallback">
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
       height: '200px',
       fontSize: '14px',
       color: '#666',
-      background: '#ffffff', 
+      background: '#ffffff',
       width: '100%',
       position: 'relative'
     }}>
@@ -88,7 +89,7 @@ StablePageWrapper.displayName = 'StablePageWrapper';
 // Optimized HomePage wrapper
 const HomePageWithCollapse: React.FC<{ onCardClick?: (...args: any[]) => void }> = (props) => {
   const { collapseMenu } = useMenuCollapse();
-  
+
   const handleApplicationClick = (...args: any[]) => {
     collapseMenu();
     if (props.onCardClick) props.onCardClick(...args);
@@ -114,9 +115,15 @@ const HerederosLayout: React.FC = () => (
   <CoreProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
     <TitularProvider>
       <HerederoProvider>
-        <CollapseOnRoute>
-          <Outlet />
-        </CollapseOnRoute>
+        <ButtonLockingProviderWrapper
+          showNotification={true}
+          showOverlay={true}
+          showTopBar={true}
+        >
+          <CollapseOnRoute>
+            <Outlet />
+          </CollapseOnRoute>
+        </ButtonLockingProviderWrapper>
       </HerederoProvider>
     </TitularProvider>
   </CoreProtectedRoute>
@@ -155,19 +162,19 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
     <MenuCollapseProvider>
       <Routes>
         {/* Rutas Públicas */}
-        <Route 
-          path="/login" 
+        <Route
+          path="/login"
           element={
             <CoreProtectedRoute isPublic={true}>
               <StablePageWrapper>
-                <Login 
+                <Login
                   appName="sistema gestión de solicitudes"
                   onLoginSuccess={handleLoginSuccess}
                   logoSrc={logo}
                 />
               </StablePageWrapper>
             </CoreProtectedRoute>
-          } 
+          }
         />
 
         {/* Resto de la app con SyncedLayout */}
@@ -177,14 +184,14 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
             <SyncedLayout logo={logo}>
               <Routes>
                 {/* Ruta Raíz */}
-                <Route 
+                <Route
                   path="/"
                   element={
                     isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />
                   }
                 />
                 {/* Ruta Home - HomePage del Core */}
-                <Route 
+                <Route
                   path="/home"
                   element={
                     <CoreProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
@@ -211,29 +218,29 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
                   <Route path="ingresoher/IngresoDocumentos" element={<IngresoDocumentosPage />} />
                 </Route>
                 {/* Redirección para rutas con mayúsculas (compatibilidad) */}
-                <Route 
+                <Route
                   path="/mnHerederos/*"
-                  element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />} 
+                  element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />}
                 />
-                <Route 
+                <Route
                   path="/mnHerederos/IngresoHer/*"
-                  element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />} 
+                  element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />}
                 />
-                <Route 
+                <Route
                   path="/mnHerederos/IngresoHer"
-                  element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />} 
+                  element={<Navigate to="/mnherederos/ingresoher/ingresotitular" replace />}
                 />
                 {/* Rutas de error */}
-                <Route 
-                  path="/unauthorized" 
+                <Route
+                  path="/unauthorized"
                   element={
                     <StablePageWrapper>
                       <Unauthorized />
                     </StablePageWrapper>
                   }
                 />
-                <Route 
-                  path="/not-found" 
+                <Route
+                  path="/not-found"
                   element={
                     <StablePageWrapper>
                       <NotFound/>

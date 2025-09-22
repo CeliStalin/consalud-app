@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MandatosTransactionData, mandatosTransactionService } from '../services/mandatosTransactionService';
-import { useButtonLocking } from './useButtonLocking';
-import { useExternalTab } from './useExternalTab';
+import { useGlobalButtonLocking } from './useGlobalButtonLocking';
 
 export interface UseMandatosTransactionReturn {
   // Estados
@@ -28,6 +27,8 @@ export interface UseMandatosTransactionReturn {
   // Funcionalidad de bloqueo de botones
   isButtonsLocked: boolean;
   lockReason: string | null;
+  transactionToken: string | null;
+  hasActiveTransaction: boolean;
 }
 
 /**
@@ -42,23 +43,28 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
   const [iframeUrl, setIframeUrl] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
 
-  // Hook para manejar pestañas externas
+  // Hook mejorado que combina pestañas externas con bloqueo global
   const {
     isExternalTabOpen,
     loading: externalTabLoading,
     error: externalTabError,
     tabUrl: externalTabUrl,
     openExternalTab: openExternalTabBase,
-    closeExternalTab: closeExternalTabBase
-  } = useExternalTab();
-
-  // Hook para manejar bloqueo de botones
-  const {
-    isLocked: isButtonsLocked,
+    closeExternalTab: closeExternalTabBase,
+    isButtonsLocked,
     lockReason,
     lockButtons,
-    unlockButtons
-  } = useButtonLocking();
+    unlockButtons,
+    transactionToken,
+    hasActiveTransaction
+  } = useGlobalButtonLocking();
+
+  // Debug: Log del estado recibido del hook global
+  console.log('🔍 [useMandatosTransaction] Estado del hook global:', {
+    isButtonsLocked,
+    lockReason,
+    isExternalTabOpen
+  });
 
   // Ref para el iframe
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -153,11 +159,14 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
       }
 
       // Abrir pestaña externa con la URL encriptada
+      console.log('🔄 [useMandatosTransaction] Llamando a openExternalTabBase...');
       await openExternalTabBase(transaction.encryptedUrl);
+      console.log('🔄 [useMandatosTransaction] openExternalTabBase completado sin error');
 
-      // Bloquear botones mientras la pestaña externa esté abierta
-      lockButtons('Formulario de mandatos abierto en pestaña externa');
+      // NO bloquear botones aquí - el bloqueo se maneja en openExternalTabBase
+      // solo si la pestaña se abre exitosamente
 
+      // Solo mostrar este mensaje si no hubo error
       console.log('✅ Pestaña externa abierta exitosamente');
     } catch (err: any) {
       console.error('❌ Error al abrir pestaña externa:', err);
@@ -254,11 +263,18 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
    * Efecto para detectar cuando se cierra la pestaña externa y desbloquear botones
    */
   useEffect(() => {
+    console.log('🔍 [useMandatosTransaction] Efecto de cierre de pestaña:', {
+      isExternalTabOpen,
+      isButtonsLocked,
+      lockReason
+    });
+
     if (!isExternalTabOpen && isButtonsLocked) {
-      console.log('🔄 Pestaña externa cerrada, desbloqueando botones');
+      console.log('🔄 [useMandatosTransaction] Pestaña externa cerrada, desbloqueando botones');
+      console.trace('🔍 [useMandatosTransaction] Stack trace del desbloqueo automático');
       unlockButtons();
     }
-  }, [isExternalTabOpen, isButtonsLocked, unlockButtons]);
+  }, [isExternalTabOpen, isButtonsLocked, unlockButtons, lockReason]);
 
   return {
     // Estados
@@ -285,6 +301,8 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
     // Funcionalidad de bloqueo de botones
     isButtonsLocked,
     lockReason,
+    transactionToken,
+    hasActiveTransaction,
 
     // Referencias internas (para uso interno del componente)
     iframeRef,
