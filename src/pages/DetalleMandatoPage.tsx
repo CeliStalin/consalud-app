@@ -2,7 +2,7 @@ import { Stepper, StepperProvider, useStepper } from '@/features/herederos/compo
 import * as ConsaludCore from '@consalud/core';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { MandatoResult, mandatoSoapService } from '../features/documentos/services/MandatoSoapService';
+import { MandatoResult, mockMandatoService } from '../features/herederos/services/mockMandatoService';
 import './styles/DetalleMandatoPage.css';
 
 const DetalleMandatoPageContent: React.FC = () => {
@@ -33,7 +33,7 @@ const DetalleMandatoPageContent: React.FC = () => {
         console.log(`Obteniendo detalles para RUT: ${rutCliente}, Mandato: ${mandatoId}`);
 
         // Llamar al servicio
-        const resultado = await mandatoSoapService.getMandatoInfo(rutCliente, mandatoId);
+        const resultado = await mockMandatoService.getMandatoInfo(rutCliente, mandatoId);
         setMandatoInfo(resultado);
       } catch (err) {
         console.error('Error al cargar detalles del mandato:', err);
@@ -167,13 +167,13 @@ const DetalleMandatoPageContent: React.FC = () => {
                     <label className="label">ID de mandato</label>
                     <p className="field-value">{mandatoInfo.mandatoId}</p>
                   </div>
-                  {mandatoInfo.Sindtipo && (
+                  {mandatoInfo.indTipo && (
                     <div className="field">
                       <label className="label">Tipo</label>
-                      <p className="field-value">{mandatoInfo.Sindtipo === '1' ? 'Cuenta Corriente' :
-                                                 mandatoInfo.Sindtipo === '2' ? 'Cuenta Vista' :
-                                                 mandatoInfo.Sindtipo === '3' ? 'Cuenta de Ahorro' :
-                                                 mandatoInfo.Sindtipo}</p>
+                      <p className="field-value">{mandatoInfo.indTipo === '1' ? 'Cuenta Corriente' :
+                                                 mandatoInfo.indTipo === '2' ? 'Cuenta Vista' :
+                                                 mandatoInfo.indTipo === '3' ? 'Cuenta de Ahorro' :
+                                                 mandatoInfo.indTipo}</p>
                     </div>
                   )}
                 </div>

@@ -112,7 +112,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
           close: () => console.log('Mock tab closed'),
           focus: () => console.log('Mock tab focused'),
           openTime: Date.now() // Timestamp para verificación de tiempo mínimo
-        } as Window;
+        } as unknown as Window;
 
         console.log('✅ [Global] Referencia mock creada, continuando con bloqueo...');
       }
@@ -185,8 +185,8 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
         } catch (accessError) {
           console.error('❌ [Global] Error al acceder a la pestaña:', accessError);
           console.error('❌ [Global] Detalles del error de acceso:', {
-            errorMessage: accessError.message,
-            errorStack: accessError.stack,
+            errorMessage: (accessError as Error).message,
+            errorStack: (accessError as Error).stack,
             newTabClosed: newTab?.closed
           });
           throw new Error('No se pudo acceder a la pestaña abierta');

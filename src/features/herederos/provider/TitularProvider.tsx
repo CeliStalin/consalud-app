@@ -1,12 +1,11 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { Titular } from "../interfaces/Titular";
-import { TitularProviderProps } from "../interfaces/TitularProviderProps";
-import axios from "axios";
-import { TitularContextType } from "../interfaces/TitularContext";
+import React, { useCallback, useEffect, useState } from "react";
+import { extraerNumerosRut } from '../../../utils/rutValidation';
 import { TitularContext } from "../contexts/TitularContext";
 import { useRutChileno } from "../hooks/useRutChileno";
+import { Titular } from "../interfaces/Titular";
+import { TitularContextType } from "../interfaces/TitularContext";
+import { TitularProviderProps } from "../interfaces/TitularProviderProps";
 import { fetchTitularByRut } from '../services';
-import { extraerNumerosRut } from '../../../utils/rutValidation';
 
 export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) => {
   const [titular, setTitular] = useState<Titular | null>(() => {
@@ -54,7 +53,9 @@ export const TitularProvider: React.FC<TitularProviderProps> = ({ children }) =>
           return null;
         }
       } else {
-        const { data } = await axios.get('http://localhost:3001/Titular');
+        // Usar servicio mock local
+        const { mockDataService } = await import('../services/mockDataService');
+        const data = await mockDataService.getTitulares();
         const formattedRut = formatSimpleRut(rut);
         const titularEncontrado = data.find((t: Titular) => t.rut === formattedRut);
         if (!titularEncontrado) {

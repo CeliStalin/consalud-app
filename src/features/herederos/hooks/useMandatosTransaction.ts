@@ -32,10 +32,10 @@ export interface UseMandatosTransactionReturn {
  * Implementa el sistema de bloqueo de botones con token de transacción
  */
 export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
-  const [transactionData, setTransactionData] = useState<MandatosTransactionData | null>(null);
+  const [transactionData] = useState<MandatosTransactionData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [transactionId, setTransactionId] = useState<string | null>(null);
+  const [transactionId] = useState<string | null>(null);
 
   // Hook mejorado que combina pestañas externas con bloqueo global
   const {

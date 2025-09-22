@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MENSAJES_ERROR, validarEdadConMensaje } from "../../../utils/ageValidation";
@@ -323,8 +322,9 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
         }
 
       } else {
-        // Fallback a mock (para desarrollo)
-        const { data } = await axios.get('http://localhost:3001/Heredero');
+        // Usar servicio mock local
+        const { mockDataService } = await import('../services/mockDataService');
+        const data = await mockDataService.getHerederos();
         const formattedRut = formatSimpleRut(rut);
 
         const herederoEncontrado = data.find((h: Heredero) => h.rut === formattedRut);
