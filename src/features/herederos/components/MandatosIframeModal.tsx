@@ -10,13 +10,22 @@ interface MandatosIframeModalProps {
   loading: boolean;
   error: string | null;
   onIframeLoad?: () => void;
+  // Funcionalidad de pestaña externa
+  isExternalTabOpen?: boolean;
+  onOpenExternalTab?: () => void;
+  onCloseExternalTab?: () => void;
+  externalTabUrl?: string | null;
 }
 
 const MandatosIframeModal: React.FC<MandatosIframeModalProps> = ({
   isOpen,
   onClose,
   loading,
-  error
+  error,
+  isExternalTabOpen = false,
+  onOpenExternalTab,
+  onCloseExternalTab,
+  externalTabUrl
 }) => {
   const [tabContent, setTabContent] = useState<string>('');
   const [tabLoading, setTabLoading] = useState(false);
@@ -25,6 +34,13 @@ const MandatosIframeModal: React.FC<MandatosIframeModalProps> = ({
     setTabContent('');
     setTabLoading(false);
     onClose();
+  };
+
+  // Función para abrir en pestaña externa
+  const handleOpenExternalTab = () => {
+    if (onOpenExternalTab) {
+      onOpenExternalTab();
+    }
   };
 
   // Simular pestaña dentro de la aplicación con proxy avanzado
@@ -349,13 +365,25 @@ const MandatosIframeModal: React.FC<MandatosIframeModalProps> = ({
             <h2>Actualizar Mandatos</h2>
           <div className="mandatos-iframe-modal-actions">
             <button
+              className="button is-small is-success"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenExternalTab();
+              }}
+              title="Abrir en nueva pestaña del navegador (recomendado)"
+              disabled={loading || isExternalTabOpen}
+            >
+              <i className="fas fa-external-link-alt"></i>
+              {loading ? '⏳ Cargando...' : 'Abrir en Pestaña'}
+            </button>
+            <button
               className="button is-small is-primary"
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenTabSimulation();
               }}
               title="Simular pestaña del navegador dentro de la aplicación"
-              disabled={tabLoading}
+              disabled={tabLoading || isExternalTabOpen}
             >
               <i className="fas fa-tab"></i>
               {tabLoading ? '⏳ Cargando...' : 'Simular Pestaña'}
@@ -375,7 +403,37 @@ const MandatosIframeModal: React.FC<MandatosIframeModalProps> = ({
 
         {/* Contenido del modal */}
         <div className="mandatos-iframe-modal-body">
-          {loading ? (
+          {isExternalTabOpen ? (
+            <div className="mandatos-external-tab-info">
+              <div className="notification is-info">
+                <h3>🌐 Pestaña Externa Abierta</h3>
+                <p>El formulario de mandatos se ha abierto en una nueva pestaña del navegador.</p>
+                <p><strong>URL:</strong> <code>{externalTabUrl}</code></p>
+                <div className="mt-4">
+                  <p className="has-text-weight-semibold">⚠️ Instrucciones importantes:</p>
+                  <ul className="mt-2">
+                    <li>• Complete el formulario en la pestaña externa</li>
+                    <li>• Los botones de esta aplicación estarán bloqueados hasta que cierre la pestaña</li>
+                    <li>• Una vez terminado, cierre la pestaña externa para continuar</li>
+                  </ul>
+                </div>
+                <div className="mt-4">
+                  <button
+                    className="button is-warning"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onCloseExternalTab) {
+                        onCloseExternalTab();
+                      }
+                    }}
+                  >
+                    <i className="fas fa-times"></i>
+                    Cerrar Pestaña Externa
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : loading ? (
             <div className="mandatos-iframe-loading">
               <div className="loader-container">
                 <div className="loader"></div>
@@ -412,15 +470,41 @@ const MandatosIframeModal: React.FC<MandatosIframeModalProps> = ({
             <div className="mandatos-iframe-placeholder">
               <div className="notification is-info">
                 <h3>Formulario de Mandatos</h3>
-                <p>Haga clic en "Simular Pestaña" para abrir el formulario de mandatos dentro de la aplicación.</p>
-                <p><strong>Ventajas de esta opción:</strong></p>
-                <ul>
-                  <li>✅ No sales de la aplicación</li>
-                  <li>✅ Interceptores avanzados para recursos</li>
-                  <li>✅ Interfaz familiar de navegador</li>
-                  <li>✅ Proxy automático para CORS</li>
-                  <li>✅ Experiencia integrada</li>
-                </ul>
+                <p>Seleccione una opción para abrir el formulario de mandatos:</p>
+
+                <div className="columns mt-4">
+                  <div className="column">
+                    <div className="box has-background-success-light">
+                      <h4 className="has-text-success-dark">
+                        <i className="fas fa-external-link-alt"></i> Pestaña Externa (Recomendado)
+                      </h4>
+                      <p className="mt-2">Abre el formulario en una nueva pestaña del navegador.</p>
+                      <p><strong>Ventajas:</strong></p>
+                      <ul>
+                        <li>✅ Experiencia nativa del navegador</li>
+                        <li>✅ Mejor compatibilidad con formularios complejos</li>
+                        <li>✅ Bloqueo automático de botones durante el proceso</li>
+                        <li>✅ Detección automática de cierre de pestaña</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="column">
+                    <div className="box has-background-primary-light">
+                      <h4 className="has-text-primary-dark">
+                        <i className="fas fa-tab"></i> Simulación de Pestaña
+                      </h4>
+                      <p className="mt-2">Abre el formulario dentro de la aplicación.</p>
+                      <p><strong>Ventajas:</strong></p>
+                      <ul>
+                        <li>✅ No sales de la aplicación</li>
+                        <li>✅ Interceptores avanzados para recursos</li>
+                        <li>✅ Interfaz familiar de navegador</li>
+                        <li>✅ Proxy automático para CORS</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}

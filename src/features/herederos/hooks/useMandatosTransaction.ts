@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MandatosTransactionData, mandatosTransactionService } from '../services/mandatosTransactionService';
+import { useButtonLocking } from './useButtonLocking';
+import { useExternalTab } from './useExternalTab';
 
 export interface UseMandatosTransactionReturn {
   // Estados
@@ -16,10 +18,20 @@ export interface UseMandatosTransactionReturn {
   // Datos del iframe
   iframeUrl: string | null;
   transactionId: string | null;
+
+  // Funcionalidad de pestaña externa
+  isExternalTabOpen: boolean;
+  openExternalTab: (rut: string) => Promise<void>;
+  closeExternalTab: () => void;
+  externalTabUrl: string | null;
+
+  // Funcionalidad de bloqueo de botones
+  isButtonsLocked: boolean;
+  lockReason: string | null;
 }
 
 /**
- * Hook para manejar transacciones de mandatos con iframe
+ * Hook para manejar transacciones de mandatos con iframe y pestaña externa
  * Implementa el sistema de puntero de información con token de transacción
  */
 export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
@@ -29,6 +41,24 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
   const [error, setError] = useState<string | null>(null);
   const [iframeUrl, setIframeUrl] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
+
+  // Hook para manejar pestañas externas
+  const {
+    isExternalTabOpen,
+    loading: externalTabLoading,
+    error: externalTabError,
+    tabUrl: externalTabUrl,
+    openExternalTab: openExternalTabBase,
+    closeExternalTab: closeExternalTabBase
+  } = useExternalTab();
+
+  // Hook para manejar bloqueo de botones
+  const {
+    isLocked: isButtonsLocked,
+    lockReason,
+    lockButtons,
+    unlockButtons
+  } = useButtonLocking();
 
   // Ref para el iframe
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -100,6 +130,52 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
     // Por ahora, solo logueamos la acción
     console.log('📊 Datos de mandatos refrescados');
   }, []);
+
+  /**
+   * Abre una pestaña externa para actualizar mandatos
+   */
+  const openExternalTab = useCallback(async (rut: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log('🚀 Abriendo pestaña externa para mandatos, RUT:', rut);
+
+      // Iniciar transacción
+      const transaction = await mandatosTransactionService.iniciarTransaccionMandatos(rut);
+
+      console.log('📋 Datos de transacción recibidos:', transaction);
+      console.log('🔗 URL encriptada a abrir:', transaction.encryptedUrl);
+
+      // Validar que la URL encriptada sea válida
+      if (!transaction.encryptedUrl || !transaction.encryptedUrl.startsWith('http')) {
+        throw new Error(`URL encriptada inválida: ${transaction.encryptedUrl}`);
+      }
+
+      // Abrir pestaña externa con la URL encriptada
+      await openExternalTabBase(transaction.encryptedUrl);
+
+      // Bloquear botones mientras la pestaña externa esté abierta
+      lockButtons('Formulario de mandatos abierto en pestaña externa');
+
+      console.log('✅ Pestaña externa abierta exitosamente');
+    } catch (err: any) {
+      console.error('❌ Error al abrir pestaña externa:', err);
+      setError(err.message || 'Error al abrir la pestaña externa');
+    } finally {
+      setLoading(false);
+    }
+  }, [openExternalTabBase, lockButtons]);
+
+  /**
+   * Cierra la pestaña externa
+   */
+  const closeExternalTab = useCallback(() => {
+    console.log('🔒 Cerrando pestaña externa');
+    closeExternalTabBase();
+    unlockButtons(); // Desbloquear botones al cerrar la pestaña
+    refreshMandatosData();
+  }, [closeExternalTabBase, unlockButtons, refreshMandatosData]);
 
   /**
    * Cierra el modal de iframe
@@ -174,12 +250,22 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
     mandatosTransactionService.cleanupOldTransactions();
   }, []);
 
+  /**
+   * Efecto para detectar cuando se cierra la pestaña externa y desbloquear botones
+   */
+  useEffect(() => {
+    if (!isExternalTabOpen && isButtonsLocked) {
+      console.log('🔄 Pestaña externa cerrada, desbloqueando botones');
+      unlockButtons();
+    }
+  }, [isExternalTabOpen, isButtonsLocked, unlockButtons]);
+
   return {
     // Estados
     isIframeModalOpen,
     transactionData,
-    loading,
-    error,
+    loading: loading || externalTabLoading,
+    error: error || externalTabError,
 
     // Acciones
     openIframeModal,
@@ -189,6 +275,16 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
     // Datos del iframe
     iframeUrl,
     transactionId,
+
+    // Funcionalidad de pestaña externa
+    isExternalTabOpen,
+    openExternalTab,
+    closeExternalTab,
+    externalTabUrl,
+
+    // Funcionalidad de bloqueo de botones
+    isButtonsLocked,
+    lockReason,
 
     // Referencias internas (para uso interno del componente)
     iframeRef,

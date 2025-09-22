@@ -63,16 +63,23 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
   const { setStep } = useStepper();
   const { enviarDocumentos, loading: documentosLoading, error: documentosError } = useDocumentos();
 
-  // Hook para manejar transacciones de mandatos con iframe
+  // Hook para manejar transacciones de mandatos con iframe y pestaña externa
   const {
     isIframeModalOpen,
     loading: iframeLoading,
     error: iframeError,
-    openIframeModal,
     closeIframeModal,
     refreshMandatosData,
     iframeUrl,
-    transactionId
+    transactionId,
+    // Funcionalidad de pestaña externa
+    isExternalTabOpen,
+    openExternalTab,
+    closeExternalTab,
+    externalTabUrl,
+    // Funcionalidad de bloqueo de botones
+    isButtonsLocked,
+    lockReason
   } = useMandatosTransaction();
 
   // Función para manejar el clic en "Actualizar Mandato"
@@ -102,10 +109,10 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
         throw new Error('No se encontró RUT del heredero en el session storage');
       }
 
-      console.log('🔄 Abriendo modal de actualización de mandatos para RUT:', rutHeredero);
-      await openIframeModal(rutHeredero);
+      console.log('🔄 Abriendo pestaña externa para actualización de mandatos, RUT:', rutHeredero);
+      await openExternalTab(rutHeredero);
     } catch (err: any) {
-      console.error('❌ Error al abrir modal de actualización:', err);
+      console.error('❌ Error al abrir pestaña externa:', err);
       setError(err.message || 'Error al abrir el formulario de actualización');
     }
   };
@@ -113,6 +120,12 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
   // Función para refrescar datos después de cerrar el iframe
   const handleIframeClose = () => {
     closeIframeModal();
+    refreshMandatosData();
+  };
+
+  // Función para manejar el cierre de pestaña externa
+  const handleExternalTabClose = () => {
+    closeExternalTab();
     refreshMandatosData();
 
     // Recargar datos del mandato
@@ -565,6 +578,22 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
 
         {/* Contenido del modal */}
         <div className="modal-body">
+          {/* Indicador de bloqueo de botones */}
+          {isButtonsLocked && (
+            <div className="notification is-warning mb-4">
+              <div className="is-flex is-align-items-center">
+                <span className="icon is-small mr-2">
+                  <i className="fas fa-lock"></i>
+                </span>
+                <div>
+                  <strong>Botones bloqueados:</strong> {lockReason}
+                  <br />
+                  <small>Complete el proceso en la pestaña externa para desbloquear los botones.</small>
+                </div>
+              </div>
+            </div>
+          )}
+
           {loading ? (
             <div className="has-text-centered p-6">
               <div className="loader-container">
@@ -709,18 +738,20 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
             <ConsaludCore.Button
               variant="secondary"
               onClick={handleActualizarMandato}
-              disabled={iframeLoading}
+              disabled={iframeLoading || isButtonsLocked}
               className="mr-3"
+              title={isButtonsLocked ? `Botones bloqueados: ${lockReason}` : ''}
             >
-              {iframeLoading ? 'Cargando...' : 'Actualizar Mandato'}
+              {iframeLoading ? 'Cargando...' : isButtonsLocked ? 'Pestaña Externa Abierta' : 'Actualizar Mandato'}
             </ConsaludCore.Button>
           )}
           <ConsaludCore.Button
             variant="primary"
             onClick={handleSave}
-            disabled={!mandatoInfo || saving}
+            disabled={!mandatoInfo || saving || isButtonsLocked}
+            title={isButtonsLocked ? `Botones bloqueados: ${lockReason}` : ''}
           >
-            {saving ? 'Guardando...' : 'Guardar'}
+            {saving ? 'Guardando...' : isButtonsLocked ? 'Bloqueado' : 'Guardar'}
           </ConsaludCore.Button>
         </div>
       </div>
@@ -733,6 +764,11 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
         transactionId={transactionId}
         loading={iframeLoading}
         error={iframeError}
+        // Funcionalidad de pestaña externa
+        isExternalTabOpen={isExternalTabOpen}
+        onOpenExternalTab={handleActualizarMandato}
+        onCloseExternalTab={handleExternalTabClose}
+        externalTabUrl={externalTabUrl}
       />
     </div>
   );
