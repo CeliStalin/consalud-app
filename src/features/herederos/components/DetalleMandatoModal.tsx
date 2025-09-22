@@ -5,7 +5,7 @@ import { DOCUMENTOS_MESSAGES } from '../constants';
 import { useDocumentos } from '../hooks/useDocumentos';
 import { useMandatosTransaction } from '../hooks/useMandatosTransaction';
 import { createSolicitante, createSolicitud, fetchTitularByRut, obtenerDocumentosAlmacenados } from '../services/herederosService';
-import MandatosIframeModal from './MandatosIframeModal';
+// import MandatosIframeModal from './MandatosIframeModal'; // No utilizado - sistema usa pestañas externas
 import { useStepper } from './Stepper';
 import './styles/DetalleMandatoModal.css';
 
@@ -63,14 +63,11 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
   const { setStep } = useStepper();
   const { enviarDocumentos, loading: documentosLoading, error: documentosError } = useDocumentos();
 
-  // Hook para manejar transacciones de mandatos con iframe y pestaña externa
+  // Hook para manejar transacciones de mandatos con pestaña externa
   const {
-    isIframeModalOpen,
     loading: iframeLoading,
     error: iframeError,
-    closeIframeModal,
     refreshMandatosData,
-    iframeUrl,
     transactionId,
     // Funcionalidad de pestaña externa
     isExternalTabOpen,
@@ -141,12 +138,6 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
       console.error('❌ Error al abrir pestaña externa:', err);
       setError(err.message || 'Error al abrir el formulario de actualización');
     }
-  };
-
-  // Función para refrescar datos después de cerrar el iframe
-  const handleIframeClose = () => {
-    closeIframeModal();
-    refreshMandatosData();
   };
 
   // Función para manejar el cierre de pestaña externa
@@ -782,20 +773,7 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
         </div>
       </div>
 
-      {/* Modal de iframe para actualizar mandatos */}
-      <MandatosIframeModal
-        isOpen={isIframeModalOpen}
-        onClose={handleIframeClose}
-        iframeUrl={iframeUrl}
-        transactionId={transactionId}
-        loading={iframeLoading}
-        error={iframeError}
-        // Funcionalidad de pestaña externa
-        isExternalTabOpen={isExternalTabOpen}
-        onOpenExternalTab={handleActualizarMandato}
-        onCloseExternalTab={handleExternalTabClose}
-        externalTabUrl={externalTabUrl}
-      />
+      {/* Modal de iframe eliminado - sistema usa pestañas externas directamente */}
     </div>
   );
 };

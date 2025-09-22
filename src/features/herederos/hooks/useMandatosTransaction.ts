@@ -4,18 +4,14 @@ import { useGlobalButtonLocking } from './useGlobalButtonLocking';
 
 export interface UseMandatosTransactionReturn {
   // Estados
-  isIframeModalOpen: boolean;
   transactionData: MandatosTransactionData | null;
   loading: boolean;
   error: string | null;
 
   // Acciones
-  openIframeModal: (rut: string) => Promise<void>;
-  closeIframeModal: () => void;
   refreshMandatosData: () => void;
 
-  // Datos del iframe
-  iframeUrl: string | null;
+  // Datos de transacción
   transactionId: string | null;
 
   // Funcionalidad de pestaña externa
@@ -32,15 +28,13 @@ export interface UseMandatosTransactionReturn {
 }
 
 /**
- * Hook para manejar transacciones de mandatos con iframe y pestaña externa
- * Implementa el sistema de puntero de información con token de transacción
+ * Hook para manejar transacciones de mandatos con pestaña externa
+ * Implementa el sistema de bloqueo de botones con token de transacción
  */
 export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
-  const [isIframeModalOpen, setIsIframeModalOpen] = useState(false);
   const [transactionData, setTransactionData] = useState<MandatosTransactionData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [iframeUrl, setIframeUrl] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
 
   // Hook mejorado que combina pestañas externas con bloqueo global
@@ -66,51 +60,12 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
     isExternalTabOpen
   });
 
-  // Ref para el iframe
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  // Referencias de iframe eliminadas - no se usan
 
   // Ref para el intervalo de verificación
   const intervalRef = useRef<number | undefined>(undefined);
 
-  /**
-   * Abre el modal con iframe para actualizar mandatos
-   */
-  const openIframeModal = useCallback(async (rut: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      console.log('🚀 Abriendo modal de iframe para mandatos, RUT:', rut);
-
-      // Iniciar transacción
-      const transaction = await mandatosTransactionService.iniciarTransaccionMandatos(rut);
-
-      console.log('📋 Datos de transacción recibidos:', transaction);
-      console.log('🔗 URL encriptada a establecer:', transaction.encryptedUrl);
-
-      setTransactionData(transaction);
-      setTransactionId(transaction.transactionId);
-
-      // Establecer la URL del iframe con validación
-      if (transaction.encryptedUrl && transaction.encryptedUrl.startsWith('http')) {
-        setIframeUrl(transaction.encryptedUrl);
-        console.log('✅ URL del iframe establecida correctamente:', transaction.encryptedUrl);
-        setIsIframeModalOpen(true);
-      } else {
-        throw new Error(`URL encriptada inválida: ${transaction.encryptedUrl}`);
-      }
-
-      // Iniciar verificación periódica del estado
-      startStatusCheck(transaction.transactionId);
-
-      console.log('✅ Modal de iframe abierto exitosamente');
-    } catch (err: any) {
-      console.error('❌ Error al abrir modal de iframe:', err);
-      setError(err.message || 'Error al abrir el modal de mandatos');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // Funciones de iframe eliminadas - sistema usa pestañas externas directamente
 
   /**
    * Detiene la verificación periódica
@@ -186,62 +141,11 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
     refreshMandatosData();
   }, [closeExternalTabBase, unlockButtons, refreshMandatosData]);
 
-  /**
-   * Cierra el modal de iframe
-   */
-  const closeIframeModal = useCallback(() => {
-    console.log('🔒 Cerrando modal de iframe');
+  // Función closeIframeModal eliminada - no se usa
 
-    // Detener verificación periódica
-    stopStatusCheck();
+  // Función startStatusCheck eliminada - no se usa
 
-    // Actualizar estado de transacción si existe
-    if (transactionId) {
-      mandatosTransactionService.updateTransactionStatus(transactionId, 'cancelled');
-    }
-
-    // Limpiar estados
-    setIsIframeModalOpen(false);
-    setTransactionData(null);
-    setTransactionId(null);
-    setIframeUrl(null);
-    setError(null);
-  }, [transactionId, stopStatusCheck]);
-
-  /**
-   * Inicia la verificación periódica del estado de la transacción
-   */
-  const startStatusCheck = useCallback((txId: string) => {
-    console.log('⏰ Iniciando verificación periódica para transacción:', txId);
-
-    intervalRef.current = window.setInterval(() => {
-      const currentTransaction = mandatosTransactionService.getTransactionData(txId);
-
-      if (currentTransaction) {
-        console.log('📊 Estado actual de transacción:', currentTransaction.status);
-
-        // Si la transacción se completó o hubo error, cerrar el modal
-        if (currentTransaction.status === 'completed' || currentTransaction.status === 'error') {
-          console.log('✅ Transacción finalizada, cerrando modal');
-          closeIframeModal();
-          refreshMandatosData();
-        }
-      } else {
-        console.log('⚠️ Transacción no encontrada, cerrando verificación');
-        stopStatusCheck();
-      }
-    }, 2000); // Verificar cada 2 segundos
-  }, [closeIframeModal, refreshMandatosData, stopStatusCheck]);
-
-  /**
-   * Maneja el evento de carga del iframe
-   */
-  const handleIframeLoad = useCallback(() => {
-    console.log('📄 Iframe cargado');
-
-    // Aquí se puede implementar lógica adicional cuando el iframe se carga
-    // Por ejemplo, verificar si la página cargó correctamente
-  }, []);
+  // Función handleIframeLoad eliminada - no se usa
 
   /**
    * Limpia recursos al desmontar el componente
@@ -278,18 +182,14 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
 
   return {
     // Estados
-    isIframeModalOpen,
     transactionData,
     loading: loading || externalTabLoading,
     error: error || externalTabError,
 
     // Acciones
-    openIframeModal,
-    closeIframeModal,
     refreshMandatosData,
 
-    // Datos del iframe
-    iframeUrl,
+    // Datos de transacción
     transactionId,
 
     // Funcionalidad de pestaña externa
@@ -304,11 +204,5 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
     transactionToken,
     hasActiveTransaction,
 
-    // Referencias internas (para uso interno del componente)
-    iframeRef,
-    handleIframeLoad
-  } as UseMandatosTransactionReturn & {
-    iframeRef: React.RefObject<HTMLIFrameElement>;
-    handleIframeLoad: () => void;
   };
 };

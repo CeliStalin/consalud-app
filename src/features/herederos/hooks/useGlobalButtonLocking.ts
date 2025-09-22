@@ -150,20 +150,6 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
           const testAccess = newTab.closed;
           console.log('🔍 [Global] Test de acceso a pestaña:', { testAccess });
 
-          // Si es un objeto mock, saltar verificaciones adicionales
-          if (newTab.constructor?.name === 'Object') {
-            console.log('🔍 [Global] Objeto mock detectado, saltando verificaciones adicionales...');
-          } else {
-            // Verificar si podemos acceder a otras propiedades
-            try {
-              const hasLocation = 'location' in newTab;
-              const locationAccess = hasLocation ? 'accessible' : 'not accessible';
-              console.log('🔍 [Global] Acceso a location:', { hasLocation, locationAccess });
-            } catch (locationError) {
-              console.log('🔍 [Global] Error al acceder a location (esperado por CORS):', locationError.message);
-            }
-          }
-
           if (testAccess) {
             console.error('❌ [Global] Pestaña se cerró inmediatamente después de abrirse');
             throw new Error('La pestaña se cerró inmediatamente después de abrirse');
