@@ -8,6 +8,8 @@ export interface UseGlobalButtonLockingReturn {
   error: string | null;
   tabUrl: string | null;
   transactionToken: string | null;
+  isOpeningTab: boolean; // Nuevo estado para prevenir apertura múltiple
+  // Eliminado: useIframeModal ya no se usa
 
   // Estados de bloqueo (del contexto global)
   isButtonsLocked: boolean;
@@ -38,6 +40,8 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
   const [error, setError] = useState<string | null>(null);
   const [tabUrl, setTabUrl] = useState<string | null>(null);
   const [transactionToken, setTransactionToken] = useState<string | null>(null);
+  const [isOpeningTab, setIsOpeningTab] = useState(false); // Prevenir apertura múltiple
+  // Eliminado: useIframeModal ya no se usa // Usar iframe modal
 
   // Referencias para el control de la pestaña
   const tabRef = useRef<Window | null>(null);
@@ -71,41 +75,44 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       isExternalTabOpen,
       tabRef: !!tabRef.current,
       loading,
-      error
+      error,
+      isOpeningTab
     });
 
+    // Prevenir apertura múltiple
+    if (isExternalTabOpen || isOpeningTab) {
+      console.warn('⚠️ [Global] Ya hay una pestaña externa abierta o se está abriendo una nueva');
+      return;
+    }
+
     try {
+      setIsOpeningTab(true);
       setLoading(true);
       setError(null);
 
       console.log('🚀 [Global] Abriendo pestaña externa:', url);
-      console.log('🔍 [Global] Estado antes de abrir:', { isExternalTabOpen, tabRef: !!tabRef.current });
+      console.log('🔍 [Global] Estado antes de abrir:', { isExternalTabOpen, tabRef: !!tabRef.current, isOpeningTab });
 
       // Verificar que la URL sea válida
       if (!url || !url.startsWith('http')) {
         throw new Error('URL inválida para abrir en pestaña externa');
       }
 
-      // Verificar si ya hay una pestaña abierta
-      if (isExternalTabOpen || tabRef.current) {
-        throw new Error('Ya hay una pestaña externa abierta. Cierre la pestaña actual antes de abrir una nueva.');
-      }
-
-      // ESTRATEGIA MEJORADA: Intentar múltiples métodos para abrir la pestaña real
-      console.log('🔄 [Global] Intentando abrir pestaña externa...');
+      // ESTRATEGIA SIMPLIFICADA: Solo permitir pestañas reales
+      console.log('🔄 [Global] Intentando abrir pestaña externa real...');
       let newTab: Window | null = null;
 
       // Método 1: window.open estándar
       try {
         newTab = window.open(url, '_blank', 'noopener,noreferrer');
-        console.log('🔄 [Global] window.open resultado (método 1):', {
+        console.log('🔄 [Global] window.open resultado:', {
           newTab: !!newTab,
           closed: newTab?.closed,
           newTabType: typeof newTab,
           newTabConstructor: newTab?.constructor?.name
         });
       } catch (error) {
-        console.warn('⚠️ [Global] Error en window.open (método 1):', error);
+        console.warn('⚠️ [Global] Error en window.open:', error);
       }
 
       // Método 2: Si falló, intentar sin restricciones de seguridad
@@ -133,11 +140,11 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
             tempWindow.location.href = url;
             newTab = tempWindow;
             console.log('🔄 [Global] window.open resultado (método 3):', {
-        newTab: !!newTab,
-        closed: newTab?.closed,
-        newTabType: typeof newTab,
-        newTabConstructor: newTab?.constructor?.name
-      });
+              newTab: !!newTab,
+              closed: newTab?.closed,
+              newTabType: typeof newTab,
+              newTabConstructor: newTab?.constructor?.name
+            });
           }
         } catch (error) {
           console.warn('⚠️ [Global] Error en window.open (método 3):', error);
@@ -146,9 +153,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
 
       // Método 4: Si todo falla, usar un enfoque de redirección
       if (!newTab) {
-        console.warn('⚠️ [Global] Todos los métodos fallaron, usando redirección directa...');
-
-        // Crear un enlace temporal y hacer clic en él
+        console.log('🔄 [Global] Intentando con enlace programático...');
         const link = document.createElement('a');
         link.href = url;
         link.target = '_blank';
@@ -160,51 +165,28 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
 
         // Esperar un momento y verificar si se abrió
         setTimeout(() => {
-          // Verificar si el usuario perdió el foco (indicando que se abrió la pestaña)
-          if (document.visibilityState === 'hidden' || !document.hasFocus()) {
-            console.log('✅ [Global] Pestaña detectada como abierta (usuario perdió foco)');
-            // Crear un objeto mock solo si confirmamos que se abrió
-            newTab = {
-              closed: false,
-              close: () => console.log('Mock tab closed'),
-              focus: () => console.log('Mock tab focused'),
-              openTime: Date.now(),
-              isMock: true
-            } as unknown as Window;
-          } else {
-            console.error('❌ [Global] No se pudo abrir la pestaña externa');
-            throw new Error('No se pudo abrir la pestaña externa. Verifique que los popups estén permitidos y que la URL sea accesible.');
+          // Verificar si se abrió una nueva ventana
+          if (window.focus) {
+            window.focus();
           }
-        }, 1000);
+        }, 100);
       }
 
-      // Método 5: Si todos los métodos fallaron, usar mock inteligente como último recurso
+      // Si todos los métodos fallaron, lanzar error
       if (!newTab) {
-        console.warn('⚠️ [Global] Todos los métodos de apertura fallaron, usando mock inteligente como último recurso...');
-        console.warn('⚠️ [Global] Esto puede deberse a:');
-        console.warn('   - Bloqueador de popups muy estricto');
-        console.warn('   - Restricciones de seguridad del navegador');
-        console.warn('   - Configuración de CORS o políticas de seguridad');
-
-        // Crear un mock inteligente que simule una pestaña abierta
-        newTab = {
-          closed: false,
-          close: () => console.log('Mock tab closed'),
-          focus: () => console.log('Mock tab focused'),
-          openTime: Date.now(),
-          isMock: true,
-          // Agregar propiedades adicionales para mejor detección
-          lastActivity: Date.now(),
-          userInteractions: 0
-        } as unknown as Window;
-
-        console.log('✅ [Global] Mock inteligente creado - la pestaña debería haberse abierto en el navegador');
-        console.log('✅ [Global] El usuario puede usar el botón de desbloqueo manual cuando termine');
+        const errorMessage = 'No se pudo abrir la pestaña externa. Verifique que los popups estén permitidos y que el navegador no esté bloqueando la apertura de nuevas ventanas.';
+        console.error('❌ [Global] Todos los métodos de apertura fallaron');
+        console.error('❌ [Global] Posibles causas:');
+        console.error('   - Bloqueador de popups activo');
+        console.error('   - Restricciones de seguridad del navegador');
+        console.error('   - Configuración de CORS o políticas de seguridad');
+        throw new Error(errorMessage);
       }
 
+      // Verificar que la pestaña se abrió correctamente
       if (!newTab) {
-        console.error('❌ [Global] No se pudo abrir la pestaña después de todos los intentos');
-        throw new Error('No se pudo abrir la pestaña externa. Verifique la configuración del navegador.');
+        console.error('❌ [Global] Error crítico: newTab es null');
+        throw new Error('Error interno: No se pudo abrir la pestaña externa.');
       }
 
       // Verificación adicional: si la pestaña se abre pero se cierra inmediatamente
@@ -236,13 +218,18 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
         try {
           console.log('🔍 [Global] Iniciando verificación de acceso a pestaña...');
 
-          // Intentar acceder a la pestaña para verificar que está realmente abierta
-          const testAccess = newTab?.closed;
-          console.log('🔍 [Global] Test de acceso a pestaña:', { testAccess });
+          // Para objetos mock, no verificar closed ya que siempre será false
+          if ((newTab as any).isMock) {
+            console.log('✅ [Global] Objeto mock detectado - saltando verificación de closed');
+          } else {
+            // Solo verificar closed para pestañas reales
+            const testAccess = newTab?.closed;
+            console.log('🔍 [Global] Test de acceso a pestaña:', { testAccess });
 
-          if (testAccess) {
-            console.error('❌ [Global] Pestaña se cerró inmediatamente después de abrirse');
-            throw new Error('La pestaña se cerró inmediatamente después de abrirse');
+            if (testAccess) {
+              console.error('❌ [Global] Pestaña se cerró inmediatamente después de abrirse');
+              throw new Error('La pestaña se cerró inmediatamente después de abrirse');
+            }
           }
 
           console.log('✅ [Global] Pestaña accesible, procediendo con bloqueo...');
@@ -281,8 +268,9 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
             }, 2000); // 2 segundos después de abrir
           }
 
-          // Intentar detectar el cierre real de la pestaña externa usando postMessage
-          if (newTab && !(newTab as any).isMock) {
+        // Intentar detectar el cierre real de la pestaña externa usando postMessage
+        // Solo para pestañas reales, no para objetos mock
+        if (newTab && !(newTab as any).isMock && newTab.document) {
             try {
               // Inyectar script de monitoreo en la pestaña externa
               setTimeout(() => {
@@ -362,18 +350,32 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
           console.error('❌ [Global] Detalles del error de acceso:', {
             errorMessage: (accessError as Error).message,
             errorStack: (accessError as Error).stack,
-            newTabClosed: newTab?.closed
+            newTabClosed: newTab?.closed,
+            isMock: (newTab as any).isMock
           });
-          throw new Error('No se pudo acceder a la pestaña abierta');
+
+          // Para objetos mock, no lanzar excepción ya que es normal
+          if ((newTab as any).isMock) {
+            console.log('✅ [Global] Error ignorado para objeto mock - continuando normalmente');
+          } else {
+            throw new Error('No se pudo acceder a la pestaña abierta');
+          }
         }
       } else {
         console.error('❌ [Global] Pestaña no se abrió correctamente:', {
           newTab: !!newTab,
           closed: newTab?.closed,
           newTabType: typeof newTab,
-          newTabConstructor: newTab?.constructor?.name
+          newTabConstructor: newTab?.constructor?.name,
+          isMock: (newTab as any).isMock
         });
-        throw new Error('La pestaña se cerró inmediatamente o no se pudo abrir correctamente');
+
+        // Para objetos mock, no lanzar excepción ya que es normal
+        if ((newTab as any).isMock) {
+          console.log('✅ [Global] Objeto mock detectado en else - continuando normalmente');
+        } else {
+          throw new Error('La pestaña se cerró inmediatamente o no se pudo abrir correctamente');
+        }
       }
     } catch (err: any) {
       console.error('❌ [Global] Error al abrir pestaña externa:', err);
@@ -383,8 +385,9 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       console.log('🔄 [Global] Re-lanzando excepción...');
       throw err;
     } finally {
-      console.log('🔄 [Global] FINALLY - setLoading(false)');
+      console.log('🔄 [Global] FINALLY - setLoading(false) y setIsOpeningTab(false)');
       setLoading(false);
+      setIsOpeningTab(false);
     }
   }, [isExternalTabOpen, lockButtons]);
 
@@ -423,6 +426,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
     setTabUrl(null);
     setError(null);
     setTransactionToken(null);
+    // Eliminado: setUseIframeModal ya no se usa
 
     // Desbloquear botones si estaban bloqueados por pestaña externa
     if (isLockedByReason('Pestaña externa abierta - Token:')) {
@@ -445,80 +449,8 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
     }
 
     try {
-      // Si es un objeto mock, usar detección alternativa
-      if (tabRef.current.constructor?.name === 'Object' || (tabRef.current as any).isMock) {
-        console.log('🔍 [Global] Verificando pestaña mock - usando detección alternativa');
-
-        const timeSinceOpen = Date.now() - (tabRef.current as any).openTime;
-        const minTimeOpen = 5 * 1000; // 5 segundos mínimo antes de considerar desbloqueo
-
-        console.log('🔍 [Global] Tiempo transcurrido desde apertura:', Math.round(timeSinceOpen / 1000), 'segundos');
-
-        // Verificar si el usuario está de vuelta en la pestaña principal
-        if (document.hasFocus() &&
-            document.visibilityState === 'visible' &&
-            timeSinceOpen > minTimeOpen) {
-
-          const wasHidden = (tabRef.current as any).wasHidden || false;
-          const focusChanges = (tabRef.current as any).focusChanges || 0;
-          const lastVisibilityChange = (tabRef.current as any).lastVisibilityChange || 0;
-          const timeSinceVisibilityChange = Date.now() - lastVisibilityChange;
-
-          console.log('🔍 [Global] Estado del mock:', {
-            wasHidden,
-            focusChanges,
-            timeSinceVisibilityChange: Math.round(timeSinceVisibilityChange / 1000),
-            timeSinceOpenSeconds: Math.round(timeSinceOpen / 1000)
-          });
-
-        // ESTRATEGIA INTELIGENTE: Detectar si el usuario regresó después de estar en la pestaña externa
-        console.log('🔍 [Global] Objeto mock detectado - usando detección inteligente');
-
-        // Si el usuario regresó recientemente Y estuvo en la pestaña externa, asumir que la cerró
-        const hasReturnedRecently = timeSinceVisibilityChange < 5000; // 5 segundos
-        const hasEnoughTimePassed = timeSinceOpen > 10000; // 10 segundos mínimo
-        const wasActuallyOnExternalTab = wasHidden && focusChanges >= 2;
-
-        // Timeout de emergencia más corto (30 segundos)
-        const hasEmergencyTimeout = timeSinceOpen > 30000; // 30 segundos
-
-        if (hasEmergencyTimeout) {
-          console.log('🔄 [Global] Desbloqueo automático - timeout de emergencia alcanzado');
-          console.log('🔍 [Global] Condiciones cumplidas:', {
-            hasEmergencyTimeout,
-            timeSinceOpenSeconds: Math.round(timeSinceOpen / 1000),
-            mensaje: 'Timeout de emergencia - desbloqueando automáticamente después de 30 segundos'
-          });
-          closeExternalTab();
-          return false;
-        } else if (hasReturnedRecently && hasEnoughTimePassed && wasActuallyOnExternalTab) {
-          console.log('🔄 [Global] Desbloqueo automático - usuario regresó después de estar en pestaña externa');
-          console.log('🔍 [Global] Condiciones cumplidas:', {
-            hasReturnedRecently,
-            hasEnoughTimePassed,
-            wasActuallyOnExternalTab,
-            timeSinceOpenSeconds: Math.round(timeSinceOpen / 1000),
-            focusChanges,
-            mensaje: 'Usuario regresó después de estar en pestaña externa - asumiendo que la cerró'
-          });
-          closeExternalTab();
-          return false;
-        } else {
-          console.log('🔍 [Global] Usuario volvió a la pestaña principal - NO desbloqueando automáticamente (objeto mock)');
-          console.log('🔍 [Global] Condiciones actuales:', {
-            hasReturnedRecently,
-            hasEnoughTimePassed,
-            wasActuallyOnExternalTab,
-            hasEmergencyTimeout,
-            timeSinceOpenSeconds: Math.round(timeSinceOpen / 1000),
-            focusChanges,
-            mensaje: 'Use el botón de desbloqueo manual si cerró la pestaña externa'
-          });
-        }
-        }
-
-        return true; // Asumir que está abierta si no hay evidencia clara de cierre
-      }
+      // NO HAY OBJETOS MOCK - Solo pestañas reales
+      console.log('🔍 [Global] Verificando pestaña real');
 
       // Para pestañas reales, verificar directamente si están cerradas
       if (tabRef.current.closed) {
@@ -730,18 +662,19 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
   }, [isExternalTabOpen, closeExternalTab]);
 
     /**
-     * Timeout adicional para objetos mock - desbloquear automáticamente después de 15 segundos
+     * Timeout de emergencia para objetos mock - desbloquear automáticamente después de 5 minutos
+     * Solo como medida de seguridad extrema
      */
     useEffect(() => {
       if (!isExternalTabOpen || !tabRef.current) return;
       if (!(tabRef.current as any).isMock) return; // Solo para objetos mock
 
-      const mockTimeout = setTimeout(() => {
-        console.warn('⚠️ [Global] Timeout para objeto mock: desbloqueando después de 15 segundos');
+      const emergencyTimeout = setTimeout(() => {
+        console.warn('⚠️ [Global] Timeout de emergencia para objeto mock: desbloqueando después de 5 minutos');
         closeExternalTab();
-      }, 15000); // 15 segundos
+      }, 300000); // 5 minutos (300 segundos)
 
-      return () => clearTimeout(mockTimeout);
+      return () => clearTimeout(emergencyTimeout);
     }, [isExternalTabOpen, closeExternalTab]);
 
   /**
@@ -776,6 +709,8 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
     error,
     tabUrl,
     transactionToken,
+    isOpeningTab, // Nuevo estado para prevenir apertura múltiple
+    // Eliminado: useIframeModal ya no se usa
 
     // Estados de bloqueo
     isButtonsLocked,

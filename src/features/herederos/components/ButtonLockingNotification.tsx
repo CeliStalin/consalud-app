@@ -76,7 +76,7 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
   const getLockIcon = (): string => {
     if (!lockReason) return '🔒';
 
-    if (lockReason.includes('pestaña externa')) return '🌐';
+    if (lockReason.toLowerCase().includes('pestaña externa')) return '🌐';
     if (lockReason.includes('procesando')) return '⏳';
     if (lockReason.includes('error')) return '❌';
     if (lockReason.includes('cargando')) return '🔄';
@@ -88,7 +88,7 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
   const getLockMessage = (): string => {
     if (!lockReason) return 'Operación en progreso';
 
-    if (lockReason.includes('pestaña externa')) {
+    if (lockReason.toLowerCase().includes('pestaña externa')) {
       return 'Formulario de mandatos abierto en nueva pestaña';
     }
     if (lockReason.includes('procesando')) {
@@ -108,7 +108,7 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
   const getLockInstructions = (): string => {
     if (!lockReason) return 'Por favor espere...';
 
-    if (lockReason.includes('pestaña externa')) {
+    if (lockReason.toLowerCase().includes('pestaña externa')) {
       return 'Complete el formulario en la nueva pestaña y ciérrela para continuar. La página permanecerá bloqueada hasta que cierre la pestaña externa.';
     }
     if (lockReason.includes('procesando')) {
@@ -162,7 +162,7 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
             )}
 
             {/* Notificación especial si ha pasado mucho tiempo */}
-            {lockDuration && lockDuration > 5000 && lockReason?.includes('pestaña externa') && (
+            {lockDuration && lockDuration > 5000 && lockReason?.toLowerCase().includes('pestaña externa') && (
               <div style={{
                 backgroundColor: '#fff3cd',
                 border: '1px solid #ffeaa7',
@@ -179,7 +179,7 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
             )}
 
             {/* Botón de desbloqueo manual - SIEMPRE visible para pestañas externas */}
-            {lockReason?.includes('pestaña externa') && (
+            {lockReason?.toLowerCase().includes('pestaña externa') && (
               <div className="manual-unlock-section" style={{ marginTop: '20px', textAlign: 'center' }}>
                 <p style={{ fontSize: '16px', color: '#333', marginBottom: '15px', fontWeight: 'bold' }}>
                   {lockDuration && lockDuration > 1000

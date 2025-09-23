@@ -4,8 +4,10 @@ import { DOCUMENTOS_MESSAGES } from '../constants';
 import { useDocumentos } from '../hooks/useDocumentos';
 import { useMandatosTransaction } from '../hooks/useMandatosTransaction';
 import { createSolicitante, createSolicitud, fetchTitularByRut, obtenerDocumentosAlmacenados } from '../services/herederosService';
+import { mandatosTransactionService } from '../services/mandatosTransactionService';
 import { MandatoResult, mockMandatoService } from '../services/mockMandatoService';
 // import MandatosIframeModal from './MandatosIframeModal'; // No utilizado - sistema usa pestañas externas
+// Eliminado: ExternalFormModal ya no se usa
 import { useStepper } from './Stepper';
 import './styles/DetalleMandatoModal.css';
 
@@ -58,6 +60,8 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [mandatoInfo, setMandatoInfo] = useState<MandatoResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showManualUrl, setShowManualUrl] = useState(false);
+  const [manualUrl, setManualUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const { setStep } = useStepper();
@@ -68,10 +72,14 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
     loading: iframeLoading,
     // Funcionalidad de pestaña externa
     isExternalTabOpen,
+    isOpeningTab,
+    // Eliminado: useIframeModal ya no se usa
     openExternalTab,
     // Funcionalidad de bloqueo de botones
     isButtonsLocked,
     lockReason,
+    lockButtons,
+    unlockButtons,
     // Token de transacción
     transactionToken,
     hasActiveTransaction
@@ -98,9 +106,9 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
   // Función para manejar el clic en "Actualizar Mandato"
   const handleActualizarMandato = async () => {
     try {
-      // Verificar si ya hay una pestaña externa abierta
-      if (isExternalTabOpen) {
-        throw new Error('Ya hay una pestaña externa abierta. Cierre la pestaña actual antes de abrir una nueva.');
+      // Verificar si ya hay una pestaña externa abierta o se está abriendo una
+      if (isExternalTabOpen || isOpeningTab) {
+        throw new Error('Ya hay una pestaña externa abierta o se está abriendo una nueva. Espere a que se complete la operación.');
       }
 
       // Obtener RUT del session storage
@@ -128,10 +136,45 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
       }
 
       console.log('🔄 Abriendo pestaña externa para actualización de mandatos, RUT:', rutHeredero);
-      await openExternalTab(rutHeredero);
+
+      // Bloquear botones ANTES de intentar abrir la pestaña
+      lockButtons('Abriendo pestaña externa...');
+
+      try {
+        await openExternalTab(rutHeredero);
+        console.log('✅ Pestaña externa abierta exitosamente');
+      } catch (openError) {
+        console.error('❌ Error al abrir pestaña externa:', openError);
+        // Desbloquear botones si falla la apertura
+        unlockButtons();
+        throw openError; // Re-lanzar el error para que se capture en el catch principal
+      }
     } catch (err: any) {
       console.error('❌ Error al abrir pestaña externa:', err);
-      setError(err.message || 'Error al abrir el formulario de actualización');
+
+      // Asegurar que los botones estén desbloqueados
+      unlockButtons();
+
+      // Mostrar mensaje de error más específico
+      if (err.message?.includes('popups estén permitidos')) {
+        setError('No se pudo abrir la pestaña externa. Por favor, permita popups para este sitio y vuelva a intentar. Alternativamente, puede copiar la URL y abrirla manualmente en una nueva pestaña.');
+
+        // Intentar obtener la URL que se intentó abrir
+        try {
+          const rutHeredero = sessionStorage.getItem('RutCompleto');
+          if (rutHeredero) {
+            const transactionData = await mandatosTransactionService.iniciarTransaccionMandatos(rutHeredero);
+            if (transactionData?.encryptedUrl) {
+              setManualUrl(transactionData.encryptedUrl);
+              setShowManualUrl(true);
+            }
+          }
+        } catch (urlError) {
+          console.warn('No se pudo obtener la URL para apertura manual:', urlError);
+        }
+      } else {
+        setError(err.message || 'Error al abrir el formulario de actualización');
+      }
     }
   };
 
@@ -712,15 +755,23 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
             Cancelar
           </ConsaludCore.Button>
           {mandatoInfo && (
-            <ConsaludCore.Button
-              variant="secondary"
-              onClick={handleActualizarMandato}
-              disabled={iframeLoading || isButtonsLocked}
-              className="mr-3"
-              title={isButtonsLocked ? `Botones bloqueados: ${lockReason}` : ''}
-            >
-              {iframeLoading ? 'Cargando...' : isButtonsLocked ? 'Pestaña Externa Abierta' : 'Actualizar Mandato'}
-            </ConsaludCore.Button>
+        <ConsaludCore.Button
+          variant="secondary"
+          onClick={handleActualizarMandato}
+          disabled={iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl}
+          className="mr-3"
+          title={
+            isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
+            isOpeningTab ? 'Abriendo pestaña externa...' :
+            showManualUrl ? 'Modal de apertura manual abierto' : ''
+          }
+        >
+          {iframeLoading ? 'Cargando...' :
+           isOpeningTab ? 'Abriendo...' :
+           isButtonsLocked ? 'Pestaña Externa Abierta' :
+           showManualUrl ? 'Modal Abierto' :
+           'Actualizar Mandato'}
+        </ConsaludCore.Button>
           )}
           <ConsaludCore.Button
             variant="primary"
@@ -733,7 +784,146 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
         </div>
       </div>
 
-      {/* Modal de iframe eliminado - sistema usa pestañas externas directamente */}
+        {/* Modal para mostrar URL manual cuando falla window.open */}
+        {showManualUrl && manualUrl && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999
+          }}>
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              padding: '20px',
+              maxWidth: '600px',
+              width: '90%',
+              maxHeight: '80vh',
+              overflow: 'auto',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '20px',
+                borderBottom: '1px solid #dee2e6',
+                paddingBottom: '10px'
+              }}>
+                <h3 style={{ margin: 0, color: '#333' }}>Abrir Formulario Manualmente</h3>
+                <button
+                  onClick={() => setShowManualUrl(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    color: '#666'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                <div style={{
+                  backgroundColor: '#fff3cd',
+                  border: '1px solid #ffeaa7',
+                  borderRadius: '8px',
+                  padding: '15px',
+                  marginBottom: '20px'
+                }}>
+                  <h4 style={{ color: '#856404', margin: '0 0 10px 0' }}>
+                    ⚠️ No se pudo abrir la pestaña automáticamente
+                  </h4>
+                  <p style={{ color: '#856404', margin: '0' }}>
+                    Su navegador está bloqueando la apertura de popups. Puede abrir el formulario manualmente copiando la URL de abajo.
+                  </p>
+                </div>
+
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    URL del formulario:
+                  </label>
+                  <div style={{
+                    display: 'flex',
+                    gap: '10px',
+                    alignItems: 'center',
+                    backgroundColor: '#f8f9fa',
+                    border: '1px solid #dee2e6',
+                    borderRadius: '4px',
+                    padding: '10px'
+                  }}>
+                    <input
+                      type="text"
+                      value={manualUrl}
+                      readOnly
+                      style={{
+                        flex: 1,
+                        padding: '8px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        fontSize: '14px',
+                        fontFamily: 'monospace'
+                      }}
+                    />
+                    <ConsaludCore.Button
+                      variant="secondary"
+                      onClick={() => {
+                        navigator.clipboard.writeText(manualUrl);
+                        alert('URL copiada al portapapeles');
+                      }}
+                    >
+                      📋 Copiar
+                    </ConsaludCore.Button>
+                  </div>
+                </div>
+
+                <div style={{
+                  backgroundColor: '#e7f3ff',
+                  border: '1px solid #b3d9ff',
+                  borderRadius: '6px',
+                  padding: '15px',
+                  textAlign: 'left',
+                  marginBottom: '20px'
+                }}>
+                  <h5 style={{ margin: '0 0 10px 0', color: '#0066cc' }}>Instrucciones:</h5>
+                  <ol style={{ margin: '0', paddingLeft: '20px', color: '#0066cc' }}>
+                    <li>Copie la URL de arriba</li>
+                    <li>Abra una nueva pestaña en su navegador</li>
+                    <li>Pegue la URL en la barra de direcciones</li>
+                    <li>Complete el formulario en la nueva pestaña</li>
+                    <li>Regrese a esta pestaña cuando termine</li>
+                  </ol>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                  <ConsaludCore.Button
+                    variant="secondary"
+                    onClick={() => setShowManualUrl(false)}
+                  >
+                    Cerrar
+                  </ConsaludCore.Button>
+                  <ConsaludCore.Button
+                    variant="primary"
+                    onClick={() => {
+                      window.open(manualUrl, '_blank');
+                      setShowManualUrl(false);
+                    }}
+                  >
+                    🌐 Intentar Abrir
+                  </ConsaludCore.Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 };

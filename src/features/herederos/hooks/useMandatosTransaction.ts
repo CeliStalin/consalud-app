@@ -16,6 +16,8 @@ export interface UseMandatosTransactionReturn {
 
   // Funcionalidad de pestaña externa
   isExternalTabOpen: boolean;
+  isOpeningTab: boolean; // Nuevo estado para prevenir apertura múltiple
+  // Eliminado: useIframeModal ya no se usa
   openExternalTab: (rut: string) => Promise<void>;
   closeExternalTab: () => void;
   externalTabUrl: string | null;
@@ -23,6 +25,8 @@ export interface UseMandatosTransactionReturn {
   // Funcionalidad de bloqueo de botones
   isButtonsLocked: boolean;
   lockReason: string | null;
+  lockButtons: (reason: string) => void;
+  unlockButtons: () => void;
   transactionToken: string | null;
   hasActiveTransaction: boolean;
 }
@@ -40,6 +44,8 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
   // Hook mejorado que combina pestañas externas con bloqueo global
   const {
     isExternalTabOpen,
+    isOpeningTab,
+    // Eliminado: useIframeModal ya no se usa
     loading: externalTabLoading,
     error: externalTabError,
     tabUrl: externalTabUrl,
@@ -196,6 +202,8 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
 
     // Funcionalidad de pestaña externa
     isExternalTabOpen,
+    isOpeningTab,
+    // Eliminado: useIframeModal ya no se usa
     openExternalTab,
     closeExternalTab,
     externalTabUrl,
@@ -203,6 +211,8 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
     // Funcionalidad de bloqueo de botones
     isButtonsLocked,
     lockReason,
+    lockButtons,
+    unlockButtons,
     transactionToken,
     hasActiveTransaction,
 
