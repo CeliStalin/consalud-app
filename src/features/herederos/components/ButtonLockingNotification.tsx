@@ -161,53 +161,100 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
               </div>
             )}
 
-            {/* Botón de desbloqueo manual para casos de emergencia */}
+            {/* Notificación especial si ha pasado mucho tiempo */}
+            {lockDuration && lockDuration > 5000 && lockReason?.includes('pestaña externa') && (
+              <div style={{
+                backgroundColor: '#fff3cd',
+                border: '1px solid #ffeaa7',
+                borderRadius: '6px',
+                padding: '10px',
+                marginTop: '15px',
+                textAlign: 'center'
+              }}>
+                <p style={{ margin: '0', fontSize: '14px', color: '#856404' }}>
+                  ⚠️ <strong>¿Cerraste la pestaña externa por error?</strong><br/>
+                  Si ya completaste el formulario o cerraste la pestaña, usa el botón de desbloqueo manual.
+                </p>
+              </div>
+            )}
+
+            {/* Botón de desbloqueo manual - SIEMPRE visible para pestañas externas */}
             {lockReason?.includes('pestaña externa') && (
               <div className="manual-unlock-section" style={{ marginTop: '20px', textAlign: 'center' }}>
-                <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
-                  {lockDuration && lockDuration > 5
-                    ? 'Si ya cerró la pestaña externa, puede desbloquear manualmente:'
+                <p style={{ fontSize: '16px', color: '#333', marginBottom: '15px', fontWeight: 'bold' }}>
+                  {lockDuration && lockDuration > 1000
+                    ? '¿Ya completaste el formulario en la pestaña externa?'
                     : 'Complete el formulario en la nueva pestaña y ciérrela para continuar'
                   }
                 </p>
-                {lockDuration && lockDuration > 5 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-                    <button
-                      onClick={() => {
-                        console.log('🔓 [Manual] Usuario solicitó desbloqueo manual');
-                        unlockButtons();
-                      }}
-                      style={{
-                        padding: '12px 24px',
-                        backgroundColor: '#28a745',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        fontSize: '18px',
-                        fontWeight: 'bold',
-                        boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-                        transition: 'all 0.2s',
-                        minWidth: '200px'
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.backgroundColor = '#218838';
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.4)';
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.backgroundColor = '#28a745';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
-                      }}
-                    >
-                      ✅ Desbloquear Ahora
-                    </button>
-                    <p style={{ fontSize: '12px', color: '#999', margin: '0' }}>
-                      Use este botón si ya cerró la pestaña externa
+
+                {/* Mensaje informativo sobre el estado de la pestaña */}
+                <div style={{
+                  backgroundColor: '#e7f3ff',
+                  border: '1px solid #b3d9ff',
+                  borderRadius: '6px',
+                  padding: '10px 15px',
+                  marginBottom: '15px',
+                  fontSize: '14px',
+                  color: '#0066cc'
+                }}>
+                  <p style={{ margin: '0 0 8px 0' }}>
+                    <strong>ℹ️ Información:</strong> La pestaña externa debería haberse abierto en tu navegador.
+                  </p>
+                  <p style={{ margin: '0', fontSize: '13px', color: '#004499' }}>
+                    <strong>Importante:</strong> El sistema NO se desbloqueará automáticamente. Debes usar el botón de desbloqueo manual cuando termines.
+                  </p>
+                </div>
+
+        {/* Botón principal - siempre visible */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+          <button
+            onClick={() => {
+              console.log('🔓 [Manual] Usuario solicitó desbloqueo manual');
+              unlockButtons();
+            }}
+            style={{
+              padding: '15px 30px',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              boxShadow: '0 6px 12px rgba(0,123,255,0.4)',
+              transition: 'all 0.3s',
+              minWidth: '250px',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              animation: 'pulse 2s infinite'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = '#0056b3';
+              e.currentTarget.style.transform = 'translateY(-3px)';
+              e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,123,255,0.6)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = '#007bff';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,123,255,0.4)';
+            }}
+                  >
+                    🔓 Desbloquear Ahora
+                  </button>
+
+                  <div style={{
+                    backgroundColor: '#e7f3ff',
+                    border: '1px solid #b3d9ff',
+                    borderRadius: '8px',
+                    padding: '10px 15px',
+                    maxWidth: '400px'
+                  }}>
+                    <p style={{ margin: '0', fontSize: '14px', color: '#0066cc' }}>
+                      <strong>💡 Consejo:</strong> Use este botón cuando haya terminado de trabajar en la pestaña externa o si la cerró por error.
                     </p>
                   </div>
-                )}
+                </div>
               </div>
             )}
           </div>
