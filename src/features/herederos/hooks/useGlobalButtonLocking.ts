@@ -101,17 +101,44 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
         newTabConstructor: newTab?.constructor?.name
       });
 
-      // SOLUCIÓN TEMPORAL: Si newTab es null pero sabemos que la pestaña se abre,
-      // crear un objeto mock para continuar con el flujo
+      // SOLUCIÓN MEJORADA: Si newTab es null, usar detección alternativa
       if (!newTab) {
-        console.warn('⚠️ [Global] window.open retornó null, pero la pestaña se abre. Creando referencia mock...');
+        console.warn('⚠️ [Global] window.open retornó null, usando detección alternativa...');
 
-        // Crear un objeto mock que simule una pestaña abierta
+        // En lugar de crear un mock, usar un enfoque diferente
+        // Verificar si la pestaña realmente se abrió usando el Page Visibility API
+        let tabActuallyOpened = false;
+
+        // Intentar detectar si la pestaña se abrió monitoreando el foco
+        const focusCheck = () => {
+          // Si el usuario pierde el foco inmediatamente después de abrir la pestaña,
+          // es probable que la pestaña se haya abierto
+          if (document.visibilityState === 'hidden' || !document.hasFocus()) {
+            tabActuallyOpened = true;
+            console.log('✅ [Global] Pestaña detectada como abierta (usuario perdió foco)');
+          }
+        };
+
+        // Verificar inmediatamente
+        setTimeout(focusCheck, 100);
+        setTimeout(focusCheck, 500);
+        setTimeout(focusCheck, 1000);
+
+        // Si no se detectó que se abrió, lanzar error
+        setTimeout(() => {
+          if (!tabActuallyOpened) {
+            console.error('❌ [Global] No se pudo confirmar que la pestaña se abrió');
+            throw new Error('No se pudo abrir la pestaña externa. Verifique que los popups estén permitidos.');
+          }
+        }, 2000);
+
+        // Crear un objeto mock solo si confirmamos que se abrió
         newTab = {
           closed: false,
           close: () => console.log('Mock tab closed'),
           focus: () => console.log('Mock tab focused'),
-          openTime: Date.now() // Timestamp para verificación de tiempo mínimo
+          openTime: Date.now(), // Timestamp para verificación de tiempo mínimo
+          isMock: true // Marcar como mock para detección especial
         } as unknown as Window;
 
         console.log('✅ [Global] Referencia mock creada, continuando con bloqueo...');
@@ -261,40 +288,76 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
 
     try {
       // Si es un objeto mock, usar detección alternativa
-      if (tabRef.current.constructor?.name === 'Object') {
+      if (tabRef.current.constructor?.name === 'Object' || (tabRef.current as any).isMock) {
         console.log('🔍 [Global] Verificando pestaña mock - usando detección alternativa');
 
-        // Para objetos mock, usar una estrategia más conservadora
-        // Solo desbloquear si el usuario hace clic en la pestaña principal
-        // y ha pasado un tiempo mínimo desde que se abrió la pestaña
+        // Para objetos mock, usar detección basada en Page Visibility API
+        // Detectar cuando el usuario vuelve a la pestaña principal después de haber estado en la externa
 
-        // Verificar si ha pasado tiempo suficiente (5 segundos mínimo)
         const timeSinceOpen = Date.now() - (tabRef.current as any).openTime;
-        const minTimeOpen = 5000; // 5 segundos
+        const minTimeOpen = 5 * 1000; // 5 segundos mínimo antes de considerar desbloqueo
 
+        console.log('🔍 [Global] Tiempo transcurrido desde apertura:', Math.round(timeSinceOpen / 1000), 'segundos');
+
+        // Verificar si el usuario está de vuelta en la pestaña principal
         if (document.hasFocus() &&
             document.visibilityState === 'visible' &&
             timeSinceOpen > minTimeOpen) {
-          console.log('🔄 [Global] Usuario enfocado en pestaña principal después de tiempo mínimo - asumiendo cierre de pestaña externa');
+
+          // Verificar si ha habido un cambio de visibilidad reciente
+          // (esto indica que el usuario volvió de otra pestaña)
+          const lastVisibilityChange = (tabRef.current as any).lastVisibilityChange || 0;
+          const timeSinceVisibilityChange = Date.now() - lastVisibilityChange;
+
+          // Si el usuario volvió a la pestaña principal recientemente (últimos 3 segundos)
+          // y ha pasado tiempo suficiente desde que se abrió la pestaña externa
+          if (timeSinceVisibilityChange < 3000 && timeSinceOpen > 10000) {
+            console.log('🔄 [Global] Usuario volvió a la pestaña principal recientemente - asumiendo cierre de pestaña externa');
+            closeExternalTab();
+            return false;
+          }
+        }
+
+        return true; // Asumir que está abierta si no hay evidencia clara de cierre
+      }
+
+      // Para ventanas reales, usar la verificación normal
+      try {
+        const isClosed = tabRef.current.closed;
+
+        if (isClosed) {
+          console.log('📋 [Global] Pestaña externa cerrada detectada (closed=true)');
           closeExternalTab();
           return false;
         }
 
-        return true; // Asumir que está abierta si no hay evidencia de cierre
-      }
+        // Verificación adicional: intentar acceder a propiedades de la ventana
+        // para confirmar que realmente está abierta
+        try {
+          // Intentar acceder a una propiedad que solo existe en ventanas abiertas
+          const hasLocation = 'location' in tabRef.current;
+          const hasDocument = 'document' in tabRef.current;
 
-      // Para ventanas reales, usar la verificación normal
-      const isClosed = tabRef.current.closed;
+          if (!hasLocation && !hasDocument) {
+            console.log('📋 [Global] Pestaña externa parece estar cerrada (sin location/document)');
+            closeExternalTab();
+            return false;
+          }
+        } catch (accessError) {
+          // Si no podemos acceder a las propiedades, asumir que está cerrada
+          console.log('📋 [Global] Pestaña externa cerrada (error al acceder a propiedades):', accessError);
+          closeExternalTab();
+          return false;
+        }
 
-      if (isClosed) {
-        console.log('📋 [Global] Pestaña externa cerrada detectada (closed=true)');
+        // Si llegamos aquí, la pestaña está abierta
+        return true;
+      } catch (err) {
+        // Si hay cualquier error al acceder a la ventana, asumir que está cerrada
+        console.log('📋 [Global] Pestaña externa cerrada (error general):', err);
         closeExternalTab();
         return false;
       }
-
-      // Si llegamos aquí, la pestaña está abierta
-      // No necesitamos verificar location porque puede estar en un dominio diferente
-      return true;
     } catch (err) {
       // Solo considerar cerrada si hay una excepción al acceder a la propiedad closed
       console.log('📋 [Global] Pestaña externa cerrada (excepción al acceder a closed):', err);
@@ -302,6 +365,9 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       return false;
     }
   }, [closeExternalTab]);
+
+  // Referencias para los event listeners
+  const visibilityCleanupRef = useRef<(() => void) | null>(null);
 
   /**
    * Inicia la verificación periódica del estado de la pestaña
@@ -312,17 +378,61 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
     // Verificación inmediata
     checkTabStatus();
 
-    // Verificación periódica cada 1 segundo
+    // Verificación periódica cada 2 segundos (reducida frecuencia para mejor rendimiento)
     intervalRef.current = window.setInterval(() => {
       checkTabStatus();
-    }, 1000);
+    }, 2000);
 
-    // Verificación adicional cada 5 segundos para casos edge
+    // Verificación adicional cada 10 segundos para casos edge
     checkIntervalRef.current = window.setInterval(() => {
       if (tabRef.current && !checkTabStatus()) {
         console.log('🔄 [Global] Verificación adicional: pestaña cerrada');
       }
-    }, 5000);
+    }, 10000);
+
+    // Agregar listeners para detectar cuando el usuario vuelve a la pestaña principal
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && tabRef.current) {
+        console.log('👁️ [Global] Usuario volvió a la pestaña principal, verificando estado de pestaña externa');
+
+        // Marcar el momento del cambio de visibilidad para objetos mock
+        if ((tabRef.current as any).isMock) {
+          (tabRef.current as any).lastVisibilityChange = Date.now();
+          console.log('🔍 [Global] Marcado cambio de visibilidad para objeto mock');
+        }
+
+        // Pequeño delay para evitar verificaciones prematuras
+        setTimeout(() => {
+          checkTabStatus();
+        }, 1000);
+      }
+    };
+
+    const handleFocus = () => {
+      if (tabRef.current) {
+        console.log('🎯 [Global] Pestaña principal recibió foco, verificando estado de pestaña externa');
+
+        // Marcar el momento del cambio de foco para objetos mock
+        if ((tabRef.current as any).isMock) {
+          (tabRef.current as any).lastVisibilityChange = Date.now();
+          console.log('🔍 [Global] Marcado cambio de foco para objeto mock');
+        }
+
+        // Pequeño delay para evitar verificaciones prematuras
+        setTimeout(() => {
+          checkTabStatus();
+        }, 1000);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    // Guardar función de cleanup
+    visibilityCleanupRef.current = () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, [checkTabStatus]);
 
   /**
@@ -333,6 +443,13 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       console.log('⏹️ [Global] Deteniendo verificación periódica de pestaña');
       clearInterval(intervalRef.current);
       intervalRef.current = undefined;
+    }
+
+    // Limpiar event listeners
+    if (visibilityCleanupRef.current) {
+      console.log('🧹 [Global] Limpiando event listeners de visibilidad');
+      visibilityCleanupRef.current();
+      visibilityCleanupRef.current = null;
     }
   }, []);
 
@@ -346,6 +463,26 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       checkIntervalRef.current = undefined;
     }
   }, []);
+
+  /**
+   * Timeout de seguridad para evitar bloqueos infinitos
+   */
+  useEffect(() => {
+    if (!isExternalTabOpen || !tabRef.current) return;
+
+    const maxLockTime = 15 * 60 * 1000; // 15 minutos máximo
+    const startTime = (tabRef.current as any).openTime || Date.now();
+
+    const safetyTimeout = setTimeout(() => {
+      const elapsed = Date.now() - startTime;
+      if (elapsed > maxLockTime) {
+        console.warn('⚠️ [Global] Timeout de seguridad: desbloqueando después de 15 minutos');
+        closeExternalTab();
+      }
+    }, maxLockTime);
+
+    return () => clearTimeout(safetyTimeout);
+  }, [isExternalTabOpen, closeExternalTab]);
 
   /**
    * Limpia recursos al desmontar el componente

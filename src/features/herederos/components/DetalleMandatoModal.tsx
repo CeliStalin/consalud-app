@@ -490,42 +490,32 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
                     if (resultDocumentos.success) {
                       console.log('Documentos enviados exitosamente:', resultDocumentos);
                       setSaveSuccess(true);
-                      // Cerrar el modal después de 3 segundos
-                      setTimeout(() => {
-                        onSave();
-                      }, 3000);
+                      // Cerrar el modal inmediatamente - NO usar setTimeout
+                      onSave();
                     } else {
                       console.warn(DOCUMENTOS_MESSAGES.ERROR.DOCUMENTS_SEND_FAILED, resultDocumentos.message);
                       setSaveSuccess(true);
-                      // Cerrar el modal después de 3 segundos aunque fallen los documentos
-                      setTimeout(() => {
-                        onSave();
-                      }, 3000);
+                      // Cerrar el modal inmediatamente - NO usar setTimeout
+                      onSave();
                     }
                   } else {
                     console.log(DOCUMENTOS_MESSAGES.ERROR.NO_DOCUMENTS);
                     setSaveSuccess(true);
-                    // Cerrar el modal después de 3 segundos
-                    setTimeout(() => {
-                      onSave();
-                    }, 3000);
+                    // Cerrar el modal inmediatamente - NO usar setTimeout
+                    onSave();
                   }
               } catch (errorDocumentos: any) {
                 console.error('Error al enviar documentos:', errorDocumentos);
                 // Aunque fallen los documentos, la solicitud se creó correctamente
                 setSaveSuccess(true);
-                // Cerrar el modal después de 3 segundos
-                setTimeout(() => {
-                  onSave();
-                }, 3000);
+                // Cerrar el modal inmediatamente - NO usar setTimeout
+                onSave();
               }
             } else {
               console.warn('No se pudo obtener el ID de la solicitud de la respuesta');
               setSaveSuccess(true);
-              // Cerrar el modal después de 3 segundos
-              setTimeout(() => {
-                onSave();
-              }, 3000);
+              // Cerrar el modal inmediatamente - NO usar setTimeout
+              onSave();
             }
           } else {
             throw new Error(`Error al crear la solicitud. Status: ${resultSolicitud.status}, Respuesta: ${JSON.stringify(resultSolicitud)}`);

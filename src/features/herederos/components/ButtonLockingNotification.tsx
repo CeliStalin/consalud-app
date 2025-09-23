@@ -109,7 +109,7 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
     if (!lockReason) return 'Por favor espere...';
 
     if (lockReason.includes('pestaña externa')) {
-      return 'Complete el formulario en la nueva pestaña y ciérrela para continuar';
+      return 'Complete el formulario en la nueva pestaña y ciérrela para continuar. La página permanecerá bloqueada hasta que cierre la pestaña externa.';
     }
     if (lockReason.includes('procesando')) {
       return 'No cierre esta ventana mientras se procesa la información';
@@ -162,28 +162,52 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
             )}
 
             {/* Botón de desbloqueo manual para casos de emergencia */}
-            {lockReason?.includes('pestaña externa') && lockDuration && lockDuration > 10 && (
+            {lockReason?.includes('pestaña externa') && (
               <div className="manual-unlock-section" style={{ marginTop: '20px', textAlign: 'center' }}>
                 <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
-                  Si ya cerró la pestaña externa, puede desbloquear manualmente:
+                  {lockDuration && lockDuration > 5
+                    ? 'Si ya cerró la pestaña externa, puede desbloquear manualmente:'
+                    : 'Complete el formulario en la nueva pestaña y ciérrela para continuar'
+                  }
                 </p>
-                <button
-                  onClick={() => {
-                    console.log('🔓 [Manual] Usuario solicitó desbloqueo manual');
-                    unlockButtons();
-                  }}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#dc3545',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}
-                >
-                  Desbloquear Manualmente
-                </button>
+                {lockDuration && lockDuration > 5 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                    <button
+                      onClick={() => {
+                        console.log('🔓 [Manual] Usuario solicitó desbloqueo manual');
+                        unlockButtons();
+                      }}
+                      style={{
+                        padding: '12px 24px',
+                        backgroundColor: '#28a745',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                        boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+                        transition: 'all 0.2s',
+                        minWidth: '200px'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = '#218838';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.4)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = '#28a745';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+                      }}
+                    >
+                      ✅ Desbloquear Ahora
+                    </button>
+                    <p style={{ fontSize: '12px', color: '#999', margin: '0' }}>
+                      Use este botón si ya cerró la pestaña externa
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>

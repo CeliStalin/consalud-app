@@ -165,6 +165,7 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
 
   /**
    * Efecto para detectar cuando se cierra la pestaña externa y desbloquear botones
+   * SOLO si el bloqueo fue causado por una pestaña externa
    */
   useEffect(() => {
     console.log('🔍 [useMandatosTransaction] Efecto de cierre de pestaña:', {
@@ -173,7 +174,8 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
       lockReason
     });
 
-    if (!isExternalTabOpen && isButtonsLocked) {
+    // Solo desbloquear si la pestaña externa se cerró Y el bloqueo fue causado por una pestaña externa
+    if (!isExternalTabOpen && isButtonsLocked && lockReason?.includes('Pestaña externa abierta')) {
       console.log('🔄 [useMandatosTransaction] Pestaña externa cerrada, desbloqueando botones');
       console.trace('🔍 [useMandatosTransaction] Stack trace del desbloqueo automático');
       unlockButtons();
