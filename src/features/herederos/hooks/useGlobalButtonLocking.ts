@@ -98,11 +98,11 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
         throw new Error('URL inválida para abrir en pestaña externa');
       }
 
-      // ESTRATEGIA SIMPLIFICADA: Solo permitir pestañas reales
-      console.log('🔄 [Global] Intentando abrir pestaña externa real...');
+      // ESTRATEGIA SIMPLIFICADA: Solo usar window.open estándar
+      console.log('🔄 [Global] Intentando abrir pestaña externa...');
       let newTab: Window | null = null;
 
-      // Método 1: window.open estándar
+      // Solo usar window.open estándar para evitar múltiples pestañas
       try {
         newTab = window.open(url, '_blank', 'noopener,noreferrer');
         console.log('🔄 [Global] window.open resultado:', {
@@ -115,67 +115,10 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
         console.warn('⚠️ [Global] Error en window.open:', error);
       }
 
-      // Método 2: Si falló, intentar sin restricciones de seguridad
-      if (!newTab) {
-        try {
-          console.log('🔄 [Global] Intentando window.open sin restricciones...');
-          newTab = window.open(url, '_blank');
-          console.log('🔄 [Global] window.open resultado (método 2):', {
-            newTab: !!newTab,
-            closed: newTab?.closed,
-            newTabType: typeof newTab,
-            newTabConstructor: newTab?.constructor?.name
-          });
-        } catch (error) {
-          console.warn('⚠️ [Global] Error en window.open (método 2):', error);
-        }
-      }
-
-      // Método 3: Si aún falla, usar location.href
-      if (!newTab) {
-        try {
-          console.log('🔄 [Global] Intentando con location.href...');
-          const tempWindow = window.open('', '_blank');
-          if (tempWindow) {
-            tempWindow.location.href = url;
-            newTab = tempWindow;
-            console.log('🔄 [Global] window.open resultado (método 3):', {
-              newTab: !!newTab,
-              closed: newTab?.closed,
-              newTabType: typeof newTab,
-              newTabConstructor: newTab?.constructor?.name
-            });
-          }
-        } catch (error) {
-          console.warn('⚠️ [Global] Error en window.open (método 3):', error);
-        }
-      }
-
-      // Método 4: Si todo falla, usar un enfoque de redirección
-      if (!newTab) {
-        console.log('🔄 [Global] Intentando con enlace programático...');
-        const link = document.createElement('a');
-        link.href = url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        // Esperar un momento y verificar si se abrió
-        setTimeout(() => {
-          // Verificar si se abrió una nueva ventana
-          if (window.focus) {
-            window.focus();
-          }
-        }, 100);
-      }
-
-      // Si todos los métodos fallaron, lanzar error
+      // Si window.open falló, lanzar error
       if (!newTab) {
         const errorMessage = 'No se pudo abrir la pestaña externa. Verifique que los popups estén permitidos y que el navegador no esté bloqueando la apertura de nuevas ventanas.';
-        console.error('❌ [Global] Todos los métodos de apertura fallaron');
+        console.error('❌ [Global] window.open falló');
         console.error('❌ [Global] Posibles causas:');
         console.error('   - Bloqueador de popups activo');
         console.error('   - Restricciones de seguridad del navegador');
