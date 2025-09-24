@@ -55,6 +55,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const [manualUrl, setManualUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isMandatoIncorrecto, setIsMandatoIncorrecto] = useState(false);
   const { setStep } = useStepper();
   const { enviarDocumentos, loading: documentosLoading, error: documentosError } = useDocumentos();
 
@@ -731,6 +732,24 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               <p>Esta información bancaria será utilizada para realizar la devolución de los fondos correspondientes.</p>
               <p className="mt-2 is-size-7">Si los datos no son correctos, por favor vuelva al paso anterior y modifique la información.</p>
             </div>
+
+            {/* Radio button para habilitar actualización de mandatos */}
+            <div className="field mt-4">
+              <div className="control">
+                <label className="radio">
+                  <input
+                    type="radio"
+                    name="mandatoCorrecto"
+                    checked={isMandatoIncorrecto}
+                    onChange={(e) => setIsMandatoIncorrecto(e.target.checked)}
+                  />
+                  <span className="ml-2 has-text-weight-medium">No es mandato correcto</span>
+                </label>
+                <p className="help is-size-7 mt-1">
+                  Seleccione esta opción si la información del mandato no es correcta y necesita ser actualizada.
+                </p>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="has-text-centered p-5">
@@ -750,18 +769,43 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             <ConsaludCore.Button
               variant="secondary"
               onClick={handleActualizarMandato}
-              disabled={iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl}
+              disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || !isMandatoIncorrecto}
               title={
+                loading ? 'Cargando información del mandato...' :
                 isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
                 isOpeningTab ? 'Abriendo pestaña externa...' :
-                showManualUrl ? 'Modal de apertura manual abierto' : ''
+                showManualUrl ? 'Modal de apertura manual abierto' :
+                !isMandatoIncorrecto ? 'Seleccione "No es mandato correcto" para habilitar este botón' : ''
               }
+              style={{
+                minWidth: '180px',
+                height: '40px',
+                fontSize: '14px',
+                fontWeight: '500',
+                border: '1px solid #00CBBF',
+                borderRadius: '6px',
+                transition: 'all 0.2s ease',
+                ...(loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || !isMandatoIncorrecto ? {
+                  backgroundColor: '#FFFFFF',
+                  color: '#00CBBF',
+                  borderColor: '#00CBBF',
+                  opacity: 0.6,
+                  cursor: 'not-allowed'
+                } : {
+                  backgroundColor: '#FFFFFF',
+                  color: '#00CBBF',
+                  borderColor: '#00CBBF',
+                  cursor: 'pointer'
+                })
+              }}
             >
-              {iframeLoading ? 'Cargando...' :
+              {loading ? 'Cargando...' :
+               iframeLoading ? 'Cargando...' :
                isOpeningTab ? 'Abriendo...' :
                isButtonsLocked ? 'Pestaña Externa Abierta' :
                showManualUrl ? 'Modal Abierto' :
-               'Actualizar Mandato'}
+               !isMandatoIncorrecto ? 'Actualizar Mandatos (Deshabilitado)' :
+               'Actualizar Mandatos'}
             </ConsaludCore.Button>
           )}
           <ConsaludCore.Button
