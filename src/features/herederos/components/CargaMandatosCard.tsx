@@ -55,7 +55,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const [manualUrl, setManualUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [isMandatoIncorrecto, setIsMandatoIncorrecto] = useState(false);
+  const [esMandatoCorrecto, setEsMandatoCorrecto] = useState<string | null>(null);
   const { setStep } = useStepper();
   const { enviarDocumentos, loading: documentosLoading, error: documentosError } = useDocumentos();
 
@@ -733,20 +733,40 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               <p className="mt-2 is-size-7">Si los datos no son correctos, por favor vuelva al paso anterior y modifique la información.</p>
             </div>
 
-            {/* Radio button para habilitar actualización de mandatos */}
+            {/* Radio button para confirmar si el mandato es correcto */}
             <div className="field mt-4">
               <div className="control">
-                <label className="radio">
-                  <input
-                    type="radio"
-                    name="mandatoCorrecto"
-                    checked={isMandatoIncorrecto}
-                    onChange={(e) => setIsMandatoIncorrecto(e.target.checked)}
-                  />
-                  <span className="ml-2 has-text-weight-medium">No es mandato correcto</span>
-                </label>
+                <label className="label has-text-weight-medium">¿Es Mandato correcto?</label>
+                <div className="field">
+                  <div className="control">
+                    <label className="radio">
+                      <input
+                        type="radio"
+                        name="esMandatoCorrecto"
+                        value="si"
+                        checked={esMandatoCorrecto === 'si'}
+                        onChange={(e) => setEsMandatoCorrecto(e.target.value)}
+                      />
+                      <span className="ml-2">SÍ</span>
+                    </label>
+                  </div>
+                </div>
+                <div className="field">
+                  <div className="control">
+                    <label className="radio">
+                      <input
+                        type="radio"
+                        name="esMandatoCorrecto"
+                        value="no"
+                        checked={esMandatoCorrecto === 'no'}
+                        onChange={(e) => setEsMandatoCorrecto(e.target.value)}
+                      />
+                      <span className="ml-2">NO</span>
+                    </label>
+                  </div>
+                </div>
                 <p className="help is-size-7 mt-1">
-                  Seleccione esta opción si la información del mandato no es correcta y necesita ser actualizada.
+                  Seleccione "SÍ" si la información del mandato es correcta, o "NO" si necesita ser actualizada.
                 </p>
               </div>
             </div>
@@ -769,13 +789,16 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             <ConsaludCore.Button
               variant="secondary"
               onClick={handleActualizarMandato}
-              disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || !isMandatoIncorrecto}
+              disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === 'si' || esMandatoCorrecto === null}
               title={
                 loading ? 'Cargando información del mandato...' :
                 isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
                 isOpeningTab ? 'Abriendo pestaña externa...' :
                 showManualUrl ? 'Modal de apertura manual abierto' :
-                !isMandatoIncorrecto ? 'Seleccione "No es mandato correcto" para habilitar este botón' : ''
+                esMandatoCorrecto === 'si' ? 'El mandato es correcto, no se puede actualizar' :
+                esMandatoCorrecto === 'no' ? 'El mandato es incorrecto, se puede actualizar' :
+                esMandatoCorrecto === null ? 'Seleccione si el mandato es correcto o no' :
+                'Seleccione si el mandato es correcto o no'
               }
               style={{
                 minWidth: '180px',
@@ -785,7 +808,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 border: '1px solid #00CBBF',
                 borderRadius: '6px',
                 transition: 'all 0.2s ease',
-                ...(loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || !isMandatoIncorrecto ? {
+                ...(loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === 'si' || esMandatoCorrecto === null ? {
                   backgroundColor: '#FFFFFF',
                   color: '#00CBBF',
                   borderColor: '#00CBBF',
@@ -804,17 +827,23 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                isOpeningTab ? 'Abriendo...' :
                isButtonsLocked ? 'Pestaña Externa Abierta' :
                showManualUrl ? 'Modal Abierto' :
-               !isMandatoIncorrecto ? 'Actualizar Mandatos (Deshabilitado)' :
                'Actualizar Mandatos'}
             </ConsaludCore.Button>
           )}
           <ConsaludCore.Button
             variant="primary"
             onClick={handleSave}
-            disabled={!mandatoInfo || saving || isButtonsLocked}
-            title={isButtonsLocked ? `Botones bloqueados: ${lockReason}` : ''}
+            disabled={!mandatoInfo || saving || isButtonsLocked || esMandatoCorrecto === 'no' || esMandatoCorrecto === null}
+            title={
+              isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
+              esMandatoCorrecto === 'no' ? 'El mandato es incorrecto, debe actualizarse primero' :
+              esMandatoCorrecto === null ? 'Seleccione si el mandato es correcto o no' :
+              ''
+            }
           >
-            {saving ? 'Guardando...' : isButtonsLocked ? 'Bloqueado' : 'Guardar'}
+            {saving ? 'Guardando...' :
+             isButtonsLocked ? 'Bloqueado' :
+             'Guardar'}
           </ConsaludCore.Button>
         </div>
       </div>
@@ -964,3 +993,4 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
 };
 
 export { CargaMandatosCard };
+
