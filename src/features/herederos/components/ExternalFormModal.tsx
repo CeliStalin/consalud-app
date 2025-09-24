@@ -72,16 +72,16 @@ export const ExternalFormModal: React.FC<ExternalFormModalProps> = ({
           </div>
           <div className="flex items-center space-x-2">
             <ConsaludCore.Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="small"
               onClick={onComplete}
               className="bg-green-500 text-white hover:bg-green-600"
             >
               ✅ Completar
             </ConsaludCore.Button>
             <ConsaludCore.Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="small"
               onClick={onClose}
               className="bg-red-500 text-white hover:bg-red-600"
             >
@@ -107,7 +107,7 @@ export const ExternalFormModal: React.FC<ExternalFormModalProps> = ({
                 <div className="text-red-500 text-6xl mb-4">⚠️</div>
                 <p className="text-red-600 mb-4">{error}</p>
                 <ConsaludCore.Button
-                  variant="outline"
+                  variant="secondary"
                   onClick={() => window.location.reload()}
                   className="bg-blue-500 text-white hover:bg-blue-600"
                 >
