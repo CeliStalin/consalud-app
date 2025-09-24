@@ -6,7 +6,7 @@ import { UseAlert } from "../hooks/Alert";
 import { useFileStorage } from "../hooks/useFileStorage";
 import { useTiposDocumento } from "../hooks/useTiposDocumento";
 import { TipoDocumento } from "../interfaces/Pargen";
-import { DetalleMandatoModal } from "./DetalleMandatoModal";
+import { CargaMandatosCard } from "./CargaMandatosCard";
 import { DocumentUploadArea } from "./DocumentUploadArea";
 import { useStepper } from "./Stepper";
 import { StorageCleanup } from "./StorageCleanup";
@@ -15,7 +15,7 @@ import './styles/globalStyle.css';
 const CargaDocumento: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState(false);
-  const [showMandatoModal, setShowMandatoModal] = useState(false);
+  const [showMandatoCard, setShowMandatoCard] = useState(false);
 
   const navigate = useNavigate();
   const { tiposDocumento, loading: loadingTipos, error: errorTipos } = useTiposDocumento();
@@ -112,8 +112,8 @@ const CargaDocumento: React.FC = () => {
       // Simular envío
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Mostrar el modal de mandatos en lugar de navegar
-      setShowMandatoModal(true);
+      // Mostrar la card de mandatos en lugar de navegar
+      setShowMandatoCard(true);
     } catch (error) {
       // Manejar error de envío
     } finally {
@@ -122,16 +122,9 @@ const CargaDocumento: React.FC = () => {
   }, [documentFiles, checked, tiposDocumento]);
 
   const handleMandatoSave = useCallback(() => {
-    // Cerrar el modal
-    setShowMandatoModal(false);
-
     // Navegar a la página de éxito
     navigate('/mnherederos/ingresoher/success');
   }, [navigate]);
-
-  const handleMandatoClose = useCallback(() => {
-    setShowMandatoModal(false);
-  }, []);
 
   // Mostrar loading mientras se cargan los tipos de documento o los archivos inicialmente
   if (loadingTipos || (!initialLoadComplete && heredero?.rut)) {
@@ -191,6 +184,26 @@ const CargaDocumento: React.FC = () => {
           </div>
         </div>
       </div>
+    );
+  }
+
+  // Si se debe mostrar la card de mandatos, mostrarla en lugar del formulario
+  if (showMandatoCard) {
+    return (
+      <>
+        {/* Componente de limpieza automática */}
+        {heredero?.rut && (
+          <StorageCleanup
+            rut={heredero.rut}
+            onCleanup={() => {
+              // Recargar archivos después de la limpieza
+              loadFilesFromStorage(heredero.rut);
+            }}
+          />
+        )}
+
+        <CargaMandatosCard onSave={handleMandatoSave} />
+      </>
     );
   }
 
@@ -384,13 +397,7 @@ const CargaDocumento: React.FC = () => {
       </div>
     </form>
 
-    {/* Modal de Detalle de Mandato */}
-    <DetalleMandatoModal
-      isOpen={showMandatoModal}
-      onClose={handleMandatoClose}
-      onSave={handleMandatoSave}
-    />
-  </>
+    </>
   );
 };
 

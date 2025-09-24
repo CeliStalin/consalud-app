@@ -6,8 +6,8 @@ export { NumberAutoCompleteInput } from './NumberAutoCompleteInput';
 export { RegistroTitularCard } from './RegistroTitularCard';
 
 // Componentes de UI
+export { CargaMandatosCard } from './CargaMandatosCard';
 export { CustomSelect } from './CustomSelect';
-export { DetalleMandatoModal } from './DetalleMandatoModal';
 // MandatosIframeModal eliminado - sistema usa pestañas externas
 export { default as RutErrorMessage } from './RutErrorMessage';
 export { Stepper } from './Stepper';

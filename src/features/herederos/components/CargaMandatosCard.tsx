@@ -6,10 +6,7 @@ import { useMandatosTransaction } from '../hooks/useMandatosTransaction';
 import { createSolicitante, createSolicitud, fetchTitularByRut, obtenerDocumentosAlmacenados } from '../services/herederosService';
 import { mandatosTransactionService } from '../services/mandatosTransactionService';
 import { MandatoResult, mockMandatoService } from '../services/mockMandatoService';
-// import MandatosIframeModal from './MandatosIframeModal'; // No utilizado - sistema usa pestañas externas
-// Eliminado: ExternalFormModal ya no se usa
 import { useStepper } from './Stepper';
-import './styles/DetalleMandatoModal.css';
 
 /**
  * Función helper para formatear fecha al formato esperado por la API (YYYY-MM-DD)
@@ -46,17 +43,11 @@ const formatDateForAPI = (date: Date | string | null | undefined): string => {
   return `${year}-${month}-${day}`;
 };
 
-interface DetalleMandatoModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface CargaMandatosCardProps {
   onSave: () => void;
 }
 
-const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
-  isOpen,
-  onClose,
-  onSave
-}) => {
+const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const [loading, setLoading] = useState(false);
   const [mandatoInfo, setMandatoInfo] = useState<MandatoResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +64,6 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
     // Funcionalidad de pestaña externa
     isExternalTabOpen,
     isOpeningTab,
-    // Eliminado: useIframeModal ya no se usa
     openExternalTab,
     // Funcionalidad de bloqueo de botones
     isButtonsLocked,
@@ -86,7 +76,7 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
   } = useMandatosTransaction();
 
   // Debug: Log del estado de bloqueo
-  console.log('🔍 [DetalleMandatoModal] Estado completo:', {
+  console.log('🔍 [CargaMandatosCard] Estado completo:', {
     isButtonsLocked,
     lockReason,
     isExternalTabOpen,
@@ -97,7 +87,7 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
 
   // Verificar si los botones deberían estar bloqueados
   const shouldBeLocked = isButtonsLocked || hasActiveTransaction;
-  console.log('🔍 [DetalleMandatoModal] ¿Deberían estar bloqueados?', {
+  console.log('🔍 [CargaMandatosCard] ¿Deberían estar bloqueados?', {
     isButtonsLocked,
     hasActiveTransaction,
     shouldBeLocked
@@ -178,52 +168,33 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
     }
   };
 
-  // Función handleExternalTabClose eliminada - no se usa
-
-     // Obtener datos del mandato cuando se abre el modal
-   useEffect(() => {
-     if (isOpen) {
-       // Avanzar al paso 4 del stepper cuando se abre el modal
-       setStep(4);
-
-       // Limpiar documentos de sesiones anteriores (opcional - comentar si no se desea)
-       // const allKeys = Object.keys(sessionStorage);
-       // const documentoKeys = allKeys.filter(key => key.includes('documentos'));
-       // documentoKeys.forEach(key => {
-       //   console.log('🧹 Limpiando documentos de sesión anterior:', key);
-       //   sessionStorage.removeItem(key);
-       // });
-
-      const fetchMandatoData = async () => {
-        setLoading(true);
-        try {
-          // Buscar en localStorage
-          const rutCliente = localStorage.getItem('currentRutCliente') || '17175966';
-          const mandatoId = localStorage.getItem('currentMandatoId') || '';
-
-          console.log(`Obteniendo detalles para RUT: ${rutCliente}, Mandato: ${mandatoId}`);
-
-          // Llamar al servicio
-          const resultado = await mockMandatoService.getMandatoInfo(rutCliente, mandatoId);
-          setMandatoInfo(resultado);
-        } catch (err) {
-          console.error('Error al cargar detalles del mandato:', err);
-          setError('No se pudo cargar la información del mandato');
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchMandatoData();
-    }
-  }, [isOpen, setStep]);
-
-  // Restaurar al paso 3 cuando se cierre el modal
+  // Obtener datos del mandato cuando se monta el componente
   useEffect(() => {
-    if (!isOpen) {
-      setStep(3);
-    }
-  }, [isOpen, setStep]);
+    // Avanzar al paso 4 del stepper cuando se abre el componente
+    setStep(4);
+
+    const fetchMandatoData = async () => {
+      setLoading(true);
+      try {
+        // Buscar en localStorage
+        const rutCliente = localStorage.getItem('currentRutCliente') || '17175966';
+        const mandatoId = localStorage.getItem('currentMandatoId') || '';
+
+        console.log(`Obteniendo detalles para RUT: ${rutCliente}, Mandato: ${mandatoId}`);
+
+        // Llamar al servicio
+        const resultado = await mockMandatoService.getMandatoInfo(rutCliente, mandatoId);
+        setMandatoInfo(resultado);
+      } catch (err) {
+        console.error('Error al cargar detalles del mandato:', err);
+        setError('No se pudo cargar la información del mandato');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMandatoData();
+  }, [setStep]);
 
   // Función para manejar el guardado del solicitante
   const handleSave = async () => {
@@ -533,31 +504,31 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
                     if (resultDocumentos.success) {
                       console.log('Documentos enviados exitosamente:', resultDocumentos);
                       setSaveSuccess(true);
-                      // Cerrar el modal inmediatamente - NO usar setTimeout
+                      // Llamar a la función de guardado exitoso
                       onSave();
                     } else {
                       console.warn(DOCUMENTOS_MESSAGES.ERROR.DOCUMENTS_SEND_FAILED, resultDocumentos.message);
                       setSaveSuccess(true);
-                      // Cerrar el modal inmediatamente - NO usar setTimeout
+                      // Llamar a la función de guardado exitoso
                       onSave();
                     }
                   } else {
                     console.log(DOCUMENTOS_MESSAGES.ERROR.NO_DOCUMENTS);
                     setSaveSuccess(true);
-                    // Cerrar el modal inmediatamente - NO usar setTimeout
+                    // Llamar a la función de guardado exitoso
                     onSave();
                   }
               } catch (errorDocumentos: any) {
                 console.error('Error al enviar documentos:', errorDocumentos);
                 // Aunque fallen los documentos, la solicitud se creó correctamente
                 setSaveSuccess(true);
-                // Cerrar el modal inmediatamente - NO usar setTimeout
+                // Llamar a la función de guardado exitoso
                 onSave();
               }
             } else {
               console.warn('No se pudo obtener el ID de la solicitud de la respuesta');
               setSaveSuccess(true);
-              // Cerrar el modal inmediatamente - NO usar setTimeout
+              // Llamar a la función de guardado exitoso
               onSave();
             }
           } else {
@@ -583,195 +554,215 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        {/* Header del modal */}
-        <div className="modal-header">
-          <h2 className="modal-title">Mandatos</h2>
-          <button className="modal-close-button" onClick={onClose} aria-label="Cerrar modal">
-            ×
-          </button>
-        </div>
-
-        {/* Contenido del modal */}
-        <div className="modal-body">
-          {/* Indicador de bloqueo de botones */}
-          {isButtonsLocked && (
-            <div className="notification is-warning mb-4">
-              <div className="is-flex is-align-items-center">
-                <span className="icon is-small mr-2">
-                  <i className="fas fa-lock"></i>
-                </span>
-                <div>
-                  <strong>Botones bloqueados:</strong> {lockReason}
-                  <br />
-                  <small>Complete el proceso en la pestaña externa para desbloquear los botones.</small>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {loading ? (
-            <div className="has-text-centered p-6">
-              <div className="loader-container">
-                <div className="loader"></div>
-              </div>
-              <p className="mt-4">Cargando información...</p>
-            </div>
-          ) : saveSuccess ? (
-            <div className="has-text-centered p-6">
-              <div className="notification is-success is-light">
-                <div className="has-text-centered">
-                  <i className="fas fa-check-circle" style={{ fontSize: '3rem', color: '#48c774' }}></i>
-                  <h3 className="title is-4 mt-3" style={{ color: '#48c774' }}>¡CREADO CON ÉXITO!</h3>
-                  <p className="mt-2">El solicitante y la solicitud han sido creados correctamente.</p>
-                  <p className="mt-2">
-                    {documentosLoading ? DOCUMENTOS_MESSAGES.INFO.SENDING_DOCUMENTS :
-                     documentosError ? DOCUMENTOS_MESSAGES.ERROR.DOCUMENTS_SEND_FAILED :
-                     DOCUMENTOS_MESSAGES.SUCCESS.DOCUMENTS_SENT}
-                  </p>
-                  <p className="is-size-7 mt-2">{DOCUMENTOS_MESSAGES.INFO.CLOSING_MODAL}</p>
-                </div>
-              </div>
-            </div>
-          ) : error ? (
-            <div className="notification is-danger">
-              <p>{error}</p>
-              <ConsaludCore.Button
-                variant="primary"
-                onClick={onClose}
-                className="mt-4"
-              >
-                Cerrar
-              </ConsaludCore.Button>
-            </div>
-          ) : mandatoInfo ? (
-            <div className="mandato-detalle">
-              <div className="columns">
-                <div className="column">
-                  <div className="field-group">
-                    <h4 className="subtitle is-6">Información de la cuenta</h4>
-                    <div className="field">
-                      <label className="label">Banco</label>
-                      <p className="field-value">{mandatoInfo.banco}</p>
-                    </div>
-                    <div className="field">
-                      <label className="label">Tipo de cuenta</label>
-                      <p className="field-value">{mandatoInfo.tipoCuenta}</p>
-                    </div>
-                    <div className="field">
-                      <label className="label">Número de cuenta</label>
-                      <p className="field-value">{mandatoInfo.numeroCuenta}</p>
-                    </div>
-                    <div className="field">
-                      <label className="label">ID de mandato</label>
-                      <p className="field-value">{mandatoInfo.mandatoId}</p>
-                    </div>
-                    {mandatoInfo.indTipo && (
-                      <div className="field">
-                        <label className="label">Tipo</label>
-                        <p className="field-value">{mandatoInfo.indTipo === '1' ? 'Cuenta Corriente' :
-                                                   mandatoInfo.indTipo === '2' ? 'Cuenta Vista' :
-                                                   mandatoInfo.indTipo === '3' ? 'Cuenta de Ahorro' :
-                                                   mandatoInfo.indTipo}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="column">
-                  <div className="field-group">
-                    <h4 className="subtitle is-6">Información del titular</h4>
-                    <div className="field">
-                      <label className="label">Nombre</label>
-                      <p className="field-value">{mandatoInfo.nombreCliente}</p>
-                    </div>
-                    <div className="field">
-                      <label className="label">Apellido Paterno</label>
-                      <p className="field-value">{mandatoInfo.apellidoPaterno || '-'}</p>
-                    </div>
-                    <div className="field">
-                      <label className="label">Apellido Materno</label>
-                      <p className="field-value">{mandatoInfo.apellido}</p>
-                    </div>
-                    <div className="field">
-                      <label className="label">RUT</label>
-                      <p className="field-value">{mandatoInfo.rutCliente}-{mandatoInfo.digitoVerificador}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mostrar campos adicionales del servicio SOAP en un acordeón */}
-              <div className="box mt-4">
-                <details>
-                  <summary className="has-text-primary has-text-weight-medium">Información adicional del mandato</summary>
-                  <div className="columns is-multiline mt-3">
-                    {Object.entries(mandatoInfo)
-                      .filter(([key]) => !['mandatoId', 'banco', 'tipoCuenta', 'numeroCuenta',
-                                          'nombreCliente', 'apellido', 'apellidoPaterno', 'rutCliente',
-                                          'digitoVerificador', 'mensaje', 'Sindtipo'].includes(key))
-                      .map(([key, value]) => (
-                        <div className="column is-half" key={key}>
-                          <div className="field">
-                            <label className="label is-small">{key}</label>
-                            <p className="field-value">{String(value || '-')}</p>
-                          </div>
-                        </div>
-                      ))
-                    }
-                  </div>
-                </details>
-              </div>
-
-              <div className="notification is-info is-light mt-4">
-                <p>Esta información bancaria será utilizada para realizar la devolución de los fondos correspondientes.</p>
-                <p className="mt-2 is-size-7">Si los datos no son correctos, por favor vuelva al paso anterior y modifique la información.</p>
-              </div>
-            </div>
-          ) : (
-            <div className="has-text-centered p-5">
-              <p>No se encontró información de la cuenta bancaria</p>
-              <ConsaludCore.Button
-                variant="primary"
-                onClick={onClose}
-                className="mt-4"
-              >
-                Cerrar
-              </ConsaludCore.Button>
-            </div>
-          )}
-        </div>
-
-        {/* Footer del modal con botones */}
-        <div className="modal-footer">
-          <ConsaludCore.Button
-            variant="secondary"
-            onClick={onClose}
-            className="mr-3"
+    <>
+      <div className="carga-mandatos-card" style={{
+        padding: '2rem 3rem',
+        backgroundColor: '#FFFFFF',
+        borderRadius: '1.25rem',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: 'fit-content',
+        maxHeight: 'fit-content',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+      }}>
+        {/* Title */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          marginBottom: '2rem',
+          flexShrink: 0
+        }}>
+          <div style={{
+            width: '2.5rem',
+            height: '2.5rem',
+            borderRadius: '50%',
+            backgroundColor: '#E8F8F7',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}>
+            <svg width="1.25rem" height="1.25rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 10H21L20 6H4L3 10Z" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 10L4 18H20L21 10" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M8 14H16" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <ConsaludCore.Typography
+            variant="h6"
+            component="h2"
+            weight="bold"
+            style={{
+              fontSize: '1.25rem',
+              color: '#505050',
+              margin: 0,
+              lineHeight: '1.4'
+            }}
           >
-            Cancelar
-          </ConsaludCore.Button>
+            Mandatos
+          </ConsaludCore.Typography>
+        </div>
+
+        {/* Indicador de bloqueo de botones */}
+        {isButtonsLocked && (
+          <div className="notification is-warning mb-4">
+            <div className="is-flex is-align-items-center">
+              <span className="icon is-small mr-2">
+                <i className="fas fa-lock"></i>
+              </span>
+              <div>
+                <strong>Botones bloqueados:</strong> {lockReason}
+                <br />
+                <small>Complete el proceso en la pestaña externa para desbloquear los botones.</small>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {loading ? (
+          <div className="has-text-centered p-6">
+            <div className="loader-container">
+              <div className="loader"></div>
+            </div>
+            <p className="mt-4">Cargando información...</p>
+          </div>
+        ) : saveSuccess ? (
+          <div className="has-text-centered p-6">
+            <div className="notification is-success is-light">
+              <div className="has-text-centered">
+                <i className="fas fa-check-circle" style={{ fontSize: '3rem', color: '#48c774' }}></i>
+                <h3 className="title is-4 mt-3" style={{ color: '#48c774' }}>¡CREADO CON ÉXITO!</h3>
+                <p className="mt-2">El solicitante y la solicitud han sido creados correctamente.</p>
+                <p className="mt-2">
+                  {documentosLoading ? DOCUMENTOS_MESSAGES.INFO.SENDING_DOCUMENTS :
+                   documentosError ? DOCUMENTOS_MESSAGES.ERROR.DOCUMENTS_SEND_FAILED :
+                   DOCUMENTOS_MESSAGES.SUCCESS.DOCUMENTS_SENT}
+                </p>
+                <p className="is-size-7 mt-2">{DOCUMENTOS_MESSAGES.INFO.CLOSING_MODAL}</p>
+              </div>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="notification is-danger">
+            <p>{error}</p>
+          </div>
+        ) : mandatoInfo ? (
+          <div className="mandato-detalle">
+            <div className="columns">
+              <div className="column">
+                <div className="field-group">
+                  <h4 className="subtitle is-6">Información de la cuenta</h4>
+                  <div className="field">
+                    <label className="label">Banco</label>
+                    <p className="field-value">{mandatoInfo.banco}</p>
+                  </div>
+                  <div className="field">
+                    <label className="label">Tipo de cuenta</label>
+                    <p className="field-value">{mandatoInfo.tipoCuenta}</p>
+                  </div>
+                  <div className="field">
+                    <label className="label">Número de cuenta</label>
+                    <p className="field-value">{mandatoInfo.numeroCuenta}</p>
+                  </div>
+                  <div className="field">
+                    <label className="label">ID de mandato</label>
+                    <p className="field-value">{mandatoInfo.mandatoId}</p>
+                  </div>
+                  {mandatoInfo.indTipo && (
+                    <div className="field">
+                      <label className="label">Tipo</label>
+                      <p className="field-value">{mandatoInfo.indTipo === '1' ? 'Cuenta Corriente' :
+                                                 mandatoInfo.indTipo === '2' ? 'Cuenta Vista' :
+                                                 mandatoInfo.indTipo === '3' ? 'Cuenta de Ahorro' :
+                                                 mandatoInfo.indTipo}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="column">
+                <div className="field-group">
+                  <h4 className="subtitle is-6">Información del titular</h4>
+                  <div className="field">
+                    <label className="label">Nombre</label>
+                    <p className="field-value">{mandatoInfo.nombreCliente}</p>
+                  </div>
+                  <div className="field">
+                    <label className="label">Apellido Paterno</label>
+                    <p className="field-value">{mandatoInfo.apellidoPaterno || '-'}</p>
+                  </div>
+                  <div className="field">
+                    <label className="label">Apellido Materno</label>
+                    <p className="field-value">{mandatoInfo.apellido}</p>
+                  </div>
+                  <div className="field">
+                    <label className="label">RUT</label>
+                    <p className="field-value">{mandatoInfo.rutCliente}-{mandatoInfo.digitoVerificador}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mostrar campos adicionales del servicio SOAP en un acordeón */}
+            <div className="box mt-4">
+              <details>
+                <summary className="has-text-primary has-text-weight-medium">Información adicional del mandato</summary>
+                <div className="columns is-multiline mt-3">
+                  {Object.entries(mandatoInfo)
+                    .filter(([key]) => !['mandatoId', 'banco', 'tipoCuenta', 'numeroCuenta',
+                                        'nombreCliente', 'apellido', 'apellidoPaterno', 'rutCliente',
+                                        'digitoVerificador', 'mensaje', 'Sindtipo'].includes(key))
+                    .map(([key, value]) => (
+                      <div className="column is-half" key={key}>
+                        <div className="field">
+                          <label className="label is-small">{key}</label>
+                          <p className="field-value">{String(value || '-')}</p>
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div>
+              </details>
+            </div>
+
+            <div className="notification is-info is-light mt-4">
+              <p>Esta información bancaria será utilizada para realizar la devolución de los fondos correspondientes.</p>
+              <p className="mt-2 is-size-7">Si los datos no son correctos, por favor vuelva al paso anterior y modifique la información.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="has-text-centered p-5">
+            <p>No se encontró información de la cuenta bancaria</p>
+          </div>
+        )}
+
+        {/* Botones */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '1rem',
+          marginTop: '2rem',
+          padding: '1rem 0'
+        }}>
           {mandatoInfo && (
-        <ConsaludCore.Button
-          variant="secondary"
-          onClick={handleActualizarMandato}
-          disabled={iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl}
-          className="mr-3"
-          title={
-            isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
-            isOpeningTab ? 'Abriendo pestaña externa...' :
-            showManualUrl ? 'Modal de apertura manual abierto' : ''
-          }
-        >
-          {iframeLoading ? 'Cargando...' :
-           isOpeningTab ? 'Abriendo...' :
-           isButtonsLocked ? 'Pestaña Externa Abierta' :
-           showManualUrl ? 'Modal Abierto' :
-           'Actualizar Mandato'}
-        </ConsaludCore.Button>
+            <ConsaludCore.Button
+              variant="secondary"
+              onClick={handleActualizarMandato}
+              disabled={iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl}
+              title={
+                isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
+                isOpeningTab ? 'Abriendo pestaña externa...' :
+                showManualUrl ? 'Modal de apertura manual abierto' : ''
+              }
+            >
+              {iframeLoading ? 'Cargando...' :
+               isOpeningTab ? 'Abriendo...' :
+               isButtonsLocked ? 'Pestaña Externa Abierta' :
+               showManualUrl ? 'Modal Abierto' :
+               'Actualizar Mandato'}
+            </ConsaludCore.Button>
           )}
           <ConsaludCore.Button
             variant="primary"
@@ -784,149 +775,148 @@ const DetalleMandatoModal: React.FC<DetalleMandatoModalProps> = ({
         </div>
       </div>
 
-        {/* Modal para mostrar URL manual cuando falla window.open */}
-        {showManualUrl && manualUrl && (
+      {/* Modal para mostrar URL manual cuando falla window.open */}
+      {showManualUrl && manualUrl && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
           <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '20px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
           }}>
             <div style={{
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              padding: '20px',
-              maxWidth: '600px',
-              width: '90%',
-              maxHeight: '80vh',
-              overflow: 'auto',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px',
+              borderBottom: '1px solid #dee2e6',
+              paddingBottom: '10px'
             }}>
+              <h3 style={{ margin: 0, color: '#333' }}>Abrir Formulario Manualmente</h3>
+              <button
+                onClick={() => setShowManualUrl(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div style={{ padding: '20px', textAlign: 'center' }}>
               <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '20px',
-                borderBottom: '1px solid #dee2e6',
-                paddingBottom: '10px'
+                backgroundColor: '#fff3cd',
+                border: '1px solid #ffeaa7',
+                borderRadius: '8px',
+                padding: '15px',
+                marginBottom: '20px'
               }}>
-                <h3 style={{ margin: 0, color: '#333' }}>Abrir Formulario Manualmente</h3>
-                <button
-                  onClick={() => setShowManualUrl(false)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    fontSize: '24px',
-                    cursor: 'pointer',
-                    color: '#666'
-                  }}
-                >
-                  ×
-                </button>
+                <h4 style={{ color: '#856404', margin: '0 0 10px 0' }}>
+                  ⚠️ No se pudo abrir la pestaña automáticamente
+                </h4>
+                <p style={{ color: '#856404', margin: '0' }}>
+                  Su navegador está bloqueando la apertura de popups. Puede abrir el formulario manualmente copiando la URL de abajo.
+                </p>
               </div>
 
-              <div style={{ padding: '20px', textAlign: 'center' }}>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                  URL del formulario:
+                </label>
                 <div style={{
-                  backgroundColor: '#fff3cd',
-                  border: '1px solid #ffeaa7',
-                  borderRadius: '8px',
-                  padding: '15px',
-                  marginBottom: '20px'
+                  display: 'flex',
+                  gap: '10px',
+                  alignItems: 'center',
+                  backgroundColor: '#f8f9fa',
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px',
+                  padding: '10px'
                 }}>
-                  <h4 style={{ color: '#856404', margin: '0 0 10px 0' }}>
-                    ⚠️ No se pudo abrir la pestaña automáticamente
-                  </h4>
-                  <p style={{ color: '#856404', margin: '0' }}>
-                    Su navegador está bloqueando la apertura de popups. Puede abrir el formulario manualmente copiando la URL de abajo.
-                  </p>
-                </div>
-
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    URL del formulario:
-                  </label>
-                  <div style={{
-                    display: 'flex',
-                    gap: '10px',
-                    alignItems: 'center',
-                    backgroundColor: '#f8f9fa',
-                    border: '1px solid #dee2e6',
-                    borderRadius: '4px',
-                    padding: '10px'
-                  }}>
-                    <input
-                      type="text"
-                      value={manualUrl}
-                      readOnly
-                      style={{
-                        flex: 1,
-                        padding: '8px',
-                        border: 'none',
-                        backgroundColor: 'transparent',
-                        fontSize: '14px',
-                        fontFamily: 'monospace'
-                      }}
-                    />
-                    <ConsaludCore.Button
-                      variant="secondary"
-                      onClick={() => {
-                        navigator.clipboard.writeText(manualUrl);
-                        alert('URL copiada al portapapeles');
-                      }}
-                    >
-                      📋 Copiar
-                    </ConsaludCore.Button>
-                  </div>
-                </div>
-
-                <div style={{
-                  backgroundColor: '#e7f3ff',
-                  border: '1px solid #b3d9ff',
-                  borderRadius: '6px',
-                  padding: '15px',
-                  textAlign: 'left',
-                  marginBottom: '20px'
-                }}>
-                  <h5 style={{ margin: '0 0 10px 0', color: '#0066cc' }}>Instrucciones:</h5>
-                  <ol style={{ margin: '0', paddingLeft: '20px', color: '#0066cc' }}>
-                    <li>Copie la URL de arriba</li>
-                    <li>Abra una nueva pestaña en su navegador</li>
-                    <li>Pegue la URL en la barra de direcciones</li>
-                    <li>Complete el formulario en la nueva pestaña</li>
-                    <li>Regrese a esta pestaña cuando termine</li>
-                  </ol>
-                </div>
-
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                  <input
+                    type="text"
+                    value={manualUrl}
+                    readOnly
+                    style={{
+                      flex: 1,
+                      padding: '8px',
+                      border: 'none',
+                      backgroundColor: 'transparent',
+                      fontSize: '14px',
+                      fontFamily: 'monospace'
+                    }}
+                  />
                   <ConsaludCore.Button
                     variant="secondary"
-                    onClick={() => setShowManualUrl(false)}
-                  >
-                    Cerrar
-                  </ConsaludCore.Button>
-                  <ConsaludCore.Button
-                    variant="primary"
                     onClick={() => {
-                      window.open(manualUrl, '_blank');
-                      setShowManualUrl(false);
+                      navigator.clipboard.writeText(manualUrl);
+                      alert('URL copiada al portapapeles');
                     }}
                   >
-                    🌐 Intentar Abrir
+                    📋 Copiar
                   </ConsaludCore.Button>
                 </div>
+              </div>
+
+              <div style={{
+                backgroundColor: '#e7f3ff',
+                border: '1px solid #b3d9ff',
+                borderRadius: '6px',
+                padding: '15px',
+                textAlign: 'left',
+                marginBottom: '20px'
+              }}>
+                <h5 style={{ margin: '0 0 10px 0', color: '#0066cc' }}>Instrucciones:</h5>
+                <ol style={{ margin: '0', paddingLeft: '20px', color: '#0066cc' }}>
+                  <li>Copie la URL de arriba</li>
+                  <li>Abra una nueva pestaña en su navegador</li>
+                  <li>Pegue la URL en la barra de direcciones</li>
+                  <li>Complete el formulario en la nueva pestaña</li>
+                  <li>Regrese a esta pestaña cuando termine</li>
+                </ol>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                <ConsaludCore.Button
+                  variant="secondary"
+                  onClick={() => setShowManualUrl(false)}
+                >
+                  Cerrar
+                </ConsaludCore.Button>
+                <ConsaludCore.Button
+                  variant="primary"
+                  onClick={() => {
+                    window.open(manualUrl, '_blank');
+                    setShowManualUrl(false);
+                  }}
+                >
+                  🌐 Intentar Abrir
+                </ConsaludCore.Button>
               </div>
             </div>
           </div>
-        )}
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 
-export { DetalleMandatoModal };
-
+export { CargaMandatosCard };
