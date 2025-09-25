@@ -604,7 +604,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               flex: 1
             }}
           >
-            Si la persona <span style={{ color: '#BB4E01', fontWeight: 'bold' }}>no tiene una cuenta bancaria registrada o debe editar sus datos</span>. Ingresa en "Actualizar Mandatos", para ingresar Cuenta bancaria o actualiza los datos de su cuenta bancaria..
+            Si la persona <span style={{ color: '#BB4E01', fontWeight: 'bold' }}>no tiene una cuenta bancaria registrada o debe editar sus datos</span>. Ingresa en "Actualizar Mandatos", para ingresar Cuenta bancaria o actualizar los datos de su cuenta bancaria.
           </ConsaludCore.Typography>
         </div>
 
@@ -783,7 +783,6 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             {/* Radio button para confirmar si el mandato es correcto */}
             <div className="field mt-4">
               <div className="control">
-                <label className="label has-text-weight-medium">¿Es Mandato correcto?</label>
                 <div className="field">
                   <div className="control">
                     <label className="radio">
@@ -794,7 +793,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                         checked={esMandatoCorrecto === 'si'}
                         onChange={(e) => setEsMandatoCorrecto(e.target.value)}
                       />
-                      <span className="ml-2">SÍ</span>
+                      <span className="ml-2">Sí, los datos corresponden a la persona heredera.</span>
                     </label>
                   </div>
                 </div>
@@ -808,13 +807,10 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                         checked={esMandatoCorrecto === 'no'}
                         onChange={(e) => setEsMandatoCorrecto(e.target.value)}
                       />
-                      <span className="ml-2">NO</span>
+                      <span className="ml-2">No, los datos no corresponden a la persona heredera.</span>
                     </label>
                   </div>
                 </div>
-                <p className="help is-size-7 mt-1">
-                  Seleccione "SÍ" si la información del mandato es correcta, o "NO" si necesita ser actualizada.
-                </p>
               </div>
             </div>
           </div>
