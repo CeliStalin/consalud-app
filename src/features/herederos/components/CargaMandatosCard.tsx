@@ -108,6 +108,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const [shouldResetSelection, setShouldResetSelection] = useState(false);
   const [noTieneCuentaBancaria, setNoTieneCuentaBancaria] = useState(false);
   const [bloquearRadioButtons, setBloquearRadioButtons] = useState(false);
+  const [botonActualizarVisible, setBotonActualizarVisible] = useState(false);
   const { setStep } = useStepper();
   const { enviarDocumentos, loading: documentosLoading, error: documentosError } = useDocumentos();
 
@@ -334,6 +335,21 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
       setShouldResetSelection(false);
     }
   }, [shouldResetSelection, loadingCuentaBancaria]);
+
+  // Controlar la visibilidad del botón "Actualizar Mandatos" con animación
+  useEffect(() => {
+    if (mandatoInfo && (esMandatoCorrecto === 'no' || noTieneCuentaBancaria)) {
+      setBotonActualizarVisible(true);
+    } else if (esMandatoCorrecto === 'si') {
+      // Cuando se marca "Sí", iniciar animación de salida
+      const timer = setTimeout(() => {
+        setBotonActualizarVisible(false);
+      }, 300); // Tiempo para la animación de salida
+      return () => clearTimeout(timer);
+    } else {
+      setBotonActualizarVisible(false);
+    }
+  }, [mandatoInfo, esMandatoCorrecto, noTieneCuentaBancaria]);
 
   // Función para manejar el guardado del solicitante
   const handleSave = async () => {
@@ -1045,9 +1061,9 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
           marginTop: '2rem',
           padding: '1rem 0'
         }}>
-          {mandatoInfo && (esMandatoCorrecto === 'no' || noTieneCuentaBancaria) && (
+          {mandatoInfo && botonActualizarVisible && (
             <button
-              className={`button is-primary is-rounded proceso-button animate-fade-in-up${(loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || (esMandatoCorrecto === null && !noTieneCuentaBancaria) || loadingCuentaBancaria || shouldResetSelection) ? ' buttonRut--invalid' : ' buttonRut--valid'}`}
+              className={`button is-primary is-rounded proceso-button ${esMandatoCorrecto === 'si' ? 'animate-fade-out-up' : 'animate-fade-in-up'}${(loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || (esMandatoCorrecto === null && !noTieneCuentaBancaria) || loadingCuentaBancaria || shouldResetSelection) ? ' buttonRut--invalid' : ' buttonRut--valid'}`}
               disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || (esMandatoCorrecto === null && !noTieneCuentaBancaria) || loadingCuentaBancaria || shouldResetSelection}
               onClick={handleActualizarMandato}
               type="button"
