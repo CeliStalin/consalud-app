@@ -7,6 +7,38 @@ import { RETRY_CONFIGS, withRetry } from '../utils/retryUtils';
 import { apiGet, buildHeaders, getHerederosApiConfig } from './apiUtils';
 
 /**
+ * Interfaz para la respuesta de la API de cuenta bancaria
+ */
+export interface CuentaBancariaResponse {
+  tipoCuenta: string;
+  sMandato: number;
+  banco: string;
+  SindTipo: number;
+  numeroCuenta: string;
+}
+
+/**
+ * Función helper para limpiar RUT (sin puntos ni DV)
+ */
+const limpiarRut = (rut: string): string => {
+  if (!rut || typeof rut !== 'string') return '';
+  // Remover puntos, guiones y dígito verificador, mantener solo números
+  let rutLimpio = rut.replace(/[^0-9kK]/g, '');
+
+  // Si el RUT tiene dígito verificador (K o k), removerlo
+  if (rutLimpio.length > 0 && (rutLimpio.endsWith('K') || rutLimpio.endsWith('k'))) {
+    rutLimpio = rutLimpio.slice(0, -1);
+  }
+
+  // Si el RUT tiene más de 8 dígitos, tomar solo los primeros 8 (sin DV)
+  if (rutLimpio.length > 8) {
+    rutLimpio = rutLimpio.slice(0, 8);
+  }
+
+  return rutLimpio;
+};
+
+/**
  * Servicio para gestión de herederos
  * Maneja titulares, solicitantes y parámetros generales del sistema
  */
@@ -14,6 +46,31 @@ export class HerederosService {
   private config = getHerederosApiConfig();
 
   // ===== MÉTODOS DE HEREDEROS =====
+
+  /**
+   * Obtiene información de cuenta bancaria por RUT
+   * @param rut - RUT del heredero (sin puntos ni DV)
+   */
+  async getCuentaBancaria(rut: string): Promise<CuentaBancariaResponse> {
+    const rutLimpio = limpiarRut(rut);
+    const url = `${this.config.baseUrl}/api/Mandatos/CuentaBancaria?rut=${rutLimpio}`;
+
+    try {
+      console.log('🏦 Obteniendo información de cuenta bancaria');
+      console.log('📡 URL:', url);
+      console.log('📋 RUT original:', rut);
+      console.log('📋 RUT limpio (sin DV):', rutLimpio);
+      console.log('📋 Longitud RUT limpio:', rutLimpio.length);
+
+      const data = await apiGet<CuentaBancariaResponse>(url, this.config, 'obtener cuenta bancaria');
+
+      console.log('✅ Información de cuenta bancaria obtenida:', data);
+      return data;
+    } catch (error: any) {
+      console.error('❌ Error al obtener cuenta bancaria:', error);
+      throw error;
+    }
+  }
 
   /**
    * Obtiene información de un titular por RUT
@@ -601,3 +658,6 @@ export const encriptarParametrosMandatos = (
   apellidoPaterno: string,
   apellidoMaterno: string
 ) => herederosService.encriptarParametrosMandatos(usuario, rutAfiliado, nombres, apellidoPaterno, apellidoMaterno);
+
+export const getCuentaBancaria = (rut: string) =>
+  herederosService.getCuentaBancaria(rut);

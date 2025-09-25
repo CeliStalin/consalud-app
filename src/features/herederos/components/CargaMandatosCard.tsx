@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { DOCUMENTOS_MESSAGES } from '../constants';
 import { useDocumentos } from '../hooks/useDocumentos';
 import { useMandatosTransaction } from '../hooks/useMandatosTransaction';
-import { createSolicitante, createSolicitud, fetchTitularByRut, obtenerDocumentosAlmacenados } from '../services/herederosService';
+import { createSolicitante, createSolicitud, CuentaBancariaResponse, fetchTitularByRut, getCuentaBancaria, obtenerDocumentosAlmacenados } from '../services/herederosService';
 import { mandatosTransactionService } from '../services/mandatosTransactionService';
 import { MandatoResult, mockMandatoService } from '../services/mockMandatoService';
 import { useStepper } from './Stepper';
@@ -43,6 +43,47 @@ const formatDateForAPI = (date: Date | string | null | undefined): string => {
   return `${year}-${month}-${day}`;
 };
 
+/**
+ * Función helper para formatear nombres con primera letra en mayúscula y resto en minúscula
+ */
+const formatName = (name: string): string => {
+  if (!name || typeof name !== 'string') return '';
+  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+};
+
+/**
+ * Función para obtener datos del heredero desde sessionStorage
+ */
+const getHerederoDataFromSessionStorage = () => {
+  try {
+    const allKeys = Object.keys(sessionStorage);
+    const formKeys = allKeys.filter(key => key.includes('formHeredero') || key.includes('heredero'));
+
+    for (const key of formKeys) {
+      const data = sessionStorage.getItem(key);
+      if (data) {
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed && (parsed.NombrePersona || parsed.ApellidoPaterno || parsed.ApellidoMaterno)) {
+            return {
+              NombrePersona: parsed.NombrePersona || '',
+              ApellidoPaterno: parsed.ApellidoPaterno || '',
+              ApellidoMaterno: parsed.ApellidoMaterno || '',
+              RutCompleto: parsed.RutCompleto || ''
+            };
+          }
+        } catch (parseError) {
+          continue;
+        }
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Error al obtener datos del heredero desde sessionStorage:', error);
+    return null;
+  }
+};
+
 interface CargaMandatosCardProps {
   onSave: () => void;
 }
@@ -56,6 +97,13 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [esMandatoCorrecto, setEsMandatoCorrecto] = useState<string | null>(null);
+  const [herederoData, setHerederoData] = useState<{
+    NombrePersona: string;
+    ApellidoPaterno: string;
+    ApellidoMaterno: string;
+  } | null>(null);
+  const [cuentaBancariaData, setCuentaBancariaData] = useState<CuentaBancariaResponse | null>(null);
+  const [loadingCuentaBancaria, setLoadingCuentaBancaria] = useState(false);
   const { setStep } = useStepper();
   const { enviarDocumentos, loading: documentosLoading, error: documentosError } = useDocumentos();
 
@@ -174,6 +222,20 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     // Avanzar al paso 4 del stepper cuando se abre el componente
     setStep(4);
 
+    // Cargar datos del heredero desde sessionStorage
+    const herederoDataFromStorage = getHerederoDataFromSessionStorage();
+    if (herederoDataFromStorage) {
+      setHerederoData(herederoDataFromStorage);
+      console.log('Datos del heredero cargados desde sessionStorage:', herederoDataFromStorage);
+
+      // Cargar datos de cuenta bancaria si tenemos RUT
+      if (herederoDataFromStorage.RutCompleto) {
+        loadCuentaBancaria(herederoDataFromStorage.RutCompleto);
+      }
+    } else {
+      console.warn('No se encontraron datos del heredero en sessionStorage');
+    }
+
     const fetchMandatoData = async () => {
       setLoading(true);
       try {
@@ -196,6 +258,22 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
 
     fetchMandatoData();
   }, [setStep]);
+
+  // Función para cargar datos de cuenta bancaria
+  const loadCuentaBancaria = async (rutCompleto: string) => {
+    setLoadingCuentaBancaria(true);
+    try {
+      console.log('🏦 Cargando datos de cuenta bancaria para RUT:', rutCompleto);
+      const cuentaData = await getCuentaBancaria(rutCompleto);
+      setCuentaBancariaData(cuentaData);
+      console.log('✅ Datos de cuenta bancaria cargados:', cuentaData);
+    } catch (error) {
+      console.error('❌ Error al cargar datos de cuenta bancaria:', error);
+      // No mostrar error al usuario, solo log
+    } finally {
+      setLoadingCuentaBancaria(false);
+    }
+  };
 
   // Función para manejar el guardado del solicitante
   const handleSave = async () => {
@@ -733,7 +811,10 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     margin: 0
                   }}
                 >
-                  {mandatoInfo.nombreCliente} {mandatoInfo.apellidoPaterno || ''} {mandatoInfo.apellido}
+                  {herederoData ?
+                    `${formatName(herederoData.NombrePersona)} ${formatName(herederoData.ApellidoPaterno)} ${formatName(herederoData.ApellidoMaterno)}`.trim() :
+                    `${mandatoInfo.nombreCliente} ${mandatoInfo.apellidoPaterno || ''} ${mandatoInfo.apellido}`.trim()
+                  }
                 </ConsaludCore.Typography>
               </div>
             </div>
@@ -745,37 +826,89 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               borderRadius: '8px',
               padding: '1rem'
             }}>
-              <ConsaludCore.Typography
-                variant="body2"
-                weight="bold"
-                style={{
-                  color: '#505050',
-                  fontSize: '0.875rem',
-                  marginBottom: '0.25rem'
-                }}
-              >
-                {mandatoInfo.banco}
-              </ConsaludCore.Typography>
-              <ConsaludCore.Typography
-                variant="body2"
-                style={{
-                  color: '#505050',
-                  fontSize: '0.875rem',
-                  marginBottom: '0.25rem'
-                }}
-              >
-                {mandatoInfo.tipoCuenta}
-              </ConsaludCore.Typography>
-              <ConsaludCore.Typography
-                variant="body2"
-                style={{
-                  color: '#505050',
-                  fontSize: '0.875rem',
-                  margin: 0
-                }}
-              >
-                N° {mandatoInfo.numeroCuenta}
-              </ConsaludCore.Typography>
+              {loadingCuentaBancaria ? (
+                <div style={{ textAlign: 'center', padding: '1rem' }}>
+                  <div className="loader" style={{ margin: '0 auto' }}></div>
+                  <ConsaludCore.Typography
+                    variant="body2"
+                    style={{
+                      color: '#666666',
+                      fontSize: '0.875rem',
+                      marginTop: '0.5rem'
+                    }}
+                  >
+                    Cargando información bancaria...
+                  </ConsaludCore.Typography>
+                </div>
+              ) : cuentaBancariaData ? (
+                <>
+                  <ConsaludCore.Typography
+                    variant="body2"
+                    weight="bold"
+                    style={{
+                      color: '#505050',
+                      fontSize: '0.875rem',
+                      marginBottom: '0.25rem'
+                    }}
+                  >
+                    {cuentaBancariaData.banco}
+                  </ConsaludCore.Typography>
+                  <ConsaludCore.Typography
+                    variant="body2"
+                    style={{
+                      color: '#505050',
+                      fontSize: '0.875rem',
+                      marginBottom: '0.25rem'
+                    }}
+                  >
+                    {cuentaBancariaData.tipoCuenta}
+                  </ConsaludCore.Typography>
+                  <ConsaludCore.Typography
+                    variant="body2"
+                    style={{
+                      color: '#505050',
+                      fontSize: '0.875rem',
+                      margin: 0
+                    }}
+                  >
+                    N° {cuentaBancariaData.numeroCuenta}
+                  </ConsaludCore.Typography>
+                </>
+              ) : (
+                <>
+                  <ConsaludCore.Typography
+                    variant="body2"
+                    weight="bold"
+                    style={{
+                      color: '#505050',
+                      fontSize: '0.875rem',
+                      marginBottom: '0.25rem'
+                    }}
+                  >
+                    {mandatoInfo.banco}
+                  </ConsaludCore.Typography>
+                  <ConsaludCore.Typography
+                    variant="body2"
+                    style={{
+                      color: '#505050',
+                      fontSize: '0.875rem',
+                      marginBottom: '0.25rem'
+                    }}
+                  >
+                    {mandatoInfo.tipoCuenta}
+                  </ConsaludCore.Typography>
+                  <ConsaludCore.Typography
+                    variant="body2"
+                    style={{
+                      color: '#505050',
+                      fontSize: '0.875rem',
+                      margin: 0
+                    }}
+                  >
+                    N° {mandatoInfo.numeroCuenta}
+                  </ConsaludCore.Typography>
+                </>
+              )}
             </div>
 
 
