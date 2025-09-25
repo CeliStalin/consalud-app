@@ -106,6 +106,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const [cuentaBancariaData, setCuentaBancariaData] = useState<CuentaBancariaResponse | null>(null);
   const [loadingCuentaBancaria, setLoadingCuentaBancaria] = useState(false);
   const [shouldResetSelection, setShouldResetSelection] = useState(false);
+  const [noTieneCuentaBancaria, setNoTieneCuentaBancaria] = useState(false);
   const { setStep } = useStepper();
   const { enviarDocumentos, loading: documentosLoading, error: documentosError } = useDocumentos();
 
@@ -267,14 +268,25 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   // Función para cargar datos de cuenta bancaria
   const loadCuentaBancaria = async (rutCompleto: string) => {
     setLoadingCuentaBancaria(true);
+    setNoTieneCuentaBancaria(false);
     try {
       console.log('🏦 Cargando datos de cuenta bancaria para RUT:', rutCompleto);
       const cuentaData = await getCuentaBancaria(rutCompleto);
       setCuentaBancariaData(cuentaData);
+      setNoTieneCuentaBancaria(false);
       console.log('✅ Datos de cuenta bancaria cargados:', cuentaData);
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error al cargar datos de cuenta bancaria:', error);
-      // No mostrar error al usuario, solo log
+
+      // Si es error 500, significa que no tiene cuenta bancaria registrada
+      if (error?.status === 500 || error?.message?.includes('500')) {
+        console.log('📋 No tiene cuenta bancaria registrada (error 500)');
+        setNoTieneCuentaBancaria(true);
+        setCuentaBancariaData(null);
+      } else {
+        // Para otros errores, mantener el comportamiento anterior
+        setNoTieneCuentaBancaria(false);
+      }
     } finally {
       setLoadingCuentaBancaria(false);
     }
@@ -883,6 +895,19 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     Cargando información bancaria...
                   </ConsaludCore.Typography>
                 </div>
+              ) : noTieneCuentaBancaria ? (
+                <div style={{ textAlign: 'center', padding: '1rem' }}>
+                  <ConsaludCore.Typography
+                    variant="body2"
+                    style={{
+                      color: '#666666',
+                      fontSize: '0.875rem',
+                      fontStyle: 'italic'
+                    }}
+                  >
+                    No tiene una cuenta bancaria registrada
+                  </ConsaludCore.Typography>
+                </div>
               ) : cuentaBancariaData ? (
                 <>
                   <ConsaludCore.Typography
@@ -1005,13 +1030,13 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
           marginTop: '2rem',
           padding: '1rem 0'
         }}>
-          {mandatoInfo && esMandatoCorrecto === 'no' && (
+          {mandatoInfo && (esMandatoCorrecto === 'no' || noTieneCuentaBancaria) && (
             <button
-              className={`button is-primary is-rounded proceso-button animate-fade-in-up${(loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === null || loadingCuentaBancaria || shouldResetSelection) ? ' buttonRut--invalid' : ' buttonRut--valid'}`}
-              disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === null || loadingCuentaBancaria || shouldResetSelection}
+              className={`button is-primary is-rounded proceso-button animate-fade-in-up${(loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || (esMandatoCorrecto === null && !noTieneCuentaBancaria) || loadingCuentaBancaria || shouldResetSelection) ? ' buttonRut--invalid' : ' buttonRut--valid'}`}
+              disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || (esMandatoCorrecto === null && !noTieneCuentaBancaria) || loadingCuentaBancaria || shouldResetSelection}
               onClick={handleActualizarMandato}
               type="button"
-              aria-label="Actualizar mandatos"
+              aria-label={noTieneCuentaBancaria ? "Agregar mandato" : "Actualizar mandatos"}
               aria-busy={loading || iframeLoading}
               title={
                 loading ? 'Cargando información del mandato...' :
@@ -1037,7 +1062,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 border: 'none',
                 boxShadow: 'none',
                 fontSize: 16,
-                background: (loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === null || loadingCuentaBancaria || shouldResetSelection) ? '#E0F7F6' : '#04A59B',
+                background: (loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || (esMandatoCorrecto === null && !noTieneCuentaBancaria) || loadingCuentaBancaria || shouldResetSelection) ? '#E0F7F6' : '#04A59B',
                 color: '#fff',
                 padding: '17px 24px'
               }}
@@ -1049,6 +1074,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                isOpeningTab ? 'Abriendo...' :
                isButtonsLocked ? 'Pestaña Externa Abierta' :
                showManualUrl ? 'Modal Abierto' :
+               noTieneCuentaBancaria ? 'Agregar Mandato' :
                'Actualizar Mandatos'}
             </button>
           )}
