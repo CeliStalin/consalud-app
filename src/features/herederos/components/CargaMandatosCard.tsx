@@ -999,16 +999,20 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         {/* Botones */}
         <div style={{
           display: 'flex',
-          justifyContent: 'center',
+          flexDirection: 'column',
+          alignItems: 'center',
           gap: '1rem',
           marginTop: '2rem',
           padding: '1rem 0'
         }}>
-          {mandatoInfo && (
-            <ConsaludCore.Button
-              variant="secondary"
+          {mandatoInfo && esMandatoCorrecto === 'no' && (
+            <button
+              className={`button is-primary is-rounded proceso-button animate-fade-in-up${(loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === null || loadingCuentaBancaria || shouldResetSelection) ? ' buttonRut--invalid' : ' buttonRut--valid'}`}
+              disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === null || loadingCuentaBancaria || shouldResetSelection}
               onClick={handleActualizarMandato}
-              disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === 'si' || esMandatoCorrecto === null || loadingCuentaBancaria || shouldResetSelection}
+              type="button"
+              aria-label="Actualizar mandatos"
+              aria-busy={loading || iframeLoading}
               title={
                 loading ? 'Cargando información del mandato...' :
                 loadingCuentaBancaria ? 'Cargando información bancaria...' :
@@ -1016,31 +1020,26 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
                 isOpeningTab ? 'Abriendo pestaña externa...' :
                 showManualUrl ? 'Modal de apertura manual abierto' :
-                esMandatoCorrecto === 'si' ? 'El mandato es correcto, no se puede actualizar' :
                 esMandatoCorrecto === 'no' ? 'El mandato es incorrecto, se puede actualizar' :
                 esMandatoCorrecto === null ? 'Seleccione si el mandato es correcto o no' :
                 'Seleccione si el mandato es correcto o no'
               }
               style={{
-                minWidth: '180px',
-                height: '40px',
-                fontSize: '14px',
-                fontWeight: '500',
-                border: '1px solid #00CBBF',
-                borderRadius: '6px',
-                transition: 'all 0.2s ease',
-                ...(loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === 'si' || esMandatoCorrecto === null || loadingCuentaBancaria ? {
-                  backgroundColor: '#FFFFFF',
-                  color: '#00CBBF',
-                  borderColor: '#00CBBF',
-                  opacity: 0.6,
-                  cursor: 'not-allowed'
-                } : {
-                  backgroundColor: '#FFFFFF',
-                  color: '#00CBBF',
-                  borderColor: '#00CBBF',
-                  cursor: 'pointer'
-                })
+                minWidth: 180,
+                height: 42,
+                fontWeight: 600,
+                opacity: (loading || iframeLoading) ? 0.7 : 1,
+                transition: 'opacity 0.2s',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 8,
+                border: 'none',
+                boxShadow: 'none',
+                fontSize: 16,
+                background: (loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === null || loadingCuentaBancaria || shouldResetSelection) ? '#E0F7F6' : '#04A59B',
+                color: '#fff',
+                padding: '17px 24px'
               }}
             >
               {loading ? 'Cargando...' :
@@ -1051,12 +1050,15 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                isButtonsLocked ? 'Pestaña Externa Abierta' :
                showManualUrl ? 'Modal Abierto' :
                'Actualizar Mandatos'}
-            </ConsaludCore.Button>
+            </button>
           )}
-          <ConsaludCore.Button
-            variant="primary"
-            onClick={handleSave}
+          <button
+            className={`button is-primary is-rounded proceso-button animate-fade-in-up${(!mandatoInfo || saving || isButtonsLocked || esMandatoCorrecto === 'no' || esMandatoCorrecto === null || shouldResetSelection) ? ' buttonRut--invalid' : ' buttonRut--valid'}`}
             disabled={!mandatoInfo || saving || isButtonsLocked || esMandatoCorrecto === 'no' || esMandatoCorrecto === null || shouldResetSelection}
+            onClick={handleSave}
+            type="button"
+            aria-label="Enviar solicitud"
+            aria-busy={saving}
             title={
               shouldResetSelection ? 'Datos actualizados, seleccione nuevamente si el mandato es correcto' :
               isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
@@ -1064,12 +1066,29 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               esMandatoCorrecto === null ? 'Seleccione si el mandato es correcto o no' :
               ''
             }
+            style={{
+              minWidth: 180,
+              height: 42,
+              fontWeight: 600,
+              opacity: saving ? 0.7 : 1,
+              transition: 'opacity 0.2s',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 8,
+              border: 'none',
+              boxShadow: 'none',
+              fontSize: 16,
+              background: (!mandatoInfo || saving || isButtonsLocked || esMandatoCorrecto === 'no' || esMandatoCorrecto === null || shouldResetSelection) ? '#E0F7F6' : '#04A59B',
+              color: '#fff',
+              padding: '17px 24px'
+            }}
           >
-            {saving ? 'Guardando...' :
+            {saving ? 'Enviando...' :
              shouldResetSelection ? 'Seleccione Opción' :
              isButtonsLocked ? 'Bloqueado' :
-             'Guardar'}
-          </ConsaludCore.Button>
+             'Enviar solicitud'}
+          </button>
         </div>
       </div>
 
