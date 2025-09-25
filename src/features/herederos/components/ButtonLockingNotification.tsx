@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useButtonLockingContext } from '../contexts/ButtonLockingContext';
+import { useMandatosTransaction } from '../hooks/useMandatosTransaction';
+import { useTabCommunication } from '../hooks/useTabCommunication';
 import '../styles/ButtonLocking.css';
 
 export interface ButtonLockingNotificationProps {
@@ -20,8 +22,63 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
   hideDelay = 5000
 }) => {
   const { isLocked, lockReason, lockTimestamp, getLockDuration, unlockButtons } = useButtonLockingContext();
+  const { isExternalTabOpen, isButtonsLocked: isMandatosLocked, lockReason: mandatosLockReason } = useMandatosTransaction();
+  const { hasExternalTabs, externalTabsCount } = useTabCommunication();
   const [isVisible, setIsVisible] = useState(false);
   const [lockDuration, setLockDuration] = useState<number | null>(null);
+  const [hasOpenTabs, setHasOpenTabs] = useState(false);
+  const [checkingTabs, setCheckingTabs] = useState(false);
+
+  // Función para verificar si hay pestañas abiertas
+  const checkForOpenTabs = async () => {
+    setCheckingTabs(true);
+    try {
+      console.log('🔍 [ButtonLocking] Verificando estado de pestañas externas...');
+
+      // Usar el nuevo servicio de comunicación que es más confiable
+      const tabsAreOpen = hasExternalTabs;
+      setHasOpenTabs(tabsAreOpen);
+
+      console.log('🔍 [ButtonLocking] Estado de pestañas desde useTabCommunication:', {
+        hasExternalTabs,
+        externalTabsCount,
+        tabsAreOpen,
+        isExternalTabOpen,
+        isMandatosLocked,
+        mandatosLockReason
+      });
+
+      return tabsAreOpen;
+    } catch (error) {
+      console.error('❌ [ButtonLocking] Error al verificar pestañas:', error);
+      setHasOpenTabs(false);
+      return false;
+    } finally {
+      setCheckingTabs(false);
+    }
+  };
+
+  // Función para manejar el desbloqueo con verificación de pestañas
+  const handleUnlockWithTabCheck = async () => {
+    console.log('🔓 [Manual] Usuario solicitó desbloqueo manual con verificación de pestañas');
+
+    const tabsAreOpen = await checkForOpenTabs();
+
+    if (tabsAreOpen) {
+      console.log('⚠️ [Manual] No se puede desbloquear - hay pestañas abiertas');
+      // No desbloquear si hay pestañas abiertas
+      return;
+    }
+
+    console.log('✅ [Manual] No hay pestañas abiertas - procediendo con desbloqueo');
+
+    // Limpiar el estado persistente de pestaña externa
+    localStorage.removeItem('consalud_external_tab_active');
+    localStorage.removeItem('consalud_external_tab_open');
+    console.log('🧹 [Manual] Estado persistente de pestaña externa limpiado (consalud_external_tab_active y consalud_external_tab_open)');
+
+    unlockButtons();
+  };
 
   // Actualizar duración del bloqueo cada segundo
   useEffect(() => {
@@ -40,6 +97,38 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
 
     return () => clearInterval(interval);
   }, [isLocked, lockTimestamp, getLockDuration]);
+
+  // Verificar estado de pestañas cuando se monta el componente
+  useEffect(() => {
+    if (isLocked) {
+      checkForOpenTabs();
+    }
+  }, [isLocked]);
+
+  // Actualizar estado cuando cambie hasExternalTabs
+  useEffect(() => {
+    console.log('🔍 [ButtonLocking] hasExternalTabs cambió:', hasExternalTabs, 'count:', externalTabsCount);
+    setHasOpenTabs(hasExternalTabs);
+  }, [hasExternalTabs, externalTabsCount]);
+
+  // Monitoreo continuo de pestañas cuando está bloqueado
+  useEffect(() => {
+    if (!isLocked) {
+      return;
+    }
+
+    const monitorInterval = setInterval(async () => {
+      const tabsAreOpen = await checkForOpenTabs();
+
+      // Si no hay pestañas abiertas, desbloquear automáticamente
+      if (!tabsAreOpen) {
+        console.log('🔓 [Auto] No hay pestañas abiertas - desbloqueando automáticamente');
+        unlockButtons();
+      }
+    }, 3000); // Verificar cada 3 segundos
+
+    return () => clearInterval(monitorInterval);
+  }, [isLocked, unlockButtons]);
 
   // Mostrar/ocultar notificación
   useEffect(() => {
@@ -209,49 +298,67 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
         {/* Botón principal - siempre visible */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
           <button
-            onClick={() => {
-              console.log('🔓 [Manual] Usuario solicitó desbloqueo manual');
-              unlockButtons();
-            }}
+            onClick={handleUnlockWithTabCheck}
+            disabled={checkingTabs}
             style={{
               padding: '15px 30px',
-              backgroundColor: '#007bff',
+              backgroundColor: hasOpenTabs ? '#dc3545' : '#007bff',
               color: 'white',
               border: 'none',
               borderRadius: '10px',
-              cursor: 'pointer',
+              cursor: checkingTabs ? 'wait' : (hasOpenTabs ? 'not-allowed' : 'pointer'),
               fontSize: '20px',
               fontWeight: 'bold',
-              boxShadow: '0 6px 12px rgba(0,123,255,0.4)',
+              boxShadow: hasOpenTabs ? '0 6px 12px rgba(220,53,69,0.4)' : '0 6px 12px rgba(0,123,255,0.4)',
               transition: 'all 0.3s',
               minWidth: '250px',
               textTransform: 'uppercase',
               letterSpacing: '1px',
-              animation: 'pulse 2s infinite'
+              animation: hasOpenTabs ? 'none' : 'pulse 2s infinite',
+              opacity: checkingTabs ? 0.7 : 1
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#0056b3';
-              e.currentTarget.style.transform = 'translateY(-3px)';
-              e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,123,255,0.6)';
+              if (!checkingTabs && !hasOpenTabs) {
+                e.currentTarget.style.backgroundColor = '#0056b3';
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,123,255,0.6)';
+              }
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#007bff';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,123,255,0.4)';
+              if (!checkingTabs && !hasOpenTabs) {
+                e.currentTarget.style.backgroundColor = '#007bff';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,123,255,0.4)';
+              }
             }}
                   >
-                    🔓 Desbloquear Ahora
+                    {checkingTabs ? '⏳ Verificando...' :
+                     hasOpenTabs ? '🚫 Pestañas Abiertas' :
+                     '🔓 Desbloquear Ahora'}
                   </button>
 
+                  {/* Mensaje informativo basado en el estado de las pestañas */}
                   <div style={{
-                    backgroundColor: '#e7f3ff',
-                    border: '1px solid #b3d9ff',
+                    backgroundColor: hasOpenTabs ? '#fff3cd' : '#e7f3ff',
+                    border: `1px solid ${hasOpenTabs ? '#ffeaa7' : '#b3d9ff'}`,
                     borderRadius: '8px',
                     padding: '10px 15px',
                     maxWidth: '400px'
                   }}>
-                    <p style={{ margin: '0', fontSize: '14px', color: '#0066cc' }}>
-                      <strong>💡 Consejo:</strong> Use este botón cuando haya terminado de trabajar en la pestaña externa o si la cerró por error.
+                    <p style={{ margin: '0', fontSize: '14px', color: hasOpenTabs ? '#856404' : '#0066cc' }}>
+                      {checkingTabs ? (
+                        <>
+                          <strong>⏳ Verificando:</strong> Comprobando si hay pestañas externas abiertas...
+                        </>
+                      ) : hasOpenTabs ? (
+                        <>
+                          <strong>⚠️ Pestañas Detectadas:</strong> Hay pestañas externas abiertas. El sistema permanecerá bloqueado hasta que se cierren todas las pestañas.
+                        </>
+                      ) : (
+                        <>
+                          <strong>💡 Consejo:</strong> Use este botón cuando haya terminado de trabajar en la pestaña externa o si la cerró por error.
+                        </>
+                      )}
                     </p>
                   </div>
                 </div>

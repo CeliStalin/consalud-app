@@ -403,18 +403,15 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
         }
 
       // Verificar si la pestaña sigue siendo accesible
+      // NOTA: No intentar acceder a location por políticas CORS
+      // Solo verificar si la pestaña está cerrada usando la propiedad closed
       try {
-        // Intentar acceder a una propiedad de la pestaña
-        const isAccessible = tabRef.current.location !== undefined;
-        if (!isAccessible) {
-          console.log('🔍 [Global] Pestaña real ya no es accesible (posiblemente cerrada)');
-          closeExternalTab();
-          return false;
-        }
+        // Para pestañas externas, intentar acceder a location puede fallar por CORS
+        // incluso cuando la pestaña está abierta, así que solo verificamos closed
+        console.log('🔍 [Global] Verificando solo propiedad closed (evitando CORS)');
       } catch (error) {
-        console.log('🔍 [Global] Error al acceder a la pestaña real:', error);
-        closeExternalTab();
-        return false;
+        console.log('🔍 [Global] Error en verificación de accesibilidad (ignorado por CORS):', error);
+        // No cerrar la pestaña por errores de CORS
       }
 
       // Para ventanas reales, usar la verificación normal
@@ -423,26 +420,28 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
 
       if (isClosed) {
         console.log('📋 [Global] Pestaña externa cerrada detectada (closed=true)');
-        closeExternalTab();
+        // TEMPORALMENTE DESHABILITADO: closeExternalTab(); - Estaba limpiando localStorage prematuramente
+        console.log('⚠️ [Global] NO cerrando pestaña automáticamente para evitar limpieza prematura');
         return false;
       }
 
-        // Verificación adicional: intentar acceder a propiedades de la ventana
-        // para confirmar que realmente está abierta
+        // Verificación adicional: Solo verificar propiedades básicas sin acceder a contenido
         try {
-          // Intentar acceder a una propiedad que solo existe en ventanas abiertas
-          const hasLocation = 'location' in tabRef.current;
-          const hasDocument = 'document' in tabRef.current;
+          // Verificar propiedades básicas sin acceder a location o document (CORS issues)
+          const hasWindow = typeof tabRef.current === 'object' && tabRef.current !== null;
+          const hasClosedProperty = 'closed' in tabRef.current;
 
-          if (!hasLocation && !hasDocument) {
-            console.log('📋 [Global] Pestaña externa parece estar cerrada (sin location/document)');
-            closeExternalTab();
+          if (!hasWindow || !hasClosedProperty) {
+            console.log('📋 [Global] Pestaña externa parece estar cerrada (sin propiedades básicas)');
+            // TEMPORALMENTE DESHABILITADO: closeExternalTab(); - Estaba limpiando localStorage prematuramente
+            console.log('⚠️ [Global] NO cerrando pestaña automáticamente para evitar limpieza prematura');
             return false;
           }
         } catch (accessError) {
-          // Si no podemos acceder a las propiedades, asumir que está cerrada
-          console.log('📋 [Global] Pestaña externa cerrada (error al acceder a propiedades):', accessError);
-          closeExternalTab();
+          // Si no podemos acceder a las propiedades básicas, asumir que está cerrada
+          console.log('📋 [Global] Pestaña externa cerrada (error al acceder a propiedades básicas):', accessError);
+          // TEMPORALMENTE DESHABILITADO: closeExternalTab(); - Estaba limpiando localStorage prematuramente
+          console.log('⚠️ [Global] NO cerrando pestaña automáticamente para evitar limpieza prematura');
           return false;
         }
 
@@ -451,13 +450,15 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       } catch (err) {
         // Si hay cualquier error al acceder a la ventana, asumir que está cerrada
         console.log('📋 [Global] Pestaña externa cerrada (error general):', err);
-        closeExternalTab();
+        // TEMPORALMENTE DESHABILITADO: closeExternalTab(); - Estaba limpiando localStorage prematuramente
+        console.log('⚠️ [Global] NO cerrando pestaña automáticamente para evitar limpieza prematura');
         return false;
       }
     } catch (err) {
       // Solo considerar cerrada si hay una excepción al acceder a la propiedad closed
       console.log('📋 [Global] Pestaña externa cerrada (excepción al acceder a closed):', err);
-      closeExternalTab();
+      // TEMPORALMENTE DESHABILITADO: closeExternalTab(); - Estaba limpiando localStorage prematuramente
+      console.log('⚠️ [Global] NO cerrando pestaña automáticamente para evitar limpieza prematura');
       return false;
     }
   }, [closeExternalTab]);
