@@ -1,8 +1,9 @@
+import * as ConsaludCore from '@consalud/core';
+import { useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef, useCallback } from "react";
 import { Stepper } from "../components/Stepper";
 import { useTitular } from "../contexts/TitularContext";
-import * as ConsaludCore from '@consalud/core';
+import { useStorageCleanup } from "../hooks/useStorageCleanup";
 import { DatosTitularCard } from "./DatosTitularCard";
 
 interface BreadcrumbItem {
@@ -12,7 +13,13 @@ interface BreadcrumbItem {
 const DatosTitular: React.FC = () => {
     const navigator = useNavigate();
     const { titular, loading, buscarTitular } = useTitular();
+    const { cleanupAllDocuments } = useStorageCleanup();
     const hasRedirected = useRef<boolean>(false);
+
+    // Limpiar documentos del sessionStorage cuando se inicie el flujo desde Datos del titular
+    useEffect(() => {
+        cleanupAllDocuments();
+    }, [cleanupAllDocuments]);
 
     // Si no hay titular pero hay rut en sessionStorage, re-buscar
     useEffect(() => {
@@ -58,7 +65,7 @@ const DatosTitular: React.FC = () => {
     const breadcrumbItems: BreadcrumbItem[] = [
         { label: 'Administración devolución herederos' }
     ];
-    
+
     const cleanedBreadcrumbItems = breadcrumbItems.map(item => ({
         ...item,
         label: typeof item.label === 'string' ? item.label.replace(/^\/+/, '') : item.label
@@ -71,8 +78,8 @@ const DatosTitular: React.FC = () => {
                 <div style={{ marginLeft: 48 }}>
                     {/* Breadcrumb */}
                     <div style={{ marginBottom: 4 }}>
-                        <ConsaludCore.Breadcrumb 
-                            items={cleanedBreadcrumbItems} 
+                        <ConsaludCore.Breadcrumb
+                            items={cleanedBreadcrumbItems}
                             separator={<span>{'>'}</span>}
                             showHome={true}
                             className="breadcrumb-custom"

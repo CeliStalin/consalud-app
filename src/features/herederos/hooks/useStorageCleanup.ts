@@ -7,6 +7,7 @@ interface UseStorageCleanupReturn {
   migrateOldKeys: (currentRut: string) => void;
   cleanupDocumentsByRut: (rut: string) => void;
   cleanupOnBackNavigation: (currentRut: string) => void;
+  cleanupAllDocuments: () => void;
 }
 
 export const useStorageCleanup = (): UseStorageCleanupReturn => {
@@ -134,11 +135,71 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
     }
   }, []);
 
+  // Limpiar todos los documentos del sessionStorage
+  const cleanupAllDocuments = useCallback(() => {
+    try {
+      console.log('🧹 Limpiando todos los documentos del sessionStorage');
+
+      // Limpiar todas las claves que empiecen con 'documentos_'
+      Object.keys(sessionStorage).forEach(key => {
+        if (key.startsWith('documentos_')) {
+          const stored = sessionStorage.getItem(key);
+          if (stored) {
+            try {
+              // Revocar URLs de blob antes de eliminar
+              const documentos = JSON.parse(stored);
+              if (Array.isArray(documentos)) {
+                documentos.forEach(doc => {
+                  if (doc.url && typeof doc.url === 'string') {
+                    URL.revokeObjectURL(doc.url);
+                  }
+                });
+              }
+            } catch (error) {
+              console.error('Error al limpiar URLs de documentos:', error);
+            }
+          }
+          sessionStorage.removeItem(key);
+          console.log('🗑️ Documento eliminado:', key);
+        }
+      });
+
+      // También limpiar claves de fileStorage_ por compatibilidad
+      Object.keys(sessionStorage).forEach(key => {
+        if (key.startsWith('fileStorage_')) {
+          const stored = sessionStorage.getItem(key);
+          if (stored) {
+            try {
+              // Revocar URLs de blob antes de eliminar
+              const documentos = JSON.parse(stored);
+              if (Array.isArray(documentos)) {
+                documentos.forEach(doc => {
+                  if (doc.url && typeof doc.url === 'string') {
+                    URL.revokeObjectURL(doc.url);
+                  }
+                });
+              }
+            } catch (error) {
+              console.error('Error al limpiar URLs de fileStorage:', error);
+            }
+          }
+          sessionStorage.removeItem(key);
+          console.log('🗑️ FileStorage eliminado:', key);
+        }
+      });
+
+      console.log('✅ Todos los documentos han sido limpiados del sessionStorage');
+    } catch (error) {
+      console.error('Error al limpiar todos los documentos:', error);
+    }
+  }, []);
+
   return {
     cleanupFormHerederoData,
     cleanupAllHerederoData,
     migrateOldKeys,
     cleanupDocumentsByRut,
-    cleanupOnBackNavigation
+    cleanupOnBackNavigation,
+    cleanupAllDocuments
   };
 };
