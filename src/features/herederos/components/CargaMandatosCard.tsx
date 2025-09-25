@@ -105,6 +105,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   } | null>(null);
   const [cuentaBancariaData, setCuentaBancariaData] = useState<CuentaBancariaResponse | null>(null);
   const [loadingCuentaBancaria, setLoadingCuentaBancaria] = useState(false);
+  const [shouldResetSelection, setShouldResetSelection] = useState(false);
   const { setStep } = useStepper();
   const { enviarDocumentos, loading: documentosLoading, error: documentosError } = useDocumentos();
 
@@ -138,10 +139,11 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   });
 
   // Verificar si los botones deberían estar bloqueados
-  const shouldBeLocked = isButtonsLocked || transactionLoading;
+  const shouldBeLocked = isButtonsLocked || transactionLoading || shouldResetSelection;
   console.log('🔍 [CargaMandatosCard] ¿Deberían estar bloqueados?', {
     isButtonsLocked,
     transactionLoading,
+    shouldResetSelection,
     shouldBeLocked
   });
 
@@ -282,6 +284,20 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const refreshCuentaBancaria = async () => {
     if (herederoData?.RutCompleto) {
       console.log('🔄 Refrescando datos de cuenta bancaria después de cerrar ventana de mandatos');
+
+      // Limpiar sessionStorage de mandatos_transaction
+      const allKeys = Object.keys(sessionStorage);
+      const mandatosKeys = allKeys.filter(key => key.includes('mandatos_transaction'));
+      mandatosKeys.forEach(key => {
+        sessionStorage.removeItem(key);
+        console.log('🧹 Limpiando sessionStorage:', key);
+      });
+
+      // Resetear selección del radio button
+      setEsMandatoCorrecto(null);
+      setShouldResetSelection(true);
+
+      // Cargar nuevos datos
       await loadCuentaBancaria(herederoData.RutCompleto);
     }
   };
@@ -293,6 +309,14 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
       refreshCuentaBancaria();
     }
   }, [externalAppStatus, closedAt, herederoData?.RutCompleto]);
+
+  // Resetear el flag de reset cuando termine la carga
+  useEffect(() => {
+    if (shouldResetSelection && !loadingCuentaBancaria) {
+      console.log('✅ Carga completada, reseteando flag de selección');
+      setShouldResetSelection(false);
+    }
+  }, [shouldResetSelection, loadingCuentaBancaria]);
 
   // Función para manejar el guardado del solicitante
   const handleSave = async () => {
@@ -984,10 +1008,11 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             <ConsaludCore.Button
               variant="secondary"
               onClick={handleActualizarMandato}
-              disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === 'si' || esMandatoCorrecto === null || loadingCuentaBancaria}
+              disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === 'si' || esMandatoCorrecto === null || loadingCuentaBancaria || shouldResetSelection}
               title={
                 loading ? 'Cargando información del mandato...' :
                 loadingCuentaBancaria ? 'Cargando información bancaria...' :
+                shouldResetSelection ? 'Datos actualizados, seleccione nuevamente si el mandato es correcto' :
                 isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
                 isOpeningTab ? 'Abriendo pestaña externa...' :
                 showManualUrl ? 'Modal de apertura manual abierto' :
@@ -1020,6 +1045,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             >
               {loading ? 'Cargando...' :
                loadingCuentaBancaria ? 'Cargando...' :
+               shouldResetSelection ? 'Seleccione Opción' :
                iframeLoading ? 'Cargando...' :
                isOpeningTab ? 'Abriendo...' :
                isButtonsLocked ? 'Pestaña Externa Abierta' :
@@ -1030,8 +1056,9 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
           <ConsaludCore.Button
             variant="primary"
             onClick={handleSave}
-            disabled={!mandatoInfo || saving || isButtonsLocked || esMandatoCorrecto === 'no' || esMandatoCorrecto === null}
+            disabled={!mandatoInfo || saving || isButtonsLocked || esMandatoCorrecto === 'no' || esMandatoCorrecto === null || shouldResetSelection}
             title={
+              shouldResetSelection ? 'Datos actualizados, seleccione nuevamente si el mandato es correcto' :
               isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
               esMandatoCorrecto === 'no' ? 'El mandato es incorrecto, debe actualizarse primero' :
               esMandatoCorrecto === null ? 'Seleccione si el mandato es correcto o no' :
@@ -1039,6 +1066,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             }
           >
             {saving ? 'Guardando...' :
+             shouldResetSelection ? 'Seleccione Opción' :
              isButtonsLocked ? 'Bloqueado' :
              'Guardar'}
           </ConsaludCore.Button>
