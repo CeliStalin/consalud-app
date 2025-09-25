@@ -984,9 +984,10 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             <ConsaludCore.Button
               variant="secondary"
               onClick={handleActualizarMandato}
-              disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === 'si' || esMandatoCorrecto === null}
+              disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === 'si' || esMandatoCorrecto === null || loadingCuentaBancaria}
               title={
                 loading ? 'Cargando información del mandato...' :
+                loadingCuentaBancaria ? 'Cargando información bancaria...' :
                 isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
                 isOpeningTab ? 'Abriendo pestaña externa...' :
                 showManualUrl ? 'Modal de apertura manual abierto' :
@@ -1003,7 +1004,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 border: '1px solid #00CBBF',
                 borderRadius: '6px',
                 transition: 'all 0.2s ease',
-                ...(loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === 'si' || esMandatoCorrecto === null ? {
+                ...(loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || esMandatoCorrecto === 'si' || esMandatoCorrecto === null || loadingCuentaBancaria ? {
                   backgroundColor: '#FFFFFF',
                   color: '#00CBBF',
                   borderColor: '#00CBBF',
@@ -1018,6 +1019,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               }}
             >
               {loading ? 'Cargando...' :
+               loadingCuentaBancaria ? 'Cargando...' :
                iframeLoading ? 'Cargando...' :
                isOpeningTab ? 'Abriendo...' :
                isButtonsLocked ? 'Pestaña Externa Abierta' :
