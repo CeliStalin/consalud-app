@@ -107,6 +107,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const [loadingCuentaBancaria, setLoadingCuentaBancaria] = useState(false);
   const [shouldResetSelection, setShouldResetSelection] = useState(false);
   const [noTieneCuentaBancaria, setNoTieneCuentaBancaria] = useState(false);
+  const [bloquearRadioButtons, setBloquearRadioButtons] = useState(false);
   const { setStep } = useStepper();
   const { enviarDocumentos, loading: documentosLoading, error: documentosError } = useDocumentos();
 
@@ -269,11 +270,13 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const loadCuentaBancaria = async (rutCompleto: string) => {
     setLoadingCuentaBancaria(true);
     setNoTieneCuentaBancaria(false);
+    setBloquearRadioButtons(false);
     try {
       console.log('🏦 Cargando datos de cuenta bancaria para RUT:', rutCompleto);
       const cuentaData = await getCuentaBancaria(rutCompleto);
       setCuentaBancariaData(cuentaData);
       setNoTieneCuentaBancaria(false);
+      setBloquearRadioButtons(false);
       console.log('✅ Datos de cuenta bancaria cargados:', cuentaData);
     } catch (error: any) {
       console.error('❌ Error al cargar datos de cuenta bancaria:', error);
@@ -283,9 +286,11 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         console.log('📋 No tiene cuenta bancaria registrada (error 404)');
         setNoTieneCuentaBancaria(true);
         setCuentaBancariaData(null);
+        setBloquearRadioButtons(true);
       } else {
         // Para otros errores, mantener el comportamiento anterior
         setNoTieneCuentaBancaria(false);
+        setBloquearRadioButtons(false);
       }
     } finally {
       setLoadingCuentaBancaria(false);
@@ -993,6 +998,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                         value="si"
                         checked={esMandatoCorrecto === 'si'}
                         onChange={(e) => setEsMandatoCorrecto(e.target.value)}
+                        disabled={bloquearRadioButtons}
                       />
                       <span className="ml-2">Sí, los datos corresponden a la persona heredera.</span>
                     </label>
@@ -1007,6 +1013,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                         value="no"
                         checked={esMandatoCorrecto === 'no'}
                         onChange={(e) => setEsMandatoCorrecto(e.target.value)}
+                        disabled={bloquearRadioButtons}
                       />
                       <span className="ml-2">No, los datos no corresponden a la persona heredera.</span>
                     </label>
