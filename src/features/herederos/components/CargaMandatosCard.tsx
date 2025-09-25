@@ -603,7 +603,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               lineHeight: '1.4'
             }}
           >
-            Mandatos
+            Cuenta bancaria
           </ConsaludCore.Typography>
         </div>
 

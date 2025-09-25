@@ -106,7 +106,7 @@ const DetalleMandatoPageContent: React.FC = () => {
                 marginBottom: '1.5rem'
               }}
             >
-              Mandatos
+              Cuenta bancaria
             </ConsaludCore.Typography>
           </div>
 

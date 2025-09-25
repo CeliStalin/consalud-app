@@ -35,7 +35,7 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
     { title: "Paso 1", description: "Datos del titular" },
     { title: "Paso 2", description: "Registrar persona heredera" },
     { title: "Paso 3", description: "Carga de documentos" },
-    { title: "Paso 4", description: "Mandatos" },
+    { title: "Paso 4", description: "Cuenta bancaria" },
   ];
 
   const renderCircle = (index: number) => {
