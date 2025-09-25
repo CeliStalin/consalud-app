@@ -579,17 +579,15 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
           <div style={{
             width: '2.5rem',
             height: '2.5rem',
-            borderRadius: '50%',
-            backgroundColor: '#E8F8F7',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0
           }}>
             <svg width="1.25rem" height="1.25rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 10H21L20 6H4L3 10Z" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 10L4 18H20L21 10" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M8 14H16" stroke="#00CBBF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M18.5023 6.95098L16.1365 3.79657C15.4993 2.94704 14.3095 2.74323 13.426 3.33227L7.92773 6.99776" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path fillRule="evenodd" clipRule="evenodd" d="M18.501 11.498H21.0021C21.5546 11.498 22.0025 11.9459 22.0025 12.4985V15.4997C22.0025 16.0522 21.5546 16.5001 21.0021 16.5001H18.501C17.1198 16.5001 16 15.3804 16 13.9991V13.9991C16 12.6178 17.1198 11.498 18.501 11.498V11.498Z" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M21.0036 11.498V9.49714C21.0036 8.11585 19.8838 6.99609 18.5026 6.99609H5.49714C4.11585 6.99609 2.99609 8.11585 2.99609 9.49714V18.5009C2.99609 19.8822 4.11585 21.0019 5.49714 21.0019H18.5026C19.8838 21.0019 21.0036 19.8822 21.0036 18.5009V16.5001" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           <ConsaludCore.Typography
