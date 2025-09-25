@@ -278,9 +278,9 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     } catch (error: any) {
       console.error('❌ Error al cargar datos de cuenta bancaria:', error);
 
-      // Si es error 500, significa que no tiene cuenta bancaria registrada
-      if (error?.status === 500 || error?.message?.includes('500')) {
-        console.log('📋 No tiene cuenta bancaria registrada (error 500)');
+      // Si es error 404, significa que no tiene cuenta bancaria registrada
+      if (error?.status === 404 || error?.message?.includes('404')) {
+        console.log('📋 No tiene cuenta bancaria registrada (error 404)');
         setNoTieneCuentaBancaria(true);
         setCuentaBancariaData(null);
       } else {
