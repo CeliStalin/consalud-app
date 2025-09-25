@@ -798,18 +798,26 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
           </ConsaludCore.Typography>
         </div>
 
-        {/* Indicador de bloqueo de botones */}
-        {isButtonsLocked && (
-          <div className="notification is-warning mb-4">
+
+        {/* Mensaje sutil cuando la ventana de mandatos está abierta */}
+        {(isExternalTabOpen || isOpeningTab) && (
+          <div
+            className="notification is-info mb-4"
+            style={{
+              animation: 'fadeInDown 0.5s ease-out',
+              border: '1px solid rgb(255 250 233)',
+              borderRadius: '8px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              backgroundColor: 'rgb(255 249 229)'
+            }}
+          >
             <div className="is-flex is-align-items-center">
-              <span className="icon is-small mr-2">
-                <i className="fas fa-lock"></i>
+              <span className="icon" style={{ color: '#F5A200' }}>
+                <i className="fas fa-external-link-alt"></i>
               </span>
-              <div>
-                <strong>Botones bloqueados:</strong> {lockReason}
-                <br />
-                <small>Complete el proceso en la pestaña externa para desbloquear los botones.</small>
-              </div>
+              <span className="ml-2" style={{ color: '#856404', fontWeight: '500' }}>
+                Complete el proceso ingresa/actualiza Mandatos, para desbloquear los botones y continuar con el flujo.
+              </span>
             </div>
           </div>
         )}
@@ -998,7 +1006,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                         value="si"
                         checked={esMandatoCorrecto === 'si'}
                         onChange={(e) => setEsMandatoCorrecto(e.target.value)}
-                        disabled={bloquearRadioButtons}
+                        disabled={bloquearRadioButtons || isExternalTabOpen || isOpeningTab}
                       />
                       <span className="ml-2">Sí, los datos corresponden a la persona heredera.</span>
                     </label>
@@ -1013,7 +1021,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                         value="no"
                         checked={esMandatoCorrecto === 'no'}
                         onChange={(e) => setEsMandatoCorrecto(e.target.value)}
-                        disabled={bloquearRadioButtons}
+                        disabled={bloquearRadioButtons || isExternalTabOpen || isOpeningTab}
                       />
                       <span className="ml-2">No, los datos no corresponden a la persona heredera.</span>
                     </label>

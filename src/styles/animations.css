@@ -3,7 +3,18 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px); 
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
@@ -14,7 +25,7 @@
 @keyframes fadeInScale {
   from {
     opacity: 0;
-    transform: scale(0.98); 
+    transform: scale(0.98);
   }
   to {
     opacity: 1;
@@ -25,7 +36,7 @@
 @keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(-20px); 
+    transform: translateX(-20px);
   }
   to {
     opacity: 1;
@@ -71,7 +82,7 @@
 @keyframes smoothSlideIn {
   from {
     opacity: 0;
-    transform: translateX(8px); 
+    transform: translateX(8px);
   }
   to {
     opacity: 1;
@@ -209,7 +220,7 @@
 }
 
 .animate-bounce-in {
-  animation: bounceIn 600ms ease-out; 
+  animation: bounceIn 600ms ease-out;
 }
 
 .animate-pulse {
@@ -252,11 +263,11 @@
 }
 
 .hover-scale {
-  transition: transform 200ms ease; 
+  transition: transform 200ms ease;
 }
 
 .hover-scale:hover {
-  transform: scale(1.02); 
+  transform: scale(1.02);
 }
 /* clase para elementos que necesitan estabilidad visual */
 .visual-stable {
@@ -275,7 +286,7 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   .page-entering,
   .page-exiting {
     animation: none !important;
@@ -314,17 +325,17 @@
 
 /*  Soporte específico para bounce effect del core */
 @keyframes coreBounceClick {
-  0% { 
-    transform: scale(1); 
+  0% {
+    transform: scale(1);
   }
-  30% { 
-    transform: scale(0.95); 
+  30% {
+    transform: scale(0.95);
   }
-  60% { 
-    transform: scale(1.02); 
+  60% {
+    transform: scale(1.02);
   }
-  100% { 
-    transform: scale(1); 
+  100% {
+    transform: scale(1);
   }
 }
 
