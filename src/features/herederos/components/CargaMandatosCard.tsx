@@ -101,6 +101,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     NombrePersona: string;
     ApellidoPaterno: string;
     ApellidoMaterno: string;
+    RutCompleto: string;
   } | null>(null);
   const [cuentaBancariaData, setCuentaBancariaData] = useState<CuentaBancariaResponse | null>(null);
   const [loadingCuentaBancaria, setLoadingCuentaBancaria] = useState(false);
@@ -114,6 +115,8 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     isExternalTabOpen,
     isOpeningTab,
     openExternalTab,
+    externalAppStatus,
+    closedAt,
     // Funcionalidad de bloqueo de botones
     isButtonsLocked,
     lockReason,
@@ -274,6 +277,22 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
       setLoadingCuentaBancaria(false);
     }
   };
+
+  // Función para refrescar datos de cuenta bancaria
+  const refreshCuentaBancaria = async () => {
+    if (herederoData?.RutCompleto) {
+      console.log('🔄 Refrescando datos de cuenta bancaria después de cerrar ventana de mandatos');
+      await loadCuentaBancaria(herederoData.RutCompleto);
+    }
+  };
+
+  // Detectar cuando se cierra la ventana externa de mandatos y refrescar datos
+  useEffect(() => {
+    if (externalAppStatus === 'closed' && closedAt) {
+      console.log('🔄 Ventana externa de mandatos cerrada, refrescando datos de cuenta bancaria');
+      refreshCuentaBancaria();
+    }
+  }, [externalAppStatus, closedAt, herederoData?.RutCompleto]);
 
   // Función para manejar el guardado del solicitante
   const handleSave = async () => {
