@@ -25,6 +25,10 @@ export interface UseMandatosTransactionReturn {
   lockReason: string | null;
   lockButtons: (reason: string) => void;
   unlockButtons: () => void;
+
+  // Propiedades de transacción
+  transactionToken: string | null;
+  hasActiveTransaction: boolean;
 }
 
 /**
@@ -38,7 +42,14 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
   const [transactionId, setTransactionId] = useState<string | null>(null);
 
   // Hook de bloqueo de botones
-  const { isButtonsLocked, lockReason, lockButtons, unlockButtons } = useGlobalButtonLocking();
+  const {
+    isButtonsLocked,
+    lockReason,
+    lockButtons,
+    unlockButtons,
+    transactionToken,
+    hasActiveTransaction
+  } = useGlobalButtonLocking();
 
   // Hook de aplicación externa
   const {
@@ -140,6 +151,10 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
     isButtonsLocked,
     lockReason,
     lockButtons,
-    unlockButtons
+    unlockButtons,
+
+    // Propiedades de transacción
+    transactionToken,
+    hasActiveTransaction
   };
 };
