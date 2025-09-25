@@ -117,9 +117,9 @@ const HerederosLayout: React.FC = () => (
     <TitularProvider>
       <HerederoProvider>
         <ButtonLockingProviderWrapper
-          showNotification={true}
-          showOverlay={true}
-          showTopBar={true}
+          showNotification={false}
+          showOverlay={false}
+          showTopBar={false}
         >
           <CollapseOnRoute>
             <Outlet />

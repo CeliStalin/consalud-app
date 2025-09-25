@@ -71,9 +71,9 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     lockReason,
     lockButtons,
     unlockButtons,
-    // Token de transacción
-    transactionToken,
-    hasActiveTransaction
+    // Estados de transacción
+    transactionId,
+    loading: transactionLoading
   } = useMandatosTransaction();
 
   // Debug: Log del estado de bloqueo
@@ -81,16 +81,16 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     isButtonsLocked,
     lockReason,
     isExternalTabOpen,
-    transactionToken,
-    hasActiveTransaction,
+    transactionId,
+    transactionLoading,
     timestamp: Date.now()
   });
 
   // Verificar si los botones deberían estar bloqueados
-  const shouldBeLocked = isButtonsLocked || hasActiveTransaction;
+  const shouldBeLocked = isButtonsLocked || transactionLoading;
   console.log('🔍 [CargaMandatosCard] ¿Deberían estar bloqueados?', {
     isButtonsLocked,
-    hasActiveTransaction,
+    transactionLoading,
     shouldBeLocked
   });
 

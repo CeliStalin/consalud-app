@@ -57,30 +57,6 @@ class TabCommunicationService {
     this.isInitialized = true;
   }
 
-  /**
-   * Inicializa la detección de pestañas
-   */
-  private initTabDetection(): void {
-    console.log('🔍 [TabCommunication] Inicializando detección de pestañas');
-
-    // Configurar detección de visibilidad para detectar pestañas activas
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        console.log('🔍 [TabCommunication] Pestaña principal oculta - posible pestaña externa activa');
-      } else {
-        console.log('🔍 [TabCommunication] Pestaña principal visible');
-      }
-    });
-
-    // Configurar detección de foco para detectar cambios de pestaña
-    window.addEventListener('focus', () => {
-      console.log('🔍 [TabCommunication] Pestaña principal enfocada');
-    });
-
-    window.addEventListener('blur', () => {
-      console.log('🔍 [TabCommunication] Pestaña principal perdió foco - posible pestaña externa activa');
-    });
-  }
 
   /**
    * Registra un handler para mensajes específicos
@@ -157,72 +133,6 @@ class TabCommunicationService {
     }
   }
 
-  /**
-   * Inyecta el script de comunicación en la pestaña externa
-   */
-  private injectCommunicationScript(newTab: Window, tabId: string): void {
-    // Esperar a que la pestaña se cargue
-    setTimeout(() => {
-      try {
-        // Crear script de comunicación
-        const script = newTab.document.createElement('script');
-        script.textContent = `
-          (function() {
-            'use strict';
-
-            const tabId = '${tabId}';
-            const parentWindow = window.opener;
-
-            console.log('🔗 [ExternalTab] Script de comunicación cargado para tabId:', tabId);
-
-            // Función para enviar mensaje al padre
-            function sendToParent(type, data = {}) {
-              if (parentWindow && !parentWindow.closed) {
-                parentWindow.postMessage({
-                  type: type,
-                  source: 'external-tab',
-                  tabId: tabId,
-                  timestamp: Date.now(),
-                  ...data
-                }, '*');
-              }
-            }
-
-            // Notificar que la pestaña está lista
-            sendToParent('TAB_READY');
-
-            // Configurar heartbeat cada 2 segundos
-            const heartbeatInterval = setInterval(() => {
-              sendToParent('TAB_HEARTBEAT');
-            }, 2000);
-
-            // Notificar cierre de pestaña
-            window.addEventListener('beforeunload', () => {
-              clearInterval(heartbeatInterval);
-              sendToParent('TAB_CLOSED');
-            });
-
-            // Notificar cuando la pestaña pierde/gana foco
-            window.addEventListener('blur', () => {
-              sendToParent('TAB_HEARTBEAT', { status: 'blurred' });
-            });
-
-            window.addEventListener('focus', () => {
-              sendToParent('TAB_HEARTBEAT', { status: 'focused' });
-            });
-
-            console.log('✅ [ExternalTab] Comunicación configurada');
-          })();
-        `;
-
-        newTab.document.head.appendChild(script);
-        console.log('✅ [TabCommunication] Script de comunicación inyectado');
-
-      } catch (error) {
-        console.warn('⚠️ [TabCommunication] No se pudo inyectar script de comunicación:', error);
-      }
-    }, 1000);
-  }
 
   /**
    * Maneja mensajes del BroadcastChannel
@@ -359,28 +269,6 @@ class TabCommunicationService {
     return this.externalTabs.size > 0;
   }
 
-  /**
-   * Verifica y limpia pestañas mock que no se pueden detectar
-   */
-  private verifyAndCleanupMockTab(tabId: string): void {
-    const tabInfo = this.externalTabs.get(tabId);
-    if (!tabInfo || tabInfo.windowRef) {
-      // Si la pestaña tiene windowRef, no es mock, no limpiar
-      return;
-    }
-
-    console.log('🔍 [TabCommunication] Verificando pestaña mock:', tabId);
-
-    // Intentar detectar si realmente hay una pestaña abierta usando técnicas alternativas
-    const hasRealTab = this.detectOpenTabs();
-
-    if (!hasRealTab) {
-      console.log('🗑️ [TabCommunication] Limpiando pestaña mock - no se detectó pestaña real:', tabId);
-      this.closeExternalTab(tabId);
-    } else {
-      console.log('✅ [TabCommunication] Pestaña mock confirmada como real:', tabId);
-    }
-  }
 
   /**
    * Detecta manualmente si hay pestañas abiertas usando técnicas alternativas
@@ -392,7 +280,6 @@ class TabCommunicationService {
 
       // Técnica 1: Verificar si window.focus() funciona
       // Si hay otras pestañas abiertas, window.focus() puede no funcionar
-      const originalFocus = document.hasFocus();
 
       // Intentar hacer foco en la ventana
       window.focus();
@@ -510,7 +397,8 @@ class TabCommunicationService {
    */
   private createSimpleTabId(tabId: string, url: string): void {
     try {
-      const simpleTabId = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      // Usar el tabId proporcionado en lugar de generar uno nuevo
+      const simpleTabId = tabId;
 
       // Guardar en localStorage con un ID único simple
       localStorage.setItem('consalud_external_tab_active', Date.now().toString());
@@ -585,9 +473,14 @@ class TabCommunicationService {
             })();
           `;
 
-          // Intentar ejecutar el script en la pestaña externa
-          tabWindow.eval(script);
-          console.log(`✅ [TabCommunication] Script de detección inyectado en pestaña ${tabId}`);
+          // Intentar ejecutar el script en la pestaña externa usando una función
+          try {
+            const scriptFunction = new Function(script);
+            scriptFunction.call(tabWindow);
+            console.log(`✅ [TabCommunication] Script de detección inyectado en pestaña ${tabId}`);
+          } catch (evalError) {
+            console.warn(`⚠️ [TabCommunication] No se pudo ejecutar script en pestaña ${tabId}:`, evalError);
+          }
 
         } catch (error) {
           console.warn(`⚠️ [TabCommunication] No se pudo inyectar script en pestaña ${tabId}:`, error);
@@ -600,73 +493,13 @@ class TabCommunicationService {
     }
   }
 
-  /**
-   * Configura monitoreo para detectar cuando se cierra la pestaña
-   */
-  private setupTabCloseMonitoring(tabId: string): void {
-    console.log(`🔍 [TabCommunication] Configurando monitoreo de cierre para ${tabId}`);
 
-    // Monitorear cambios en la visibilidad de la página
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        console.log(`🔍 [TabCommunication] Pestaña principal oculta - posible cambio a pestaña externa ${tabId}`);
-      } else {
-        console.log(`🔍 [TabCommunication] Pestaña principal visible - verificando si ${tabId} aún está abierta`);
-
-        // Verificar si la pestaña externa aún está abierta
-        setTimeout(() => {
-          this.checkIfTabStillOpen(tabId);
-        }, 1000);
-      }
-    };
-
-    // Monitorear cuando la página vuelve a tener foco
-    const handleFocus = () => {
-      console.log(`🔍 [TabCommunication] Pestaña principal enfocada - verificando estado de ${tabId}`);
-      setTimeout(() => {
-        this.checkIfTabStillOpen(tabId);
-      }, 500);
-    };
-
-    // Agregar listeners
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-
-    // Limpiar listeners después de 5 minutos
-    setTimeout(() => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-    }, 300000);
-  }
-
-  /**
-   * Verifica si una pestaña externa aún está abierta
-   */
-  private checkIfTabStillOpen(tabId: string): void {
-    const tabInfo = this.externalTabs.get(tabId);
-    if (!tabInfo) {
-      return; // La pestaña ya fue limpiada
-    }
-
-    // Si es una pestaña mock (sin windowRef), usar técnicas de detección alternativas
-    if (!tabInfo.windowRef) {
-      console.log(`🔍 [TabCommunication] Verificando pestaña mock ${tabId} usando técnicas alternativas`);
-
-      // Verificar si hay cambios en el foco o visibilidad que indiquen que la pestaña se cerró
-      const hasRealTab = this.detectOpenTabs();
-
-      if (!hasRealTab) {
-        console.log(`🗑️ [TabCommunication] Pestaña mock ${tabId} parece estar cerrada - limpiando`);
-        this.closeExternalTab(tabId);
-      }
-    }
-  }
 
   /**
    * Cierra todas las pestañas externas
    */
   closeAllExternalTabs(): void {
-    for (const [tabId, tabInfo] of this.externalTabs.entries()) {
+    for (const [tabId] of this.externalTabs.entries()) {
       this.closeExternalTab(tabId);
     }
   }
