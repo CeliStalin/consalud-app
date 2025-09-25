@@ -605,6 +605,21 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
           </ConsaludCore.Typography>
         </div>
 
+        {/* Descripción */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <ConsaludCore.Typography
+            variant="body2"
+            style={{
+              color: '#666666',
+              fontSize: '0.875rem',
+              lineHeight: '1.4',
+              margin: 0
+            }}
+          >
+            La devolución se realizará en la cuenta registrada a nombre de la persona heredera.
+          </ConsaludCore.Typography>
+        </div>
+
         {/* Indicador de bloqueo de botones */}
         {isButtonsLocked && (
           <div className="notification is-warning mb-4">
@@ -650,86 +665,80 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
           </div>
         ) : mandatoInfo ? (
           <div className="mandato-detalle">
-            <div className="columns">
-              <div className="column">
-                <div className="field-group">
-                  <h4 className="subtitle is-6">Información de la cuenta</h4>
-                  <div className="field">
-                    <label className="label">Banco</label>
-                    <p className="field-value">{mandatoInfo.banco}</p>
-                  </div>
-                  <div className="field">
-                    <label className="label">Tipo de cuenta</label>
-                    <p className="field-value">{mandatoInfo.tipoCuenta}</p>
-                  </div>
-                  <div className="field">
-                    <label className="label">Número de cuenta</label>
-                    <p className="field-value">{mandatoInfo.numeroCuenta}</p>
-                  </div>
-                  <div className="field">
-                    <label className="label">ID de mandato</label>
-                    <p className="field-value">{mandatoInfo.mandatoId}</p>
-                  </div>
-                  {mandatoInfo.indTipo && (
-                    <div className="field">
-                      <label className="label">Tipo</label>
-                      <p className="field-value">{mandatoInfo.indTipo === '1' ? 'Cuenta Corriente' :
-                                                 mandatoInfo.indTipo === '2' ? 'Cuenta Vista' :
-                                                 mandatoInfo.indTipo === '3' ? 'Cuenta de Ahorro' :
-                                                 mandatoInfo.indTipo}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="column">
-                <div className="field-group">
-                  <h4 className="subtitle is-6">Información del titular</h4>
-                  <div className="field">
-                    <label className="label">Nombre</label>
-                    <p className="field-value">{mandatoInfo.nombreCliente}</p>
-                  </div>
-                  <div className="field">
-                    <label className="label">Apellido Paterno</label>
-                    <p className="field-value">{mandatoInfo.apellidoPaterno || '-'}</p>
-                  </div>
-                  <div className="field">
-                    <label className="label">Apellido Materno</label>
-                    <p className="field-value">{mandatoInfo.apellido}</p>
-                  </div>
-                  <div className="field">
-                    <label className="label">RUT</label>
-                    <p className="field-value">{mandatoInfo.rutCliente}-{mandatoInfo.digitoVerificador}</p>
-                  </div>
-                </div>
+            {/* Cuenta asociada a */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <ConsaludCore.Typography
+                variant="body2"
+                weight="medium"
+                style={{
+                  color: '#505050',
+                  fontSize: '0.875rem',
+                  marginBottom: '0.5rem'
+                }}
+              >
+                Cuenta asociada a
+              </ConsaludCore.Typography>
+              <div style={{
+                backgroundColor: '#F8F9FA',
+                border: '1px solid #E9ECEF',
+                borderRadius: '20px',
+                padding: '0.75rem',
+                marginBottom: '1rem'
+              }}>
+                <ConsaludCore.Typography
+                  variant="body2"
+                  style={{
+                    color: '#666666',
+                    fontSize: '0.875rem',
+                    margin: 0
+                  }}
+                >
+                  {mandatoInfo.nombreCliente} {mandatoInfo.apellidoPaterno || ''} {mandatoInfo.apellido}
+                </ConsaludCore.Typography>
               </div>
             </div>
 
-            {/* Mostrar campos adicionales del servicio SOAP en un acordeón */}
-            <div className="box mt-4">
-              <details>
-                <summary className="has-text-primary has-text-weight-medium">Información adicional del mandato</summary>
-                <div className="columns is-multiline mt-3">
-                  {Object.entries(mandatoInfo)
-                    .filter(([key]) => !['mandatoId', 'banco', 'tipoCuenta', 'numeroCuenta',
-                                        'nombreCliente', 'apellido', 'apellidoPaterno', 'rutCliente',
-                                        'digitoVerificador', 'mensaje', 'Sindtipo'].includes(key))
-                    .map(([key, value]) => (
-                      <div className="column is-half" key={key}>
-                        <div className="field">
-                          <label className="label is-small">{key}</label>
-                          <p className="field-value">{String(value || '-')}</p>
-                        </div>
-                      </div>
-                    ))
-                  }
-                </div>
-              </details>
+            {/* Detalles bancarios */}
+            <div style={{
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E9ECEF',
+              borderRadius: '8px',
+              padding: '1rem'
+            }}>
+              <ConsaludCore.Typography
+                variant="body2"
+                weight="bold"
+                style={{
+                  color: '#505050',
+                  fontSize: '0.875rem',
+                  marginBottom: '0.25rem'
+                }}
+              >
+                {mandatoInfo.banco}
+              </ConsaludCore.Typography>
+              <ConsaludCore.Typography
+                variant="body2"
+                style={{
+                  color: '#505050',
+                  fontSize: '0.875rem',
+                  marginBottom: '0.25rem'
+                }}
+              >
+                {mandatoInfo.tipoCuenta}
+              </ConsaludCore.Typography>
+              <ConsaludCore.Typography
+                variant="body2"
+                style={{
+                  color: '#505050',
+                  fontSize: '0.875rem',
+                  margin: 0
+                }}
+              >
+                N° {mandatoInfo.numeroCuenta}
+              </ConsaludCore.Typography>
             </div>
 
-            <div className="notification is-info is-light mt-4">
-              <p>Esta información bancaria será utilizada para realizar la devolución de los fondos correspondientes.</p>
-              <p className="mt-2 is-size-7">Si los datos no son correctos, por favor vuelva al paso anterior y modifique la información.</p>
-            </div>
+
 
             {/* Radio button para confirmar si el mandato es correcto */}
             <div className="field mt-4">
