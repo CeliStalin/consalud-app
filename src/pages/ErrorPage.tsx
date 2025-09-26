@@ -1,11 +1,11 @@
-import CheckRequisitosIcon from '@/assets/check-requisitos.svg';
 import { Stepper, StepperProvider } from '@/features/herederos/components/Stepper';
 import * as ConsaludCore from '@consalud/core';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './styles/SuccessPage.css';
+import './styles/ErrorPage.css';
+import WarningIcon from '/public/Warning.svg';
 
-const SuccessPage: React.FC = () => {
+const ErrorPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleBackToHome = useCallback(() => {
@@ -14,9 +14,9 @@ const SuccessPage: React.FC = () => {
 
   return (
     <StepperProvider>
-      <div className="success-page-container">
-        {/* Título "¡Listo!" */}
-        <div className="success-page-title">
+      <div className="error-page-container">
+        {/* Título "Error en el envío" */}
+        <div className="error-page-title">
           <ConsaludCore.Typography
             variant="h4"
             component="h1"
@@ -28,41 +28,40 @@ const SuccessPage: React.FC = () => {
               marginBottom: '1rem'
             }}
           >
-            ¡Listo!
+            Error en el envío
           </ConsaludCore.Typography>
         </div>
 
         {/* Stepper con todos los pasos completados - mismo tamaño que otras páginas */}
-        <div className="success-page-stepper">
+        <div className="error-page-stepper">
           <Stepper step={4} />
         </div>
 
-        {/* Tarjeta de éxito */}
-        <div className="success-card">
-          {/* Icono de éxito */}
-          <div className="success-icon">
+        {/* Tarjeta de error */}
+        <div className="error-card">
+          {/* Icono de error */}
+          <div className="error-icon">
             <img
-              src={CheckRequisitosIcon}
-              alt="Solicitud completada"
-              width="40"
-              height="40"
+              src={WarningIcon}
+              alt="Error en el envío"
+              width="48"
+              height="48"
             />
           </div>
 
           {/* Título principal */}
-          <h1 className="success-title">
-            La solicitud de devolución se ingresó correctamente
+          <h1 className="error-title">
+            Ocurrió un error en el envío de tu solicitud
           </h1>
 
           {/* Mensaje descriptivo */}
-          <p className="success-message">
-            La persona heredera recibirá una respuesta sobre la devolución en{' '}
-            <strong>3 días hábiles</strong>, a través de su correo electrónico registrado.
+          <p className="error-message">
+            Por favor, inténtalo nuevamente.
           </p>
 
           {/* Botón de acción */}
           <button
-            className="success-button"
+            className="error-button"
             onClick={handleBackToHome}
           >
             Volver al Inicio
@@ -73,4 +72,4 @@ const SuccessPage: React.FC = () => {
   );
 };
 
-export default SuccessPage;
+export default ErrorPage;

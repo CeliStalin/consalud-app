@@ -60,9 +60,30 @@ export const useDocumentos = (): UseDocumentosReturn => {
     } catch (err: any) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido al enviar documentos';
       console.error('Error en useDocumentos:', errorMessage);
+      console.log('🔍 Debug useDocumentos - err.message:', err.message);
+      console.log('🔍 Debug useDocumentos - err completo:', err);
       setError(errorMessage);
 
-      // Retornar respuesta de error
+      // Verificar si es un error que debe propagarse (retry agotado)
+      if (err.message && (
+        err.message.includes('Falló definitivamente después de') ||
+        err.message.includes('Falló definitivamente') ||
+        err.message.includes('definitivamente después de')
+      )) {
+        console.log('🚨 Error crítico en useDocumentos - propagando error');
+        console.log('🚨 Mensaje de error crítico:', err.message);
+        // Re-lanzar el error para que sea capturado por CargaMandatosCard
+        throw err;
+      }
+
+      // Verificar si es "Failed to fetch" que también debe propagarse
+      if (err.message && err.message.includes('Failed to fetch')) {
+        console.log('🚨 Error "Failed to fetch" en useDocumentos - propagando error');
+        throw err;
+      }
+
+      console.log('⚠️ Error no crítico en useDocumentos - retornando respuesta de error');
+      // Retornar respuesta de error para errores no críticos
       return {
         success: false,
         message: errorMessage,

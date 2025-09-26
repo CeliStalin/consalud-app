@@ -39,8 +39,8 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
   ];
 
   const renderCircle = (index: number) => {
-    const isCompleted = index < step - 1;
-    const isActive = index === step - 1;
+    const isCompleted = index < step - 1 || (step === steps.length);
+    const isActive = index === step - 1 && step < steps.length;
 
     return (
       <div
@@ -55,7 +55,7 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
     if (index >= steps.length - 1) return null;
 
     return (
-      <div className={`progressLine${index < step - 1 ? ' active' : ''}`} />
+      <div className={`progressLine${index < step - 1 || step === steps.length ? ' active' : ''}`} />
     );
   };
 

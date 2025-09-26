@@ -1,5 +1,6 @@
 import * as ConsaludCore from '@consalud/core';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DOCUMENTOS_MESSAGES } from '../constants';
 import { useDocumentos } from '../hooks/useDocumentos';
 import { useMandatosTransaction } from '../hooks/useMandatosTransaction';
@@ -89,6 +90,7 @@ interface CargaMandatosCardProps {
 }
 
 const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [mandatoInfo, setMandatoInfo] = useState<MandatoResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -663,8 +665,32 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                       onSave();
                     } else {
                       console.warn(DOCUMENTOS_MESSAGES.ERROR.DOCUMENTS_SEND_FAILED, resultDocumentos.message);
+
+                      // Verificar si el error indica que se agotaron los intentos
+                      if (resultDocumentos.message && (
+                        resultDocumentos.message.includes('Falló definitivamente después de') ||
+                        resultDocumentos.message.includes('Falló definitivamente') ||
+                        resultDocumentos.message.includes('definitivamente después de')
+                      )) {
+                        console.log('🚨 Error en documentos después de agotar intentos - navegando a página de error');
+                        navigate('/mnherederos/ingresoher/error');
+                        return;
+                      }
+
+                      // Verificar códigos de error específicos en el mensaje
+                      if (resultDocumentos.message && (
+                        resultDocumentos.message.includes('500') ||
+                        resultDocumentos.message.includes('503') ||
+                        resultDocumentos.message.includes('412') ||
+                        resultDocumentos.message.includes('400')
+                      )) {
+                        console.log('🚨 Error en documentos con código específico - navegando a página de error');
+                        navigate('/mnherederos/ingresoher/error');
+                        return;
+                      }
+
+                      // Si no es un error crítico, continuar con éxito
                       setSaveSuccess(true);
-                      // Llamar a la función de guardado exitoso
                       onSave();
                     }
                   } else {
@@ -675,6 +701,38 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                   }
               } catch (errorDocumentos: any) {
                 console.error('Error al enviar documentos:', errorDocumentos);
+                console.log('🔍 Debug - errorDocumentos.message:', errorDocumentos.message);
+                console.log('🔍 Debug - errorDocumentos.status:', errorDocumentos.status);
+                console.log('🔍 Debug - errorDocumentos completo:', errorDocumentos);
+
+                // Verificar si es un error que debe ir a página de error
+                if (errorDocumentos.message && (
+                  errorDocumentos.message.includes('Falló definitivamente después de') ||
+                  errorDocumentos.message.includes('Falló definitivamente') ||
+                  errorDocumentos.message.includes('definitivamente después de')
+                )) {
+                  console.log('🚨 Error en documentos después de agotar intentos - navegando a página de error');
+                  console.log('🚨 Mensaje de error detectado:', errorDocumentos.message);
+                  navigate('/mnherederos/ingresoher/error');
+                  return;
+                }
+
+                // Verificar códigos de error específicos
+                if (errorDocumentos.status && [500, 503, 412, 400].includes(errorDocumentos.status)) {
+                  console.log('🚨 Error en documentos con código específico - navegando a página de error');
+                  console.log('🚨 Código de error detectado:', errorDocumentos.status);
+                  navigate('/mnherederos/ingresoher/error');
+                  return;
+                }
+
+                // Verificar si el mensaje contiene "Failed to fetch" que es el error que vemos en la consola
+                if (errorDocumentos.message && errorDocumentos.message.includes('Failed to fetch')) {
+                  console.log('🚨 Error "Failed to fetch" detectado - navegando a página de error');
+                  navigate('/mnherederos/ingresoher/error');
+                  return;
+                }
+
+                console.log('⚠️ Error no crítico en documentos - continuando con éxito');
                 // Aunque fallen los documentos, la solicitud se creó correctamente
                 setSaveSuccess(true);
                 // Llamar a la función de guardado exitoso
@@ -691,6 +749,25 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
           }
         } catch (errorSolicitud: any) {
           console.error('Error al crear solicitud:', errorSolicitud);
+
+          // Verificar si es un error que debe ir a página de error
+          if (errorSolicitud.message && (
+            errorSolicitud.message.includes('Falló definitivamente después de') ||
+            errorSolicitud.message.includes('Falló definitivamente') ||
+            errorSolicitud.message.includes('definitivamente después de')
+          )) {
+            console.log('🚨 Error en solicitud después de agotar intentos - navegando a página de error');
+            navigate('/mnherederos/ingresoher/error');
+            return;
+          }
+
+          // Verificar códigos de error específicos
+          if (errorSolicitud.status && [500, 503, 412, 400].includes(errorSolicitud.status)) {
+            console.log('🚨 Error en solicitud con código específico - navegando a página de error');
+            navigate('/mnherederos/ingresoher/error');
+            return;
+          }
+
           // Aunque falle la solicitud, el solicitante se creó correctamente
           setError(`Solicitante creado pero error al crear solicitud: ${errorSolicitud.message}`);
         }
@@ -702,6 +779,26 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
 
       // Log del error para debugging
       console.error('Error completo:', err);
+
+      // Verificar si el error indica que se agotaron los intentos
+      if (err.message && (
+        err.message.includes('Falló definitivamente después de') ||
+        err.message.includes('Falló definitivamente') ||
+        err.message.includes('definitivamente después de')
+      )) {
+        console.log('🚨 Error después de agotar intentos - navegando a página de error');
+        console.log('🚨 Mensaje de error:', err.message);
+        navigate('/mnherederos/ingresoher/error');
+        return;
+      }
+
+      // También verificar códigos de error específicos que deben ir a página de error
+      if (err.status && [500, 503, 412, 400].includes(err.status)) {
+        console.log('🚨 Error con código específico - navegando a página de error');
+        console.log('🚨 Código de error:', err.status);
+        navigate('/mnherederos/ingresoher/error');
+        return;
+      }
 
       setError(err.message || 'Error al guardar el solicitante');
     } finally {

@@ -1,5 +1,5 @@
-/* Estilos para la página de éxito */
-.success-page-container {
+/* Estilos para la página de error */
+.error-page-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -9,7 +9,7 @@
   background-color: #f8f9fa;
 }
 
-.success-page-title {
+.error-page-title {
   margin-bottom: 1rem;
   width: 100%;
   max-width: 1300px;
@@ -17,7 +17,7 @@
   margin-right: auto;
 }
 
-.success-page-stepper {
+.error-page-stepper {
   margin-bottom: 2rem;
   width: 100%;
   max-width: 1300px;
@@ -25,7 +25,7 @@
   margin-right: auto;
 }
 
-.success-card {
+.error-card {
   display: flex;
   width: 652px;
   padding: 24px 24px 32px 24px;
@@ -40,17 +40,17 @@
   position: relative;
 }
 
-.success-icon {
+.error-icon {
   display: flex;
   justify-content: center;
 }
 
-.success-icon img {
-  width: 40px;
-  height: 40px;
+.error-icon img {
+  width: 48px;
+  height: 48px;
 }
 
-.success-title {
+.error-title {
   font-size: 24px;
   font-weight: 600;
   color: #333333;
@@ -59,7 +59,7 @@
   text-align: center;
 }
 
-.success-message {
+.error-message {
   font-size: 16px;
   color: #666666;
   line-height: 1.6;
@@ -68,12 +68,12 @@
   text-align: center;
 }
 
-.success-message strong {
+.error-message strong {
   color: #333333;
   font-weight: 600;
 }
 
-.success-button {
+.error-button {
   background-color: #04A59B;
   color: white;
   border: none;
@@ -88,13 +88,13 @@
   margin: 0;
 }
 
-.success-button:hover {
+.error-button:hover {
   background-color: #038C84;
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(4, 165, 155, 0.3);
 }
 
-.success-button:active {
+.error-button:active {
   transform: translateY(0);
   box-shadow: 0 2px 8px rgba(4, 165, 155, 0.2);
 }
@@ -111,38 +111,38 @@
   }
 }
 
-.success-card {
+.error-card {
   animation: fadeInUp 0.6s ease-out forwards;
 }
 
 /* Responsive */
 @media screen and (max-width: 768px) {
-  .success-page-container {
+  .error-page-container {
     padding: 20px 16px;
   }
 
-  .success-card {
+  .error-card {
     width: 100%;
     max-width: 652px;
     padding: 20px 16px 24px 16px;
   }
 
-  .success-title {
+  .error-title {
     font-size: 20px;
   }
 
-  .success-message {
+  .error-message {
     font-size: 15px;
     max-width: 100%;
   }
 
-  .success-button {
+  .error-button {
     padding: 12px 24px;
     font-size: 15px;
   }
 
-  .success-icon img {
-    width: 30px;
-    height: 30px;
+  .error-icon img {
+    width: 40px;
+    height: 40px;
   }
 }

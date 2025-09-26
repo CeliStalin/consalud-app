@@ -22,6 +22,7 @@ import { SyncedLayout as CoreSyncedLayout } from './SyncedLayout';
 // Importaciones directas para evitar flash blanco
 import DatosTitularPage from '../pages/DatosTitularPage';
 import DetalleMandatoPage from '../pages/DetalleMandatoPage';
+import ErrorPage from '../pages/ErrorPage';
 import InfoRequisitosTitularPage from '../pages/InfoRequisitosTitularPage';
 import IngresoDocumentosPage from '../pages/IngresoDocumentosPage';
 import IngresoHerederoFormPage from '../pages/IngresoHerederoFormPage';
@@ -217,6 +218,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
                   <Route path="ingresoher/mandatos" element={<MandatosPage />} />
                   <Route path="ingresoher/detallemandato" element={<DetalleMandatoPage />} />
                   <Route path="ingresoher/success" element={<SuccessPage />} />
+                  <Route path="ingresoher/error" element={<ErrorPage />} />
                   <Route path="ingresoher/IngresoDocumentos" element={<IngresoDocumentosPage />} />
                 </Route>
                 {/* Redirección para rutas con mayúsculas (compatibilidad) */}
