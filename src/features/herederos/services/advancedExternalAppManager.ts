@@ -49,7 +49,7 @@ class AdvancedExternalAppManager {
    */
   async openExternalApp(url: string, windowFeatures?: string): Promise<string> {
     try {
-      console.log('🚀 [AdvancedExternalAppManager] Abriendo aplicación externa:', url);
+
 
       this.updateState({
         status: 'opening',
@@ -95,7 +95,7 @@ class AdvancedExternalAppManager {
       this.startMonitoring();
       this.callbacks.onOpened?.(this.appState);
 
-      console.log('✅ [AdvancedExternalAppManager] Aplicación externa abierta exitosamente:', tabId);
+
       return tabId;
 
     } catch (error) {
@@ -120,7 +120,7 @@ class AdvancedExternalAppManager {
       clearInterval(this.pollInterval);
     }
 
-    console.log('🔍 [AdvancedExternalAppManager] Iniciando monitoreo de ventana');
+
 
     this.pollInterval = setInterval(() => {
       if (this.windowRef?.closed) {
@@ -136,7 +136,7 @@ class AdvancedExternalAppManager {
    * Maneja el cierre de la ventana
    */
   private handleWindowClosed(): void {
-    console.log('🔒 [AdvancedExternalAppManager] Ventana cerrada detectada');
+
 
     this.updateState({
       status: 'closed',
@@ -155,7 +155,7 @@ class AdvancedExternalAppManager {
    * Acciones a ejecutar cuando se cierra la aplicación externa
    */
   private onApplicationClosed(): void {
-    console.log('🔄 [AdvancedExternalAppManager] Ejecutando acciones post-cierre');
+
 
     try {
       // Ejemplo de acciones comunes:
@@ -165,7 +165,7 @@ class AdvancedExternalAppManager {
       // - Llamadas a API
 
       localStorage.setItem('lastExternalAppClosed', new Date().toISOString());
-      console.log('✅ [AdvancedExternalAppManager] Acciones post-cierre completadas');
+
 
     } catch (error) {
       console.error('❌ [AdvancedExternalAppManager] Error en acciones post-cierre:', error);
@@ -179,7 +179,7 @@ class AdvancedExternalAppManager {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
       this.pollInterval = null;
-      console.log('⏹️ [AdvancedExternalAppManager] Monitoreo detenido');
+
     }
   }
 
@@ -188,7 +188,7 @@ class AdvancedExternalAppManager {
    */
   closeExternalWindow(): void {
     if (this.windowRef && !this.windowRef.closed) {
-      console.log('🔒 [AdvancedExternalAppManager] Cerrando ventana externa manualmente');
+
       this.windowRef.close();
       this.handleWindowClosed();
     }
@@ -222,7 +222,7 @@ class AdvancedExternalAppManager {
       manager: 'AdvancedExternalAppManager'
     }));
 
-    console.log('💾 [AdvancedExternalAppManager] Estado guardado en localStorage:', tabId);
+
   }
 
   /**
@@ -239,7 +239,7 @@ class AdvancedExternalAppManager {
   private clearFromLocalStorage(): void {
     localStorage.removeItem('consalud_external_tab_active');
     localStorage.removeItem('consalud_external_tab_open');
-    console.log('🧹 [AdvancedExternalAppManager] Estado limpiado del localStorage');
+
   }
 
   /**
@@ -271,7 +271,7 @@ class AdvancedExternalAppManager {
 
         // Si han pasado menos de 10 minutos, restaurar el estado
         if (timeSinceOpened < 600000) {
-          console.log('🔄 [AdvancedExternalAppManager] Restaurando estado desde localStorage:', tabData.tabId);
+
 
           this.updateState({
             status: 'open',
@@ -285,7 +285,7 @@ class AdvancedExternalAppManager {
           // No podemos restaurar windowRef, pero podemos simular el estado
           return true;
         } else {
-          console.log('⏰ [AdvancedExternalAppManager] Estado en localStorage expirado, limpiando');
+
           this.clearFromLocalStorage();
         }
       } catch (error) {
@@ -301,7 +301,7 @@ class AdvancedExternalAppManager {
    * Limpia recursos
    */
   cleanup(): void {
-    console.log('🧹 [AdvancedExternalAppManager] Limpiando recursos');
+
     this.stopMonitoring();
 
     if (this.windowRef && !this.windowRef.closed) {

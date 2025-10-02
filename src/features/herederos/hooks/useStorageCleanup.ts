@@ -129,7 +129,6 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
         }
       });
 
-      console.log('🧹 Datos limpiados al navegar hacia atrás para RUT:', rutLimpio);
     } catch (error) {
       console.error('Error al limpiar datos en navegación hacia atrás:', error);
     }
@@ -138,7 +137,6 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
   // Limpiar todos los documentos del sessionStorage
   const cleanupAllDocuments = useCallback(() => {
     try {
-      console.log('🧹 Limpiando todos los documentos del sessionStorage');
 
       // Limpiar todas las claves que empiecen con 'documentos_'
       Object.keys(sessionStorage).forEach(key => {
@@ -160,7 +158,6 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
             }
           }
           sessionStorage.removeItem(key);
-          console.log('🗑️ Documento eliminado:', key);
         }
       });
 
@@ -184,11 +181,9 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
             }
           }
           sessionStorage.removeItem(key);
-          console.log('🗑️ FileStorage eliminado:', key);
         }
       });
 
-      console.log('✅ Todos los documentos han sido limpiados del sessionStorage');
     } catch (error) {
       console.error('Error al limpiar todos los documentos:', error);
     }

@@ -31,13 +31,10 @@ class TabCommunicationService {
   initialize(): void {
     if (this.isInitialized) return;
 
-    console.log('🔗 [TabCommunication] Inicializando servicio de comunicación entre pestañas');
-
     // Crear BroadcastChannel para comunicación same-origin
     try {
       this.broadcastChannel = new BroadcastChannel('consalud-mandatos-channel');
       this.broadcastChannel.onmessage = this.handleBroadcastMessage.bind(this);
-      console.log('✅ [TabCommunication] BroadcastChannel inicializado');
     } catch (error) {
       console.warn('⚠️ [TabCommunication] No se pudo inicializar BroadcastChannel:', error);
     }
@@ -69,7 +66,6 @@ class TabCommunicationService {
    * Abre una pestaña externa y establece comunicación
    */
   async openExternalTab(url: string): Promise<string> {
-    console.log('🚀 [TabCommunication] Abriendo pestaña externa:', url);
 
     const tabId = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -91,7 +87,6 @@ class TabCommunicationService {
       };
 
       this.externalTabs.set(tabId, mockTabInfo);
-      console.log('✅ [TabCommunication] Pestaña externa registrada como mock (popup bloqueado):', tabId);
 
       // Crear ID único simple en localStorage para esta pestaña
       this.createSimpleTabId(tabId, url);
@@ -124,7 +119,6 @@ class TabCommunicationService {
       // Inyectar script de comunicación en la pestaña externa
       this.injectCommunicationScript(newTab, tabId);
 
-      console.log('✅ [TabCommunication] Pestaña externa registrada:', tabId);
       return tabId;
 
     } catch (error) {
@@ -138,7 +132,6 @@ class TabCommunicationService {
    * Maneja mensajes del BroadcastChannel
    */
   private handleBroadcastMessage(event: MessageEvent): void {
-    console.log('📡 [TabCommunication] Mensaje BroadcastChannel recibido:', event.data);
     this.processMessage(event.data);
   }
 
@@ -148,7 +141,6 @@ class TabCommunicationService {
   private handlePostMessage(event: MessageEvent): void {
     // Solo procesar mensajes de pestañas externas
     if (event.data && event.data.source === 'external-tab') {
-      console.log('📨 [TabCommunication] Mensaje PostMessage recibido:', event.data);
       this.processMessage(event.data);
     }
   }

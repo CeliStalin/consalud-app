@@ -58,26 +58,11 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
     getLockDuration
   } = useButtonLockingContext();
 
-  // Debug: Verificar el contexto de bloqueo
-  console.log('🔍 [Global] Contexto de bloqueo disponible:', {
-    isButtonsLocked,
-    lockReason,
-    hasLockButtons: typeof lockButtons === 'function',
-    hasUnlockButtons: typeof unlockButtons === 'function'
-  });
 
   /**
    * Abre una nueva pestaña externa y bloquea los botones
    */
   const openExternalTab = useCallback(async (url: string) => {
-    console.log('🚀 [Global] INICIO openExternalTab - URL:', url);
-    console.log('🔍 [Global] Estado inicial:', {
-      isExternalTabOpen,
-      tabRef: !!tabRef.current,
-      loading,
-      error,
-      isOpeningTab
-    });
 
     // Prevenir apertura múltiple
     if (isExternalTabOpen || isOpeningTab) {
@@ -90,8 +75,8 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       setLoading(true);
       setError(null);
 
-      console.log('🚀 [Global] Abriendo pestaña externa:', url);
-      console.log('🔍 [Global] Estado antes de abrir:', { isExternalTabOpen, tabRef: !!tabRef.current, isOpeningTab });
+
+
 
       // Verificar que la URL sea válida
       if (!url || !url.startsWith('http')) {
@@ -99,7 +84,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       }
 
       // ESTRATEGIA SIMPLIFICADA: Solo usar window.open estándar
-      console.log('🔄 [Global] Intentando abrir pestaña externa...');
+
       let newTab: Window | null = null;
 
       // Solo usar window.open estándar para evitar múltiples pestañas
@@ -149,7 +134,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       });
 
       if (newTab && !newTab?.closed) {
-        console.log('✅ [Global] Pestaña abierta correctamente, verificando acceso...');
+
         console.log('🔍 [Global] Pestaña válida detectada:', {
           isWindow: (newTab as any) instanceof Window,
           hasLocation: 'location' in newTab,
@@ -159,15 +144,15 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
 
         // Verificación adicional: intentar acceder a la pestaña
         try {
-          console.log('🔍 [Global] Iniciando verificación de acceso a pestaña...');
+
 
           // Para objetos mock, no verificar closed ya que siempre será false
           if ((newTab as any).isMock) {
-            console.log('✅ [Global] Objeto mock detectado - saltando verificación de closed');
+
           } else {
             // Solo verificar closed para pestañas reales
             const testAccess = newTab?.closed;
-            console.log('🔍 [Global] Test de acceso a pestaña:', { testAccess });
+
 
             if (testAccess) {
               console.error('❌ [Global] Pestaña se cerró inmediatamente después de abrirse');
@@ -175,7 +160,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
             }
           }
 
-          console.log('✅ [Global] Pestaña accesible, procediendo con bloqueo...');
+
 
           // Generar token de transacción único
           const token = `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -194,9 +179,9 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
           });
 
           // Bloquear botones globalmente SOLO si la pestaña se abrió correctamente
-          console.log('🔒 [Global] ANTES de lockButtons - Token:', token);
+
           lockButtons(`Pestaña externa abierta - Token: ${token}`);
-          console.log('🔒 [Global] DESPUÉS de lockButtons - Token:', token);
+
 
           // Iniciar verificación periódica del estado de la pestaña
           startTabStatusCheck();
@@ -206,7 +191,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
             setTimeout(() => {
               if (tabRef.current && (tabRef.current as any).isMock) {
                 (tabRef.current as any).wasHidden = true;
-                console.log('🔍 [Global] Asumiendo que usuario se fue a pestaña externa (wasHidden = true)');
+
               }
             }, 2000); // 2 segundos después de abrir
           }
@@ -223,14 +208,14 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
                   script.textContent = `
                     (function() {
                       'use strict';
-                      console.log('🔍 [ExternalTabMonitor] Script de monitoreo cargado');
+
 
                       window.addEventListener('message', function(event) {
                         if (event.data && event.data.type === 'EXTERNAL_TAB_MONITOR' && event.data.source === 'consalud-app') {
-                          console.log('🔍 [ExternalTabMonitor] Monitoreo activado por pestaña principal');
+
 
                           window.addEventListener('beforeunload', function() {
-                            console.log('🔍 [ExternalTabMonitor] Pestaña externa se está cerrando, notificando a pestaña principal');
+
 
                             try {
                               if (event.source && !event.source.closed) {
@@ -249,7 +234,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
                     })();
                   `;
                   newTab.document.head.appendChild(script);
-                  console.log('✅ [Global] Script de monitoreo inyectado en pestaña externa');
+
                 } catch (injectionError) {
                   console.warn('⚠️ [Global] No se pudo inyectar script de monitoreo:', injectionError);
                 }
@@ -268,7 +253,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
               // Escuchar mensajes de la pestaña externa
               const handleMessage = (event: MessageEvent) => {
                 if (event.data && event.data.type === 'EXTERNAL_TAB_CLOSING') {
-                  console.log('🔍 [Global] Pestaña externa notificó que se está cerrando');
+
                   closeExternalTab();
                 }
               };
@@ -287,7 +272,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
             }
           }
 
-          console.log('✅ [Global] Pestaña externa abierta exitosamente');
+
         } catch (accessError) {
           console.error('❌ [Global] Error al acceder a la pestaña:', accessError);
           console.error('❌ [Global] Detalles del error de acceso:', {
@@ -299,7 +284,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
 
           // Para objetos mock, no lanzar excepción ya que es normal
           if ((newTab as any).isMock) {
-            console.log('✅ [Global] Error ignorado para objeto mock - continuando normalmente');
+
           } else {
             throw new Error('No se pudo acceder a la pestaña abierta');
           }
@@ -315,7 +300,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
 
         // Para objetos mock, no lanzar excepción ya que es normal
         if ((newTab as any).isMock) {
-          console.log('✅ [Global] Objeto mock detectado en else - continuando normalmente');
+
         } else {
           throw new Error('La pestaña se cerró inmediatamente o no se pudo abrir correctamente');
         }
@@ -325,10 +310,10 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       console.error('❌ [Global] Stack trace del error:', err.stack);
       setError(err.message || 'Error al abrir la pestaña externa');
       // Re-lanzar la excepción para que sea capturada por el llamador
-      console.log('🔄 [Global] Re-lanzando excepción...');
+
       throw err;
     } finally {
-      console.log('🔄 [Global] FINALLY - setLoading(false) y setIsOpeningTab(false)');
+
       setLoading(false);
       setIsOpeningTab(false);
     }
@@ -338,7 +323,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
    * Cierra la pestaña externa y desbloquea los botones
    */
   const closeExternalTab = useCallback(() => {
-    console.log('🔒 [Global] Cerrando pestaña externa');
+
 
     // Detener verificaciones
     stopTabStatusCheck();
@@ -348,7 +333,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
     if (tabRef.current && (tabRef.current as any).cleanup) {
       try {
         (tabRef.current as any).cleanup();
-        console.log('🧹 [Global] Listener de mensajes limpiado');
+
       } catch (err) {
         console.warn('⚠️ [Global] Error al limpiar listener de mensajes:', err);
       }
@@ -373,7 +358,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
 
     // Desbloquear botones si estaban bloqueados por pestaña externa
     if (isLockedByReason('Pestaña externa abierta - Token:')) {
-      console.log('🔓 [Global] Desbloqueando botones - pestaña externa cerrada');
+
       unlockButtons();
     }
 
@@ -393,11 +378,11 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
 
     try {
       // NO HAY OBJETOS MOCK - Solo pestañas reales
-      console.log('🔍 [Global] Verificando pestaña real');
+
 
       // Para pestañas reales, verificar directamente si están cerradas
       if (tabRef.current.closed) {
-        console.log('🔍 [Global] Pestaña real detectada como cerrada');
+
           closeExternalTab();
           return false;
         }
@@ -408,9 +393,9 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       try {
         // Para pestañas externas, intentar acceder a location puede fallar por CORS
         // incluso cuando la pestaña está abierta, así que solo verificamos closed
-        console.log('🔍 [Global] Verificando solo propiedad closed (evitando CORS)');
+
       } catch (error) {
-        console.log('🔍 [Global] Error en verificación de accesibilidad (ignorado por CORS):', error);
+
         // No cerrar la pestaña por errores de CORS
       }
 
@@ -419,9 +404,9 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       const isClosed = tabRef.current.closed;
 
       if (isClosed) {
-        console.log('📋 [Global] Pestaña externa cerrada detectada (closed=true)');
+
         // TEMPORALMENTE DESHABILITADO: closeExternalTab(); - Estaba limpiando localStorage prematuramente
-        console.log('⚠️ [Global] NO cerrando pestaña automáticamente para evitar limpieza prematura');
+
         return false;
       }
 
@@ -432,16 +417,16 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
           const hasClosedProperty = 'closed' in tabRef.current;
 
           if (!hasWindow || !hasClosedProperty) {
-            console.log('📋 [Global] Pestaña externa parece estar cerrada (sin propiedades básicas)');
+
             // TEMPORALMENTE DESHABILITADO: closeExternalTab(); - Estaba limpiando localStorage prematuramente
-            console.log('⚠️ [Global] NO cerrando pestaña automáticamente para evitar limpieza prematura');
+
             return false;
           }
         } catch (accessError) {
           // Si no podemos acceder a las propiedades básicas, asumir que está cerrada
-          console.log('📋 [Global] Pestaña externa cerrada (error al acceder a propiedades básicas):', accessError);
+
           // TEMPORALMENTE DESHABILITADO: closeExternalTab(); - Estaba limpiando localStorage prematuramente
-          console.log('⚠️ [Global] NO cerrando pestaña automáticamente para evitar limpieza prematura');
+
           return false;
         }
 
@@ -449,16 +434,16 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
       return true;
       } catch (err) {
         // Si hay cualquier error al acceder a la ventana, asumir que está cerrada
-        console.log('📋 [Global] Pestaña externa cerrada (error general):', err);
+
         // TEMPORALMENTE DESHABILITADO: closeExternalTab(); - Estaba limpiando localStorage prematuramente
-        console.log('⚠️ [Global] NO cerrando pestaña automáticamente para evitar limpieza prematura');
+
         return false;
       }
     } catch (err) {
       // Solo considerar cerrada si hay una excepción al acceder a la propiedad closed
-      console.log('📋 [Global] Pestaña externa cerrada (excepción al acceder a closed):', err);
+
       // TEMPORALMENTE DESHABILITADO: closeExternalTab(); - Estaba limpiando localStorage prematuramente
-      console.log('⚠️ [Global] NO cerrando pestaña automáticamente para evitar limpieza prematura');
+
       return false;
     }
   }, [closeExternalTab]);
@@ -470,7 +455,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
    * Inicia la verificación periódica del estado de la pestaña
    */
   const startTabStatusCheck = useCallback(() => {
-    console.log('⏰ [Global] Iniciando verificación periódica de pestaña externa');
+
 
     // Verificación inmediata
     checkTabStatus();
@@ -483,7 +468,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
     // Verificación adicional cada 10 segundos para casos edge
     checkIntervalRef.current = window.setInterval(() => {
       if (tabRef.current && !checkTabStatus()) {
-        console.log('🔄 [Global] Verificación adicional: pestaña cerrada');
+
       }
     }, 10000);
 
@@ -491,13 +476,13 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
     const handleVisibilityChange = () => {
       if (tabRef.current) {
         if (document.visibilityState === 'visible') {
-          console.log('👁️ [Global] Usuario volvió a la pestaña principal, verificando estado de pestaña externa');
+
 
           // Marcar el momento del cambio de visibilidad para objetos mock
           if ((tabRef.current as any).isMock) {
             (tabRef.current as any).lastVisibilityChange = Date.now();
             (tabRef.current as any).focusChanges = ((tabRef.current as any).focusChanges || 0) + 1;
-            console.log('🔍 [Global] Marcado cambio de visibilidad para objeto mock - Total cambios:', (tabRef.current as any).focusChanges);
+
           }
 
           // Pequeño delay para evitar verificaciones prematuras
@@ -508,7 +493,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
           // La página se ocultó - marcar que el usuario se fue a otra pestaña
           if ((tabRef.current as any).isMock) {
             (tabRef.current as any).wasHidden = true;
-            console.log('🔍 [Global] Página ocultada - usuario se fue a otra pestaña (wasHidden = true)');
+
           }
         }
       }
@@ -516,13 +501,13 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
 
     const handleFocus = () => {
       if (tabRef.current) {
-        console.log('🎯 [Global] Pestaña principal recibió foco, verificando estado de pestaña externa');
+
 
         // Marcar el momento del cambio de foco para objetos mock
         if ((tabRef.current as any).isMock) {
           (tabRef.current as any).lastVisibilityChange = Date.now();
           (tabRef.current as any).focusChanges = ((tabRef.current as any).focusChanges || 0) + 1;
-          console.log('🔍 [Global] Marcado cambio de foco para objeto mock - Total cambios:', (tabRef.current as any).focusChanges);
+
         }
 
         // Pequeño delay para evitar verificaciones prematuras
@@ -534,12 +519,12 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
 
     const handleBlur = () => {
       if (tabRef.current) {
-        console.log('👁️ [Global] Pestaña principal perdió foco - usuario se fue a otra pestaña');
+
 
         // Marcar que el usuario se fue a otra pestaña
         if ((tabRef.current as any).isMock) {
           (tabRef.current as any).wasHidden = true;
-          console.log('🔍 [Global] Marcado pérdida de foco para objeto mock (wasHidden = true)');
+
         }
       }
     };
@@ -561,14 +546,14 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
    */
   const stopTabStatusCheck = useCallback(() => {
     if (intervalRef.current) {
-      console.log('⏹️ [Global] Deteniendo verificación periódica de pestaña');
+
       clearInterval(intervalRef.current);
       intervalRef.current = undefined;
     }
 
     // Limpiar event listeners
     if (visibilityCleanupRef.current) {
-      console.log('🧹 [Global] Limpiando event listeners de visibilidad');
+
       visibilityCleanupRef.current();
       visibilityCleanupRef.current = null;
     }
@@ -579,7 +564,7 @@ export const useGlobalButtonLocking = (): UseGlobalButtonLockingReturn => {
    */
   const stopPeriodicCheck = useCallback(() => {
     if (checkIntervalRef.current) {
-      console.log('⏹️ [Global] Deteniendo verificación periódica adicional');
+
       clearInterval(checkIntervalRef.current);
       checkIntervalRef.current = undefined;
     }

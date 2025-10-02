@@ -21,8 +21,8 @@ export class MockMandatoService {
   /**
    * Obtiene información del mandato (datos mock)
    */
-  async getMandatoInfo(rutCliente: string, nSecMandato: string = ''): Promise<MandatoResult> {
-    console.log(`📋 [Mock] Consultando mandato para RUT: ${rutCliente}, Mandato: ${nSecMandato || 'No especificado'}`);
+  async getMandatoInfo(rutCliente: string, _nSecMandato: string = ''): Promise<MandatoResult> {
+
 
     // Simular delay de red
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -42,7 +42,7 @@ export class MockMandatoService {
       indTipo: '1'
     };
 
-    console.log('✅ [Mock] Datos de mandato generados:', mockData);
+
     return mockData;
   }
 }

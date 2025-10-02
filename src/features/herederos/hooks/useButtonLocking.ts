@@ -25,7 +25,6 @@ export const useButtonLocking = (): UseButtonLockingReturn => {
    * Bloquea los botones con una razón específica
    */
   const lockButtons = useCallback((reason: string) => {
-    console.log('🔒 Bloqueando botones:', reason);
     setIsLocked(true);
     setLockReason(reason);
     setLockTimestamp(Date.now());
@@ -38,7 +37,6 @@ export const useButtonLocking = (): UseButtonLockingReturn => {
    * Desbloquea los botones
    */
   const unlockButtons = useCallback(() => {
-    console.log('🔓 Desbloqueando botones');
     setIsLocked(false);
     setLockReason(null);
     setLockTimestamp(null);

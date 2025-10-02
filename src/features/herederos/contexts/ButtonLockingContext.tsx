@@ -36,58 +36,34 @@ export const ButtonLockingProvider: React.FC<ButtonLockingProviderProps> = ({ ch
    * Bloquea los botones con una razón específica
    */
   const lockButtons = useCallback((reason: string) => {
-    console.log('🔒 [Global] INICIO lockButtons - Razón:', reason);
-    console.log('🔍 [Global] Estado ANTES del bloqueo:', { isLocked, lockReason });
-    console.trace('🔍 [Global] Stack trace del bloqueo de botones');
-
     setIsLocked(true);
     setLockReason(reason);
     setLockTimestamp(Date.now());
 
-    console.log('🔍 [Global] Estado DESPUÉS del bloqueo:', {
-      isLocked: true,
-      lockReason: reason,
-      timestamp: Date.now()
-    });
-
     // Agregar clase CSS al body para indicar que la interfaz está bloqueada
     document.body.classList.add('buttons-locked');
-    console.log('🔍 [Global] Clase CSS agregada al body');
 
     // Emitir evento personalizado para notificar a otros componentes
     window.dispatchEvent(new CustomEvent('buttons-locked', {
       detail: { reason, timestamp: Date.now() }
     }));
-    console.log('🔍 [Global] Evento personalizado emitido');
   }, [isLocked, lockReason]);
 
   /**
    * Desbloquea los botones
    */
   const unlockButtons = useCallback(() => {
-    console.log('🔓 [Global] INICIO unlockButtons');
-    console.log('🔍 [Global] Estado ANTES del desbloqueo:', { isLocked, lockReason });
-    console.trace('🔍 [Global] Stack trace del desbloqueo de botones');
-
     setIsLocked(false);
     setLockReason(null);
     setLockTimestamp(null);
 
-    console.log('🔍 [Global] Estado DESPUÉS del desbloqueo:', {
-      isLocked: false,
-      lockReason: null,
-      timestamp: null
-    });
-
     // Remover clase CSS del body
     document.body.classList.remove('buttons-locked');
-    console.log('🔍 [Global] Clase CSS removida del body');
 
     // Emitir evento personalizado para notificar a otros componentes
     window.dispatchEvent(new CustomEvent('buttons-unlocked', {
       detail: { timestamp: Date.now() }
     }));
-    console.log('🔍 [Global] Evento de desbloqueo emitido');
   }, [isLocked, lockReason]);
 
   /**
@@ -142,7 +118,6 @@ export const ButtonLockingProvider: React.FC<ButtonLockingProviderProps> = ({ ch
   useEffect(() => {
     const handleExternalTabClosed = () => {
       if (isLocked && lockReason?.includes('pestaña externa')) {
-        console.log('🔄 [Global] Pestaña externa cerrada, desbloqueando botones');
         unlockButtons();
       }
     };
@@ -164,7 +139,6 @@ export const ButtonLockingProvider: React.FC<ButtonLockingProviderProps> = ({ ch
       // Solo limpiar la clase CSS del body, pero no cambiar el estado de bloqueo
       // para evitar interferir con el flujo de pestañas externas
       document.body.classList.remove('buttons-locked');
-      console.log('🧹 [Global] Cleanup: Clase CSS removida del body (sin cambiar estado de bloqueo)');
     };
   }, []);
 

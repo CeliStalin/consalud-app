@@ -33,7 +33,6 @@ const IngresoTitular: React.FC = () => {
     useEffect(() => {
         cleanupAllHerederoData();
         limpiarHeredero();
-        console.log('🧹 Datos anteriores limpiados al iniciar flujo nuevo');
     }, [limpiarHeredero, cleanupAllHerederoData]);
 
     // Memoizar las funciones de alerta para evitar recreaciones
@@ -120,8 +119,6 @@ const IngresoTitular: React.FC = () => {
             const titularOk = titularContext && titularContext.rut && titularContext.rut.replace(/\./g, '').toLowerCase() === rut.replace(/\./g, '').toLowerCase();
             if (titularOk && titularContext.indFallecido === 'S' && titularContext.poseeFondos) {
                 goToRequisitosTitular();
-            } else {
-                console.log('NO NAVEGA: titular en contexto/sessionStorage no coincide o no cumple condiciones');
             }
         }, 0);
     }, [isValidRut, rut, buscarTitular, goToRequisitosTitular, mostrarAlerta, mostrarAlerta2, mostrarAlerta3, mostrarAlertaHerederoRegistrado, error]);

@@ -54,41 +54,24 @@ function isRetryableError(error: any, config: RetryConfig): boolean {
  */
 export async function withRetry<T>(
   operation: () => Promise<T>,
-  config: RetryConfig = DEFAULT_RETRY_CONFIG,
-  operationName: string = 'Operation'
+  config: RetryConfig = DEFAULT_RETRY_CONFIG
 ): Promise<T> {
   let lastError: any;
 
   for (let attempt = 1; attempt <= config.maxRetries + 1; attempt++) {
     try {
-      console.log(`🔄 ${operationName} - Intento ${attempt}/${config.maxRetries + 1}`);
-
       const result = await operation();
-
-      if (attempt > 1) {
-        console.log(`✅ ${operationName} - Éxito en el intento ${attempt}`);
-      }
-
       return result;
     } catch (error: any) {
       lastError = error;
 
-      console.log(`❌ ${operationName} - Intento ${attempt} falló:`, {
-        error: error.message,
-        status: error.status || error.statusCode,
-        isRetryable: isRetryableError(error, config)
-      });
-
       // Si es el último intento o el error no es retryable, lanzar el error
       if (attempt === config.maxRetries + 1 || !isRetryableError(error, config)) {
-        console.error(`💥 ${operationName} - Falló definitivamente después de ${attempt} intentos`);
         throw error;
       }
 
       // Calcular delay para el siguiente intento
       const delay = calculateDelay(attempt, config);
-      console.log(`⏳ ${operationName} - Esperando ${delay}ms antes del siguiente intento...`);
-
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }

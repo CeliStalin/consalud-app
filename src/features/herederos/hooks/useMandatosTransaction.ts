@@ -67,19 +67,14 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
    * SOLUCIÓN SIMPLE: Solo bloquear botones específicos (Actualizar/Guardar) sin modal
    */
   useEffect(() => {
-    console.log('🔍 [useMandatosTransaction] Estado de aplicación externa:', {
-      status: externalAppStatus,
-      isOpen: isExternalAppOpen,
-      tabId: externalAppTabId
-    });
 
     // Solo bloquear botones específicos, NO mostrar modal de bloqueo
     if (externalAppStatus === 'open' && externalAppTabId) {
-      console.log('🔒 [useMandatosTransaction] Aplicación externa abierta - bloqueando botones específicos');
+
       // Bloquear solo los botones, sin modal
       lockButtons(`Pestaña externa abierta - TabId: ${externalAppTabId}`);
     } else if (externalAppStatus === 'closed') {
-      console.log('🔓 [useMandatosTransaction] Aplicación externa cerrada - desbloqueando botones');
+
       unlockButtons();
     }
   }, [externalAppStatus, externalAppTabId, lockButtons, unlockButtons]);
@@ -93,14 +88,14 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
       setLoading(true);
       setError(null);
 
-      console.log('🚀 Abriendo pestaña externa para mandatos, RUT:', rut);
+
 
       // Iniciar transacción
       const transaction = await mandatosTransactionService.iniciarTransaccionMandatos(rut);
       setTransactionId(transaction.transactionId);
 
-      console.log('📋 Datos de transacción recibidos:', transaction);
-      console.log('🔗 URL encriptada a abrir:', transaction.encryptedUrl);
+
+
 
       // Validar que la URL encriptada sea válida
       if (!transaction.encryptedUrl || !transaction.encryptedUrl.startsWith('http')) {
@@ -110,7 +105,7 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
       // Abrir aplicación externa - el bloqueo se maneja automáticamente por el useEffect
       await openExternalApp(transaction.encryptedUrl);
 
-      console.log('✅ Pestaña externa abierta exitosamente');
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido al abrir pestaña externa';
       console.error('❌ Error al abrir pestaña externa:', errorMessage);
@@ -125,9 +120,9 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
    * SIMPLIFICADO: Solo cierra la aplicación externa, el desbloqueo se maneja automáticamente
    */
   const closeExternalTab = useCallback(() => {
-    console.log('🔄 [useMandatosTransaction] Cerrando pestaña externa');
+
     closeExternalApp();
-    console.log('✅ [useMandatosTransaction] Pestaña externa cerrada');
+
   }, [closeExternalApp]);
 
   return {

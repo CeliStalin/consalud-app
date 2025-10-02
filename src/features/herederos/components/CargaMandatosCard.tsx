@@ -128,29 +128,9 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     lockReason,
     lockButtons,
     unlockButtons,
-    // Estados de transacción
-    transactionId,
-    loading: transactionLoading
   } = useMandatosTransaction();
 
-  // Debug: Log del estado de bloqueo
-  console.log('🔍 [CargaMandatosCard] Estado completo:', {
-    isButtonsLocked,
-    lockReason,
-    isExternalTabOpen,
-    transactionId,
-    transactionLoading,
-    timestamp: Date.now()
-  });
 
-  // Verificar si los botones deberían estar bloqueados
-  const shouldBeLocked = isButtonsLocked || transactionLoading || shouldResetSelection;
-  console.log('🔍 [CargaMandatosCard] ¿Deberían estar bloqueados?', {
-    isButtonsLocked,
-    transactionLoading,
-    shouldResetSelection,
-    shouldBeLocked
-  });
 
   // Función para manejar el clic en "Actualizar Mandato"
   const handleActualizarMandato = async () => {
@@ -184,14 +164,14 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         throw new Error('No se encontró RUT del heredero en el session storage');
       }
 
-      console.log('🔄 Abriendo pestaña externa para actualización de mandatos, RUT:', rutHeredero);
+
 
       // Bloquear botones ANTES de intentar abrir la pestaña
       lockButtons('Abriendo pestaña externa...');
 
       try {
         await openExternalTab(rutHeredero);
-        console.log('✅ Pestaña externa abierta exitosamente');
+
       } catch (openError) {
         console.error('❌ Error al abrir pestaña externa:', openError);
         // Desbloquear botones si falla la apertura
@@ -236,7 +216,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     const herederoDataFromStorage = getHerederoDataFromSessionStorage();
     if (herederoDataFromStorage) {
       setHerederoData(herederoDataFromStorage);
-      console.log('Datos del heredero cargados desde sessionStorage:', herederoDataFromStorage);
+
 
       // Cargar datos de cuenta bancaria si tenemos RUT
       if (herederoDataFromStorage.RutCompleto) {
@@ -253,7 +233,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         const rutCliente = localStorage.getItem('currentRutCliente') || '17175966';
         const mandatoId = localStorage.getItem('currentMandatoId') || '';
 
-        console.log(`Obteniendo detalles para RUT: ${rutCliente}, Mandato: ${mandatoId}`);
+
 
         // Llamar al servicio
         const resultado = await mockMandatoService.getMandatoInfo(rutCliente, mandatoId);
@@ -275,18 +255,18 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     setNoTieneCuentaBancaria(false);
     setBloquearRadioButtons(false);
     try {
-      console.log('🏦 Cargando datos de cuenta bancaria para RUT:', rutCompleto);
+
       const cuentaData = await getCuentaBancaria(rutCompleto);
       setCuentaBancariaData(cuentaData);
       setNoTieneCuentaBancaria(false);
       setBloquearRadioButtons(false);
-      console.log('✅ Datos de cuenta bancaria cargados:', cuentaData);
+
     } catch (error: any) {
       console.error('❌ Error al cargar datos de cuenta bancaria:', error);
 
       // Si es error 404, significa que no tiene cuenta bancaria registrada
       if (error?.status === 404 || error?.message?.includes('404')) {
-        console.log('📋 No tiene cuenta bancaria registrada (error 404)');
+
         setNoTieneCuentaBancaria(true);
         setCuentaBancariaData(null);
         setBloquearRadioButtons(true);
@@ -303,14 +283,14 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   // Función para refrescar datos de cuenta bancaria
   const refreshCuentaBancaria = async () => {
     if (herederoData?.RutCompleto) {
-      console.log('🔄 Refrescando datos de cuenta bancaria después de cerrar ventana de mandatos');
+
 
       // Limpiar sessionStorage de mandatos_transaction
       const allKeys = Object.keys(sessionStorage);
       const mandatosKeys = allKeys.filter(key => key.includes('mandatos_transaction'));
       mandatosKeys.forEach(key => {
         sessionStorage.removeItem(key);
-        console.log('🧹 Limpiando sessionStorage:', key);
+
       });
 
       // Resetear selección del radio button
@@ -325,7 +305,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   // Detectar cuando se cierra la ventana externa de mandatos y refrescar datos
   useEffect(() => {
     if (externalAppStatus === 'closed' && closedAt) {
-      console.log('🔄 Ventana externa de mandatos cerrada, refrescando datos de cuenta bancaria');
+
       refreshCuentaBancaria();
     }
   }, [externalAppStatus, closedAt, herederoData?.RutCompleto]);
@@ -333,7 +313,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   // Resetear el flag de reset cuando termine la carga
   useEffect(() => {
     if (shouldResetSelection && !loadingCuentaBancaria) {
-      console.log('✅ Carga completada, reseteando flag de selección');
+
       setShouldResetSelection(false);
     }
   }, [shouldResetSelection, loadingCuentaBancaria]);
@@ -365,8 +345,8 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
       const allKeys = Object.keys(sessionStorage);
       const formKeys = allKeys.filter(key => key.includes('formHeredero') || key.includes('heredero'));
 
-      console.log('Claves disponibles en sessionStorage:', allKeys);
-      console.log('Claves relacionadas con herederos:', formKeys);
+
+
 
       let storedData: string | null = null;
 
@@ -379,11 +359,11 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             // Verificar que tenga la estructura correcta (al menos RutPersona)
             if (parsed && parsed.RutPersona) {
               storedData = data;
-              console.log('Datos encontrados en clave:', key);
+
               break;
             }
           } catch (parseError) {
-            console.log('Error al parsear datos de la clave:', key, parseError);
+
             continue;
           }
         }
@@ -394,21 +374,20 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
       }
 
       const formData = JSON.parse(storedData);
-      console.log('Datos del formulario parseados:', formData);
+
 
       // Verificar datos del titular en sessionStorage
       const titularContextData = sessionStorage.getItem('titularContext');
       if (titularContextData) {
-        const titularData = JSON.parse(titularContextData);
-        console.log('Datos del titular en sessionStorage:', titularData);
-        console.log('IdPersona del titular disponible:', titularData.id);
+
+
       } else {
         console.warn('No se encontraron datos del titular en sessionStorage');
       }
 
       // Extraer el RUT del formulario encontrado
       const rutFormulario = formData.RutPersona || formData.RutCompleto || '0';
-      console.log('RUT del formulario encontrado:', rutFormulario);
+
 
       // Preparar datos para la API
       const solicitanteData = {
@@ -438,15 +417,15 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         Usuario: formData.Usuario || 'SISTEMA'
       };
 
-      console.log('Datos preparados para la API:', solicitanteData);
+
 
       // Llamar a la API para crear el solicitante
       const resultSolicitante = await createSolicitante(solicitanteData, 'SISTEMA');
 
-      console.log('Respuesta completa de createSolicitante:', resultSolicitante);
+
 
       if (resultSolicitante.success && resultSolicitante.status === 201) {
-        console.log('Solicitante creado exitosamente:', resultSolicitante);
+
 
         // Ahora crear la solicitud usando los datos del retorno del primer endpoint
         try {
@@ -461,9 +440,9 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
           // Obtener la fecha actual en formato local (sin conversión UTC)
           const fechaISO = getLocalISOString();
 
-          console.log('Fecha actual en formato ISO (local):', fechaISO);
-          console.log('Hora local actual:', new Date().toLocaleString());
-          console.log('Offset de zona horaria (minutos):', new Date().getTimezoneOffset());
+
+
+
 
           // Extraer el ID del solicitante de la respuesta del primer endpoint
           // El campo correcto es 'newIdSolicitante' según la especificación
@@ -488,33 +467,33 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             if (titularContextData) {
               const titularData = JSON.parse(titularContextData);
               idMae = titularData.id; // IdPersona del titular
-              console.log('✅ IdPersona del titular obtenido desde sessionStorage:', titularData.id);
+
 
               // Obtener el RUT del titular desde sessionStorage
               if (titularData.rut) {
                 rutTitular = titularData.rut;
-                console.log('✅ RUT del titular obtenido desde sessionStorage:', rutTitular);
+
               } else if (titularData.rutPersona) {
                 rutTitular = titularData.rutPersona;
-                console.log('✅ RUT del titular obtenido desde sessionStorage (rutPersona):', rutTitular);
+
               }
             }
 
             // Si no se encontró en sessionStorage, usar el RUT del mandato
             if (!rutTitular || rutTitular === 0) {
               rutTitular = mandatoInfo.rutCliente;
-              console.log('🔍 RUT del titular obtenido del mandato (fallback):', rutTitular);
+
 
               // Si tampoco tenemos idMae, consultar la API
               if (!idMae || idMae === 0) {
                 const titularInfo = await fetchTitularByRut(parseInt(rutTitular), 'SISTEMA');
                 idMae = titularInfo.id;
-                console.log('✅ IdPersona del titular obtenido desde API:', idMae);
+
               }
             }
 
-            console.log('🔍 RUT del titular final para documentos:', rutTitular);
-            console.log('🔍 IdPersona del titular final:', idMae);
+
+
 
           } catch (errorTitular: any) {
             console.error('Error al obtener datos del titular:', errorTitular);
@@ -529,7 +508,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             }
           }
 
-          console.log('IDs extraídos de la respuesta:', { newIdSolicitante, idMae });
+
 
           // Preparar datos para la solicitud
           const solicitudData = {
@@ -545,19 +524,19 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             fechaEstadoRegistro: fechaISO
           };
 
-          console.log('Datos para crear solicitud:', solicitudData);
+
 
           // Llamar a la API para crear la solicitud
           const resultSolicitud = await createSolicitud(solicitudData, 'SISTEMA');
 
-          console.log('Respuesta completa de createSolicitud:', resultSolicitud);
+
 
           if (resultSolicitud.success && resultSolicitud.status === 201) {
-            console.log('Solicitud creada exitosamente:', resultSolicitud);
+
 
                          // Obtener el ID de la solicitud creada
-             console.log('🔍 Respuesta completa de createSolicitud para debugging:', JSON.stringify(resultSolicitud, null, 2));
-             console.log('🔍 Estructura de resultSolicitud.data:', resultSolicitud.data);
+
+
 
                           const newIdSolicitud = resultSolicitud.data?.newId ||
                                    resultSolicitud.data?.newIdSolicitud ||
@@ -572,10 +551,10 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                                    resultSolicitud.newIdSolicitante ||
                                                                        resultSolicitud.idSolicitante;
 
-                          console.log('🔍 ID de solicitud extraído:', newIdSolicitud);
+
 
              if (newIdSolicitud) {
-               console.log('✅ ID de solicitud obtenido exitosamente:', newIdSolicitud);
+
 
                                             try {
                  // Obtener el RUT del titular fallecido (sin DV, solo números)
@@ -585,12 +564,12 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                    // Extraer solo los números del RUT (sin puntos, guiones ni DV)
                    const rutNumeros = rutTitular.replace(/[^0-9]/g, '');
                    rutTitularFallecido = parseInt(rutNumeros);
-                   console.log('🔍 RUT original:', rutTitular);
-                   console.log('🔍 RUT solo números:', rutNumeros);
-                   console.log('🔍 RUT del titular fallecido (sin DV):', rutTitularFallecido);
+
+
+
                  } else {
                    rutTitularFallecido = rutTitular;
-                   console.log('🔍 RUT del titular fallecido (ya numérico):', rutTitularFallecido);
+
                  }
 
                  if (!rutTitularFallecido || rutTitularFallecido === 0) {
@@ -599,57 +578,50 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                  }
 
                                                   // Obtener documentos almacenados del session storage
-                 console.log('🔍 Buscando documentos en sessionStorage con RUT:', rutTitularFallecido);
-                 console.log('🔍 Claves disponibles en sessionStorage:', Object.keys(sessionStorage));
 
-                 // Verificar si existe la clave específica de documentos
-                 const expectedKey = `documentos_${rutTitularFallecido.toString().replace(/[^0-9kK]/g, '')}`;
-                 console.log('🔍 Clave esperada para documentos:', expectedKey);
-                 console.log('🔍 ¿Existe la clave en sessionStorage?', sessionStorage.getItem(expectedKey) ? 'SÍ' : 'NO');
+
+
+
+
 
                  const documentos = obtenerDocumentosAlmacenados(rutTitularFallecido);
-                 console.log('📄 Documentos obtenidos del storage:', documentos);
+
 
                  // Si no hay documentos, buscar manualmente en todas las claves que contengan "documentos"
                  if (documentos.length === 0) {
                    const allKeys = Object.keys(sessionStorage);
                    const documentoKeys = allKeys.filter(key => key.includes('documentos'));
-                   console.log('🔍 Claves que contienen "documentos":', documentoKeys);
+
 
                    // Buscar documentos en cualquier clave disponible
                    for (const key of documentoKeys) {
                      const data = sessionStorage.getItem(key);
-                     console.log(`🔍 Contenido de ${key}:`, data ? 'TIENE DATOS' : 'VACÍO');
+
 
                      if (data) {
                        try {
                          const documentosAlternativos = JSON.parse(data);
                          if (documentosAlternativos && documentosAlternativos.length > 0) {
-                           console.log('✅ Documentos encontrados en clave alternativa:', key);
-                           console.log('📄 Documentos alternativos:', documentosAlternativos);
+
+
 
                            // Usar estos documentos como fallback
                            documentos.push(...documentosAlternativos);
                            break; // Usar el primer conjunto de documentos encontrados
                          }
                        } catch (parseError) {
-                         console.log('Error al parsear documentos de clave alternativa:', key, parseError);
+
                        }
                      }
                    }
 
-                   console.log('📄 Total de documentos encontrados (incluyendo alternativos):', documentos.length);
+
                  }
 
                 if (documentos.length > 0) {
-                    console.log('Documentos encontrados para enviar:', documentos);
+
 
                     // Enviar documentos a la API usando el hook
-                    console.log('Iniciando envío de documentos con:', {
-                      newIdSolicitud,
-                      rutTitularFallecido,
-                      totalDocumentos: documentos.length
-                    });
 
                     const resultDocumentos = await enviarDocumentos(
                       newIdSolicitud,
@@ -659,7 +631,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     );
 
                     if (resultDocumentos.success) {
-                      console.log('Documentos enviados exitosamente:', resultDocumentos);
+
                       setSaveSuccess(true);
                       // Llamar a la función de guardado exitoso
                       onSave();
@@ -672,7 +644,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                         resultDocumentos.message.includes('Falló definitivamente') ||
                         resultDocumentos.message.includes('definitivamente después de')
                       )) {
-                        console.log('🚨 Error en documentos después de agotar intentos - navegando a página de error');
+
                         navigate('/mnherederos/ingresoher/error');
                         return;
                       }
@@ -684,7 +656,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                         resultDocumentos.message.includes('412') ||
                         resultDocumentos.message.includes('400')
                       )) {
-                        console.log('🚨 Error en documentos con código específico - navegando a página de error');
+
                         navigate('/mnherederos/ingresoher/error');
                         return;
                       }
@@ -694,16 +666,16 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                       onSave();
                     }
                   } else {
-                    console.log(DOCUMENTOS_MESSAGES.ERROR.NO_DOCUMENTS);
+
                     setSaveSuccess(true);
                     // Llamar a la función de guardado exitoso
                     onSave();
                   }
               } catch (errorDocumentos: any) {
                 console.error('Error al enviar documentos:', errorDocumentos);
-                console.log('🔍 Debug - errorDocumentos.message:', errorDocumentos.message);
-                console.log('🔍 Debug - errorDocumentos.status:', errorDocumentos.status);
-                console.log('🔍 Debug - errorDocumentos completo:', errorDocumentos);
+
+
+
 
                 // Verificar si es un error que debe ir a página de error
                 if (errorDocumentos.message && (
@@ -711,28 +683,28 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                   errorDocumentos.message.includes('Falló definitivamente') ||
                   errorDocumentos.message.includes('definitivamente después de')
                 )) {
-                  console.log('🚨 Error en documentos después de agotar intentos - navegando a página de error');
-                  console.log('🚨 Mensaje de error detectado:', errorDocumentos.message);
+
+
                   navigate('/mnherederos/ingresoher/error');
                   return;
                 }
 
                 // Verificar códigos de error específicos
                 if (errorDocumentos.status && [500, 503, 412, 400].includes(errorDocumentos.status)) {
-                  console.log('🚨 Error en documentos con código específico - navegando a página de error');
-                  console.log('🚨 Código de error detectado:', errorDocumentos.status);
+
+
                   navigate('/mnherederos/ingresoher/error');
                   return;
                 }
 
                 // Verificar si el mensaje contiene "Failed to fetch" que es el error que vemos en la consola
                 if (errorDocumentos.message && errorDocumentos.message.includes('Failed to fetch')) {
-                  console.log('🚨 Error "Failed to fetch" detectado - navegando a página de error');
+
                   navigate('/mnherederos/ingresoher/error');
                   return;
                 }
 
-                console.log('⚠️ Error no crítico en documentos - continuando con éxito');
+
                 // Aunque fallen los documentos, la solicitud se creó correctamente
                 setSaveSuccess(true);
                 // Llamar a la función de guardado exitoso
@@ -756,14 +728,14 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             errorSolicitud.message.includes('Falló definitivamente') ||
             errorSolicitud.message.includes('definitivamente después de')
           )) {
-            console.log('🚨 Error en solicitud después de agotar intentos - navegando a página de error');
+
             navigate('/mnherederos/ingresoher/error');
             return;
           }
 
           // Verificar códigos de error específicos
           if (errorSolicitud.status && [500, 503, 412, 400].includes(errorSolicitud.status)) {
-            console.log('🚨 Error en solicitud con código específico - navegando a página de error');
+
             navigate('/mnherederos/ingresoher/error');
             return;
           }
@@ -786,16 +758,16 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         err.message.includes('Falló definitivamente') ||
         err.message.includes('definitivamente después de')
       )) {
-        console.log('🚨 Error después de agotar intentos - navegando a página de error');
-        console.log('🚨 Mensaje de error:', err.message);
+
+
         navigate('/mnherederos/ingresoher/error');
         return;
       }
 
       // También verificar códigos de error específicos que deben ir a página de error
       if (err.status && [500, 503, 412, 400].includes(err.status)) {
-        console.log('🚨 Error con código específico - navegando a página de error');
-        console.log('🚨 Código de error:', err.status);
+
+
         navigate('/mnherederos/ingresoher/error');
         return;
       }

@@ -67,7 +67,7 @@ export class MandatosTransactionService {
    */
   async iniciarTransaccionMandatos(rut: string): Promise<MandatosTransactionData> {
     try {
-      console.log('🚀 Iniciando transacción de mandatos para RUT:', rut);
+
 
       // Obtener datos del session storage
       const sessionData = this.getSessionStorageData(rut);
@@ -75,7 +75,7 @@ export class MandatosTransactionService {
         throw new Error('No se encontraron datos en el session storage para el RUT especificado');
       }
 
-      console.log('📋 Datos obtenidos del session storage:', sessionData);
+
 
       // Limpiar RUT para la API
       const rutAfiliado = this.cleanRutForApi(sessionData.RutCompleto);
@@ -98,13 +98,13 @@ export class MandatosTransactionService {
       let cleanUrl = encryptedUrl.trim();
       if (cleanUrl.startsWith('"') && cleanUrl.endsWith('"')) {
         cleanUrl = cleanUrl.slice(1, -1);
-        console.log('🧹 URL limpiada de comillas en transacción:', cleanUrl);
+
       }
 
       // Limpiar símbolo @ al inicio si existe
       if (cleanUrl.startsWith('@')) {
         cleanUrl = cleanUrl.slice(1);
-        console.log('🧹 URL limpiada de símbolo @ en transacción:', cleanUrl);
+
       }
 
       // Verificar que la URL sea válida
@@ -112,8 +112,8 @@ export class MandatosTransactionService {
         throw new Error(`URL encriptada inválida: ${cleanUrl}`);
       }
 
-      console.log('🔐 URL encriptada recibida:', cleanUrl);
-      console.log('🔍 Longitud de la URL:', cleanUrl.length);
+
+
 
       // Crear datos de transacción
       const transactionId = this.generateTransactionId();
@@ -128,7 +128,7 @@ export class MandatosTransactionService {
       const storageKey = `${MandatosTransactionService.TRANSACTION_PREFIX}${transactionId}`;
       sessionStorage.setItem(storageKey, JSON.stringify(transactionData));
 
-      console.log('✅ Transacción iniciada exitosamente:', transactionData);
+
 
       return transactionData;
     } catch (error) {
@@ -245,7 +245,7 @@ export class MandatosTransactionService {
         }
       });
 
-      console.log(`🧹 Limpiadas ${cleanedCount} transacciones antiguas`);
+
       return cleanedCount;
     } catch (error) {
       console.error('Error al limpiar transacciones antiguas:', error);

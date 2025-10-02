@@ -56,11 +56,11 @@ export const useAdvancedExternalApp = () => {
   useEffect(() => {
     const callbacks: ExternalAppCallbacks = {
       onOpened: (state) => {
-        console.log('🌉 [useAdvancedExternalApp] Aplicación abierta:', state);
+
         setAppState(state);
       },
       onClosed: (state) => {
-        console.log('🌉 [useAdvancedExternalApp] Aplicación cerrada:', state);
+
         setAppState(state);
       },
       onError: (error) => {
@@ -68,7 +68,7 @@ export const useAdvancedExternalApp = () => {
         setAppState(prev => ({ ...prev, error, status: 'error' }));
       },
       onStatusChange: (status) => {
-        console.log('🌉 [useAdvancedExternalApp] Estado cambiado:', status);
+
         setAppState(prev => ({ ...prev, status }));
       }
     };
@@ -92,7 +92,7 @@ export const useAdvancedExternalApp = () => {
       if (!document.hidden && appState.status === 'open') {
         // Cuando vuelves a la pestaña principal, verificar si la ventana sigue abierta
         if (!advancedExternalAppManager.isWindowOpen()) {
-          console.log('🔍 [useAdvancedExternalApp] Ventana detectada como cerrada al volver el foco');
+
           setAppState(prev => ({
             ...prev,
             status: 'closed',

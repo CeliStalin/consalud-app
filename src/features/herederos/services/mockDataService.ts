@@ -39,7 +39,6 @@ export class MockDataService {
    * Obtiene herederos mock
    */
   async getHerederos(): Promise<any[]> {
-    console.log('📋 [Mock] Obteniendo herederos...');
     await new Promise(resolve => setTimeout(resolve, 300));
     return this.mockData.Heredero;
   }
@@ -48,7 +47,6 @@ export class MockDataService {
    * Obtiene titulares mock
    */
   async getTitulares(): Promise<any[]> {
-    console.log('📋 [Mock] Obteniendo titulares...');
     await new Promise(resolve => setTimeout(resolve, 300));
     return this.mockData.Titular;
   }

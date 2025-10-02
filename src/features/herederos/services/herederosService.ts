@@ -302,7 +302,7 @@ export class HerederosService {
       (error as any).status = response.status;
       throw error;
 
-    }, RETRY_CONFIGS.CRITICAL, 'Creación de Solicitante');
+    }, RETRY_CONFIGS.CRITICAL);
   }
 
   /**
@@ -324,12 +324,7 @@ export class HerederosService {
       usuarioCreacion: userName || solicitudData.usuarioCreacion
     };
 
-    console.log('🚀 Iniciando creación de solicitud con reintentos automáticos');
-    console.log('📡 URL:', url);
-    console.log('📋 Datos:', dataToSend);
-
     return withRetry(async () => {
-      console.log('📤 Enviando petición a /api/Solicitud');
 
       const response = await fetch(url, {
         method: 'POST',
@@ -339,15 +334,9 @@ export class HerederosService {
         body: JSON.stringify(dataToSend)
       });
 
-      console.log('📥 Respuesta de /api/Solicitud:', {
-        status: response.status,
-        statusText: response.statusText
-      });
-
       // Si la respuesta es 201, la creación fue exitosa
       if (response.status === 201) {
         const responseData = await response.json().catch(() => ({}));
-        console.log('✅ Solicitud creada exitosamente');
         return {
           success: true,
           status: 201,
@@ -369,7 +358,7 @@ export class HerederosService {
       (error as any).status = response.status;
       throw error;
 
-    }, RETRY_CONFIGS.CRITICAL, 'Creación de Solicitud');
+    }, RETRY_CONFIGS.CRITICAL);
   }
 
   // ===== MÉTODOS DE DOCUMENTOS =====
@@ -388,22 +377,12 @@ export class HerederosService {
     documentos: Documento[]
   ): Promise<DocumentosResponse> {
     const url = `${this.config.baseUrl}/api/Documentos`;
-    console.log('🔍 HerederosService.enviarDocumentos iniciado');
-    console.log('📡 URL de la API:', url);
-    console.log('📋 Parámetros recibidos:', { idSolicitud, usuarioCreacion, rutTitularFallecido, totalDocumentos: documentos.length });
-
     // Validar que hay documentos para enviar
     if (!documentos || documentos.length === 0) {
-      console.error('❌ No se encontraron documentos para enviar');
       throw new Error('No se encontraron documentos para enviar');
     }
 
-    console.log('🚀 Iniciando envío de documentos con reintentos automáticos');
-    console.log('📡 URL:', url);
-    console.log('📋 Parámetros:', { idSolicitud, usuarioCreacion, rutTitularFallecido, totalDocumentos: documentos.length });
-
     return withRetry(async () => {
-      console.log('📤 Enviando petición a /api/Documentos');
 
       // Crear FormData para enviar archivos
       const formData = new FormData();
@@ -433,11 +412,6 @@ export class HerederosService {
           formData.append(`documentos[${index}].idTipoDocumento`, documento.tipoId.toString());
           formData.append(`documentos[${index}].Documento`, file);
 
-          console.log(`Documento ${index} procesado:`, {
-            tipoId: documento.tipoId,
-            nombre: documento.nombre,
-            tamaño: file.size
-          });
 
         } catch (error) {
           console.error(`Error al procesar documento ${index}:`, error);
@@ -447,8 +421,6 @@ export class HerederosService {
 
       // Esperar a que todos los documentos se procesen
       await Promise.all(promises);
-
-      console.log('Todos los documentos procesados, enviando a la API...');
 
       // Realizar la petición POST
       const response = await fetch(url, {
@@ -460,10 +432,6 @@ export class HerederosService {
         body: formData
       });
 
-      console.log('📥 Respuesta de /api/Documentos:', {
-        status: response.status,
-        statusText: response.statusText
-      });
 
       if (!response.ok) {
         const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -473,11 +441,6 @@ export class HerederosService {
 
       const result = await response.json();
 
-      console.log('✅ Documentos enviados exitosamente:', {
-        idSolicitud,
-        totalDocumentos: documentos.length,
-        response: result
-      });
 
       return {
         success: true,
@@ -485,7 +448,7 @@ export class HerederosService {
         data: result
       };
 
-    }, RETRY_CONFIGS.DOCUMENTS, 'Envío de Documentos');
+    }, RETRY_CONFIGS.DOCUMENTS);
   }
 
   /**
@@ -526,19 +489,12 @@ export class HerederosService {
     const url = `${this.config.baseUrl}/api/Pargen/encriptar?usuario=${encodeURIComponent(usuario)}&rutAfiliado=${encodeURIComponent(rutAfiliado)}&nombres=${encodeURIComponent(nombres)}&apellidoPaterno=${encodeURIComponent(apellidoPaterno)}&apellidoMaterno=${encodeURIComponent(apellidoMaterno)}`;
 
     try {
-      console.log('🔐 Iniciando encriptación de parámetros para mandatos');
-      console.log('📡 URL:', url);
-      console.log('📋 Parámetros:', { usuario, rutAfiliado, nombres, apellidoPaterno, apellidoMaterno });
 
       const response = await fetch(url, {
         method: 'GET',
         headers: buildHeaders(this.config)
       });
 
-      console.log('📥 Respuesta de /api/Pargen/encriptar:', {
-        status: response.status,
-        statusText: response.statusText
-      });
 
       if (!response.ok) {
         const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -547,21 +503,16 @@ export class HerederosService {
       }
 
       const result = await response.text();
-      console.log('✅ Parámetros encriptados exitosamente (raw):', result);
-      console.log('✅ Tipo de resultado:', typeof result);
-      console.log('✅ Longitud del resultado:', result.length);
 
       // Limpiar comillas dobles y símbolo @ si los hay
       let cleanResult = result;
       if (result.startsWith('"') && result.endsWith('"')) {
         cleanResult = result.slice(1, -1);
-        console.log('🧹 URL limpiada de comillas:', cleanResult);
       }
 
       // Limpiar símbolo @ al inicio si existe
       if (cleanResult.startsWith('@')) {
         cleanResult = cleanResult.slice(1);
-        console.log('🧹 URL limpiada de símbolo @:', cleanResult);
       }
 
       // Verificar que la URL sea válida
@@ -571,7 +522,6 @@ export class HerederosService {
 
       return cleanResult;
     } catch (error: any) {
-      console.error('❌ Error al encriptar parámetros:', error);
       throw error;
     }
   }
