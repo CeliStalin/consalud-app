@@ -33,12 +33,7 @@ class Environment {
 
     // Validar que las variables críticas estén definidas
     this.validateEnv();
-    
-    // Mostrar información del ambiente en consola (solo en desarrollo)
-    if (this.isDevelopment() || this.isTest()) {
-      console.info(`🌎 Ambiente: ${this.env.ambiente}`);
-      console.info(`🔌 API: ${this.env.apiUrl}`);
-    }
+
   }
 
   public static getInstance(): Environment {
@@ -50,7 +45,7 @@ class Environment {
 
   private validateEnv(): void {
     const required = ['apiUrl', 'clientId', 'authority', 'sistema'];
-    
+
     for (const key of required) {
       if (!this.env[key as keyof EnvVariables]) {
         console.error(`Variable de entorno requerida no disponible: ${key}`);
