@@ -1,6 +1,7 @@
 import * as ConsaludCore from '@consalud/core';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { env } from '../../../core/config/env';
 import { DOCUMENTOS_MESSAGES } from '../constants';
 import { useDocumentos } from '../hooks/useDocumentos';
 import { useMandatosTransaction } from '../hooks/useMandatosTransaction';
@@ -50,6 +51,53 @@ const formatDateForAPI = (date: Date | string | null | undefined): string => {
 const formatName = (name: string): string => {
   if (!name || typeof name !== 'string') return '';
   return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+};
+
+/**
+ * Función para obtener el email del solicitante según el ambiente
+ */
+const getEmailSolicitante = (): string => {
+  if (env.isDevelopment() || env.isTest()) {
+    // Desarrollo/Testing: tomar del localStorage usuarioAD -> Email
+    try {
+      const usuarioAD = localStorage.getItem('usuarioAD');
+      if (usuarioAD) {
+        const usuarioData = JSON.parse(usuarioAD);
+        const email = usuarioData.Email || usuarioData.email;
+        if (email) {
+          return email;
+        }
+      }
+    } catch (error) {
+      console.error('Error al obtener email del localStorage:', error);
+    }
+    return 'stalin.celi@consalud.cl';
+  } else if (env.isProduction()) {
+    // Producción: tomar del sessionStorage formHerederoData_ -> Mail
+    try {
+      const allKeys = Object.keys(sessionStorage);
+      const formKeys = allKeys.filter(key => key.includes('formHeredero') || key.includes('heredero'));
+
+      for (const key of formKeys) {
+        const data = sessionStorage.getItem(key);
+        if (data) {
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed && parsed.Mail) {
+              return parsed.Mail;
+            }
+          } catch (parseError) {
+            continue;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error al obtener email del sessionStorage:', error);
+    }
+    return 'stalin.celi@consalud.cl';
+  }
+
+  return 'stalin.celi@consalud.cl';
 };
 
 /**
@@ -638,16 +686,10 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                       try {
                         // Obtener datos del formulario para el email
                         const nombreCompleto = `${formData.NombrePersona || ''} ${formData.ApellidoPaterno || ''} ${formData.ApellidoMaterno || ''}`.trim();
-                        const emailSolicitante = 'stalin.celi@consalud.cl'; // Email fijo según requerimiento
+                        const emailSolicitante = getEmailSolicitante(); // Email según ambiente
                         const rutNumerico = formData.RutPersona || parseInt(rutFormulario.toString());
                         const rutDigito = formData.RutDigito || '';
 
-                        console.log('📧 Todas las APIs exitosas - Enviando email de notificación...', {
-                          nombreSolicitante: nombreCompleto,
-                          mailSolicitante: emailSolicitante,
-                          rutNumerico: rutNumerico,
-                          dv: rutDigito
-                        });
 
                         const emailResult = await enviarEmail(
                           nombreCompleto,
@@ -657,27 +699,21 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                         );
 
                         if (emailResult.success && emailResult.status === 200) {
-                          console.log('✅ Email enviado correctamente');
                           setSaveSuccess(true);
                           onSave();
                         } else if ([400, 412, 503].includes(emailResult.status)) {
-                          console.error('❌ Error en envío de email, redirigiendo a página de error');
                           navigate('/mnherederos/ingresoher/error');
                           return;
                         } else {
-                          console.warn('⚠️ Email no enviado, pero continuando con el flujo');
                           setSaveSuccess(true);
                           onSave();
                         }
                       } catch (emailError: any) {
-                        console.error('❌ Error al enviar email:', emailError);
-                        // Verificar si es un error que debe ir a página de error
+                        console.error('Error al enviar email:', emailError);
                         if (emailError.status && [400, 412, 503].includes(emailError.status)) {
                           navigate('/mnherederos/ingresoher/error');
                           return;
                         }
-                        // Si no es un error crítico, continuar con éxito
-                        console.warn('⚠️ Error en email no crítico, continuando con el flujo');
                         setSaveSuccess(true);
                         onSave();
                       }
@@ -720,16 +756,10 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     try {
                       // Obtener datos del formulario para el email
                       const nombreCompleto = `${formData.NombrePersona || ''} ${formData.ApellidoPaterno || ''} ${formData.ApellidoMaterno || ''}`.trim();
-                      const emailSolicitante = 'stalin.celi@consalud.cl'; // Email fijo según requerimiento
+                      const emailSolicitante = getEmailSolicitante(); // Email según ambiente
                       const rutNumerico = formData.RutPersona || parseInt(rutFormulario.toString());
                       const rutDigito = formData.RutDigito || '';
 
-                      console.log('📧 APIs exitosas (sin documentos) - Enviando email de notificación...', {
-                        nombreSolicitante: nombreCompleto,
-                        mailSolicitante: emailSolicitante,
-                        rutNumerico: rutNumerico,
-                        dv: rutDigito
-                      });
 
                       const emailResult = await enviarEmail(
                         nombreCompleto,
@@ -739,27 +769,21 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                       );
 
                       if (emailResult.success && emailResult.status === 200) {
-                        console.log('✅ Email enviado correctamente');
                         setSaveSuccess(true);
                         onSave();
                       } else if ([400, 412, 503].includes(emailResult.status)) {
-                        console.error('❌ Error en envío de email, redirigiendo a página de error');
                         navigate('/mnherederos/ingresoher/error');
                         return;
                       } else {
-                        console.warn('⚠️ Email no enviado, pero continuando con el flujo');
                         setSaveSuccess(true);
                         onSave();
                       }
                     } catch (emailError: any) {
-                      console.error('❌ Error al enviar email:', emailError);
-                      // Verificar si es un error que debe ir a página de error
+                      console.error('Error al enviar email:', emailError);
                       if (emailError.status && [400, 412, 503].includes(emailError.status)) {
                         navigate('/mnherederos/ingresoher/error');
                         return;
                       }
-                      // Si no es un error crítico, continuar con éxito
-                      console.warn('⚠️ Error en email no crítico, continuando con el flujo');
                       setSaveSuccess(true);
                       onSave();
                     }
