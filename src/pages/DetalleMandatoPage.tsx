@@ -24,19 +24,14 @@ const DetalleMandatoPageContent: React.FC = () => {
       setLoading(true);
       try {
         // Intentar obtener datos del estado de navegación
-        const stateData = location.state as { rutCliente?: string, mandatoId?: string } | null;
-
-        // Si no hay datos en el estado, buscar en localStorage
+        const stateData = location.state as { rutCliente?: string, mandatoId?: string } | null;        // Si no hay datos en el estado, buscar en localStorage
         const rutCliente = stateData?.rutCliente || localStorage.getItem('currentRutCliente') || '17175966';
         const mandatoId = stateData?.mandatoId || localStorage.getItem('currentMandatoId') || '';
-
-        console.log(`Obteniendo detalles para RUT: ${rutCliente}, Mandato: ${mandatoId}`);
 
         // Llamar al servicio
         const resultado = await mockMandatoService.getMandatoInfo(rutCliente, mandatoId);
         setMandatoInfo(resultado);
       } catch (err) {
-        console.error('Error al cargar detalles del mandato:', err);
         setError('No se pudo cargar la información del mandato');
       } finally {
         setLoading(false);

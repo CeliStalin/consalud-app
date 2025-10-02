@@ -57,58 +57,47 @@ const IngresoDocumentosPage: React.FC = () => {
       // Guardar referencias
       setExternalWindow(result.window);
       setIsExternalAppOpen(true);
-      setTransactionStatus('pending');
-
-      // Agregar un evento beforeunload a la ventana externa para detectar cierre intencional
+      setTransactionStatus('pending');      // Agregar un evento beforeunload a la ventana externa para detectar cierre intencional
       if (result.window) {
         try {
           result.window.addEventListener('beforeunload', () => {
             userClosedRef.current = true;
           });
         } catch (e) {
-          console.warn('No se pudo agregar listener a ventana externa (restricciones de CORS)');
+          // No se pudo agregar listener a ventana externa (restricciones de CORS)
         }
       }
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido al abrir la aplicación externa';
-      console.error(errorMessage);
       setError(errorMessage);
       setTransactionStatus('error');
     } finally {
       setLoading(false);
     }
   };
-
   // Función para obtener información del mandato
   const fetchMandatoData = async (rutCliente: string = '17175966', refreshData: boolean = false) => {
     // Si ya tenemos datos y no se solicita actualización, no hacemos nada
     if (mandatoInfo && !refreshData) {
-      console.log('Usando información de mandato existente (no se solicitó actualización)');
       return;
     }
 
     setLoading(true);
     try {
-      console.log(`Consultando información del mandato para RUT: ${rutCliente}${refreshData ? ' (Actualización forzada)' : ''}`);
-
       // Agregar un timestamp como query parameter para evitar caché
       const timestamp = new Date().getTime();
 
       // Llamar al servicio SOAP - asegurando que el timestamp se pasa como un número
       const resultado = await mockMandatoService.getMandatoInfo(rutCliente, '');
 
-      console.log('Datos recibidos del servicio:', resultado);
-
       // Actualizar estado con la respuesta - usamos una función para asegurar actualización
       setMandatoInfo(prevInfo => {
         // Verificar si los datos son diferentes antes de actualizar
         if (prevInfo && prevInfo.numeroCuenta === resultado.numeroCuenta && !refreshData) {
-          console.log('Los datos recibidos son idénticos a los actuales, no es necesario actualizar.');
           return prevInfo;
         }
 
-        console.log('Actualizando información del mandato con nuevos datos.');
         return resultado;
       });
 
@@ -119,21 +108,14 @@ const IngresoDocumentosPage: React.FC = () => {
         if (refreshData || !isExternalAppOpen) {
           setTransactionStatus('success');
           setError(null);
-        }
-
-        // Guardar información para uso posterior
+        }        // Guardar información para uso posterior
         localStorage.setItem('currentRutCliente', rutCliente);
         localStorage.setItem('currentMandatoId', resultado.mandatoId);
         localStorage.setItem('lastMandatoUpdate', timestamp.toString());
-
-        console.log('Información del mandato recuperada exitosamente:', resultado);
       } else {
         setTransactionStatus('error');
-        setError(`Error en la transacción: ${resultado.mensaje}`);
-        console.error('Error en respuesta del servicio:', resultado.mensaje);
-      }
+        setError(`Error en la transacción: ${resultado.mensaje}`);      }
     } catch (err) {
-      console.error('Error al obtener datos del mandato:', err);
       setTransactionStatus('error');
       setError('Error al obtener información actualizada del mandato');
     } finally {
@@ -156,11 +138,9 @@ const IngresoDocumentosPage: React.FC = () => {
           if (externalWindow.closed) {
             // Detener el intervalo
             if (intervalRef.current) {
-              window.clearInterval(intervalRef.current);
-              intervalRef.current = undefined;
+              window.clearInterval(intervalRef.current);              intervalRef.current = undefined;
             }
 
-            console.log('La ventana externa fue cerrada - actualizando datos de cuenta bancaria');
             setIsExternalAppOpen(false);
 
             // Marcar que la ventana se acaba de cerrar para mostrar los radio buttons
@@ -171,12 +151,9 @@ const IngresoDocumentosPage: React.FC = () => {
             fetchMandatoData('17175966', true);
 
             // Limpiar tracking
-            localStorage.removeItem('currentExternalTransaction');
-          }
+            localStorage.removeItem('currentExternalTransaction');          }
         } catch (e) {
           // Si hay error al acceder, probablemente la ventana está cerrada o hay restricciones CORS
-          console.log('Error al verificar ventana - asumiendo cerrada:', e);
-
           if (intervalRef.current) {
             window.clearInterval(intervalRef.current);
             intervalRef.current = undefined;
@@ -224,12 +201,9 @@ const IngresoDocumentosPage: React.FC = () => {
           } else {
             // Si sigue pendiente, limpiamos para permitir un nuevo intento
             setTransactionStatus(null);
-          }
-
-          // Limpiar tracking en cualquier caso
+          }          // Limpiar tracking en cualquier caso
           localStorage.removeItem('currentExternalTransaction');
         } catch (err) {
-          console.error('Error al verificar transacción pendiente:', err);
           localStorage.removeItem('currentExternalTransaction');
         } finally {
           setLoading(false);

@@ -50,24 +50,14 @@ export class HerederosService {
   /**
    * Obtiene información de cuenta bancaria por RUT
    * @param rut - RUT del heredero (sin puntos ni DV)
-   */
-  async getCuentaBancaria(rut: string): Promise<CuentaBancariaResponse> {
+   */  async getCuentaBancaria(rut: string): Promise<CuentaBancariaResponse> {
     const rutLimpio = limpiarRut(rut);
     const url = `${this.config.baseUrl}/api/Mandatos/CuentaBancaria?rut=${rutLimpio}`;
 
     try {
-      console.log('🏦 Obteniendo información de cuenta bancaria');
-      console.log('📡 URL:', url);
-      console.log('📋 RUT original:', rut);
-      console.log('📋 RUT limpio (sin DV):', rutLimpio);
-      console.log('📋 Longitud RUT limpio:', rutLimpio.length);
-
       const data = await apiGet<CuentaBancariaResponse>(url, this.config, 'obtener cuenta bancaria');
-
-      console.log('✅ Información de cuenta bancaria obtenida:', data);
       return data;
     } catch (error: any) {
-      console.error('❌ Error al obtener cuenta bancaria:', error);
       throw error;
     }
   }
@@ -216,11 +206,8 @@ export class HerederosService {
       // Si la respuesta es 200, la validación es exitosa
       if (response.status === 200) {
         return true;
-      }
-
-      // Si la respuesta es 422, la validación falló
+      }      // Si la respuesta es 422, la validación falló
       if (response.status === 422) {
-        console.error('Validación de correo electrónico falló (422):', response.statusText);
         return false;
       }
 
@@ -229,7 +216,6 @@ export class HerederosService {
 
     } catch (error: any) {
       // Si hay error de red u otro tipo, también considerar como fallo de validación
-      console.error('Error en validación de correo electrónico:', error);
       return false;
     }
   }
@@ -252,11 +238,8 @@ export class HerederosService {
       // Si la respuesta es 200, la validación es exitosa
       if (response.status === 200) {
         return true;
-      }
-
-      // Si la respuesta es 422, la validación falló
+      }      // Si la respuesta es 422, la validación falló
       if (response.status === 422) {
-        console.error('Validación de teléfono falló (422):', response.statusText);
         return false;
       }
 
@@ -265,7 +248,6 @@ export class HerederosService {
 
     } catch (error: any) {
       // Si hay error de red u otro tipo, también considerar como fallo de validación
-      console.error('Error en validación de teléfono:', error);
       return false;
     }
   }
@@ -281,23 +263,13 @@ export class HerederosService {
     // Validar que la URL base esté configurada
     if (!this.config.baseUrl) {
       throw new Error('URL base de la API no configurada');
-    }
-
-    // Agregar el userName a los datos si no está presente
+    }    // Agregar el userName a los datos si no está presente
     const dataToSend = {
       ...solicitanteData,
       Usuario: userName || solicitanteData.Usuario
     };
 
-    console.log('🚀 Iniciando creación de solicitante con reintentos automáticos');
-    console.log('📡 URL:', url);
-    console.log('📋 Datos:', dataToSend);
-    console.log('📅 FechaNacimiento específica:', dataToSend.FechaNacimiento);
-    console.log('📅 Tipo de FechaNacimiento:', typeof dataToSend.FechaNacimiento);
-
     return withRetry(async () => {
-      console.log('📤 Enviando petición a /api/Solicitante');
-
       const response = await fetch(url, {
         method: 'POST',
         headers: buildHeaders(this.config, {
@@ -306,15 +278,9 @@ export class HerederosService {
         body: JSON.stringify(dataToSend)
       });
 
-      console.log('📥 Respuesta de /api/Solicitante:', {
-        status: response.status,
-        statusText: response.statusText
-      });
-
       // Si la respuesta es 201, la creación fue exitosa
       if (response.status === 201) {
         const responseData = await response.json().catch(() => ({}));
-        console.log('✅ Solicitante creado exitosamente');
         return {
           success: true,
           status: 201,

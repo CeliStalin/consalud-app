@@ -357,9 +357,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       setLoading(false);
     }
   }, [formatSimpleRut, navigate, lastSearchedRut, getStorageKey, herederoToFormHerederoData]);
-
   const limpiarHeredero = useCallback(() => {
-    console.log('HerederoProvider - limpiarHeredero llamado');
     setHeredero(null);
     setError(null);
     setLoading(false); // Asegurar que loading se resetee

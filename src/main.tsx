@@ -1,10 +1,6 @@
 // IMPORTANTE: Configurar el ambiente ANTES de importar cualquier componente del core
 import { initializeMsalConfig, setCoreEnvConfig } from '@consalud/core';
 
-// Agregado para depuración de variables de entorno
-console.log('🔍 Variables de entorno cargadas:', import.meta.env);
-console.log('📍 VITE_AMBIENTE:', import.meta.env.VITE_AMBIENTE);
-
 // ⚠️ CRÍTICO: setCoreEnvConfig DEBE ejecutarse ANTES de importar otros módulos del core
 // Esto asegura que las URLs dinámicas se generen con el ambiente correcto
 setCoreEnvConfig({
@@ -24,11 +20,8 @@ setCoreEnvConfig({
   VITE_APP_TIMEOUT: import.meta.env.VITE_APP_TIMEOUT,
   VITE_CLIENT_ID: import.meta.env.VITE_CLIENT_ID,
   VITE_APP_CLIENT_ID: import.meta.env.VITE_APP_CLIENT_ID,
-  VITE_AUTHORITY: import.meta.env.VITE_AUTHORITY,
-  VITE_APP_AUTHORITY: import.meta.env.VITE_APP_AUTHORITY,
+  VITE_AUTHORITY: import.meta.env.VITE_AUTHORITY,  VITE_APP_AUTHORITY: import.meta.env.VITE_APP_AUTHORITY,
 });
-
-console.log('✅ Configuración del core establecida correctamente');
 
 // Ahora sí, importar el resto del core después de configurar
 import '@consalud/core/core.css';
