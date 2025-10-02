@@ -1,17 +1,18 @@
-import { BrowserRouter as Router } from 'react-router-dom';
 import {
-  ErrorBoundary,
-  AuthProvider,
-  MenuConfigProvider,
-  Typography,
-  MenuCollapseProvider
+    AuthProvider,
+    ErrorBoundary,
+    MenuCollapseProvider,
+    MenuConfigProvider,
+    Typography
 } from '@consalud/core';
+import { useEffect } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { AppRoutes } from './routes';
-import './styles/variables.css';
+import './styles/anti-flash.css';
 import './styles/bulma-overrides.css';
 import './styles/navigation-optimizations.css';
-import './styles/anti-flash.css';
-import { useEffect } from 'react';
+import './styles/variables.css';
+
 const logo = '/Logo.png';
 
 const ErrorFallback = () => {
@@ -55,7 +56,10 @@ const App = () => {
             enableDynamicMenu: true,
             enableBounceEffects: true
           }}>
-            <Router>
+            <Router future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}>
               <MenuCollapseProvider>
                 <AppRoutes logo={logo} />
               </MenuCollapseProvider>

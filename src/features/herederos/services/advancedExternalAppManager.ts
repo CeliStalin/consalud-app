@@ -28,14 +28,13 @@ class AdvancedExternalAppManager {
     closedAt: null,
     error: null
   };
-
   private windowRef: Window | null = null;
   private pollInterval: NodeJS.Timeout | null = null;
   private callbacks: ExternalAppCallbacks = {};
   private readonly POLL_INTERVAL = 1000; // Verificar cada segundo
 
   constructor() {
-    console.log('🚀 [AdvancedExternalAppManager] Inicializado');
+    // Manager inicializado silenciosamente
   }
 
   /**
