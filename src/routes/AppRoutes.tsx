@@ -1,12 +1,12 @@
 import { CollapseOnRoute } from '@/features/herederos/components/CollapseOnRoute';
 import {
-    ProtectedRoute as CoreProtectedRoute,
-    HomePage,
-    Login,
-    MenuCollapseProvider,
-    NotFound,
-    Unauthorized,
-    useMenuCollapse,
+  ProtectedRoute as CoreProtectedRoute,
+  HomePage,
+  Login,
+  MenuCollapseProvider,
+  NotFound,
+  Unauthorized,
+  useMenuCollapse,
 } from '@consalud/core';
 import React, { useMemo } from 'react';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
@@ -24,7 +24,6 @@ import DatosTitularPage from '../pages/DatosTitularPage';
 import DetalleMandatoPage from '../pages/DetalleMandatoPage';
 import ErrorPage from '../pages/ErrorPage';
 import InfoRequisitosTitularPage from '../pages/InfoRequisitosTitularPage';
-import IngresoDocumentosPage from '../pages/IngresoDocumentosPage';
 import IngresoHerederoFormPage from '../pages/IngresoHerederoFormPage';
 import IngresoTitularPage from '../pages/IngresoTitularPage';
 import RegistroHerederoPage from '../pages/RegistroHerederoPage';
@@ -213,13 +212,11 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
                   <Route path="ingresoher/DatosTitular" element={<DatosTitularPage />} />
                   <Route path="ingresoher/RegistroTitular" element={<RegistroHerederoPage />} />
                   <Route path="ingresoher/RegistroHeredero" element={<RegistroHerederoPage />} />
-                  <Route path="ingresoher/formingreso" element={<IngresoHerederoFormPage />} />
-                  <Route path="ingresoher/cargadoc" element={<CargaDocumentoPage />} />
+                  <Route path="ingresoher/formingreso" element={<IngresoHerederoFormPage />} />                  <Route path="ingresoher/cargadoc" element={<CargaDocumentoPage />} />
                   <Route path="ingresoher/mandatos" element={<MandatosPage />} />
                   <Route path="ingresoher/detallemandato" element={<DetalleMandatoPage />} />
                   <Route path="ingresoher/success" element={<SuccessPage />} />
                   <Route path="ingresoher/error" element={<ErrorPage />} />
-                  <Route path="ingresoher/IngresoDocumentos" element={<IngresoDocumentosPage />} />
                 </Route>
                 {/* Redirección para rutas con mayúsculas (compatibilidad) */}
                 <Route

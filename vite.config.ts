@@ -43,10 +43,8 @@ export default defineConfig({
           'pages-secondary': [
             './src/pages/DatosTitularPage',
             './src/pages/RegistroHerederoPage'
-          ],
-          'pages-forms': [
-            './src/pages/IngresoHerederoFormPage',
-            './src/pages/IngresoDocumentosPage'
+          ],          'pages-forms': [
+            './src/pages/IngresoHerederoFormPage'
           ],
           'pages-final': [
             './src/pages/SuccessPage',

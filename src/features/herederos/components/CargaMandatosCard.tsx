@@ -2,7 +2,6 @@ import * as ConsaludCore from '@consalud/core';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { env } from '../../../core/config/env';
-import { DOCUMENTOS_MESSAGES } from '../constants';
 import { useDocumentos } from '../hooks/useDocumentos';
 import { useMandatosTransaction } from '../hooks/useMandatosTransaction';
 import { createSolicitante, createSolicitud, CuentaBancariaResponse, enviarEmail, fetchTitularByRut, getCuentaBancaria, obtenerDocumentosAlmacenados } from '../services/herederosService';
@@ -141,11 +140,9 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [mandatoInfo, setMandatoInfo] = useState<MandatoResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [showManualUrl, setShowManualUrl] = useState(false);
+  const [error, setError] = useState<string | null>(null);  const [showManualUrl, setShowManualUrl] = useState(false);
   const [manualUrl, setManualUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [esMandatoCorrecto, setEsMandatoCorrecto] = useState<string | null>(null);
   const [herederoData, setHerederoData] = useState<{
     NombrePersona: string;
@@ -158,9 +155,8 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const [shouldResetSelection, setShouldResetSelection] = useState(false);
   const [noTieneCuentaBancaria, setNoTieneCuentaBancaria] = useState(false);
   const [bloquearRadioButtons, setBloquearRadioButtons] = useState(false);
-  const [botonActualizarVisible, setBotonActualizarVisible] = useState(false);
-  const { setStep } = useStepper();
-  const { enviarDocumentos, loading: documentosLoading, error: documentosError } = useDocumentos();
+  const [botonActualizarVisible, setBotonActualizarVisible] = useState(false);  const { setStep } = useStepper();
+  const { enviarDocumentos } = useDocumentos();
 
   // Hook para manejar transacciones de mandatos con pestaña externa
   const {
@@ -218,16 +214,14 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
       lockButtons('Abriendo pestaña externa...');
 
       try {
-        await openExternalTab(rutHeredero);
-
-      } catch (openError) {
-        console.error('❌ Error al abrir pestaña externa:', openError);
+        await openExternalTab(rutHeredero);      } catch (openError) {
+        console.error('Error al abrir pestaña externa:', openError);
         // Desbloquear botones si falla la apertura
         unlockButtons();
         throw openError; // Re-lanzar el error para que se capture en el catch principal
       }
     } catch (err: any) {
-      console.error('❌ Error al abrir pestaña externa:', err);
+      console.error('Error al abrir pestaña externa:', err);
 
       // Asegurar que los botones estén desbloqueados
       unlockButtons();
@@ -307,10 +301,8 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
       const cuentaData = await getCuentaBancaria(rutCompleto);
       setCuentaBancariaData(cuentaData);
       setNoTieneCuentaBancaria(false);
-      setBloquearRadioButtons(false);
-
-    } catch (error: any) {
-      console.error('❌ Error al cargar datos de cuenta bancaria:', error);
+      setBloquearRadioButtons(false);    } catch (error: any) {
+      console.error('Error al cargar datos de cuenta bancaria:', error);
 
       // Si es error 404, significa que no tiene cuenta bancaria registrada
       if (error?.status === 404 || error?.message?.includes('404')) {
@@ -379,9 +371,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     } else {
       setBotonActualizarVisible(false);
     }
-  }, [mandatoInfo, esMandatoCorrecto, noTieneCuentaBancaria]);
-
-  // Función para manejar el guardado del solicitante
+  }, [mandatoInfo, esMandatoCorrecto, noTieneCuentaBancaria]);  // Función para manejar el guardado del solicitante
   const handleSave = async () => {
     if (!mandatoInfo) return;
 
@@ -396,9 +386,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
 
 
 
-      let storedData: string | null = null;
-
-      // Buscar en todas las claves de herederos hasta encontrar una con datos válidos
+      let storedData: string | null = null;      // Buscar en todas las claves de herederos hasta encontrar una con datos válidos
       for (const key of formKeys) {
         const data = sessionStorage.getItem(key);
         if (data) {
@@ -407,35 +395,20 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             // Verificar que tenga la estructura correcta (al menos RutPersona)
             if (parsed && parsed.RutPersona) {
               storedData = data;
-
               break;
             }
           } catch (parseError) {
-
             continue;
           }
         }
-      }
-
-      if (!storedData) {
+      }      if (!storedData) {
         throw new Error(`No se encontraron datos válidos del formulario en el sessionStorage. Claves revisadas: ${formKeys.join(', ')}`);
       }
 
       const formData = JSON.parse(storedData);
 
-
-      // Verificar datos del titular en sessionStorage
-      const titularContextData = sessionStorage.getItem('titularContext');
-      if (titularContextData) {
-
-
-      } else {
-        console.warn('No se encontraron datos del titular en sessionStorage');
-      }
-
       // Extraer el RUT del formulario encontrado
       const rutFormulario = formData.RutPersona || formData.RutCompleto || '0';
-
 
       // Preparar datos para la API
       const solicitanteData = {
@@ -461,19 +434,12 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         Calle: formData.Calle || '',
         NumCalle: formData.NumCalle || 0,
         villa: formData.villa || '',
-        DepBlock: formData.DepBlock || 0,
-        Usuario: formData.Usuario || 'SISTEMA'
-      };
-
-
+        DepBlock: formData.DepBlock || 0,        Usuario: formData.Usuario || 'SISTEMA'      };
 
       // Llamar a la API para crear el solicitante
       const resultSolicitante = await createSolicitante(solicitanteData, 'SISTEMA');
 
-
-
       if (resultSolicitante.success && resultSolicitante.status === 201) {
-
 
         // Ahora crear la solicitud usando los datos del retorno del primer endpoint
         try {
@@ -483,14 +449,8 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             const offset = now.getTimezoneOffset();
             const localDate = new Date(now.getTime() - (offset * 60000));
             return localDate.toISOString();
-          };
-
-          // Obtener la fecha actual en formato local (sin conversión UTC)
+          };          // Obtener la fecha actual en formato local (sin conversión UTC)
           const fechaISO = getLocalISOString();
-
-
-
-
 
           // Extraer el ID del solicitante de la respuesta del primer endpoint
           // El campo correcto es 'newIdSolicitante' según la especificación
@@ -502,9 +462,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                                   resultSolicitante.idSolicitante ||
                                   resultSolicitante.IdSolicitante ||
                                   resultSolicitante.id ||
-                                  1001;
-
-                    // Obtener el IdPersona del titular desde sessionStorage
+                                  1001;          // Obtener el IdPersona del titular desde sessionStorage
           // Este ID se guarda cuando se consulta /api/Titular/ByRut en el paso de ingreso del titular
           let idMae = 0;
           let rutTitular: string | number = 0; // Allow both string and number types
@@ -516,14 +474,11 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               const titularData = JSON.parse(titularContextData);
               idMae = titularData.id; // IdPersona del titular
 
-
               // Obtener el RUT del titular desde sessionStorage
               if (titularData.rut) {
                 rutTitular = titularData.rut;
-
               } else if (titularData.rutPersona) {
                 rutTitular = titularData.rutPersona;
-
               }
             }
 
@@ -531,34 +486,20 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             if (!rutTitular || rutTitular === 0) {
               rutTitular = mandatoInfo.rutCliente;
 
-
               // Si tampoco tenemos idMae, consultar la API
               if (!idMae || idMae === 0) {
                 const titularInfo = await fetchTitularByRut(parseInt(rutTitular), 'SISTEMA');
                 idMae = titularInfo.id;
-
               }
-            }
-
-
-
-
-          } catch (errorTitular: any) {
-            console.error('Error al obtener datos del titular:', errorTitular);
+            }          } catch (errorTitular: any) {
             // Fallback: usar valores por defecto
             if (!idMae || idMae === 0) {
               idMae = formData.IdPersona || 12345;
-              console.warn('⚠️ Usando IdPersona por defecto:', idMae);
             }
             if (!rutTitular || rutTitular === 0) {
               rutTitular = mandatoInfo.rutCliente;
-              console.warn('⚠️ Usando RUT del mandato por defecto:', rutTitular);
             }
-          }
-
-
-
-          // Preparar datos para la solicitud
+          }          // Preparar datos para la solicitud
           const solicitudData = {
             idSolicitante: newIdSolicitante, // newIdSolicitante del output de /api/Solicitante
             idMae: idMae, // IdPersona del titular obtenido de /api/Titular/ByRut
@@ -572,21 +513,12 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             fechaEstadoRegistro: fechaISO
           };
 
-
-
           // Llamar a la API para crear la solicitud
           const resultSolicitud = await createSolicitud(solicitudData, 'SISTEMA');
 
-
-
           if (resultSolicitud.success && resultSolicitud.status === 201) {
-
-
-                         // Obtener el ID de la solicitud creada
-
-
-
-                          const newIdSolicitud = resultSolicitud.data?.newId ||
+            // Obtener el ID de la solicitud creada
+            const newIdSolicitud = resultSolicitud.data?.newId ||
                                    resultSolicitud.data?.newIdSolicitud ||
                                    resultSolicitud.data?.idSolicitud ||
                                    resultSolicitud.data?.newIdSolicitante ||
@@ -597,81 +529,48 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                                    resultSolicitud.newIdSolicitud ||
                                    resultSolicitud.idSolicitud ||
                                    resultSolicitud.newIdSolicitante ||
-                                                                       resultSolicitud.idSolicitante;
-
-
+                                    resultSolicitud.idSolicitante;
 
              if (newIdSolicitud) {
-
-
-                                            try {
+               try {
                  // Obtener el RUT del titular fallecido (sin DV, solo números)
-                 let rutTitularFallecido: number;
-
-                 if (typeof rutTitular === 'string') {
+                 let rutTitularFallecido: number;                 if (typeof rutTitular === 'string') {
                    // Extraer solo los números del RUT (sin puntos, guiones ni DV)
                    const rutNumeros = rutTitular.replace(/[^0-9]/g, '');
                    rutTitularFallecido = parseInt(rutNumeros);
-
-
-
                  } else {
                    rutTitularFallecido = rutTitular;
-
                  }
 
                  if (!rutTitularFallecido || rutTitularFallecido === 0) {
-                   console.error('❌ ERROR: rutTitularFallecido es 0 o inválido. No se pueden buscar documentos.');
                    throw new Error('RUT del titular fallecido es 0 o inválido');
                  }
 
-                                                  // Obtener documentos almacenados del session storage
-
-
-
-
-
-
-                 const documentos = obtenerDocumentosAlmacenados(rutTitularFallecido);
-
-
-                 // Si no hay documentos, buscar manualmente en todas las claves que contengan "documentos"
+                 // Obtener documentos almacenados del session storage
+                 const documentos = obtenerDocumentosAlmacenados(rutTitularFallecido);                 // Si no hay documentos, buscar manualmente en todas las claves que contengan "documentos"
                  if (documentos.length === 0) {
                    const allKeys = Object.keys(sessionStorage);
                    const documentoKeys = allKeys.filter(key => key.includes('documentos'));
 
-
                    // Buscar documentos en cualquier clave disponible
                    for (const key of documentoKeys) {
                      const data = sessionStorage.getItem(key);
-
-
                      if (data) {
                        try {
                          const documentosAlternativos = JSON.parse(data);
                          if (documentosAlternativos && documentosAlternativos.length > 0) {
-
-
-
                            // Usar estos documentos como fallback
                            documentos.push(...documentosAlternativos);
                            break; // Usar el primer conjunto de documentos encontrados
                          }
                        } catch (parseError) {
-
+                         // Continuar con la siguiente clave
                        }
                      }
                    }
-
-
-                 }
-
-                if (documentos.length > 0) {
-
-
-                    // Enviar documentos a la API usando el hook
-
-                    const resultDocumentos = await enviarDocumentos(
+                 }                if (documentos.length > 0) {
+                  // Enviar documentos a la API usando el hook
+                  const resultDocumentos = await enviarDocumentos(
                       newIdSolicitud,
                       'SISTEMA',
                       rutTitularFallecido,
@@ -695,38 +594,27 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                           nombreCompleto,
                           emailSolicitante,
                           rutNumerico,
-                          rutDigito
-                        );
-
-                        if (emailResult.success && emailResult.status === 200) {
-                          setSaveSuccess(true);
+                          rutDigito                        );                        if (emailResult.success && emailResult.status === 200) {
+                          // Email enviado exitosamente - navegar directamente sin mostrar modal intermedio
                           onSave();
                         } else if ([400, 412, 503].includes(emailResult.status)) {
-                          navigate('/mnherederos/ingresoher/error');
-                          return;
+                          navigate('/mnherederos/ingresoher/error');                          return;
                         } else {
-                          setSaveSuccess(true);
+                          // Email falló pero APIs anteriores OK - continuar sin modal intermedio
                           onSave();
-                        }
-                      } catch (emailError: any) {
-                        console.error('Error al enviar email:', emailError);
+                        }                      } catch (emailError: any) {
                         if (emailError.status && [400, 412, 503].includes(emailError.status)) {
                           navigate('/mnherederos/ingresoher/error');
                           return;
                         }
-                        setSaveSuccess(true);
+                        // Error en email pero APIs anteriores OK - continuar sin modal intermedio
                         onSave();
-                      }
-                    } else {
-                      console.warn(DOCUMENTOS_MESSAGES.ERROR.DOCUMENTS_SEND_FAILED, resultDocumentos.message);
-
+                      }                    } else {
                       // Verificar si el error indica que se agotaron los intentos
                       if (resultDocumentos.message && (
                         resultDocumentos.message.includes('Falló definitivamente después de') ||
-                        resultDocumentos.message.includes('Falló definitivamente') ||
-                        resultDocumentos.message.includes('definitivamente después de')
+                        resultDocumentos.message.includes('Falló definitivamente') ||                        resultDocumentos.message.includes('definitivamente después de')
                       )) {
-
                         navigate('/mnherederos/ingresoher/error');
                         return;
                       }
@@ -735,30 +623,22 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                       if (resultDocumentos.message && (
                         resultDocumentos.message.includes('500') ||
                         resultDocumentos.message.includes('503') ||
-                        resultDocumentos.message.includes('412') ||
-                        resultDocumentos.message.includes('400')
+                        resultDocumentos.message.includes('412') ||                        resultDocumentos.message.includes('400')
                       )) {
-
                         navigate('/mnherederos/ingresoher/error');
                         return;
                       }
 
-                      // Si no es un error crítico, continuar con éxito
-                      setSaveSuccess(true);
+                      // Si no es un error crítico, continuar con éxito - navegar directamente sin modal intermedio
                       onSave();
-                    }
-                  } else {
-                    // ✅ No hay documentos, pero las APIs anteriores fueron exitosas:
-                    // - /api/Solicitante POST = 201 ✅
-                    // - /api/Solicitud POST = 201 ✅
-                    // - /api/Documentos no se ejecutó (no hay documentos) ✅
-                    // Ahora SÍ se puede enviar el email
+                    }                  } else {
+                    // No hay documentos, pero las APIs anteriores fueron exitosas
                     try {
-                      // Obtener datos del formulario para el email
-                      const nombreCompleto = `${formData.NombrePersona || ''} ${formData.ApellidoPaterno || ''} ${formData.ApellidoMaterno || ''}`.trim();
-                      const emailSolicitante = getEmailSolicitante(); // Email según ambiente
-                      const rutNumerico = formData.RutPersona || parseInt(rutFormulario.toString());
-                      const rutDigito = formData.RutDigito || '';
+                        // Obtener datos del formulario para el email
+                        const nombreCompleto = `${formData.NombrePersona || ''} ${formData.ApellidoPaterno || ''} ${formData.ApellidoMaterno || ''}`.trim();
+                        const emailSolicitante = getEmailSolicitante(); // Email según ambiente
+                        const rutNumerico = formData.RutPersona || parseInt(rutFormulario.toString());
+                        const rutDigito = formData.RutDigito || '';
 
 
                       const emailResult = await enviarEmail(
@@ -766,95 +646,58 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                         emailSolicitante,
                         rutNumerico,
                         rutDigito
-                      );
-
-                      if (emailResult.success && emailResult.status === 200) {
-                        setSaveSuccess(true);
+                      );                      if (emailResult.success && emailResult.status === 200) {
+                        // Email enviado exitosamente - navegar directamente sin mostrar modal intermedio
                         onSave();
                       } else if ([400, 412, 503].includes(emailResult.status)) {
-                        navigate('/mnherederos/ingresoher/error');
-                        return;
+                        navigate('/mnherederos/ingresoher/error');                        return;
                       } else {
-                        setSaveSuccess(true);
+                        // Email falló pero APIs anteriores OK - continuar sin modal intermedio
                         onSave();
-                      }
-                    } catch (emailError: any) {
-                      console.error('Error al enviar email:', emailError);
+                      }                    } catch (emailError: any) {
                       if (emailError.status && [400, 412, 503].includes(emailError.status)) {
                         navigate('/mnherederos/ingresoher/error');
                         return;
                       }
-                      setSaveSuccess(true);
+                      // Error en email pero APIs anteriores OK - continuar sin modal intermedio
                       onSave();
-                    }
-                  }
+                    }                  }
               } catch (errorDocumentos: any) {
-                console.error('Error al enviar documentos:', errorDocumentos);
-
-
-
-
                 // Verificar si es un error que debe ir a página de error
                 if (errorDocumentos.message && (
                   errorDocumentos.message.includes('Falló definitivamente después de') ||
-                  errorDocumentos.message.includes('Falló definitivamente') ||
-                  errorDocumentos.message.includes('definitivamente después de')
+                  errorDocumentos.message.includes('Falló definitivamente') ||                  errorDocumentos.message.includes('definitivamente después de')
                 )) {
-
-
                   navigate('/mnherederos/ingresoher/error');
                   return;
-                }
-
-                // Verificar códigos de error específicos
+                }                // Verificar códigos de error específicos
                 if (errorDocumentos.status && [500, 503, 412, 400].includes(errorDocumentos.status)) {
-
-
                   navigate('/mnherederos/ingresoher/error');
                   return;
-                }
-
-                // Verificar si el mensaje contiene "Failed to fetch" que es el error que vemos en la consola
+                }                // Verificar si el mensaje contiene "Failed to fetch" que es el error que vemos en la consola
                 if (errorDocumentos.message && errorDocumentos.message.includes('Failed to fetch')) {
-
                   navigate('/mnherederos/ingresoher/error');
                   return;
                 }
 
-
-                // ❌ Los documentos fallaron, NO se debe enviar email
-                // Solo continuar con el flujo sin email
-                setSaveSuccess(true);
-                // Llamar a la función de guardado exitoso
+                // Los documentos fallaron - navegar directamente sin modal intermedio
                 onSave();
-              }
-            } else {
-              console.warn('No se pudo obtener el ID de la solicitud de la respuesta');
-              // ❌ No se puede enviar documentos sin ID de solicitud, NO se debe enviar email
-              setSaveSuccess(true);
-              // Llamar a la función de guardado exitoso
+              }            } else {
+              // No se puede enviar documentos sin ID de solicitud
               onSave();
             }
-          } else {
-            throw new Error(`Error al crear la solicitud. Status: ${resultSolicitud.status}, Respuesta: ${JSON.stringify(resultSolicitud)}`);
-          }
+          } else {          throw new Error(`Error al crear la solicitud. Status: ${resultSolicitud.status}, Respuesta: ${JSON.stringify(resultSolicitud)}`);
+        }
         } catch (errorSolicitud: any) {
-          console.error('Error al crear solicitud:', errorSolicitud);
-
           // Verificar si es un error que debe ir a página de error
           if (errorSolicitud.message && (
             errorSolicitud.message.includes('Falló definitivamente después de') ||
-            errorSolicitud.message.includes('Falló definitivamente') ||
-            errorSolicitud.message.includes('definitivamente después de')
+            errorSolicitud.message.includes('Falló definitivamente') ||            errorSolicitud.message.includes('definitivamente después de')
           )) {
-
             navigate('/mnherederos/ingresoher/error');
             return;
-          }
-
-          // Verificar códigos de error específicos
+          }          // Verificar códigos de error específicos
           if (errorSolicitud.status && [500, 503, 412, 400].includes(errorSolicitud.status)) {
-
             navigate('/mnherederos/ingresoher/error');
             return;
           }
@@ -862,31 +705,18 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
           // Aunque falle la solicitud, el solicitante se creó correctamente
           setError(`Solicitante creado pero error al crear solicitud: ${errorSolicitud.message}`);
         }
-      } else {
-        throw new Error(`Error al guardar el solicitante. Status: ${resultSolicitante.status}, Respuesta: ${JSON.stringify(resultSolicitante)}`);
+      } else {        throw new Error(`Error al guardar el solicitante. Status: ${resultSolicitante.status}, Respuesta: ${JSON.stringify(resultSolicitante)}`);
       }
     } catch (err: any) {
-      console.error('Error al guardar solicitante:', err);
-
-      // Log del error para debugging
-      console.error('Error completo:', err);
-
       // Verificar si el error indica que se agotaron los intentos
       if (err.message && (
         err.message.includes('Falló definitivamente después de') ||
-        err.message.includes('Falló definitivamente') ||
-        err.message.includes('definitivamente después de')
+        err.message.includes('Falló definitivamente') ||        err.message.includes('definitivamente después de')
       )) {
-
-
         navigate('/mnherederos/ingresoher/error');
         return;
-      }
-
-      // También verificar códigos de error específicos que deben ir a página de error
+      }      // También verificar códigos de error específicos que deben ir a página de error
       if (err.status && [500, 503, 412, 400].includes(err.status)) {
-
-
         navigate('/mnherederos/ingresoher/error');
         return;
       }
@@ -1024,30 +854,12 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               </span>
             </div>
           </div>
-        )}
-
-        {loading ? (
+        )}        {loading ? (
           <div className="has-text-centered p-6">
             <div className="loader-container">
               <div className="loader"></div>
             </div>
             <p className="mt-4">Cargando información...</p>
-          </div>
-        ) : saveSuccess ? (
-          <div className="has-text-centered p-6">
-            <div className="notification is-success is-light">
-              <div className="has-text-centered">
-                <i className="fas fa-check-circle" style={{ fontSize: '3rem', color: '#48c774' }}></i>
-                <h3 className="title is-4 mt-3" style={{ color: '#48c774' }}>¡CREADO CON ÉXITO!</h3>
-                <p className="mt-2">El solicitante y la solicitud han sido creados correctamente.</p>
-                <p className="mt-2">
-                  {documentosLoading ? DOCUMENTOS_MESSAGES.INFO.SENDING_DOCUMENTS :
-                   documentosError ? DOCUMENTOS_MESSAGES.ERROR.DOCUMENTS_SEND_FAILED :
-                   DOCUMENTOS_MESSAGES.SUCCESS.DOCUMENTS_SENT}
-                </p>
-                <p className="is-size-7 mt-2">{DOCUMENTOS_MESSAGES.INFO.CLOSING_MODAL}</p>
-              </div>
-            </div>
           </div>
         ) : error ? (
           <div className="notification is-danger">

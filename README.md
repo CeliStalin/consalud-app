@@ -76,7 +76,7 @@ La aplicación implementa un sistema de rutas dinámico basado en los permisos d
 - `/home` - Página principal tras el login
 - `/mnherederos/ingresoher` - Ingreso de herederos (página principal del módulo de herederos)
 - `/mnherederos/ingresoher/ingresotitular` - Ingreso de RUT del titular (carga `IngresoTitularPage`)
-- `/mnherederos/ingresoher/cargadoc` - Ingreso de documentación (carga `IngresoDocumentosPage`)
+- `/mnherederos/ingresoher/cargadoc` - Carga de documentos (carga `CargaDocumentoPage`)
 
 ## 📚 Librería Core
 
@@ -152,7 +152,7 @@ El Dockerfile principal ahora permite construir imágenes para **cualquier ambie
   - `produccion` (o cualquier otro valor) → `.env.production`
 - `MODE`: El modo de build de Vite (`development`, `test`, `production`).
 
-**Por defecto:**  
+**Por defecto:**
 Si no especificas los argumentos, se usará `produccion` y `production`.
 
 ---
