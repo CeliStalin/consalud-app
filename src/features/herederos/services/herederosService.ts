@@ -577,3 +577,65 @@ export const encriptarParametrosMandatos = (
 
 export const getCuentaBancaria = (rut: string) =>
   herederosService.getCuentaBancaria(rut);
+
+/**
+ * Interfaz para la respuesta de la API de envío de email
+ */
+export interface EnvioMailResponse {
+  success: boolean;
+  status: number;
+  message?: string;
+}
+
+/**
+ * Envía un email de notificación
+ * @param nombreSolicitante - Nombre completo del solicitante
+ * @param mailSolicitante - Email del solicitante
+ * @param rutNumerico - RUT numérico del solicitante
+ * @param dv - Dígito verificador del RUT
+ */
+export const enviarEmail = async (
+  nombreSolicitante: string,
+  mailSolicitante: string,
+  rutNumerico: number,
+  dv: string
+): Promise<EnvioMailResponse> => {
+  const config = getHerederosApiConfig();
+  const url = `${config.baseUrl}/api/EnvioMail`;
+
+  // Construir parámetros de la URL
+  const params = new URLSearchParams({
+    nombreSolicitante: nombreSolicitante,
+    mailSolicitante: mailSolicitante,
+    rutNumerico: rutNumerico.toString(),
+    Dv: dv
+  });
+
+  const fullUrl = `${url}?${params.toString()}`;
+
+  try {
+    const response = await fetch(fullUrl, {
+      method: 'POST',
+      headers: buildHeaders(config)
+    });
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        status: 200,
+        message: 'Email enviado correctamente'
+      };
+    } else if ([400, 412, 503].includes(response.status)) {
+      return {
+        success: false,
+        status: response.status,
+        message: `Error en el envío de email: ${response.status}`
+      };
+    } else {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+  } catch (error: any) {
+    console.error('Error al enviar email:', error);
+    throw error;
+  }
+};

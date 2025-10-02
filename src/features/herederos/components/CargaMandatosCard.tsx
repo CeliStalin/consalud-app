@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { DOCUMENTOS_MESSAGES } from '../constants';
 import { useDocumentos } from '../hooks/useDocumentos';
 import { useMandatosTransaction } from '../hooks/useMandatosTransaction';
-import { createSolicitante, createSolicitud, CuentaBancariaResponse, fetchTitularByRut, getCuentaBancaria, obtenerDocumentosAlmacenados } from '../services/herederosService';
+import { createSolicitante, createSolicitud, CuentaBancariaResponse, enviarEmail, fetchTitularByRut, getCuentaBancaria, obtenerDocumentosAlmacenados } from '../services/herederosService';
 import { mandatosTransactionService } from '../services/mandatosTransactionService';
 import { MandatoResult, mockMandatoService } from '../services/mockMandatoService';
 import { useStepper } from './Stepper';
@@ -631,10 +631,56 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     );
 
                     if (resultDocumentos.success) {
+                      // Si Todas las APIs anteriores fueron exitosas:
+                      // - /api/Solicitante POST = 201
+                      // - /api/Solicitud POST = 201
+                      // - /api/Documentos POST = 200
+                      try {
+                        // Obtener datos del formulario para el email
+                        const nombreCompleto = `${formData.NombrePersona || ''} ${formData.ApellidoPaterno || ''} ${formData.ApellidoMaterno || ''}`.trim();
+                        const emailSolicitante = 'stalin.celi@consalud.cl'; // Email fijo según requerimiento
+                        const rutNumerico = formData.RutPersona || parseInt(rutFormulario.toString());
+                        const rutDigito = formData.RutDigito || '';
 
-                      setSaveSuccess(true);
-                      // Llamar a la función de guardado exitoso
-                      onSave();
+                        console.log('📧 Todas las APIs exitosas - Enviando email de notificación...', {
+                          nombreSolicitante: nombreCompleto,
+                          mailSolicitante: emailSolicitante,
+                          rutNumerico: rutNumerico,
+                          dv: rutDigito
+                        });
+
+                        const emailResult = await enviarEmail(
+                          nombreCompleto,
+                          emailSolicitante,
+                          rutNumerico,
+                          rutDigito
+                        );
+
+                        if (emailResult.success && emailResult.status === 200) {
+                          console.log('✅ Email enviado correctamente');
+                          setSaveSuccess(true);
+                          onSave();
+                        } else if ([400, 412, 503].includes(emailResult.status)) {
+                          console.error('❌ Error en envío de email, redirigiendo a página de error');
+                          navigate('/mnherederos/ingresoher/error');
+                          return;
+                        } else {
+                          console.warn('⚠️ Email no enviado, pero continuando con el flujo');
+                          setSaveSuccess(true);
+                          onSave();
+                        }
+                      } catch (emailError: any) {
+                        console.error('❌ Error al enviar email:', emailError);
+                        // Verificar si es un error que debe ir a página de error
+                        if (emailError.status && [400, 412, 503].includes(emailError.status)) {
+                          navigate('/mnherederos/ingresoher/error');
+                          return;
+                        }
+                        // Si no es un error crítico, continuar con éxito
+                        console.warn('⚠️ Error en email no crítico, continuando con el flujo');
+                        setSaveSuccess(true);
+                        onSave();
+                      }
                     } else {
                       console.warn(DOCUMENTOS_MESSAGES.ERROR.DOCUMENTS_SEND_FAILED, resultDocumentos.message);
 
@@ -666,10 +712,57 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                       onSave();
                     }
                   } else {
+                    // ✅ No hay documentos, pero las APIs anteriores fueron exitosas:
+                    // - /api/Solicitante POST = 201 ✅
+                    // - /api/Solicitud POST = 201 ✅
+                    // - /api/Documentos no se ejecutó (no hay documentos) ✅
+                    // Ahora SÍ se puede enviar el email
+                    try {
+                      // Obtener datos del formulario para el email
+                      const nombreCompleto = `${formData.NombrePersona || ''} ${formData.ApellidoPaterno || ''} ${formData.ApellidoMaterno || ''}`.trim();
+                      const emailSolicitante = 'stalin.celi@consalud.cl'; // Email fijo según requerimiento
+                      const rutNumerico = formData.RutPersona || parseInt(rutFormulario.toString());
+                      const rutDigito = formData.RutDigito || '';
 
-                    setSaveSuccess(true);
-                    // Llamar a la función de guardado exitoso
-                    onSave();
+                      console.log('📧 APIs exitosas (sin documentos) - Enviando email de notificación...', {
+                        nombreSolicitante: nombreCompleto,
+                        mailSolicitante: emailSolicitante,
+                        rutNumerico: rutNumerico,
+                        dv: rutDigito
+                      });
+
+                      const emailResult = await enviarEmail(
+                        nombreCompleto,
+                        emailSolicitante,
+                        rutNumerico,
+                        rutDigito
+                      );
+
+                      if (emailResult.success && emailResult.status === 200) {
+                        console.log('✅ Email enviado correctamente');
+                        setSaveSuccess(true);
+                        onSave();
+                      } else if ([400, 412, 503].includes(emailResult.status)) {
+                        console.error('❌ Error en envío de email, redirigiendo a página de error');
+                        navigate('/mnherederos/ingresoher/error');
+                        return;
+                      } else {
+                        console.warn('⚠️ Email no enviado, pero continuando con el flujo');
+                        setSaveSuccess(true);
+                        onSave();
+                      }
+                    } catch (emailError: any) {
+                      console.error('❌ Error al enviar email:', emailError);
+                      // Verificar si es un error que debe ir a página de error
+                      if (emailError.status && [400, 412, 503].includes(emailError.status)) {
+                        navigate('/mnherederos/ingresoher/error');
+                        return;
+                      }
+                      // Si no es un error crítico, continuar con éxito
+                      console.warn('⚠️ Error en email no crítico, continuando con el flujo');
+                      setSaveSuccess(true);
+                      onSave();
+                    }
                   }
               } catch (errorDocumentos: any) {
                 console.error('Error al enviar documentos:', errorDocumentos);
@@ -705,13 +798,15 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 }
 
 
-                // Aunque fallen los documentos, la solicitud se creó correctamente
+                // ❌ Los documentos fallaron, NO se debe enviar email
+                // Solo continuar con el flujo sin email
                 setSaveSuccess(true);
                 // Llamar a la función de guardado exitoso
                 onSave();
               }
             } else {
               console.warn('No se pudo obtener el ID de la solicitud de la respuesta');
+              // ❌ No se puede enviar documentos sin ID de solicitud, NO se debe enviar email
               setSaveSuccess(true);
               // Llamar a la función de guardado exitoso
               onSave();
