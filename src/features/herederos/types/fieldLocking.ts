@@ -11,13 +11,8 @@ export const LOCKED_FIELDS = {
 
 export type LockedFieldKey = typeof LOCKED_FIELDS[keyof typeof LOCKED_FIELDS];
 
-export interface FieldLockingState {
-  isLocked: boolean;
-  lockedFields: LockedFieldKey[];
-}
-
 export interface FieldLockingConfig {
   enableLocking: boolean;
   showLockedIndicator: boolean;
   allowOverride: boolean;
-} 
+}
