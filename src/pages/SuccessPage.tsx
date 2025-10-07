@@ -56,8 +56,7 @@ const SuccessPage: React.FC = () => {
 
           {/* Mensaje descriptivo */}
           <p className="success-message">
-            La persona heredera recibirá una respuesta sobre la devolución en{' '}
-            <strong>3 días hábiles</strong>, a través de su correo electrónico registrado.
+            La persona heredera recibirá a través de su correo electronico registrado una notificacion de ingreso de la solicitud
           </p>
 
           {/* Botón de acción */}
