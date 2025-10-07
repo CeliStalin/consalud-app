@@ -1,0 +1,27 @@
+# Dependencias
+node_modules
+*.tgz
+
+# Build outputs
+dist
+build
+coverage
+
+# Archivos generados
+*.min.js
+*.min.css
+package-lock.json
+
+# Configuración
+.env*
+*.log
+
+# Docker y despliegue
+Dockerfile
+docker-compose.yml
+*.yml
+*.yaml
+
+# Otros
+.vscode
+.idea

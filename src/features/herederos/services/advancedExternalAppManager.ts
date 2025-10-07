@@ -26,7 +26,7 @@ class AdvancedExternalAppManager {
     status: 'closed',
     openedAt: null,
     closedAt: null,
-    error: null
+    error: null,
   };
   private windowRef: Window | null = null;
   private pollInterval: NodeJS.Timeout | null = null;
@@ -49,15 +49,14 @@ class AdvancedExternalAppManager {
    */
   async openExternalApp(url: string, windowFeatures?: string): Promise<string> {
     try {
-
-
       this.updateState({
         status: 'opening',
-        error: null
+        error: null,
       });
 
       // Configuración por defecto de la ventana
-      const defaultFeatures = 'width=1200,height=800,scrollbars=yes,resizable=yes,menubar=no,toolbar=no';
+      const defaultFeatures =
+        'width=1200,height=800,scrollbars=yes,resizable=yes,menubar=no,toolbar=no';
       const features = windowFeatures || defaultFeatures;
 
       // Generar un ID único para esta pestaña
@@ -86,7 +85,7 @@ class AdvancedExternalAppManager {
         closedAt: null,
         error: null,
         tabId,
-        url
+        url,
       });
 
       // Guardar en localStorage para persistencia
@@ -95,16 +94,17 @@ class AdvancedExternalAppManager {
       this.startMonitoring();
       this.callbacks.onOpened?.(this.appState);
 
-
       return tabId;
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      console.error('❌ [AdvancedExternalAppManager] Error al abrir aplicación externa:', errorMessage);
+      console.error(
+        '❌ [AdvancedExternalAppManager] Error al abrir aplicación externa:',
+        errorMessage
+      );
 
       this.updateState({
         status: 'error',
-        error: errorMessage
+        error: errorMessage,
       });
 
       this.callbacks.onError?.(errorMessage);
@@ -120,8 +120,6 @@ class AdvancedExternalAppManager {
       clearInterval(this.pollInterval);
     }
 
-
-
     this.pollInterval = setInterval(() => {
       if (this.windowRef?.closed) {
         this.handleWindowClosed();
@@ -136,11 +134,9 @@ class AdvancedExternalAppManager {
    * Maneja el cierre de la ventana
    */
   private handleWindowClosed(): void {
-
-
     this.updateState({
       status: 'closed',
-      closedAt: new Date()
+      closedAt: new Date(),
     });
 
     this.stopMonitoring();
@@ -155,8 +151,6 @@ class AdvancedExternalAppManager {
    * Acciones a ejecutar cuando se cierra la aplicación externa
    */
   private onApplicationClosed(): void {
-
-
     try {
       // Ejemplo de acciones comunes:
       // - Recargar datos
@@ -165,8 +159,6 @@ class AdvancedExternalAppManager {
       // - Llamadas a API
 
       localStorage.setItem('lastExternalAppClosed', new Date().toISOString());
-
-
     } catch (error) {
       console.error('❌ [AdvancedExternalAppManager] Error en acciones post-cierre:', error);
     }
@@ -179,7 +171,6 @@ class AdvancedExternalAppManager {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
       this.pollInterval = null;
-
     }
   }
 
@@ -188,7 +179,6 @@ class AdvancedExternalAppManager {
    */
   closeExternalWindow(): void {
     if (this.windowRef && !this.windowRef.closed) {
-
       this.windowRef.close();
       this.handleWindowClosed();
     }
@@ -214,15 +204,16 @@ class AdvancedExternalAppManager {
     const timestamp = Date.now();
 
     localStorage.setItem('consalud_external_tab_active', timestamp.toString());
-    localStorage.setItem('consalud_external_tab_open', JSON.stringify({
-      tabId,
-      url,
-      timestamp,
-      confirmed: true,
-      manager: 'AdvancedExternalAppManager'
-    }));
-
-
+    localStorage.setItem(
+      'consalud_external_tab_open',
+      JSON.stringify({
+        tabId,
+        url,
+        timestamp,
+        confirmed: true,
+        manager: 'AdvancedExternalAppManager',
+      })
+    );
   }
 
   /**
@@ -239,7 +230,6 @@ class AdvancedExternalAppManager {
   private clearFromLocalStorage(): void {
     localStorage.removeItem('consalud_external_tab_active');
     localStorage.removeItem('consalud_external_tab_open');
-
   }
 
   /**
@@ -271,25 +261,25 @@ class AdvancedExternalAppManager {
 
         // Si han pasado menos de 10 minutos, restaurar el estado
         if (timeSinceOpened < 600000) {
-
-
           this.updateState({
             status: 'open',
             openedAt: new Date(timestamp),
             closedAt: null,
             error: null,
             tabId: tabData.tabId,
-            url: tabData.url
+            url: tabData.url,
           });
 
           // No podemos restaurar windowRef, pero podemos simular el estado
           return true;
         } else {
-
           this.clearFromLocalStorage();
         }
       } catch (error) {
-        console.error('❌ [AdvancedExternalAppManager] Error al restaurar desde localStorage:', error);
+        console.error(
+          '❌ [AdvancedExternalAppManager] Error al restaurar desde localStorage:',
+          error
+        );
         this.clearFromLocalStorage();
       }
     }
@@ -301,7 +291,6 @@ class AdvancedExternalAppManager {
    * Limpia recursos
    */
   cleanup(): void {
-
     this.stopMonitoring();
 
     if (this.windowRef && !this.windowRef.closed) {
@@ -315,7 +304,7 @@ class AdvancedExternalAppManager {
       status: 'closed',
       openedAt: null,
       closedAt: null,
-      error: null
+      error: null,
     });
   }
 
@@ -324,10 +313,14 @@ class AdvancedExternalAppManager {
    */
   getStatusColor(status: WindowStatus): string {
     switch (status) {
-      case 'open': return '#4CAF50';
-      case 'opening': return '#FF9800';
-      case 'error': return '#F44336';
-      default: return '#757575';
+      case 'open':
+        return '#4CAF50';
+      case 'opening':
+        return '#FF9800';
+      case 'error':
+        return '#F44336';
+      default:
+        return '#757575';
     }
   }
 }

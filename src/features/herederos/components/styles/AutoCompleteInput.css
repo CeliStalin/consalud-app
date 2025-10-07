@@ -22,18 +22,22 @@
 }
 
 .autocomplete-container .input:focus {
-  border-color: #04A59B;
-  box-shadow: 0 2px 8px rgba(4, 165, 155, 0.15), 0 0 0 3px rgba(4, 165, 155, 0.1);
+  border-color: #04a59b;
+  box-shadow:
+    0 2px 8px rgba(4, 165, 155, 0.15),
+    0 0 0 3px rgba(4, 165, 155, 0.1);
 }
 
 .autocomplete-container .input.is-danger {
-  border-color: #E11D48;
+  border-color: #e11d48;
   box-shadow: 0 2px 8px rgba(225, 29, 72, 0.1);
 }
 
 .autocomplete-container .input.is-danger:focus {
-  border-color: #E11D48;
-  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.15), 0 0 0 3px rgba(225, 29, 72, 0.1);
+  border-color: #e11d48;
+  box-shadow:
+    0 2px 8px rgba(225, 29, 72, 0.15),
+    0 0 0 3px rgba(225, 29, 72, 0.1);
 }
 
 .autocomplete-container .input:disabled {
@@ -63,7 +67,7 @@
   margin-top: 4px;
   animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(8px);
-  border-color: #04A59B;
+  border-color: #04a59b;
 }
 
 /* Animación de entrada del dropdown */
@@ -106,7 +110,7 @@
 .autocomplete-item:hover,
 .autocomplete-item.is-highlighted {
   background-color: #f8f9fa;
-  color: #04A59B;
+  color: #04a59b;
   transform: translateX(2px);
 }
 
@@ -189,16 +193,21 @@
 }
 
 .autocomplete-container .control.is-loading::before {
-  border-color: transparent transparent #04A59B #04A59B !important;
+  border-color: transparent transparent #04a59b #04a59b !important;
 }
 
 /* Efecto de pulso sutil en focus */
 @keyframes subtlePulse {
-  0%, 100% {
-    box-shadow: 0 2px 8px rgba(4, 165, 155, 0.15), 0 0 0 3px rgba(4, 165, 155, 0.1);
+  0%,
+  100% {
+    box-shadow:
+      0 2px 8px rgba(4, 165, 155, 0.15),
+      0 0 0 3px rgba(4, 165, 155, 0.1);
   }
   50% {
-    box-shadow: 0 2px 8px rgba(4, 165, 155, 0.2), 0 0 0 3px rgba(4, 165, 155, 0.15);
+    box-shadow:
+      0 2px 8px rgba(4, 165, 155, 0.2),
+      0 0 0 3px rgba(4, 165, 155, 0.15);
   }
 }
 
@@ -229,7 +238,7 @@
 }
 
 .autocomplete-item:focus {
-  outline: 2px solid #04A59B;
+  outline: 2px solid #04a59b;
   outline-offset: -2px;
 }
 
@@ -250,7 +259,7 @@
   right: 16px;
   top: 50%;
   transform: translateY(-50%);
-  color: #04A59B;
+  color: #04a59b;
 }
 
 /* Animación de carga sutil */

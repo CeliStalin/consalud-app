@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { FormHerederoContext } from "../contexts/FormHerederoContext";
-import { FormData, FormHerederoData } from "../interfaces/FormData";
-import { FormHerederoContextType } from "../interfaces/FormHerederoContext";
-import { FormDataTransformer } from "../services/formDataTransformer";
+import React, { useCallback, useEffect, useState } from 'react';
+import { FormHerederoContext } from '../contexts/FormHerederoContext';
+import { FormData, FormHerederoData } from '../interfaces/FormData';
+import { FormHerederoContextType } from '../interfaces/FormHerederoContext';
+import { FormDataTransformer } from '../services/formDataTransformer';
 
 interface FormHerederoProviderProps {
   children: React.ReactNode;
@@ -11,7 +11,10 @@ interface FormHerederoProviderProps {
 
 const STORAGE_KEY_PREFIX = 'formHerederoData';
 
-export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ children, rutHeredero }) => {
+export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({
+  children,
+  rutHeredero,
+}) => {
   // Generar clave única basada en el RUT - SIEMPRE usar RUT para evitar duplicación
   const getStorageKey = useCallback(() => {
     // Si no hay RUT específico, usar un RUT temporal o generar uno
@@ -189,7 +192,7 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
           numero: '',
           deptoBloqueOpcional: '',
           villaOpcional: '',
-          region: ''
+          region: '',
         };
         return { ...baseData, [field]: value };
       }
@@ -212,8 +215,11 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
     const requiredFields: (keyof FormData)[] = [
       'nombres',
       // 'apellidoPaterno', 'apellidoMaterno', // Los apellidos ya no son requeridos
-      'fechaNacimiento', 'telefono', 'correoElectronico',
-      'sexo', 'parentesco'
+      'fechaNacimiento',
+      'telefono',
+      'correoElectronico',
+      'sexo',
+      'parentesco',
     ];
 
     for (const field of requiredFields) {
@@ -263,12 +269,10 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({ chil
     validateFormData,
     getFormData,
     reloadFromStorage,
-    forceSyncFromStorage
+    forceSyncFromStorage,
   };
 
   return (
-    <FormHerederoContext.Provider value={contextValue}>
-      {children}
-    </FormHerederoContext.Provider>
+    <FormHerederoContext.Provider value={contextValue}>{children}</FormHerederoContext.Provider>
   );
 };

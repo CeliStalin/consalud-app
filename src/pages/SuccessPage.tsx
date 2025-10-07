@@ -23,7 +23,7 @@ const SuccessPage: React.FC = () => {
               textAlign: 'center',
               color: '#333333',
               fontSize: '2rem',
-              marginBottom: '1rem'
+              marginBottom: '1rem',
             }}
           >
             ¡Listo!
@@ -36,20 +36,14 @@ const SuccessPage: React.FC = () => {
 
         <div className="success-card">
           <div className="success-icon">
-            <img
-              src={CheckRequisitosIcon}
-              alt="Solicitud completada"
-              width="40"
-              height="40"
-            />
+            <img src={CheckRequisitosIcon} alt="Solicitud completada" width="40" height="40" />
           </div>
 
-          <h1 className="success-title">
-            La solicitud de devolución se ingresó correctamente
-          </h1>
+          <h1 className="success-title">La solicitud de devolución se ingresó correctamente</h1>
 
           <p className="success-message">
-            La persona heredera recibirá a través de su correo electrónico registrado una notificación de ingreso de la solicitud
+            La persona heredera recibirá a través de su correo electrónico registrado una
+            notificación de ingreso de la solicitud
           </p>
 
           <button

@@ -43,7 +43,7 @@ export class MandatosTransactionService {
           RutCompleto: parsed.RutCompleto || '',
           NombrePersona: parsed.NombrePersona || '',
           ApellidoPaterno: parsed.ApellidoPaterno || '',
-          ApellidoMaterno: parsed.ApellidoMaterno || ''
+          ApellidoMaterno: parsed.ApellidoMaterno || '',
         };
       }
       return null;
@@ -67,15 +67,11 @@ export class MandatosTransactionService {
    */
   async iniciarTransaccionMandatos(rut: string): Promise<MandatosTransactionData> {
     try {
-
-
       // Obtener datos del session storage
       const sessionData = this.getSessionStorageData(rut);
       if (!sessionData) {
         throw new Error('No se encontraron datos en el session storage para el RUT especificado');
       }
-
-
 
       // Limpiar RUT para la API
       const rutAfiliado = this.cleanRutForApi(sessionData.RutCompleto);
@@ -98,13 +94,11 @@ export class MandatosTransactionService {
       let cleanUrl = encryptedUrl.trim();
       if (cleanUrl.startsWith('"') && cleanUrl.endsWith('"')) {
         cleanUrl = cleanUrl.slice(1, -1);
-
       }
 
       // Limpiar símbolo @ al inicio si existe
       if (cleanUrl.startsWith('@')) {
         cleanUrl = cleanUrl.slice(1);
-
       }
 
       // Verificar que la URL sea válida
@@ -112,23 +106,18 @@ export class MandatosTransactionService {
         throw new Error(`URL encriptada inválida: ${cleanUrl}`);
       }
 
-
-
-
       // Crear datos de transacción
       const transactionId = this.generateTransactionId();
       const transactionData: MandatosTransactionData = {
         transactionId,
         encryptedUrl: cleanUrl,
         timestamp: Date.now(),
-        status: 'pending'
+        status: 'pending',
       };
 
       // Guardar en session storage
       const storageKey = `${MandatosTransactionService.TRANSACTION_PREFIX}${transactionId}`;
       sessionStorage.setItem(storageKey, JSON.stringify(transactionData));
-
-
 
       return transactionData;
     } catch (error) {
@@ -158,7 +147,10 @@ export class MandatosTransactionService {
   /**
    * Actualiza el estado de una transacción
    */
-  updateTransactionStatus(transactionId: string, status: MandatosTransactionData['status']): boolean {
+  updateTransactionStatus(
+    transactionId: string,
+    status: MandatosTransactionData['status']
+  ): boolean {
     try {
       const storageKey = `${MandatosTransactionService.TRANSACTION_PREFIX}${transactionId}`;
       const stored = sessionStorage.getItem(storageKey);
@@ -224,7 +216,7 @@ export class MandatosTransactionService {
    */
   cleanupOldTransactions(): number {
     try {
-      const oneHourAgo = Date.now() - (60 * 60 * 1000);
+      const oneHourAgo = Date.now() - 60 * 60 * 1000;
       let cleanedCount = 0;
       const keys = Object.keys(sessionStorage);
 
@@ -244,7 +236,6 @@ export class MandatosTransactionService {
           }
         }
       });
-
 
       return cleanedCount;
     } catch (error) {

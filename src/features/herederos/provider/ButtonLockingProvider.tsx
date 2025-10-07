@@ -10,13 +10,9 @@ export interface ButtonLockingProviderWrapperProps {
  * Facilita la integración en la aplicación principal
  */
 export const ButtonLockingProviderWrapper: React.FC<ButtonLockingProviderWrapperProps> = ({
-  children
+  children,
 }) => {
-  return (
-    <ButtonLockingProvider>
-      {children}
-    </ButtonLockingProvider>
-  );
+  return <ButtonLockingProvider>{children}</ButtonLockingProvider>;
 };
 
 export default ButtonLockingProviderWrapper;

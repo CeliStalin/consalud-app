@@ -9,7 +9,7 @@
 export const DATE_FORMATS = {
   API: 'YYYY-MM-DD',
   DISPLAY: 'DD-MM-YYYY',
-  ISO: 'ISO8601'
+  ISO: 'ISO8601',
 } as const;
 
 /**
@@ -162,5 +162,5 @@ export const getCurrentDateForAPI = (): string => {
 export const DATE_ERROR_MESSAGES = {
   INVALID_DATE: 'La fecha ingresada no es válida',
   DATE_REQUIRED: 'La fecha es requerida',
-  INVALID_FORMAT: 'El formato de la fecha no es correcto'
+  INVALID_FORMAT: 'El formato de la fecha no es correcto',
 } as const;

@@ -32,30 +32,36 @@ import SuccessPage from '../pages/SuccessPage';
 // Loading optimizado para eliminar parpadeos
 const OptimizedLoading: React.FC = React.memo(() => (
   <div className="suspense-fallback">
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '200px',
-      fontSize: '14px',
-      color: '#666',
-      background: '#ffffff',
-      width: '100%',
-      position: 'relative'
-    }}>
-      <div style={{
+    <div
+      style={{
         display: 'flex',
+        justifyContent: 'center',
         alignItems: 'center',
-        gap: '8px'
-      }}>
-        <div style={{
-          width: '16px',
-          height: '16px',
-          border: '2px solid #f3f3f3',
-          borderTop: '2px solid #04A59B',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite'
-        }} />
+        height: '200px',
+        fontSize: '14px',
+        color: '#666',
+        background: '#ffffff',
+        width: '100%',
+        position: 'relative',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}
+      >
+        <div
+          style={{
+            width: '16px',
+            height: '16px',
+            border: '2px solid #f3f3f3',
+            borderTop: '2px solid #04A59B',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+          }}
+        />
         Cargando...
       </div>
       <style>{`
@@ -77,10 +83,10 @@ const StablePageWrapper: React.FC<{ children: React.ReactNode }> = React.memo(({
   const hideSidebar = true;
   const transitionClass = `page-transition page-transition--minimal${!hideSidebar ? (isMenuCollapsed ? ' sidebar-collapsed' : ' sidebar-expanded') : ''}`;
   return (
-    <main className={`instant-stable navigation-stable no-flash${!hideSidebar ? (isMenuCollapsed ? ' sidebar-collapsed' : ' sidebar-expanded') : ''}`}>
-      <PageTransition className={transitionClass}>
-        {children}
-      </PageTransition>
+    <main
+      className={`instant-stable navigation-stable no-flash${!hideSidebar ? (isMenuCollapsed ? ' sidebar-collapsed' : ' sidebar-expanded') : ''}`}
+    >
+      <PageTransition className={transitionClass}>{children}</PageTransition>
     </main>
   );
 });
@@ -88,7 +94,9 @@ const StablePageWrapper: React.FC<{ children: React.ReactNode }> = React.memo(({
 StablePageWrapper.displayName = 'StablePageWrapper';
 
 // Optimized HomePage wrapper
-const HomePageWithCollapse: React.FC<{ onCardClick?: (...args: any[]) => void }> = (props) => {
+const HomePageWithCollapse: React.FC<{
+  onCardClick?: (...args: any[]) => void;
+}> = props => {
   const { collapseMenu } = useMenuCollapse();
 
   const handleApplicationClick = (...args: any[]) => {
@@ -122,12 +130,11 @@ const HerederosLayout: React.FC = () => (
           </CollapseOnRoute>
         </ButtonLockingProviderWrapper>
       </HerederoProvider>
-    </TitularProvider>
+    </TitularProvider>{' '}
   </CoreProtectedRoute>
 );
 
-// Debug SyncedLayout
-const SyncedLayout = (props) => {
+const SyncedLayout = props => {
   return <CoreSyncedLayout {...props} />;
 };
 
@@ -139,20 +146,13 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
   const { isAuthenticated, isLoading, handleLoginSuccess } = useAuthWithRedirect({
     defaultRedirectPath: '/home',
     protectedPaths: ['/mnherederos', '/home'],
-    publicPaths: ['/login']
+    publicPaths: ['/login'],
   });
 
-  // Loading state optimizado
-  const loadingComponent = useMemo(() => (
-    <OptimizedLoading />
-  ), []);
+  const loadingComponent = useMemo(() => <OptimizedLoading />, []);
 
   if (isLoading) {
-    return (
-      <div className="loading-overlay">
-        {loadingComponent}
-      </div>
-    );
+    return <div className="loading-overlay">{loadingComponent}</div>;
   }
 
   return (
@@ -184,7 +184,11 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
                 <Route
                   path="/"
                   element={
-                    isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />
+                    isAuthenticated ? (
+                      <Navigate to="/home" replace />
+                    ) : (
+                      <Navigate to="/login" replace />
+                    )
                   }
                 />
                 {/* Ruta Home - HomePage del Core */}
@@ -197,18 +201,19 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
                   }
                 />
                 {/* Rutas del módulo de herederos - refactorizadas */}
-                <Route
-                  path="/mnherederos/*"
-                  element={<HerederosLayout />}
-                >
+                <Route path="/mnherederos/*" element={<HerederosLayout />}>
                   <Route index element={<IngresoTitularPage />} />
                   <Route path="ingresoher" element={<IngresoTitularPage />} />
                   <Route path="ingresoher/ingresotitular" element={<IngresoTitularPage />} />
-                  <Route path="ingresoher/RequisitosTitular" element={<InfoRequisitosTitularPage />} />
+                  <Route
+                    path="ingresoher/RequisitosTitular"
+                    element={<InfoRequisitosTitularPage />}
+                  />
                   <Route path="ingresoher/DatosTitular" element={<DatosTitularPage />} />
                   <Route path="ingresoher/RegistroTitular" element={<RegistroHerederoPage />} />
                   <Route path="ingresoher/RegistroHeredero" element={<RegistroHerederoPage />} />
-                  <Route path="ingresoher/formingreso" element={<IngresoHerederoFormPage />} />                  <Route path="ingresoher/cargadoc" element={<CargaDocumentoPage />} />
+                  <Route path="ingresoher/formingreso" element={<IngresoHerederoFormPage />} />{' '}
+                  <Route path="ingresoher/cargadoc" element={<CargaDocumentoPage />} />
                   <Route path="ingresoher/mandatos" element={<MandatosPage />} />
                   <Route path="ingresoher/detallemandato" element={<DetalleMandatoPage />} />
                   <Route path="ingresoher/success" element={<SuccessPage />} />
@@ -240,7 +245,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
                   path="/not-found"
                   element={
                     <StablePageWrapper>
-                      <NotFound/>
+                      <NotFound />
                     </StablePageWrapper>
                   }
                 />

@@ -7,7 +7,7 @@ interface PageTransitionProps {
 
 export const PageTransition: React.FC<PageTransitionProps> = ({ children, className = '' }) => {
   return (
-    <div 
+    <div
       className={`page-transition-container ${className}`}
       style={{
         position: 'relative',
@@ -15,10 +15,10 @@ export const PageTransition: React.FC<PageTransitionProps> = ({ children, classN
         background: '#F8F8FA',
         opacity: 1,
         visibility: 'visible',
-        zIndex: 1
+        zIndex: 1,
       }}
     >
       {children}
     </div>
   );
-}; 
+};

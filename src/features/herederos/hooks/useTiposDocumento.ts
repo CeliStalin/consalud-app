@@ -40,6 +40,6 @@ export const useTiposDocumento = (): UseTiposDocumentoReturn => {
     tiposDocumento,
     loading,
     error,
-    refetch
+    refetch,
   };
-}; 
+};

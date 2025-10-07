@@ -25,7 +25,7 @@ const ErrorPage: React.FC = () => {
               textAlign: 'center',
               color: '#333333',
               fontSize: '2rem',
-              marginBottom: '1rem'
+              marginBottom: '1rem',
             }}
           >
             Error en el envío
@@ -41,29 +41,17 @@ const ErrorPage: React.FC = () => {
         <div className="error-card">
           {/* Icono de error */}
           <div className="error-icon">
-            <img
-              src={WarningIcon}
-              alt="Error en el envío"
-              width="48"
-              height="48"
-            />
+            <img src={WarningIcon} alt="Error en el envío" width="48" height="48" />
           </div>
 
           {/* Título principal */}
-          <h1 className="error-title">
-            Ocurrió un error en el envío de tu solicitud
-          </h1>
+          <h1 className="error-title">Ocurrió un error en el envío de tu solicitud</h1>
 
           {/* Mensaje descriptivo */}
-          <p className="error-message">
-            Por favor, inténtalo nuevamente.
-          </p>
+          <p className="error-message">Por favor, inténtalo nuevamente.</p>
 
           {/* Botón de acción */}
-          <button
-            className="error-button"
-            onClick={handleBackToHome}
-          >
+          <button className="error-button" onClick={handleBackToHome}>
             Volver al Inicio
           </button>
         </div>

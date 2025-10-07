@@ -1,5 +1,5 @@
 type StepperProps = {
-    step: number
-}
+  step: number;
+};
 
-export type { StepperProps }
+export type { StepperProps };

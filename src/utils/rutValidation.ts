@@ -90,7 +90,7 @@ export const validarRutConMensaje = (
   const esValido = validarRut(rut);
   return {
     esValido,
-    mensaje: esValido ? null : mensajeError
+    mensaje: esValido ? null : mensajeError,
   };
 };
 
@@ -122,7 +122,7 @@ export const extraerNumerosRut = (rut: string): string => {
 export const PATRONES_RUT = {
   RUT_COMPLETO: /^[0-9]{7,8}[0-9Kk]$/i,
   SOLO_NUMEROS: /^[0-9]{7,8}$/,
-  FORMATO_VALIDO: /^[0-9]{1,3}(\.[0-9]{3})*-[0-9Kk]$/i
+  FORMATO_VALIDO: /^[0-9]{1,3}(\.[0-9]{3})*-[0-9Kk]$/i,
 } as const;
 
 export const MENSAJES_ERROR_RUT = {
@@ -130,5 +130,5 @@ export const MENSAJES_ERROR_RUT = {
   RUT_INVALIDO: 'El RUT ingresado no es válido',
   RUT_FORMATO_INVALIDO: 'El formato del RUT no es correcto',
   RUTS_IGUALES: 'El RUT del heredero no puede ser igual al del titular',
-  RUT_DIGITO_VERIFICADOR_INVALIDO: 'El dígito verificador no es correcto'
+  RUT_DIGITO_VERIFICADOR_INVALIDO: 'El dígito verificador no es correcto',
 } as const;

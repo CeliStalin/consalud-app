@@ -1,8 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 interface DocumentoProviderProps {
-    children: ReactNode;
+  children: ReactNode;
 }
-export type {
-    DocumentoProviderProps
-}
+export type { DocumentoProviderProps };

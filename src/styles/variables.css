@@ -1,101 +1,101 @@
 :root {
-    /* Colores principales */
-    --app-primary-color: #04A59B;
-    --app-secondary-color: #00CBBF;
-    --app-success-color: #28a745;
-    --app-danger-color: #dc3545;
-    --app-warning-color: #ffc107;
-    --app-info-color: #17a2b8;
-    
-    /* Colores de texto */
-    --app-text-primary: #333333;
-    --app-text-secondary: #666666;
-    --app-text-muted: #999999;
-    
-    /* Colores de fondo específicos para componentes del core */
-    --app-login-bg: #f8f9fa;
-    --app-login-card-bg: #ffffff;
-    --app-login-accent: var(--app-primary-color);
-    
-    /* Bordes y sombras */
-    --app-border-radius: 8px;
-    --app-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --app-border-color: #e0e0e0;
-    
-    /* Espaciado específico de la aplicación */
-    --app-spacing-xs: 4px;
-    --app-spacing-sm: 8px;
-    --app-spacing-md: 16px;
-    --app-spacing-lg: 24px;
-    --app-spacing-xl: 32px;
-    
-    /* Layout */
-    --app-min-content-height: calc(100vh - 120px);
-    --app-max-width: 1200px;
+  /* Colores principales */
+  --app-primary-color: #04a59b;
+  --app-secondary-color: #00cbbf;
+  --app-success-color: #28a745;
+  --app-danger-color: #dc3545;
+  --app-warning-color: #ffc107;
+  --app-info-color: #17a2b8;
 
-    /* Variables específicas para Footer Sticky Layout */
-    --app-header-height: 60px;
-    --app-footer-height: 80px;
-    --app-main-content-min-height: calc(100vh - var(--app-header-height) - var(--app-footer-height));
-    
-    /* Variables específicas para el Login del core */
-    --login-container-max-width: 400px;
-    --login-card-padding: var(--app-spacing-xl);
-    --login-form-gap: var(--app-spacing-md);
-    
-    /* Z-index */
-    --app-z-modal: 1000;
-    --app-z-dropdown: 100;
-    --app-z-header: 50;
+  /* Colores de texto */
+  --app-text-primary: #333333;
+  --app-text-secondary: #666666;
+  --app-text-muted: #999999;
+
+  /* Colores de fondo específicos para componentes del core */
+  --app-login-bg: #f8f9fa;
+  --app-login-card-bg: #ffffff;
+  --app-login-accent: var(--app-primary-color);
+
+  /* Bordes y sombras */
+  --app-border-radius: 8px;
+  --app-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --app-border-color: #e0e0e0;
+
+  /* Espaciado específico de la aplicación */
+  --app-spacing-xs: 4px;
+  --app-spacing-sm: 8px;
+  --app-spacing-md: 16px;
+  --app-spacing-lg: 24px;
+  --app-spacing-xl: 32px;
+
+  /* Layout */
+  --app-min-content-height: calc(100vh - 120px);
+  --app-max-width: 1200px;
+
+  /* Variables específicas para Footer Sticky Layout */
+  --app-header-height: 60px;
+  --app-footer-height: 80px;
+  --app-main-content-min-height: calc(100vh - var(--app-header-height) - var(--app-footer-height));
+
+  /* Variables específicas para el Login del core */
+  --login-container-max-width: 400px;
+  --login-card-padding: var(--app-spacing-xl);
+  --login-form-gap: var(--app-spacing-md);
+
+  /* Z-index */
+  --app-z-modal: 1000;
+  --app-z-dropdown: 100;
+  --app-z-header: 50;
 }
 
 /* Clases de utilidad que puedes usar en toda tu aplicación */
 .app-card {
-    background-color: white;
-    border-radius: var(--app-border-radius);
-    box-shadow: var(--app-box-shadow);
-    padding: var(--app-spacing-md);
+  background-color: white;
+  border-radius: var(--app-border-radius);
+  box-shadow: var(--app-box-shadow);
+  padding: var(--app-spacing-md);
 }
 
 .app-section {
-    margin-bottom: var(--app-spacing-lg);
+  margin-bottom: var(--app-spacing-lg);
 }
 
 .app-container {
-    padding: var(--app-spacing-md);
-    max-width: 1200px;
-    margin: 0 auto;
-    min-height: var(--app-min-content-height);
+  padding: var(--app-spacing-md);
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: var(--app-min-content-height);
 }
 
 /* Layout helper classes mejoradas para sticky footer */
 .app-layout-wrapper {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .app-content-main {
-    flex: 1;
-    min-height: var(--app-main-content-min-height);
-    /* Asegurar que el contenido principal tome todo el espacio disponible */
-    display: flex;
-    flex-direction: column;
+  flex: 1;
+  min-height: var(--app-main-content-min-height);
+  /* Asegurar que el contenido principal tome todo el espacio disponible */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Nueva clase para el contenedor específico del footer sticky */
 .app-sticky-footer-layout {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .app-sticky-footer-content {
-    flex: 1 0 auto;
-    min-height: var(--app-main-content-min-height);
+  flex: 1 0 auto;
+  min-height: var(--app-main-content-min-height);
 }
 
 .app-sticky-footer {
-    flex-shrink: 0;
-    margin-top: auto;
+  flex-shrink: 0;
+  margin-top: auto;
 }

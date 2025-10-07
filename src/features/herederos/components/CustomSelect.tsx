@@ -20,10 +20,10 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   value,
   onChange,
   options,
-  placeholder = "Seleccionar",
+  placeholder = 'Seleccionar',
   disabled = false,
   error = false,
-  className = ""
+  className = '',
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -93,7 +93,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
     }
 
     const syntheticEvent = {
-      target: { name, value: optionValue }
+      target: { name, value: optionValue },
     } as React.ChangeEvent<HTMLSelectElement>;
 
     onChange(syntheticEvent);
@@ -126,7 +126,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
           opacity: 0,
           pointerEvents: 'none',
           width: '1px',
-          height: '1px'
+          height: '1px',
         }}
       >
         <option value="" disabled>
@@ -147,7 +147,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
           borderColor: error ? '#E11D48' : isFocused ? '#04A59B' : '#e0e0e0',
           backgroundColor: disabled ? '#f5f5f5' : '#f8f9fa',
           color: disabled ? '#6c757d' : selectedOption ? '#495057' : '#9ca3af',
-          cursor: disabled ? 'not-allowed' : 'pointer'
+          cursor: disabled ? 'not-allowed' : 'pointer',
         }}
       >
         <span style={{ fontWeight: selectedOption ? '500' : '400' }}>
@@ -164,7 +164,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
             xmlns="http://www.w3.org/2000/svg"
             style={{
               color: disabled ? '#6c757d' : isFocused ? '#04A59B' : '#9ca3af',
-              transition: 'color 0.2s'
+              transition: 'color 0.2s',
             }}
           >
             <path
@@ -185,7 +185,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
             <div
               key={option.value}
               className={`custom-select-option ${option.value === value ? 'selected' : ''}`}
-              onClick={(e) => handleOptionClick(option.value, e)}
+              onClick={e => handleOptionClick(option.value, e)}
             >
               {option.label}
             </div>

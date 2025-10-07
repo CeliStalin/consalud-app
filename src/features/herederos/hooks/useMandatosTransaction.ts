@@ -48,7 +48,7 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
     lockButtons,
     unlockButtons,
     transactionToken,
-    hasActiveTransaction
+    hasActiveTransaction,
   } = useGlobalButtonLocking();
 
   // Hook de aplicación externa
@@ -60,21 +60,18 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
     openedAt,
     closedAt,
     openExternalApp,
-    closeExternalApp
+    closeExternalApp,
   } = useAdvancedExternalApp();
 
   /**
    * SOLUCIÓN SIMPLE: Solo bloquear botones específicos (Actualizar/Guardar) sin modal
    */
   useEffect(() => {
-
     // Solo bloquear botones específicos, NO mostrar modal de bloqueo
     if (externalAppStatus === 'open' && externalAppTabId) {
-
       // Bloquear solo los botones, sin modal
       lockButtons(`Pestaña externa abierta - TabId: ${externalAppTabId}`);
     } else if (externalAppStatus === 'closed') {
-
       unlockButtons();
     }
   }, [externalAppStatus, externalAppTabId, lockButtons, unlockButtons]);
@@ -83,46 +80,41 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
    * Abre una pestaña externa para actualización de mandatos
    * SIMPLIFICADO: Solo abre la aplicación externa, el bloqueo se maneja automáticamente
    */
-  const openExternalTab = useCallback(async (rut: string) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const openExternalTab = useCallback(
+    async (rut: string) => {
+      try {
+        setLoading(true);
+        setError(null);
 
+        // Iniciar transacción
+        const transaction = await mandatosTransactionService.iniciarTransaccionMandatos(rut);
+        setTransactionId(transaction.transactionId);
 
+        // Validar que la URL encriptada sea válida
+        if (!transaction.encryptedUrl || !transaction.encryptedUrl.startsWith('http')) {
+          throw new Error(`URL encriptada inválida: ${transaction.encryptedUrl}`);
+        }
 
-      // Iniciar transacción
-      const transaction = await mandatosTransactionService.iniciarTransaccionMandatos(rut);
-      setTransactionId(transaction.transactionId);
-
-
-
-
-      // Validar que la URL encriptada sea válida
-      if (!transaction.encryptedUrl || !transaction.encryptedUrl.startsWith('http')) {
-        throw new Error(`URL encriptada inválida: ${transaction.encryptedUrl}`);
+        // Abrir aplicación externa - el bloqueo se maneja automáticamente por el useEffect
+        await openExternalApp(transaction.encryptedUrl);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Error desconocido al abrir pestaña externa';
+        console.error('❌ Error al abrir pestaña externa:', errorMessage);
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
       }
-
-      // Abrir aplicación externa - el bloqueo se maneja automáticamente por el useEffect
-      await openExternalApp(transaction.encryptedUrl);
-
-
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error desconocido al abrir pestaña externa';
-      console.error('❌ Error al abrir pestaña externa:', errorMessage);
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [openExternalApp]);
+    },
+    [openExternalApp]
+  );
 
   /**
    * Cierra la pestaña externa
    * SIMPLIFICADO: Solo cierra la aplicación externa, el desbloqueo se maneja automáticamente
    */
   const closeExternalTab = useCallback(() => {
-
     closeExternalApp();
-
   }, [closeExternalApp]);
 
   return {
@@ -150,6 +142,6 @@ export const useMandatosTransaction = (): UseMandatosTransactionReturn => {
 
     // Propiedades de transacción
     transactionToken,
-    hasActiveTransaction
+    hasActiveTransaction,
   };
 };

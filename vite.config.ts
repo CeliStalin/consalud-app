@@ -17,12 +17,10 @@ export default defineConfig({
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '1; mode=block',
-      'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',      'Cache-Control': 'no-cache, no-store, must-revalidate',
       'Pragma': 'no-cache',
       'Expires': '0'
-    },
-    // Proxy eliminado - no se usa
+    }
   },
   preview: {
     host: '0.0.0.0',

@@ -4,14 +4,14 @@
 html {
   scroll-behavior: auto;
   height: 100%;
-  background-color: #F8F8FA;
+  background-color: #f8f8fa;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background-color: #F8F8FA;
+  background-color: #f8f8fa;
   margin: 0;
   padding: 0;
   font-display: swap;
@@ -21,7 +21,7 @@ body {
 
 #root {
   min-height: 100vh;
-  background-color: #F8F8FA;
+  background-color: #f8f8fa;
   isolation: isolate;
   contain: layout style;
   position: relative;
@@ -33,13 +33,13 @@ body {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  background-color: #F8F8FA; 
+  background-color: #f8f8fa;
   contain: layout;
   opacity: 1;
 }
 
 .layout-stable {
-  background-color: #F8F8FA !important; 
+  background-color: #f8f8fa !important;
 }
 
 /* NUEVO: Anti-flicker crítico para navegación */
@@ -76,7 +76,7 @@ body {
   visibility: visible !important;
   transform: none !important;
   min-height: 100vh !important;
-  background: #F8F8FA !important;
+  background: #f8f8fa !important;
 }
 
 .page-transition--minimal {
@@ -84,7 +84,7 @@ body {
   visibility: visible !important;
   transform: none !important;
   min-height: 100vh !important;
-  background: #F8F8FA !important;
+  background: #f8f8fa !important;
 }
 
 .page-transition--active {
@@ -97,7 +97,7 @@ body {
 .page-transition-container {
   position: relative !important;
   min-height: 100vh !important;
-  background: #F8F8FA !important;
+  background: #f8f8fa !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
@@ -118,6 +118,6 @@ main > div {
   visibility: visible !important;
   pointer-events: auto !important;
   z-index: 1 !important;
-  background: #F8F8FA !important;
+  background: #f8f8fa !important;
   min-height: 100vh !important;
 }

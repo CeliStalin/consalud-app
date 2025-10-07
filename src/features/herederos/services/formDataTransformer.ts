@@ -6,11 +6,14 @@ import { FormData, FormHerederoData } from '../interfaces/FormData';
  * Mantiene la compatibilidad con el código existente
  */
 export class FormDataTransformer {
-
   /**
    * Convierte FormData a FormHerederoData para el session storage
    */
-  static toFormHerederoData(formData: FormData, rut: string, usuario: string = ''): FormHerederoData {
+  static toFormHerederoData(
+    formData: FormData,
+    rut: string,
+    usuario: string = ''
+  ): FormHerederoData {
     // Extraer RUT y dígito verificador
     const rutLimpio = rut.replace(/[^0-9kK]/g, '');
     const rutPersona = parseInt(rutLimpio.slice(0, -1));
@@ -25,7 +28,9 @@ export class FormDataTransformer {
       RutCompleto: rut,
       RutDigito: rutDigito,
       CodigoSexo: formData.sexo || '',
-      FechaNacimiento: formData.fechaNacimiento ? formatDateForAPI(formData.fechaNacimiento) : formatDateForAPI(new Date()),
+      FechaNacimiento: formData.fechaNacimiento
+        ? formatDateForAPI(formData.fechaNacimiento)
+        : formatDateForAPI(new Date()),
       IdParentesco: this.mapParentescoToId(formData.parentesco),
       IdTipoSolicitante: 1, // Valor por defecto para heredero
       EstadoRegistro: 'V', // Activo por defecto
@@ -41,7 +46,7 @@ export class FormDataTransformer {
       NumCalle: parseInt(formData.numero) || 0,
       villa: formData.villaOpcional || '',
       DepBlock: parseInt(formData.deptoBloqueOpcional) || 0,
-      Usuario: usuario
+      Usuario: usuario,
     };
   }
 
@@ -50,7 +55,9 @@ export class FormDataTransformer {
    */
   static toFormData(formHerederoData: FormHerederoData): FormData {
     return {
-      fechaNacimiento: formHerederoData.FechaNacimiento ? new Date(formHerederoData.FechaNacimiento) : null,
+      fechaNacimiento: formHerederoData.FechaNacimiento
+        ? new Date(formHerederoData.FechaNacimiento)
+        : null,
       nombres: formHerederoData.NombrePersona || '',
       apellidoPaterno: formHerederoData.ApellidoPaterno || '',
       apellidoMaterno: formHerederoData.ApellidoMaterno || '',
@@ -67,7 +74,7 @@ export class FormDataTransformer {
       deptoBloqueOpcional: formHerederoData.DepBlock ? formHerederoData.DepBlock.toString() : '',
       villaOpcional: formHerederoData.villa || '',
       codCiudad: formHerederoData.IdCiudad || undefined,
-      codComuna: formHerederoData.IdComuna || undefined
+      codComuna: formHerederoData.IdComuna || undefined,
     };
   }
 

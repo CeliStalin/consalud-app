@@ -15,17 +15,20 @@ export function getHerederosApiConfig(): ApiConfig {
   return {
     baseUrl: import.meta.env.VITE_BFF_HEREDEROS_DNS || '',
     apiKeyHeader: import.meta.env.VITE_BFF_HEREDEROS_API_KEY_HEADER || '',
-    apiKeyValue: import.meta.env.VITE_BFF_HEREDEROS_API_KEY_VALUE || ''
+    apiKeyValue: import.meta.env.VITE_BFF_HEREDEROS_API_KEY_VALUE || '',
   };
 }
 
 /**
  * Construye headers comunes para las peticiones
  */
-export function buildHeaders(config: ApiConfig, additionalHeaders?: Record<string, string>): Record<string, string> {
+export function buildHeaders(
+  config: ApiConfig,
+  additionalHeaders?: Record<string, string>
+): Record<string, string> {
   const headers: Record<string, string> = {
-    'accept': 'application/json',
-    ...additionalHeaders
+    accept: 'application/json',
+    ...additionalHeaders,
   };
 
   if (config.apiKeyHeader && config.apiKeyValue) {
@@ -57,7 +60,7 @@ export async function apiGet<T>(url: string, config: ApiConfig, context: string)
   try {
     const response = await fetch(url, {
       method: 'GET',
-      headers: buildHeaders(config)
+      headers: buildHeaders(config),
     });
 
     if (!response.ok) {
@@ -74,14 +77,19 @@ export async function apiGet<T>(url: string, config: ApiConfig, context: string)
 /**
  * Función helper para hacer peticiones POST
  */
-export async function apiPost<T>(url: string, data: any, config: ApiConfig, context: string): Promise<T> {
+export async function apiPost<T>(
+  url: string,
+  data: any,
+  config: ApiConfig,
+  context: string
+): Promise<T> {
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: buildHeaders(config, {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       }),
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -93,4 +101,4 @@ export async function apiPost<T>(url: string, data: any, config: ApiConfig, cont
   } catch (error) {
     handleApiError(error, context);
   }
-} 
+}

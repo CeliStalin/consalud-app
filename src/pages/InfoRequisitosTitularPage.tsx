@@ -1,9 +1,7 @@
 import { RequisitosTitular } from '@/features/herederos/components/RequisitosTitular';
 
 const InfoRequisitosTitularPage: React.FC = () => {
-  return (
-    <RequisitosTitular />
-  );
+  return <RequisitosTitular />;
 };
 
 export default InfoRequisitosTitularPage;

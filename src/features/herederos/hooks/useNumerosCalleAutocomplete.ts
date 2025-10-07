@@ -19,7 +19,7 @@ interface UseNumerosCalleAutocompleteReturn {
 export const useNumerosCalleAutocomplete = ({
   nombreCalle,
   idComuna,
-  hasExistingValue = false
+  hasExistingValue = false,
 }: UseNumerosCalleAutocompleteProps): UseNumerosCalleAutocompleteReturn => {
   const [numeros, setNumeros] = useState<NumeroCalle[]>([]);
   const [allNumeros, setAllNumeros] = useState<NumeroCalle[]>([]);
@@ -95,26 +95,37 @@ export const useNumerosCalleAutocomplete = ({
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [nombreCalle, idComuna, lastSuccessfulCall, allNumeros.length, error, loading, hasExistingValue]);
+  }, [
+    nombreCalle,
+    idComuna,
+    lastSuccessfulCall,
+    allNumeros.length,
+    error,
+    loading,
+    hasExistingValue,
+  ]);
 
   // Función para buscar números
-  const searchNumeros = useCallback((searchTerm: string) => {
-    if (!searchTerm || searchTerm.length < 1) {
-      setNumeros([]);
-      return;
-    }
+  const searchNumeros = useCallback(
+    (searchTerm: string) => {
+      if (!searchTerm || searchTerm.length < 1) {
+        setNumeros([]);
+        return;
+      }
 
-    // Solo buscar si tenemos datos cargados
-    if (!isInitialized || allNumeros.length === 0) {
-      return;
-    }
+      // Solo buscar si tenemos datos cargados
+      if (!isInitialized || allNumeros.length === 0) {
+        return;
+      }
 
-    const filteredNumeros = allNumeros.filter(numero =>
-      numero.numeroCalle.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    );
+      const filteredNumeros = allNumeros.filter(numero =>
+        numero.numeroCalle.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      );
 
-    setNumeros(filteredNumeros);
-  }, [allNumeros, isInitialized]);
+      setNumeros(filteredNumeros);
+    },
+    [allNumeros, isInitialized]
+  );
 
   // Función para limpiar los números
   const clearNumeros = useCallback(() => {
@@ -137,6 +148,6 @@ export const useNumerosCalleAutocomplete = ({
     error,
     searchNumeros,
     clearNumeros,
-    resetState
+    resetState,
   };
 };

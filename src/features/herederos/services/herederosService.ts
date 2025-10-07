@@ -1,7 +1,20 @@
 import { extraerNumerosRut, formatearRut } from '../../../utils/rutValidation';
 import { Documento, DocumentosResponse } from '../interfaces/Documento';
-import { Calle, Ciudad, Comuna, Genero, NumeroCalle, Region, TipoDocumento, TipoParentesco } from '../interfaces/Pargen';
-import { SolicitantePostRequest, SolicitanteResponse, SolicitudPostRequest } from '../interfaces/Solicitante';
+import {
+  Calle,
+  Ciudad,
+  Comuna,
+  Genero,
+  NumeroCalle,
+  Region,
+  TipoDocumento,
+  TipoParentesco,
+} from '../interfaces/Pargen';
+import {
+  SolicitantePostRequest,
+  SolicitanteResponse,
+  SolicitudPostRequest,
+} from '../interfaces/Solicitante';
 import { Titular } from '../interfaces/Titular';
 import { RETRY_CONFIGS, withRetry } from '../utils/retryUtils';
 import { apiGet, buildHeaders, getHerederosApiConfig } from './apiUtils';
@@ -35,7 +48,11 @@ export class HerederosService {
     const url = `${this.config.baseUrl}/api/Mandatos/CuentaBancaria?rut=${rutSinDV}`;
 
     try {
-      const data = await apiGet<CuentaBancariaResponse>(url, this.config, 'obtener cuenta bancaria');
+      const data = await apiGet<CuentaBancariaResponse>(
+        url,
+        this.config,
+        'obtener cuenta bancaria'
+      );
       return data;
     } catch (error: any) {
       throw error;
@@ -47,7 +64,7 @@ export class HerederosService {
    * @param rut - RUT del titular (solo números)
    * @param userName - Nombre de usuario para auditoría
    */
-  async getTitularByRut(rut: number, userName: string = ""): Promise<Titular> {
+  async getTitularByRut(rut: number, userName: string = ''): Promise<Titular> {
     const url = `${this.config.baseUrl}/api/Titular/ByRut?IdentificadorUnico=${rut}&userName=${encodeURIComponent(userName)}`;
 
     try {
@@ -81,11 +98,18 @@ export class HerederosService {
    * @param rut - RUT del solicitante (solo números)
    * @param userName - Nombre de usuario para auditoría
    */
-  async getSolicitanteMejorContactibilidad(rut: number, userName: string = ""): Promise<SolicitanteResponse> {
+  async getSolicitanteMejorContactibilidad(
+    rut: number,
+    userName: string = ''
+  ): Promise<SolicitanteResponse> {
     const url = `${this.config.baseUrl}/api/Solicitante/mejorContactibilidad?IdentificadorUnico=${rut}&userName=${encodeURIComponent(userName)}`;
 
     try {
-      return await apiGet<SolicitanteResponse>(url, this.config, 'obtener mejor contactibilidad del solicitante');
+      return await apiGet<SolicitanteResponse>(
+        url,
+        this.config,
+        'obtener mejor contactibilidad del solicitante'
+      );
     } catch (error: any) {
       // Manejo específico para status 412
       if (error.message && error.message.includes('412')) {
@@ -174,26 +198,29 @@ export class HerederosService {
    * @param email - Correo electrónico a validar
    * @param userName - Nombre de usuario para auditoría
    */
-  async validarCorreoElectronico(rut: number, email: string, userName: string = ""): Promise<boolean> {
+  async validarCorreoElectronico(
+    rut: number,
+    email: string,
+    userName: string = ''
+  ): Promise<boolean> {
     const url = `${this.config.baseUrl}/api/ValidacionContactibilidad/email?rut=${rut}&mail=${encodeURIComponent(email)}&userName=${encodeURIComponent(userName)}`;
 
     try {
       const response = await fetch(url, {
         method: 'GET',
-        headers: buildHeaders(this.config)
+        headers: buildHeaders(this.config),
       });
 
       // Si la respuesta es 200, la validación es exitosa
       if (response.status === 200) {
         return true;
-      }      // Si la respuesta es 422, la validación falló
+      } // Si la respuesta es 422, la validación falló
       if (response.status === 422) {
         return false;
       }
 
       // Para cualquier otro código de respuesta, lanzar error
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-
     } catch (error: any) {
       // Si hay error de red u otro tipo, también considerar como fallo de validación
       return false;
@@ -206,26 +233,25 @@ export class HerederosService {
    * @param telefono - Teléfono a validar
    * @param userName - Nombre de usuario para auditoría
    */
-  async validarTelefono(rut: number, telefono: string, userName: string = ""): Promise<boolean> {
+  async validarTelefono(rut: number, telefono: string, userName: string = ''): Promise<boolean> {
     const url = `${this.config.baseUrl}/api/ValidacionContactibilidad/telefono?rut=${rut}&telefono=${encodeURIComponent(telefono)}&userName=${encodeURIComponent(userName)}`;
 
     try {
       const response = await fetch(url, {
         method: 'GET',
-        headers: buildHeaders(this.config)
+        headers: buildHeaders(this.config),
       });
 
       // Si la respuesta es 200, la validación es exitosa
       if (response.status === 200) {
         return true;
-      }      // Si la respuesta es 422, la validación falló
+      } // Si la respuesta es 422, la validación falló
       if (response.status === 422) {
         return false;
       }
 
       // Para cualquier otro código de respuesta, lanzar error
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-
     } catch (error: any) {
       // Si hay error de red u otro tipo, también considerar como fallo de validación
       return false;
@@ -237,25 +263,28 @@ export class HerederosService {
    * @param solicitanteData - Datos del solicitante a crear
    * @param userName - Nombre de usuario para auditoría
    */
-  async createSolicitante(solicitanteData: SolicitantePostRequest, userName: string = ""): Promise<any> {
+  async createSolicitante(
+    solicitanteData: SolicitantePostRequest,
+    userName: string = ''
+  ): Promise<any> {
     const url = `${this.config.baseUrl}/api/Solicitante`;
 
     // Validar que la URL base esté configurada
     if (!this.config.baseUrl) {
       throw new Error('URL base de la API no configurada');
-    }    // Agregar el userName a los datos si no está presente
+    } // Agregar el userName a los datos si no está presente
     const dataToSend = {
       ...solicitanteData,
-      Usuario: userName || solicitanteData.Usuario
+      Usuario: userName || solicitanteData.Usuario,
     };
 
     return withRetry(async () => {
       const response = await fetch(url, {
         method: 'POST',
         headers: buildHeaders(this.config, {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         }),
-        body: JSON.stringify(dataToSend)
+        body: JSON.stringify(dataToSend),
       });
 
       // Si la respuesta es 201, la creación fue exitosa
@@ -264,7 +293,7 @@ export class HerederosService {
         return {
           success: true,
           status: 201,
-          data: responseData
+          data: responseData,
         };
       }
 
@@ -281,7 +310,6 @@ export class HerederosService {
       const error = new Error(`${response.status}_${response.statusText}: ${errorDetails}`);
       (error as any).status = response.status;
       throw error;
-
     }, RETRY_CONFIGS.CRITICAL);
   }
 
@@ -290,7 +318,7 @@ export class HerederosService {
    * @param solicitudData - Datos de la solicitud a crear
    * @param userName - Nombre de usuario para auditoría
    */
-  async createSolicitud(solicitudData: SolicitudPostRequest, userName: string = ""): Promise<any> {
+  async createSolicitud(solicitudData: SolicitudPostRequest, userName: string = ''): Promise<any> {
     const url = `${this.config.baseUrl}/api/Solicitud`;
 
     // Validar que la URL base esté configurada
@@ -301,17 +329,16 @@ export class HerederosService {
     // Agregar el userName a los datos si no está presente
     const dataToSend = {
       ...solicitudData,
-      usuarioCreacion: userName || solicitudData.usuarioCreacion
+      usuarioCreacion: userName || solicitudData.usuarioCreacion,
     };
 
     return withRetry(async () => {
-
       const response = await fetch(url, {
         method: 'POST',
         headers: buildHeaders(this.config, {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         }),
-        body: JSON.stringify(dataToSend)
+        body: JSON.stringify(dataToSend),
       });
 
       // Si la respuesta es 201, la creación fue exitosa
@@ -320,7 +347,7 @@ export class HerederosService {
         return {
           success: true,
           status: 201,
-          data: responseData
+          data: responseData,
         };
       }
 
@@ -337,7 +364,6 @@ export class HerederosService {
       const error = new Error(`${response.status}_${response.statusText}: ${errorDetails}`);
       (error as any).status = response.status;
       throw error;
-
     }, RETRY_CONFIGS.CRITICAL);
   }
 
@@ -363,7 +389,6 @@ export class HerederosService {
     }
 
     return withRetry(async () => {
-
       // Crear FormData para enviar archivos
       const formData = new FormData();
 
@@ -386,13 +411,13 @@ export class HerederosService {
           }
 
           const blob = await response.blob();
-          const file = new File([blob], documento.nombre, { type: 'application/pdf' });
+          const file = new File([blob], documento.nombre, {
+            type: 'application/pdf',
+          });
 
           // Agregar campos del documento al FormData
           formData.append(`documentos[${index}].idTipoDocumento`, documento.tipoId.toString());
           formData.append(`documentos[${index}].Documento`, file);
-
-
         } catch (error) {
           console.error(`Error al procesar documento ${index}:`, error);
           throw error;
@@ -409,9 +434,8 @@ export class HerederosService {
           // No incluir Content-Type para FormData, el navegador lo establece automáticamente
           ...buildHeaders(this.config),
         },
-        body: formData
+        body: formData,
       });
-
 
       if (!response.ok) {
         const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -421,13 +445,11 @@ export class HerederosService {
 
       const result = await response.json();
 
-
       return {
         success: true,
         status: response.status,
-        data: result
+        data: result,
       };
-
     }, RETRY_CONFIGS.DOCUMENTS);
   }
 
@@ -469,12 +491,10 @@ export class HerederosService {
     const url = `${this.config.baseUrl}/api/Pargen/encriptar?usuario=${encodeURIComponent(usuario)}&rutAfiliado=${encodeURIComponent(rutAfiliado)}&nombres=${encodeURIComponent(nombres)}&apellidoPaterno=${encodeURIComponent(apellidoPaterno)}&apellidoMaterno=${encodeURIComponent(apellidoMaterno)}`;
 
     try {
-
       const response = await fetch(url, {
         method: 'GET',
-        headers: buildHeaders(this.config)
+        headers: buildHeaders(this.config),
       });
-
 
       if (!response.ok) {
         const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -511,29 +531,32 @@ export class HerederosService {
 export const herederosService = new HerederosService();
 
 // Exportar funciones individuales para compatibilidad
-export const fetchTitularByRut = (rut: number, userName: string = "") =>
+export const fetchTitularByRut = (rut: number, userName: string = '') =>
   herederosService.getTitularByRut(rut, userName);
 
-export const fetchSolicitanteMejorContactibilidad = (rut: number, userName: string = "") =>
+export const fetchSolicitanteMejorContactibilidad = (rut: number, userName: string = '') =>
   herederosService.getSolicitanteMejorContactibilidad(rut, userName);
 
 export const fetchGeneros = () => herederosService.getGeneros();
 export const fetchRegiones = () => herederosService.getRegiones();
 export const fetchCiudades = (idRegion?: number) => herederosService.getCiudades(idRegion);
-export const fetchComunasPorCiudad = (idCiudad: number) => herederosService.getComunasPorCiudad(idCiudad);
-export const fetchCallesPorComuna = (idComuna: number) => herederosService.getCallesPorComuna(idComuna);
-export const fetchNumerosCalle = (nombreCalle: string, idComuna: number) => herederosService.getNumerosCalle(nombreCalle, idComuna);
+export const fetchComunasPorCiudad = (idCiudad: number) =>
+  herederosService.getComunasPorCiudad(idCiudad);
+export const fetchCallesPorComuna = (idComuna: number) =>
+  herederosService.getCallesPorComuna(idComuna);
+export const fetchNumerosCalle = (nombreCalle: string, idComuna: number) =>
+  herederosService.getNumerosCalle(nombreCalle, idComuna);
 export const fetchTiposDocumento = () => herederosService.getTiposDocumento();
 export const fetchTiposParentesco = () => herederosService.getTiposParentesco();
-export const validarCorreoElectronico = (rut: number, email: string, userName: string = "") =>
+export const validarCorreoElectronico = (rut: number, email: string, userName: string = '') =>
   herederosService.validarCorreoElectronico(rut, email, userName);
-export const validarTelefono = (rut: number, telefono: string, userName: string = "") =>
+export const validarTelefono = (rut: number, telefono: string, userName: string = '') =>
   herederosService.validarTelefono(rut, telefono, userName);
 
-export const createSolicitante = (solicitanteData: SolicitantePostRequest, userName: string = "") =>
+export const createSolicitante = (solicitanteData: SolicitantePostRequest, userName: string = '') =>
   herederosService.createSolicitante(solicitanteData, userName);
 
-export const createSolicitud = (solicitudData: SolicitudPostRequest, userName: string = "") =>
+export const createSolicitud = (solicitudData: SolicitudPostRequest, userName: string = '') =>
   herederosService.createSolicitud(solicitudData, userName);
 
 // Exportar funciones de documentos
@@ -542,7 +565,8 @@ export const enviarDocumentos = (
   usuarioCreacion: string,
   rutTitularFallecido: number,
   documentos: Documento[]
-) => herederosService.enviarDocumentos(idSolicitud, usuarioCreacion, rutTitularFallecido, documentos);
+) =>
+  herederosService.enviarDocumentos(idSolicitud, usuarioCreacion, rutTitularFallecido, documentos);
 
 export const obtenerDocumentosAlmacenados = (rutTitular: number) =>
   herederosService.obtenerDocumentosAlmacenados(rutTitular);
@@ -553,10 +577,16 @@ export const encriptarParametrosMandatos = (
   nombres: string,
   apellidoPaterno: string,
   apellidoMaterno: string
-) => herederosService.encriptarParametrosMandatos(usuario, rutAfiliado, nombres, apellidoPaterno, apellidoMaterno);
+) =>
+  herederosService.encriptarParametrosMandatos(
+    usuario,
+    rutAfiliado,
+    nombres,
+    apellidoPaterno,
+    apellidoMaterno
+  );
 
-export const getCuentaBancaria = (rut: string) =>
-  herederosService.getCuentaBancaria(rut);
+export const getCuentaBancaria = (rut: string) => herederosService.getCuentaBancaria(rut);
 
 /**
  * Interfaz para la respuesta de la API de envío de email
@@ -588,7 +618,7 @@ export const enviarEmail = async (
     nombreSolicitante: nombreSolicitante,
     mailSolicitante: mailSolicitante,
     rutNumerico: rutNumerico.toString(),
-    Dv: dv
+    Dv: dv,
   });
 
   const fullUrl = `${url}?${params.toString()}`;
@@ -596,20 +626,20 @@ export const enviarEmail = async (
   try {
     const response = await fetch(fullUrl, {
       method: 'POST',
-      headers: buildHeaders(config)
+      headers: buildHeaders(config),
     });
 
     if (response.status === 200) {
       return {
         success: true,
         status: 200,
-        message: 'Email enviado correctamente'
+        message: 'Email enviado correctamente',
       };
     } else if ([400, 412, 503].includes(response.status)) {
       return {
         success: false,
         status: response.status,
-        message: `Error en el envío de email: ${response.status}`
+        message: `Error en el envío de email: ${response.status}`,
       };
     } else {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);

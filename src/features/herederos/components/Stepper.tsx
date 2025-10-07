@@ -1,7 +1,7 @@
 import CheckIcon from '@/assets/check-icon.svg';
 import * as ConsaludCore from '@consalud/core';
 import React, { createContext, ReactNode, useContext, useState } from 'react';
-import { StepperProps } from "../interfaces/StepperProps";
+import { StepperProps } from '../interfaces/StepperProps';
 import './styles/Stepper.css';
 
 interface StepperContextType {
@@ -13,11 +13,7 @@ const StepperContext = createContext<StepperContextType | undefined>(undefined);
 
 export const StepperProvider = ({ children }: { children: ReactNode }) => {
   const [step, setStep] = useState(1);
-  return (
-    <StepperContext.Provider value={{ step, setStep }}>
-      {children}
-    </StepperContext.Provider>
-  );
+  return <StepperContext.Provider value={{ step, setStep }}>{children}</StepperContext.Provider>;
 };
 
 export const useStepper = () => {
@@ -32,14 +28,14 @@ interface StepperPropsWithLoading extends StepperProps {}
 
 const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
   const steps = [
-    { title: "Paso 1", description: "Datos del titular" },
-    { title: "Paso 2", description: "Registrar persona heredera" },
-    { title: "Paso 3", description: "Carga de documentos" },
-    { title: "Paso 4", description: "Cuenta bancaria" },
+    { title: 'Paso 1', description: 'Datos del titular' },
+    { title: 'Paso 2', description: 'Registrar persona heredera' },
+    { title: 'Paso 3', description: 'Carga de documentos' },
+    { title: 'Paso 4', description: 'Cuenta bancaria' },
   ];
 
   const renderCircle = (index: number) => {
-    const isCompleted = index < step - 1 || (step === steps.length);
+    const isCompleted = index < step - 1 || step === steps.length;
     const isActive = index === step - 1 && step < steps.length;
 
     return (
@@ -55,7 +51,9 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
     if (index >= steps.length - 1) return null;
 
     return (
-      <div className={`progressLine${index < step - 1 || step === steps.length ? ' active' : ''}`} />
+      <div
+        className={`progressLine${index < step - 1 || step === steps.length ? ' active' : ''}`}
+      />
     );
   };
 
@@ -65,7 +63,7 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
         variant="bodySmall"
         weight="bold"
         className="stepTitle"
-        color={ConsaludCore.theme?.textColors?.primary || "#505050"}
+        color={ConsaludCore.theme?.textColors?.primary || '#505050'}
         gutterBottom
       >
         {stepData.title}
@@ -73,7 +71,7 @@ const Stepper: React.FC<StepperPropsWithLoading> = ({ step }) => {
       <ConsaludCore.Typography
         variant="caption"
         className="stepDescription"
-        color={ConsaludCore.theme?.textColors?.muted || "#909090"}
+        color={ConsaludCore.theme?.textColors?.muted || '#909090'}
       >
         {stepData.description}
       </ConsaludCore.Typography>

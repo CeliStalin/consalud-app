@@ -22,18 +22,19 @@ class Environment {
       authority: import.meta.env.VITE_AUTHORITY || '',
       ambiente: import.meta.env.VITE_AMBIENTE || 'development',
       sistema: import.meta.env.VITE_SISTEMA || 'ManHerederos',
-      nombreSistema: import.meta.env.VITE_NOMBRE_SISTEMA || 'Administrador de Devolución a Herederos',
+      nombreSistema:
+        import.meta.env.VITE_NOMBRE_SISTEMA || 'Administrador de Devolución a Herederos',
       timeout: Number(import.meta.env.VITE_TIMEOUT) || 10000,
       redirectUri: (() => {
         const uri = import.meta.env.VITE_REDIRECT_URI || '/login';
         // Si empieza con http o https, se debe usar tal cual
-        return uri.startsWith('https') ? uri : window.location.origin + (uri.startsWith('/') ? uri : '/' + uri);
+        return uri.startsWith('https')
+          ? uri
+          : window.location.origin + (uri.startsWith('/') ? uri : '/' + uri);
       })(),
     };
 
-    // Validar que las variables críticas estén definidas
     this.validateEnv();
-
   }
 
   public static getInstance(): Environment {
@@ -45,11 +46,9 @@ class Environment {
 
   private validateEnv(): void {
     const required = ['apiUrl', 'clientId', 'authority', 'sistema'];
-
     for (const key of required) {
       if (!this.env[key as keyof EnvVariables]) {
         console.error(`Variable de entorno requerida no disponible: ${key}`);
-        //
         if (this.isProduction()) {
           throw new Error(`Variable de entorno requerida: ${key}`);
         }

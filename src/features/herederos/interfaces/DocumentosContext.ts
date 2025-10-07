@@ -1,12 +1,9 @@
-import { Documento } from "./Documento";
+import { Documento } from './Documento';
 
 interface DocumentoContextType {
-    documento: Documento | null;
-    loading: boolean;
-    error: string | null;
+  documento: Documento | null;
+  loading: boolean;
+  error: string | null;
 }
 
-export type {
-    DocumentoContextType
-}
-  
+export type { DocumentoContextType };

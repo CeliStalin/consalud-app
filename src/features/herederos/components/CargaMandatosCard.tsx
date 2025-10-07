@@ -4,7 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import { env } from '../../../core/config/env';
 import { useDocumentos } from '../hooks/useDocumentos';
 import { useMandatosTransaction } from '../hooks/useMandatosTransaction';
-import { createSolicitante, createSolicitud, CuentaBancariaResponse, enviarEmail, fetchTitularByRut, getCuentaBancaria, obtenerDocumentosAlmacenados } from '../services/herederosService';
+import {
+  createSolicitante,
+  createSolicitud,
+  CuentaBancariaResponse,
+  enviarEmail,
+  fetchTitularByRut,
+  getCuentaBancaria,
+  obtenerDocumentosAlmacenados,
+} from '../services/herederosService';
 import { mandatosTransactionService } from '../services/mandatosTransactionService';
 import { MandatoResult, mockMandatoService } from '../services/mockMandatoService';
 import { useStepper } from './Stepper';
@@ -75,7 +83,9 @@ const getEmailSolicitante = (): string => {
     // Producción: tomar del sessionStorage formHerederoData_ -> Mail
     try {
       const allKeys = Object.keys(sessionStorage);
-      const formKeys = allKeys.filter(key => key.includes('formHeredero') || key.includes('heredero'));
+      const formKeys = allKeys.filter(
+        key => key.includes('formHeredero') || key.includes('heredero')
+      );
 
       for (const key of formKeys) {
         const data = sessionStorage.getItem(key);
@@ -105,19 +115,24 @@ const getEmailSolicitante = (): string => {
 const getHerederoDataFromSessionStorage = () => {
   try {
     const allKeys = Object.keys(sessionStorage);
-    const formKeys = allKeys.filter(key => key.includes('formHeredero') || key.includes('heredero'));
+    const formKeys = allKeys.filter(
+      key => key.includes('formHeredero') || key.includes('heredero')
+    );
 
     for (const key of formKeys) {
       const data = sessionStorage.getItem(key);
       if (data) {
         try {
           const parsed = JSON.parse(data);
-          if (parsed && (parsed.NombrePersona || parsed.ApellidoPaterno || parsed.ApellidoMaterno)) {
+          if (
+            parsed &&
+            (parsed.NombrePersona || parsed.ApellidoPaterno || parsed.ApellidoMaterno)
+          ) {
             return {
               NombrePersona: parsed.NombrePersona || '',
               ApellidoPaterno: parsed.ApellidoPaterno || '',
               ApellidoMaterno: parsed.ApellidoMaterno || '',
-              RutCompleto: parsed.RutCompleto || ''
+              RutCompleto: parsed.RutCompleto || '',
             };
           }
         } catch (parseError) {
@@ -140,7 +155,8 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [mandatoInfo, setMandatoInfo] = useState<MandatoResult | null>(null);
-  const [error, setError] = useState<string | null>(null);  const [showManualUrl, setShowManualUrl] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showManualUrl, setShowManualUrl] = useState(false);
   const [manualUrl, setManualUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [esMandatoCorrecto, setEsMandatoCorrecto] = useState<string | null>(null);
@@ -155,7 +171,8 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   const [shouldResetSelection, setShouldResetSelection] = useState(false);
   const [noTieneCuentaBancaria, setNoTieneCuentaBancaria] = useState(false);
   const [bloquearRadioButtons, setBloquearRadioButtons] = useState(false);
-  const [botonActualizarVisible, setBotonActualizarVisible] = useState(false);  const { setStep } = useStepper();
+  const [botonActualizarVisible, setBotonActualizarVisible] = useState(false);
+  const { setStep } = useStepper();
   const { enviarDocumentos } = useDocumentos();
 
   // Hook para manejar transacciones de mandatos con pestaña externa
@@ -174,14 +191,14 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     unlockButtons,
   } = useMandatosTransaction();
 
-
-
   // Función para manejar el clic en "Actualizar Mandato"
   const handleActualizarMandato = async () => {
     try {
       // Verificar si ya hay una pestaña externa abierta o se está abriendo una
       if (isExternalTabOpen || isOpeningTab) {
-        throw new Error('Ya hay una pestaña externa abierta o se está abriendo una nueva. Espere a que se complete la operación.');
+        throw new Error(
+          'Ya hay una pestaña externa abierta o se está abriendo una nueva. Espere a que se complete la operación.'
+        );
       }
 
       // Obtener RUT del session storage
@@ -208,13 +225,12 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         throw new Error('No se encontró RUT del heredero en el session storage');
       }
 
-
-
       // Bloquear botones ANTES de intentar abrir la pestaña
       lockButtons('Abriendo pestaña externa...');
 
       try {
-        await openExternalTab(rutHeredero);      } catch (openError) {
+        await openExternalTab(rutHeredero);
+      } catch (openError) {
         console.error('Error al abrir pestaña externa:', openError);
         // Desbloquear botones si falla la apertura
         unlockButtons();
@@ -228,13 +244,16 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
 
       // Mostrar mensaje de error más específico
       if (err.message?.includes('popups estén permitidos')) {
-        setError('No se pudo abrir la pestaña externa. Por favor, permita popups para este sitio y vuelva a intentar. Alternativamente, puede copiar la URL y abrirla manualmente en una nueva pestaña.');
+        setError(
+          'No se pudo abrir la pestaña externa. Por favor, permita popups para este sitio y vuelva a intentar. Alternativamente, puede copiar la URL y abrirla manualmente en una nueva pestaña.'
+        );
 
         // Intentar obtener la URL que se intentó abrir
         try {
           const rutHeredero = sessionStorage.getItem('RutCompleto');
           if (rutHeredero) {
-            const transactionData = await mandatosTransactionService.iniciarTransaccionMandatos(rutHeredero);
+            const transactionData =
+              await mandatosTransactionService.iniciarTransaccionMandatos(rutHeredero);
             if (transactionData?.encryptedUrl) {
               setManualUrl(transactionData.encryptedUrl);
               setShowManualUrl(true);
@@ -259,7 +278,6 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     if (herederoDataFromStorage) {
       setHerederoData(herederoDataFromStorage);
 
-
       // Cargar datos de cuenta bancaria si tenemos RUT
       if (herederoDataFromStorage.RutCompleto) {
         loadCuentaBancaria(herederoDataFromStorage.RutCompleto);
@@ -274,8 +292,6 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         // Buscar en localStorage
         const rutCliente = localStorage.getItem('currentRutCliente') || '17175966';
         const mandatoId = localStorage.getItem('currentMandatoId') || '';
-
-
 
         // Llamar al servicio
         const resultado = await mockMandatoService.getMandatoInfo(rutCliente, mandatoId);
@@ -297,16 +313,15 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     setNoTieneCuentaBancaria(false);
     setBloquearRadioButtons(false);
     try {
-
       const cuentaData = await getCuentaBancaria(rutCompleto);
       setCuentaBancariaData(cuentaData);
       setNoTieneCuentaBancaria(false);
-      setBloquearRadioButtons(false);    } catch (error: any) {
+      setBloquearRadioButtons(false);
+    } catch (error: any) {
       console.error('Error al cargar datos de cuenta bancaria:', error);
 
       // Si es error 404, significa que no tiene cuenta bancaria registrada
       if (error?.status === 404 || error?.message?.includes('404')) {
-
         setNoTieneCuentaBancaria(true);
         setCuentaBancariaData(null);
         setBloquearRadioButtons(true);
@@ -323,14 +338,11 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   // Función para refrescar datos de cuenta bancaria
   const refreshCuentaBancaria = async () => {
     if (herederoData?.RutCompleto) {
-
-
       // Limpiar sessionStorage de mandatos_transaction
       const allKeys = Object.keys(sessionStorage);
       const mandatosKeys = allKeys.filter(key => key.includes('mandatos_transaction'));
       mandatosKeys.forEach(key => {
         sessionStorage.removeItem(key);
-
       });
 
       // Resetear selección del radio button
@@ -345,7 +357,6 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   // Detectar cuando se cierra la ventana externa de mandatos y refrescar datos
   useEffect(() => {
     if (externalAppStatus === 'closed' && closedAt) {
-
       refreshCuentaBancaria();
     }
   }, [externalAppStatus, closedAt, herederoData?.RutCompleto]);
@@ -353,7 +364,6 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
   // Resetear el flag de reset cuando termine la carga
   useEffect(() => {
     if (shouldResetSelection && !loadingCuentaBancaria) {
-
       setShouldResetSelection(false);
     }
   }, [shouldResetSelection, loadingCuentaBancaria]);
@@ -371,7 +381,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     } else {
       setBotonActualizarVisible(false);
     }
-  }, [mandatoInfo, esMandatoCorrecto, noTieneCuentaBancaria]);  // Función para manejar el guardado del solicitante
+  }, [mandatoInfo, esMandatoCorrecto, noTieneCuentaBancaria]); // Función para manejar el guardado del solicitante
   const handleSave = async () => {
     if (!mandatoInfo) return;
 
@@ -381,12 +391,11 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
     try {
       // Buscar automáticamente en todas las claves del sessionStorage que contengan datos de herederos
       const allKeys = Object.keys(sessionStorage);
-      const formKeys = allKeys.filter(key => key.includes('formHeredero') || key.includes('heredero'));
+      const formKeys = allKeys.filter(
+        key => key.includes('formHeredero') || key.includes('heredero')
+      );
 
-
-
-
-      let storedData: string | null = null;      // Buscar en todas las claves de herederos hasta encontrar una con datos válidos
+      let storedData: string | null = null; // Buscar en todas las claves de herederos hasta encontrar una con datos válidos
       for (const key of formKeys) {
         const data = sessionStorage.getItem(key);
         if (data) {
@@ -401,8 +410,11 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             continue;
           }
         }
-      }      if (!storedData) {
-        throw new Error(`No se encontraron datos válidos del formulario en el sessionStorage. Claves revisadas: ${formKeys.join(', ')}`);
+      }
+      if (!storedData) {
+        throw new Error(
+          `No se encontraron datos válidos del formulario en el sessionStorage. Claves revisadas: ${formKeys.join(', ')}`
+        );
       }
 
       const formData = JSON.parse(storedData);
@@ -419,7 +431,9 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         RutCompleto: formData.RutCompleto || rutFormulario.toString(),
         RutDigito: formData.RutDigito || '',
         CodigoSexo: formData.CodigoSexo || '',
-        FechaNacimiento: formData.FechaNacimiento ? formatDateForAPI(formData.FechaNacimiento) : formatDateForAPI(new Date()),
+        FechaNacimiento: formData.FechaNacimiento
+          ? formatDateForAPI(formData.FechaNacimiento)
+          : formatDateForAPI(new Date()),
         IdParentesco: formData.IdParentesco || 0,
         IdTipoSolicitante: formData.IdTipoSolicitante || 0,
         EstadoRegistro: formData.EstadoRegistro || 'A',
@@ -434,35 +448,37 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         Calle: formData.Calle || '',
         NumCalle: formData.NumCalle || 0,
         villa: formData.villa || '',
-        DepBlock: formData.DepBlock || 0,        Usuario: formData.Usuario || 'SISTEMA'      };
+        DepBlock: formData.DepBlock || 0,
+        Usuario: formData.Usuario || 'SISTEMA',
+      };
 
       // Llamar a la API para crear el solicitante
       const resultSolicitante = await createSolicitante(solicitanteData, 'SISTEMA');
 
       if (resultSolicitante.success && resultSolicitante.status === 201) {
-
         // Ahora crear la solicitud usando los datos del retorno del primer endpoint
         try {
           // Función helper para crear fecha ISO en zona horaria local
           const getLocalISOString = () => {
             const now = new Date();
             const offset = now.getTimezoneOffset();
-            const localDate = new Date(now.getTime() - (offset * 60000));
+            const localDate = new Date(now.getTime() - offset * 60000);
             return localDate.toISOString();
-          };          // Obtener la fecha actual en formato local (sin conversión UTC)
+          }; // Obtener la fecha actual en formato local (sin conversión UTC)
           const fechaISO = getLocalISOString();
 
           // Extraer el ID del solicitante de la respuesta del primer endpoint
           // El campo correcto es 'newIdSolicitante' según la especificación
-          const newIdSolicitante = resultSolicitante.data?.newIdSolicitante ||
-                                  resultSolicitante.newIdSolicitante ||
-                                  resultSolicitante.data?.idSolicitante ||
-                                  resultSolicitante.data?.IdSolicitante ||
-                                  resultSolicitante.data?.id ||
-                                  resultSolicitante.idSolicitante ||
-                                  resultSolicitante.IdSolicitante ||
-                                  resultSolicitante.id ||
-                                  1001;          // Obtener el IdPersona del titular desde sessionStorage
+          const newIdSolicitante =
+            resultSolicitante.data?.newIdSolicitante ||
+            resultSolicitante.newIdSolicitante ||
+            resultSolicitante.data?.idSolicitante ||
+            resultSolicitante.data?.IdSolicitante ||
+            resultSolicitante.data?.id ||
+            resultSolicitante.idSolicitante ||
+            resultSolicitante.IdSolicitante ||
+            resultSolicitante.id ||
+            1001; // Obtener el IdPersona del titular desde sessionStorage
           // Este ID se guarda cuando se consulta /api/Titular/ByRut en el paso de ingreso del titular
           let idMae = 0;
           let rutTitular: string | number = 0; // Allow both string and number types
@@ -491,7 +507,8 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 const titularInfo = await fetchTitularByRut(parseInt(rutTitular), 'SISTEMA');
                 idMae = titularInfo.id;
               }
-            }          } catch (errorTitular: any) {
+            }
+          } catch (errorTitular: any) {
             // Fallback: usar valores por defecto
             if (!idMae || idMae === 0) {
               idMae = formData.IdPersona || 12345;
@@ -499,7 +516,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             if (!rutTitular || rutTitular === 0) {
               rutTitular = mandatoInfo.rutCliente;
             }
-          }          // Preparar datos para la solicitud
+          } // Preparar datos para la solicitud
           const solicitudData = {
             idSolicitante: newIdSolicitante, // newIdSolicitante del output de /api/Solicitante
             idMae: idMae, // IdPersona del titular obtenido de /api/Titular/ByRut
@@ -507,10 +524,10 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             fechaDeterminacion: fechaISO,
             estadoSolicitud: 1,
             tipoSolicitud: 1,
-            observaciones: "Creacion Solicitud Heredero",
-            estadoRegistro: "V",
-            usuarioCreacion: "SISTEMA", // Usar el usuario logueado
-            fechaEstadoRegistro: fechaISO
+            observaciones: 'Creacion Solicitud Heredero',
+            estadoRegistro: 'V',
+            usuarioCreacion: 'SISTEMA', // Usar el usuario logueado
+            fechaEstadoRegistro: fechaISO,
           };
 
           // Llamar a la API para crear la solicitud
@@ -518,185 +535,216 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
 
           if (resultSolicitud.success && resultSolicitud.status === 201) {
             // Obtener el ID de la solicitud creada
-            const newIdSolicitud = resultSolicitud.data?.newId ||
-                                   resultSolicitud.data?.newIdSolicitud ||
-                                   resultSolicitud.data?.idSolicitud ||
-                                   resultSolicitud.data?.newIdSolicitante ||
-                                   resultSolicitud.data?.idSolicitante ||
-                                   resultSolicitud.data?.IdSolicitud ||
-                                   resultSolicitud.data?.IdSolicitante ||
-                                   resultSolicitud.newId ||
-                                   resultSolicitud.newIdSolicitud ||
-                                   resultSolicitud.idSolicitud ||
-                                   resultSolicitud.newIdSolicitante ||
-                                    resultSolicitud.idSolicitante;
+            const newIdSolicitud =
+              resultSolicitud.data?.newId ||
+              resultSolicitud.data?.newIdSolicitud ||
+              resultSolicitud.data?.idSolicitud ||
+              resultSolicitud.data?.newIdSolicitante ||
+              resultSolicitud.data?.idSolicitante ||
+              resultSolicitud.data?.IdSolicitud ||
+              resultSolicitud.data?.IdSolicitante ||
+              resultSolicitud.newId ||
+              resultSolicitud.newIdSolicitud ||
+              resultSolicitud.idSolicitud ||
+              resultSolicitud.newIdSolicitante ||
+              resultSolicitud.idSolicitante;
 
-             if (newIdSolicitud) {
-               try {
-                 // Obtener el RUT del titular fallecido (sin DV, solo números)
-                 let rutTitularFallecido: number;                 if (typeof rutTitular === 'string') {
-                   // Extraer solo los números del RUT (sin puntos, guiones ni DV)
-                   const rutNumeros = rutTitular.replace(/[^0-9]/g, '');
-                   rutTitularFallecido = parseInt(rutNumeros);
-                 } else {
-                   rutTitularFallecido = rutTitular;
-                 }
+            if (newIdSolicitud) {
+              try {
+                // Obtener el RUT del titular fallecido (sin DV, solo números)
+                let rutTitularFallecido: number;
+                if (typeof rutTitular === 'string') {
+                  // Extraer solo los números del RUT (sin puntos, guiones ni DV)
+                  const rutNumeros = rutTitular.replace(/[^0-9]/g, '');
+                  rutTitularFallecido = parseInt(rutNumeros);
+                } else {
+                  rutTitularFallecido = rutTitular;
+                }
 
-                 if (!rutTitularFallecido || rutTitularFallecido === 0) {
-                   throw new Error('RUT del titular fallecido es 0 o inválido');
-                 }
+                if (!rutTitularFallecido || rutTitularFallecido === 0) {
+                  throw new Error('RUT del titular fallecido es 0 o inválido');
+                }
 
-                 // Obtener documentos almacenados del session storage
-                 const documentos = obtenerDocumentosAlmacenados(rutTitularFallecido);                 // Si no hay documentos, buscar manualmente en todas las claves que contengan "documentos"
-                 if (documentos.length === 0) {
-                   const allKeys = Object.keys(sessionStorage);
-                   const documentoKeys = allKeys.filter(key => key.includes('documentos'));
+                // Obtener documentos almacenados del session storage
+                const documentos = obtenerDocumentosAlmacenados(rutTitularFallecido); // Si no hay documentos, buscar manualmente en todas las claves que contengan "documentos"
+                if (documentos.length === 0) {
+                  const allKeys = Object.keys(sessionStorage);
+                  const documentoKeys = allKeys.filter(key => key.includes('documentos'));
 
-                   // Buscar documentos en cualquier clave disponible
-                   for (const key of documentoKeys) {
-                     const data = sessionStorage.getItem(key);
-                     if (data) {
-                       try {
-                         const documentosAlternativos = JSON.parse(data);
-                         if (documentosAlternativos && documentosAlternativos.length > 0) {
-                           // Usar estos documentos como fallback
-                           documentos.push(...documentosAlternativos);
-                           break; // Usar el primer conjunto de documentos encontrados
-                         }
-                       } catch (parseError) {
-                         // Continuar con la siguiente clave
-                       }
-                     }
-                   }
-                 }                if (documentos.length > 0) {
+                  // Buscar documentos en cualquier clave disponible
+                  for (const key of documentoKeys) {
+                    const data = sessionStorage.getItem(key);
+                    if (data) {
+                      try {
+                        const documentosAlternativos = JSON.parse(data);
+                        if (documentosAlternativos && documentosAlternativos.length > 0) {
+                          // Usar estos documentos como fallback
+                          documentos.push(...documentosAlternativos);
+                          break; // Usar el primer conjunto de documentos encontrados
+                        }
+                      } catch (parseError) {
+                        // Continuar con la siguiente clave
+                      }
+                    }
+                  }
+                }
+                if (documentos.length > 0) {
                   // Enviar documentos a la API usando el hook
                   const resultDocumentos = await enviarDocumentos(
-                      newIdSolicitud,
-                      'SISTEMA',
-                      rutTitularFallecido,
-                      documentos
-                    );
+                    newIdSolicitud,
+                    'SISTEMA',
+                    rutTitularFallecido,
+                    documentos
+                  );
 
-                    if (resultDocumentos.success) {
-                      // Si Todas las APIs anteriores fueron exitosas:
-                      // - /api/Solicitante POST = 201
-                      // - /api/Solicitud POST = 201
-                      // - /api/Documentos POST = 200
-                      try {
-                        // Obtener datos del formulario para el email
-                        const nombreCompleto = `${formData.NombrePersona || ''} ${formData.ApellidoPaterno || ''} ${formData.ApellidoMaterno || ''}`.trim();
-                        const emailSolicitante = getEmailSolicitante(); // Email según ambiente
-                        const rutNumerico = formData.RutPersona || parseInt(rutFormulario.toString());
-                        const rutDigito = formData.RutDigito || '';
-
-
-                        const emailResult = await enviarEmail(
-                          nombreCompleto,
-                          emailSolicitante,
-                          rutNumerico,
-                          rutDigito                        );                        if (emailResult.success && emailResult.status === 200) {
-                          // Email enviado exitosamente - navegar directamente sin mostrar modal intermedio
-                          onSave();
-                        } else if ([400, 412, 503].includes(emailResult.status)) {
-                          navigate('/mnherederos/ingresoher/error');                          return;
-                        } else {
-                          // Email falló pero APIs anteriores OK - continuar sin modal intermedio
-                          onSave();
-                        }                      } catch (emailError: any) {
-                        if (emailError.status && [400, 412, 503].includes(emailError.status)) {
-                          navigate('/mnherederos/ingresoher/error');
-                          return;
-                        }
-                        // Error en email pero APIs anteriores OK - continuar sin modal intermedio
-                        onSave();
-                      }                    } else {
-                      // Verificar si el error indica que se agotaron los intentos
-                      if (resultDocumentos.message && (
-                        resultDocumentos.message.includes('Falló definitivamente después de') ||
-                        resultDocumentos.message.includes('Falló definitivamente') ||                        resultDocumentos.message.includes('definitivamente después de')
-                      )) {
-                        navigate('/mnherederos/ingresoher/error');
-                        return;
-                      }
-
-                      // Verificar códigos de error específicos en el mensaje
-                      if (resultDocumentos.message && (
-                        resultDocumentos.message.includes('500') ||
-                        resultDocumentos.message.includes('503') ||
-                        resultDocumentos.message.includes('412') ||                        resultDocumentos.message.includes('400')
-                      )) {
-                        navigate('/mnherederos/ingresoher/error');
-                        return;
-                      }
-
-                      // Si no es un error crítico, continuar con éxito - navegar directamente sin modal intermedio
-                      onSave();
-                    }                  } else {
-                    // No hay documentos, pero las APIs anteriores fueron exitosas
+                  if (resultDocumentos.success) {
+                    // Si Todas las APIs anteriores fueron exitosas:
+                    // - /api/Solicitante POST = 201
+                    // - /api/Solicitud POST = 201
+                    // - /api/Documentos POST = 200
                     try {
-                        // Obtener datos del formulario para el email
-                        const nombreCompleto = `${formData.NombrePersona || ''} ${formData.ApellidoPaterno || ''} ${formData.ApellidoMaterno || ''}`.trim();
-                        const emailSolicitante = getEmailSolicitante(); // Email según ambiente
-                        const rutNumerico = formData.RutPersona || parseInt(rutFormulario.toString());
-                        const rutDigito = formData.RutDigito || '';
-
+                      // Obtener datos del formulario para el email
+                      const nombreCompleto =
+                        `${formData.NombrePersona || ''} ${formData.ApellidoPaterno || ''} ${formData.ApellidoMaterno || ''}`.trim();
+                      const emailSolicitante = getEmailSolicitante(); // Email según ambiente
+                      const rutNumerico = formData.RutPersona || parseInt(rutFormulario.toString());
+                      const rutDigito = formData.RutDigito || '';
 
                       const emailResult = await enviarEmail(
                         nombreCompleto,
                         emailSolicitante,
                         rutNumerico,
                         rutDigito
-                      );                      if (emailResult.success && emailResult.status === 200) {
+                      );
+                      if (emailResult.success && emailResult.status === 200) {
                         // Email enviado exitosamente - navegar directamente sin mostrar modal intermedio
                         onSave();
                       } else if ([400, 412, 503].includes(emailResult.status)) {
-                        navigate('/mnherederos/ingresoher/error');                        return;
+                        navigate('/mnherederos/ingresoher/error');
+                        return;
                       } else {
                         // Email falló pero APIs anteriores OK - continuar sin modal intermedio
                         onSave();
-                      }                    } catch (emailError: any) {
+                      }
+                    } catch (emailError: any) {
                       if (emailError.status && [400, 412, 503].includes(emailError.status)) {
                         navigate('/mnherederos/ingresoher/error');
                         return;
                       }
                       // Error en email pero APIs anteriores OK - continuar sin modal intermedio
                       onSave();
-                    }                  }
+                    }
+                  } else {
+                    // Verificar si el error indica que se agotaron los intentos
+                    if (
+                      resultDocumentos.message &&
+                      (resultDocumentos.message.includes('Falló definitivamente después de') ||
+                        resultDocumentos.message.includes('Falló definitivamente') ||
+                        resultDocumentos.message.includes('definitivamente después de'))
+                    ) {
+                      navigate('/mnherederos/ingresoher/error');
+                      return;
+                    }
+
+                    // Verificar códigos de error específicos en el mensaje
+                    if (
+                      resultDocumentos.message &&
+                      (resultDocumentos.message.includes('500') ||
+                        resultDocumentos.message.includes('503') ||
+                        resultDocumentos.message.includes('412') ||
+                        resultDocumentos.message.includes('400'))
+                    ) {
+                      navigate('/mnherederos/ingresoher/error');
+                      return;
+                    }
+
+                    // Si no es un error crítico, continuar con éxito - navegar directamente sin modal intermedio
+                    onSave();
+                  }
+                } else {
+                  // No hay documentos, pero las APIs anteriores fueron exitosas
+                  try {
+                    // Obtener datos del formulario para el email
+                    const nombreCompleto =
+                      `${formData.NombrePersona || ''} ${formData.ApellidoPaterno || ''} ${formData.ApellidoMaterno || ''}`.trim();
+                    const emailSolicitante = getEmailSolicitante(); // Email según ambiente
+                    const rutNumerico = formData.RutPersona || parseInt(rutFormulario.toString());
+                    const rutDigito = formData.RutDigito || '';
+
+                    const emailResult = await enviarEmail(
+                      nombreCompleto,
+                      emailSolicitante,
+                      rutNumerico,
+                      rutDigito
+                    );
+                    if (emailResult.success && emailResult.status === 200) {
+                      // Email enviado exitosamente - navegar directamente sin mostrar modal intermedio
+                      onSave();
+                    } else if ([400, 412, 503].includes(emailResult.status)) {
+                      navigate('/mnherederos/ingresoher/error');
+                      return;
+                    } else {
+                      // Email falló pero APIs anteriores OK - continuar sin modal intermedio
+                      onSave();
+                    }
+                  } catch (emailError: any) {
+                    if (emailError.status && [400, 412, 503].includes(emailError.status)) {
+                      navigate('/mnherederos/ingresoher/error');
+                      return;
+                    }
+                    // Error en email pero APIs anteriores OK - continuar sin modal intermedio
+                    onSave();
+                  }
+                }
               } catch (errorDocumentos: any) {
                 // Verificar si es un error que debe ir a página de error
-                if (errorDocumentos.message && (
-                  errorDocumentos.message.includes('Falló definitivamente después de') ||
-                  errorDocumentos.message.includes('Falló definitivamente') ||                  errorDocumentos.message.includes('definitivamente después de')
-                )) {
+                if (
+                  errorDocumentos.message &&
+                  (errorDocumentos.message.includes('Falló definitivamente después de') ||
+                    errorDocumentos.message.includes('Falló definitivamente') ||
+                    errorDocumentos.message.includes('definitivamente después de'))
+                ) {
                   navigate('/mnherederos/ingresoher/error');
                   return;
-                }                // Verificar códigos de error específicos
-                if (errorDocumentos.status && [500, 503, 412, 400].includes(errorDocumentos.status)) {
+                } // Verificar códigos de error específicos
+                if (
+                  errorDocumentos.status &&
+                  [500, 503, 412, 400].includes(errorDocumentos.status)
+                ) {
                   navigate('/mnherederos/ingresoher/error');
                   return;
-                }                // Verificar si el mensaje contiene "Failed to fetch" que es el error que vemos en la consola
-                if (errorDocumentos.message && errorDocumentos.message.includes('Failed to fetch')) {
+                } // Verificar si el mensaje contiene "Failed to fetch" que es el error que vemos en la consola
+                if (
+                  errorDocumentos.message &&
+                  errorDocumentos.message.includes('Failed to fetch')
+                ) {
                   navigate('/mnherederos/ingresoher/error');
                   return;
                 }
 
                 // Los documentos fallaron - navegar directamente sin modal intermedio
                 onSave();
-              }            } else {
+              }
+            } else {
               // No se puede enviar documentos sin ID de solicitud
               onSave();
             }
-          } else {          throw new Error(`Error al crear la solicitud. Status: ${resultSolicitud.status}, Respuesta: ${JSON.stringify(resultSolicitud)}`);
-        }
+          } else {
+            throw new Error(
+              `Error al crear la solicitud. Status: ${resultSolicitud.status}, Respuesta: ${JSON.stringify(resultSolicitud)}`
+            );
+          }
         } catch (errorSolicitud: any) {
           // Verificar si es un error que debe ir a página de error
-          if (errorSolicitud.message && (
-            errorSolicitud.message.includes('Falló definitivamente después de') ||
-            errorSolicitud.message.includes('Falló definitivamente') ||            errorSolicitud.message.includes('definitivamente después de')
-          )) {
+          if (
+            errorSolicitud.message &&
+            (errorSolicitud.message.includes('Falló definitivamente después de') ||
+              errorSolicitud.message.includes('Falló definitivamente') ||
+              errorSolicitud.message.includes('definitivamente después de'))
+          ) {
             navigate('/mnherederos/ingresoher/error');
             return;
-          }          // Verificar códigos de error específicos
+          } // Verificar códigos de error específicos
           if (errorSolicitud.status && [500, 503, 412, 400].includes(errorSolicitud.status)) {
             navigate('/mnherederos/ingresoher/error');
             return;
@@ -705,17 +753,22 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
           // Aunque falle la solicitud, el solicitante se creó correctamente
           setError(`Solicitante creado pero error al crear solicitud: ${errorSolicitud.message}`);
         }
-      } else {        throw new Error(`Error al guardar el solicitante. Status: ${resultSolicitante.status}, Respuesta: ${JSON.stringify(resultSolicitante)}`);
+      } else {
+        throw new Error(
+          `Error al guardar el solicitante. Status: ${resultSolicitante.status}, Respuesta: ${JSON.stringify(resultSolicitante)}`
+        );
       }
     } catch (err: any) {
       // Verificar si el error indica que se agotaron los intentos
-      if (err.message && (
-        err.message.includes('Falló definitivamente después de') ||
-        err.message.includes('Falló definitivamente') ||        err.message.includes('definitivamente después de')
-      )) {
+      if (
+        err.message &&
+        (err.message.includes('Falló definitivamente después de') ||
+          err.message.includes('Falló definitivamente') ||
+          err.message.includes('definitivamente después de'))
+      ) {
         navigate('/mnherederos/ingresoher/error');
         return;
-      }      // También verificar códigos de error específicos que deben ir a página de error
+      } // También verificar códigos de error específicos que deben ir a página de error
       if (err.status && [500, 503, 412, 400].includes(err.status)) {
         navigate('/mnherederos/ingresoher/error');
         return;
@@ -729,41 +782,74 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
 
   return (
     <>
-      <div className="carga-mandatos-card" style={{
-        padding: '2rem 3rem',
-        backgroundColor: '#FFFFFF',
-        borderRadius: '1.25rem',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: 'fit-content',
-        maxHeight: 'fit-content',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-      }}>
-        {/* Mensaje informativo */}
-        <div style={{
-          backgroundColor: 'rgb(255 249 229)',
-          border: '1px solid rgb(255 250 233)',
-          borderRadius: '8px',
-          padding: '1rem',
-          marginBottom: '1.5rem',
+      <div
+        className="carga-mandatos-card"
+        style={{
+          padding: '2rem 3rem',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '1.25rem',
+          position: 'relative',
           display: 'flex',
-          alignItems: 'flex-start',
-          gap: '0.75rem'
-        }}>
-          <div style={{
-            width: '1.5rem',
-            height: '1.5rem',
+          flexDirection: 'column',
+          minHeight: 'fit-content',
+          maxHeight: 'fit-content',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        }}
+      >
+        {/* Mensaje informativo */}
+        <div
+          style={{
+            backgroundColor: 'rgb(255 249 229)',
+            border: '1px solid rgb(255 250 233)',
+            borderRadius: '8px',
+            padding: '1rem',
+            marginBottom: '1.5rem',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            marginTop: '0.125rem'
-          }}>
-            <svg width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M11.999 8C11.861 8 11.749 8.112 11.75 8.25C11.75 8.388 11.862 8.5 12 8.5C12.138 8.5 12.25 8.388 12.25 8.25C12.25 8.112 12.138 8 11.999 8" stroke="#F5A200" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path fillRule="evenodd" clipRule="evenodd" d="M12 21V21C7.029 21 3 16.971 3 12V12C3 7.029 7.029 3 12 3V3C16.971 3 21 7.029 21 12V12C21 16.971 16.971 21 12 21Z" stroke="#F5A200" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M12 12V17" stroke="#F5A200" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            alignItems: 'flex-start',
+            gap: '0.75rem',
+          }}
+        >
+          <div
+            style={{
+              width: '1.5rem',
+              height: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              marginTop: '0.125rem',
+            }}
+          >
+            <svg
+              width="1.5rem"
+              height="1.5rem"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M11.999 8C11.861 8 11.749 8.112 11.75 8.25C11.75 8.388 11.862 8.5 12 8.5C12.138 8.5 12.25 8.388 12.25 8.25C12.25 8.112 12.138 8 11.999 8"
+                stroke="#F5A200"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M12 21V21C7.029 21 3 16.971 3 12V12C3 7.029 7.029 3 12 3V3C16.971 3 21 7.029 21 12V12C21 16.971 16.971 21 12 21Z"
+                stroke="#F5A200"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 12V17"
+                stroke="#F5A200"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </div>
           <ConsaludCore.Typography
@@ -773,33 +859,67 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               fontSize: '0.875rem',
               lineHeight: '1.4',
               margin: 0,
-              flex: 1
+              flex: 1,
             }}
           >
-            Si la persona <span style={{ color: '#BB4E01', fontWeight: 'bold' }}>no tiene una cuenta bancaria registrada o debe editar sus datos</span>. Ingresa en "Actualizar Mandatos", para ingresar Cuenta bancaria o actualizar los datos de su cuenta bancaria.
+            Si la persona{' '}
+            <span style={{ color: '#BB4E01', fontWeight: 'bold' }}>
+              no tiene una cuenta bancaria registrada o debe editar sus datos
+            </span>
+            . Ingresa en "Actualizar Mandatos", para ingresar Cuenta bancaria o actualizar los datos
+            de su cuenta bancaria.
           </ConsaludCore.Typography>
         </div>
-
         {/* Title */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.75rem',
-          marginBottom: '2rem',
-          flexShrink: 0
-        }}>
-          <div style={{
-            width: '2.5rem',
-            height: '2.5rem',
+        <div
+          style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0
-          }}>
-            <svg width="1.25rem" height="1.25rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M18.5023 6.95098L16.1365 3.79657C15.4993 2.94704 14.3095 2.74323 13.426 3.33227L7.92773 6.99776" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path fillRule="evenodd" clipRule="evenodd" d="M18.501 11.498H21.0021C21.5546 11.498 22.0025 11.9459 22.0025 12.4985V15.4997C22.0025 16.0522 21.5546 16.5001 21.0021 16.5001H18.501C17.1198 16.5001 16 15.3804 16 13.9991V13.9991C16 12.6178 17.1198 11.498 18.501 11.498V11.498Z" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M21.0036 11.498V9.49714C21.0036 8.11585 19.8838 6.99609 18.5026 6.99609H5.49714C4.11585 6.99609 2.99609 8.11585 2.99609 9.49714V18.5009C2.99609 19.8822 4.11585 21.0019 5.49714 21.0019H18.5026C19.8838 21.0019 21.0036 19.8822 21.0036 18.5009V16.5001" stroke="#00CBBF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            gap: '0.75rem',
+            marginBottom: '2rem',
+            flexShrink: 0,
+          }}
+        >
+          <div
+            style={{
+              width: '2.5rem',
+              height: '2.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <svg
+              width="1.25rem"
+              height="1.25rem"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18.5023 6.95098L16.1365 3.79657C15.4993 2.94704 14.3095 2.74323 13.426 3.33227L7.92773 6.99776"
+                stroke="#00CBBF"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M18.501 11.498H21.0021C21.5546 11.498 22.0025 11.9459 22.0025 12.4985V15.4997C22.0025 16.0522 21.5546 16.5001 21.0021 16.5001H18.501C17.1198 16.5001 16 15.3804 16 13.9991V13.9991C16 12.6178 17.1198 11.498 18.501 11.498V11.498Z"
+                stroke="#00CBBF"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M21.0036 11.498V9.49714C21.0036 8.11585 19.8838 6.99609 18.5026 6.99609H5.49714C4.11585 6.99609 2.99609 8.11585 2.99609 9.49714V18.5009C2.99609 19.8822 4.11585 21.0019 5.49714 21.0019H18.5026C19.8838 21.0019 21.0036 19.8822 21.0036 18.5009V16.5001"
+                stroke="#00CBBF"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </div>
           <ConsaludCore.Typography
@@ -810,13 +930,12 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               fontSize: '1.25rem',
               color: '#505050',
               margin: 0,
-              lineHeight: '1.4'
+              lineHeight: '1.4',
             }}
           >
             Cuenta bancaria
           </ConsaludCore.Typography>
         </div>
-
         {/* Descripción */}
         <div style={{ marginBottom: '1.5rem' }}>
           <ConsaludCore.Typography
@@ -825,14 +944,12 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               color: '#666666',
               fontSize: '0.875rem',
               lineHeight: '1.4',
-              margin: 0
+              margin: 0,
             }}
           >
             La devolución se realizará en la cuenta registrada a nombre de la persona heredera.
           </ConsaludCore.Typography>
         </div>
-
-
         {/* Mensaje sutil cuando la ventana de mandatos está abierta */}
         {(isExternalTabOpen || isOpeningTab) && (
           <div
@@ -842,7 +959,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               border: '1px solid rgb(255 250 233)',
               borderRadius: '8px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-              backgroundColor: 'rgb(255 249 229)'
+              backgroundColor: 'rgb(255 249 229)',
             }}
           >
             <div className="is-flex is-align-items-center">
@@ -850,11 +967,13 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 <i className="fas fa-external-link-alt"></i>
               </span>
               <span className="ml-2" style={{ color: '#856404', fontWeight: '500' }}>
-                Complete el proceso ingresa/actualiza Mandatos, para desbloquear los botones y continuar con el flujo.
+                Complete el proceso ingresa/actualiza Mandatos, para desbloquear los botones y
+                continuar con el flujo.
               </span>
             </div>
           </div>
-        )}        {loading ? (
+        )}{' '}
+        {loading ? (
           <div className="has-text-centered p-6">
             <div className="loader-container">
               <div className="loader"></div>
@@ -875,41 +994,44 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 style={{
                   color: '#505050',
                   fontSize: '0.875rem',
-                  marginBottom: '0.5rem'
+                  marginBottom: '0.5rem',
                 }}
               >
                 Cuenta asociada a
               </ConsaludCore.Typography>
-              <div style={{
-                backgroundColor: '#F8F9FA',
-                border: '1px solid #E9ECEF',
-                borderRadius: '20px',
-                padding: '0.75rem',
-                marginBottom: '1rem'
-              }}>
+              <div
+                style={{
+                  backgroundColor: '#F8F9FA',
+                  border: '1px solid #E9ECEF',
+                  borderRadius: '20px',
+                  padding: '0.75rem',
+                  marginBottom: '1rem',
+                }}
+              >
                 <ConsaludCore.Typography
                   variant="body2"
                   style={{
                     color: '#666666',
                     fontSize: '0.875rem',
-                    margin: 0
+                    margin: 0,
                   }}
                 >
-                  {herederoData ?
-                    `${formatName(herederoData.NombrePersona)} ${formatName(herederoData.ApellidoPaterno)} ${formatName(herederoData.ApellidoMaterno)}`.trim() :
-                    `${mandatoInfo.nombreCliente} ${mandatoInfo.apellidoPaterno || ''} ${mandatoInfo.apellido}`.trim()
-                  }
+                  {herederoData
+                    ? `${formatName(herederoData.NombrePersona)} ${formatName(herederoData.ApellidoPaterno)} ${formatName(herederoData.ApellidoMaterno)}`.trim()
+                    : `${mandatoInfo.nombreCliente} ${mandatoInfo.apellidoPaterno || ''} ${mandatoInfo.apellido}`.trim()}
                 </ConsaludCore.Typography>
               </div>
             </div>
 
             {/* Detalles bancarios */}
-            <div style={{
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #E9ECEF',
-              borderRadius: '8px',
-              padding: '1rem'
-            }}>
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E9ECEF',
+                borderRadius: '8px',
+                padding: '1rem',
+              }}
+            >
               {loadingCuentaBancaria ? (
                 <div style={{ textAlign: 'center', padding: '1rem' }}>
                   <div className="loader" style={{ margin: '0 auto' }}></div>
@@ -918,7 +1040,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     style={{
                       color: '#666666',
                       fontSize: '0.875rem',
-                      marginTop: '0.5rem'
+                      marginTop: '0.5rem',
                     }}
                   >
                     Cargando información bancaria...
@@ -931,7 +1053,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     style={{
                       color: '#666666',
                       fontSize: '0.875rem',
-                      fontStyle: 'italic'
+                      fontStyle: 'italic',
                     }}
                   >
                     No tiene una cuenta bancaria registrada
@@ -945,7 +1067,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     style={{
                       color: '#505050',
                       fontSize: '0.875rem',
-                      marginBottom: '0.25rem'
+                      marginBottom: '0.25rem',
                     }}
                   >
                     {cuentaBancariaData.banco}
@@ -955,7 +1077,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     style={{
                       color: '#505050',
                       fontSize: '0.875rem',
-                      marginBottom: '0.25rem'
+                      marginBottom: '0.25rem',
                     }}
                   >
                     {cuentaBancariaData.tipoCuenta}
@@ -965,7 +1087,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     style={{
                       color: '#505050',
                       fontSize: '0.875rem',
-                      margin: 0
+                      margin: 0,
                     }}
                   >
                     N° {cuentaBancariaData.numeroCuenta}
@@ -979,7 +1101,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     style={{
                       color: '#505050',
                       fontSize: '0.875rem',
-                      marginBottom: '0.25rem'
+                      marginBottom: '0.25rem',
                     }}
                   >
                     {mandatoInfo.banco}
@@ -989,7 +1111,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     style={{
                       color: '#505050',
                       fontSize: '0.875rem',
-                      marginBottom: '0.25rem'
+                      marginBottom: '0.25rem',
                     }}
                   >
                     {mandatoInfo.tipoCuenta}
@@ -999,7 +1121,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                     style={{
                       color: '#505050',
                       fontSize: '0.875rem',
-                      margin: 0
+                      margin: 0,
                     }}
                   >
                     N° {mandatoInfo.numeroCuenta}
@@ -1007,8 +1129,6 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 </>
               )}
             </div>
-
-
 
             {/* Radio button para confirmar si el mandato es correcto */}
             <div className="field mt-4">
@@ -1021,10 +1141,12 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                         name="esMandatoCorrecto"
                         value="si"
                         checked={esMandatoCorrecto === 'si'}
-                        onChange={(e) => setEsMandatoCorrecto(e.target.value)}
+                        onChange={e => setEsMandatoCorrecto(e.target.value)}
                         disabled={bloquearRadioButtons || isExternalTabOpen || isOpeningTab}
                       />
-                      <span className="ml-2">Sí, los datos corresponden a la persona heredera.</span>
+                      <span className="ml-2">
+                        Sí, los datos corresponden a la persona heredera.
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -1036,10 +1158,12 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                         name="esMandatoCorrecto"
                         value="no"
                         checked={esMandatoCorrecto === 'no'}
-                        onChange={(e) => setEsMandatoCorrecto(e.target.value)}
+                        onChange={e => setEsMandatoCorrecto(e.target.value)}
                         disabled={bloquearRadioButtons || isExternalTabOpen || isOpeningTab}
                       />
-                      <span className="ml-2">No, los datos no corresponden a la persona heredera.</span>
+                      <span className="ml-2">
+                        No, los datos no corresponden a la persona heredera.
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -1051,40 +1175,58 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             <p>No se encontró información de la cuenta bancaria</p>
           </div>
         )}
-
         {/* Botones */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '1rem',
-          marginTop: '2rem',
-          padding: '1rem 0'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem',
+            marginTop: '2rem',
+            padding: '1rem 0',
+          }}
+        >
           {mandatoInfo && botonActualizarVisible && (
             <button
-              className={`button is-primary is-rounded proceso-button ${esMandatoCorrecto === 'si' ? 'animate-fade-out-up' : 'animate-fade-in-up'}${(loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || (esMandatoCorrecto === null && !noTieneCuentaBancaria) || loadingCuentaBancaria || shouldResetSelection) ? ' buttonRut--invalid' : ' buttonRut--valid'}`}
-              disabled={loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || (esMandatoCorrecto === null && !noTieneCuentaBancaria) || loadingCuentaBancaria || shouldResetSelection}
+              className={`button is-primary is-rounded proceso-button ${esMandatoCorrecto === 'si' ? 'animate-fade-out-up' : 'animate-fade-in-up'}${loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || (esMandatoCorrecto === null && !noTieneCuentaBancaria) || loadingCuentaBancaria || shouldResetSelection ? ' buttonRut--invalid' : ' buttonRut--valid'}`}
+              disabled={
+                loading ||
+                iframeLoading ||
+                isButtonsLocked ||
+                isOpeningTab ||
+                showManualUrl ||
+                (esMandatoCorrecto === null && !noTieneCuentaBancaria) ||
+                loadingCuentaBancaria ||
+                shouldResetSelection
+              }
               onClick={handleActualizarMandato}
               type="button"
-              aria-label={noTieneCuentaBancaria ? "Agregar mandato" : "Actualizar mandatos"}
+              aria-label={noTieneCuentaBancaria ? 'Agregar mandato' : 'Actualizar mandatos'}
               aria-busy={loading || iframeLoading}
               title={
-                loading ? 'Cargando información del mandato...' :
-                loadingCuentaBancaria ? 'Cargando información bancaria...' :
-                shouldResetSelection ? 'Datos actualizados, seleccione nuevamente si el mandato es correcto' :
-                isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
-                isOpeningTab ? 'Abriendo pestaña externa...' :
-                showManualUrl ? 'Modal de apertura manual abierto' :
-                esMandatoCorrecto === 'no' ? 'El mandato es incorrecto, se puede actualizar' :
-                esMandatoCorrecto === null ? 'Seleccione si el mandato es correcto o no' :
-                'Seleccione si el mandato es correcto o no'
+                loading
+                  ? 'Cargando información del mandato...'
+                  : loadingCuentaBancaria
+                    ? 'Cargando información bancaria...'
+                    : shouldResetSelection
+                      ? 'Datos actualizados, seleccione nuevamente si el mandato es correcto'
+                      : isButtonsLocked
+                        ? `Botones bloqueados: ${lockReason}`
+                        : isOpeningTab
+                          ? 'Abriendo pestaña externa...'
+                          : showManualUrl
+                            ? 'Modal de apertura manual abierto'
+                            : esMandatoCorrecto === 'no'
+                              ? 'El mandato es incorrecto, se puede actualizar'
+                              : esMandatoCorrecto === null
+                                ? 'Seleccione si el mandato es correcto o no'
+                                : 'Seleccione si el mandato es correcto o no'
               }
               style={{
                 minWidth: 180,
                 height: 42,
                 fontWeight: 600,
-                opacity: (loading || iframeLoading) ? 0.7 : 1,
+                opacity: loading || iframeLoading ? 0.7 : 1,
                 transition: 'opacity 0.2s',
                 display: 'flex',
                 justifyContent: 'center',
@@ -1093,35 +1235,64 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 border: 'none',
                 boxShadow: 'none',
                 fontSize: 16,
-                background: (loading || iframeLoading || isButtonsLocked || isOpeningTab || showManualUrl || (esMandatoCorrecto === null && !noTieneCuentaBancaria) || loadingCuentaBancaria || shouldResetSelection) ? '#E0F7F6' : '#04A59B',
+                background:
+                  loading ||
+                  iframeLoading ||
+                  isButtonsLocked ||
+                  isOpeningTab ||
+                  showManualUrl ||
+                  (esMandatoCorrecto === null && !noTieneCuentaBancaria) ||
+                  loadingCuentaBancaria ||
+                  shouldResetSelection
+                    ? '#E0F7F6'
+                    : '#04A59B',
                 color: '#fff',
-                padding: '17px 24px'
+                padding: '17px 24px',
               }}
             >
-              {loading ? 'Cargando...' :
-               loadingCuentaBancaria ? 'Cargando...' :
-               shouldResetSelection ? 'Seleccione Opción' :
-               iframeLoading ? 'Cargando...' :
-               isOpeningTab ? 'Abriendo...' :
-               isButtonsLocked ? 'Pestaña Externa Abierta' :
-               showManualUrl ? 'Modal Abierto' :
-               noTieneCuentaBancaria ? 'Agregar Mandato' :
-               'Actualizar Mandatos'}
+              {loading
+                ? 'Cargando...'
+                : loadingCuentaBancaria
+                  ? 'Cargando...'
+                  : shouldResetSelection
+                    ? 'Seleccione Opción'
+                    : iframeLoading
+                      ? 'Cargando...'
+                      : isOpeningTab
+                        ? 'Abriendo...'
+                        : isButtonsLocked
+                          ? 'Pestaña Externa Abierta'
+                          : showManualUrl
+                            ? 'Modal Abierto'
+                            : noTieneCuentaBancaria
+                              ? 'Agregar Mandato'
+                              : 'Actualizar Mandatos'}
             </button>
           )}
           <button
-            className={`button is-primary is-rounded proceso-button animate-fade-in-up${(!mandatoInfo || saving || isButtonsLocked || esMandatoCorrecto === 'no' || esMandatoCorrecto === null || shouldResetSelection) ? ' buttonRut--invalid' : ' buttonRut--valid'}`}
-            disabled={!mandatoInfo || saving || isButtonsLocked || esMandatoCorrecto === 'no' || esMandatoCorrecto === null || shouldResetSelection}
+            className={`button is-primary is-rounded proceso-button animate-fade-in-up${!mandatoInfo || saving || isButtonsLocked || esMandatoCorrecto === 'no' || esMandatoCorrecto === null || shouldResetSelection ? ' buttonRut--invalid' : ' buttonRut--valid'}`}
+            disabled={
+              !mandatoInfo ||
+              saving ||
+              isButtonsLocked ||
+              esMandatoCorrecto === 'no' ||
+              esMandatoCorrecto === null ||
+              shouldResetSelection
+            }
             onClick={handleSave}
             type="button"
             aria-label="Enviar solicitud"
             aria-busy={saving}
             title={
-              shouldResetSelection ? 'Datos actualizados, seleccione nuevamente si el mandato es correcto' :
-              isButtonsLocked ? `Botones bloqueados: ${lockReason}` :
-              esMandatoCorrecto === 'no' ? 'El mandato es incorrecto, debe actualizarse primero' :
-              esMandatoCorrecto === null ? 'Seleccione si el mandato es correcto o no' :
-              ''
+              shouldResetSelection
+                ? 'Datos actualizados, seleccione nuevamente si el mandato es correcto'
+                : isButtonsLocked
+                  ? `Botones bloqueados: ${lockReason}`
+                  : esMandatoCorrecto === 'no'
+                    ? 'El mandato es incorrecto, debe actualizarse primero'
+                    : esMandatoCorrecto === null
+                      ? 'Seleccione si el mandato es correcto o no'
+                      : ''
             }
             style={{
               minWidth: 180,
@@ -1136,51 +1307,68 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
               border: 'none',
               boxShadow: 'none',
               fontSize: 16,
-              background: (!mandatoInfo || saving || isButtonsLocked || esMandatoCorrecto === 'no' || esMandatoCorrecto === null || shouldResetSelection) ? '#E0F7F6' : '#04A59B',
+              background:
+                !mandatoInfo ||
+                saving ||
+                isButtonsLocked ||
+                esMandatoCorrecto === 'no' ||
+                esMandatoCorrecto === null ||
+                shouldResetSelection
+                  ? '#E0F7F6'
+                  : '#04A59B',
               color: '#fff',
-              padding: '17px 24px'
+              padding: '17px 24px',
             }}
           >
-            {saving ? 'Enviando...' :
-             shouldResetSelection ? 'Seleccione Opción' :
-             isButtonsLocked ? 'Bloqueado' :
-             'Enviar solicitud'}
+            {saving
+              ? 'Enviando...'
+              : shouldResetSelection
+                ? 'Seleccione Opción'
+                : isButtonsLocked
+                  ? 'Bloqueado'
+                  : 'Enviar solicitud'}
           </button>
         </div>
       </div>
 
       {/* Modal para mostrar URL manual cuando falla window.open */}
       {showManualUrl && manualUrl && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '8px',
-            padding: '20px',
-            maxWidth: '600px',
-            width: '90%',
-            maxHeight: '80vh',
-            overflow: 'auto',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
-          }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '20px',
-              borderBottom: '1px solid #dee2e6',
-              paddingBottom: '10px'
-            }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              padding: '20px',
+              maxWidth: '600px',
+              width: '90%',
+              maxHeight: '80vh',
+              overflow: 'auto',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '20px',
+                borderBottom: '1px solid #dee2e6',
+                paddingBottom: '10px',
+              }}
+            >
               <h3 style={{ margin: 0, color: '#333' }}>Abrir Formulario Manualmente</h3>
               <button
                 onClick={() => setShowManualUrl(false)}
@@ -1189,7 +1377,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                   border: 'none',
                   fontSize: '24px',
                   cursor: 'pointer',
-                  color: '#666'
+                  color: '#666',
                 }}
               >
                 ×
@@ -1197,34 +1385,45 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             </div>
 
             <div style={{ padding: '20px', textAlign: 'center' }}>
-              <div style={{
-                backgroundColor: '#fff3cd',
-                border: '1px solid #ffeaa7',
-                borderRadius: '8px',
-                padding: '15px',
-                marginBottom: '20px'
-              }}>
+              <div
+                style={{
+                  backgroundColor: '#fff3cd',
+                  border: '1px solid #ffeaa7',
+                  borderRadius: '8px',
+                  padding: '15px',
+                  marginBottom: '20px',
+                }}
+              >
                 <h4 style={{ color: '#856404', margin: '0 0 10px 0' }}>
                   ⚠️ No se pudo abrir la pestaña automáticamente
                 </h4>
                 <p style={{ color: '#856404', margin: '0' }}>
-                  Su navegador está bloqueando la apertura de popups. Puede abrir el formulario manualmente copiando la URL de abajo.
+                  Su navegador está bloqueando la apertura de popups. Puede abrir el formulario
+                  manualmente copiando la URL de abajo.
                 </p>
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '8px',
+                    fontWeight: 'bold',
+                  }}
+                >
                   URL del formulario:
                 </label>
-                <div style={{
-                  display: 'flex',
-                  gap: '10px',
-                  alignItems: 'center',
-                  backgroundColor: '#f8f9fa',
-                  border: '1px solid #dee2e6',
-                  borderRadius: '4px',
-                  padding: '10px'
-                }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '10px',
+                    alignItems: 'center',
+                    backgroundColor: '#f8f9fa',
+                    border: '1px solid #dee2e6',
+                    borderRadius: '4px',
+                    padding: '10px',
+                  }}
+                >
                   <input
                     type="text"
                     value={manualUrl}
@@ -1235,7 +1434,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                       border: 'none',
                       backgroundColor: 'transparent',
                       fontSize: '14px',
-                      fontFamily: 'monospace'
+                      fontFamily: 'monospace',
                     }}
                   />
                   <ConsaludCore.Button
@@ -1250,14 +1449,16 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 </div>
               </div>
 
-              <div style={{
-                backgroundColor: '#e7f3ff',
-                border: '1px solid #b3d9ff',
-                borderRadius: '6px',
-                padding: '15px',
-                textAlign: 'left',
-                marginBottom: '20px'
-              }}>
+              <div
+                style={{
+                  backgroundColor: '#e7f3ff',
+                  border: '1px solid #b3d9ff',
+                  borderRadius: '6px',
+                  padding: '15px',
+                  textAlign: 'left',
+                  marginBottom: '20px',
+                }}
+              >
                 <h5 style={{ margin: '0 0 10px 0', color: '#0066cc' }}>Instrucciones:</h5>
                 <ol style={{ margin: '0', paddingLeft: '20px', color: '#0066cc' }}>
                   <li>Copie la URL de arriba</li>
@@ -1268,11 +1469,14 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 </ol>
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                <ConsaludCore.Button
-                  variant="secondary"
-                  onClick={() => setShowManualUrl(false)}
-                >
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '10px',
+                  justifyContent: 'center',
+                }}
+              >
+                <ConsaludCore.Button variant="secondary" onClick={() => setShowManualUrl(false)}>
                   Cerrar
                 </ConsaludCore.Button>
                 <ConsaludCore.Button
@@ -1294,4 +1498,3 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
 };
 
 export { CargaMandatosCard };
-

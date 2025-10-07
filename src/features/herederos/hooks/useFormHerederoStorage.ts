@@ -44,25 +44,28 @@ export const useFormHerederoStorage = (rut: string) => {
   }, [storageKey]);
 
   // Guardar datos en el session storage
-  const saveToStorage = useCallback((data: FormData) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const saveToStorage = useCallback(
+    (data: FormData) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      // Convertir FormData a FormHerederoData para el storage
-      const formHerederoData = FormDataTransformer.toFormHerederoData(data, rut);
-      sessionStorage.setItem(storageKey, JSON.stringify(formHerederoData));
+        // Convertir FormData a FormHerederoData para el storage
+        const formHerederoData = FormDataTransformer.toFormHerederoData(data, rut);
+        sessionStorage.setItem(storageKey, JSON.stringify(formHerederoData));
 
-      setFormData(data);
-      return true;
-    } catch (err) {
-      console.error('Error al guardar datos en el storage:', err);
-      setError('Error al guardar datos en el storage');
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [storageKey, rut]);
+        setFormData(data);
+        return true;
+      } catch (err) {
+        console.error('Error al guardar datos en el storage:', err);
+        setError('Error al guardar datos en el storage');
+        return false;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [storageKey, rut]
+  );
 
   // Limpiar datos del session storage
   const clearStorage = useCallback(() => {
@@ -154,6 +157,6 @@ export const useFormHerederoStorage = (rut: string) => {
     saveToStorage,
     clearStorage,
     getFormHerederoData,
-    migrateToNewStructure
+    migrateToNewStructure,
   };
 };

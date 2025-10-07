@@ -1,7 +1,8 @@
 @import './variables.css';
 
 /* Override de Bulma para layout completo */
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -22,64 +23,63 @@ html, body {
 
 /* Override específico para SecureLayout del core */
 .secure-layout {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .secure-layout .content-wrapper {
-    flex: 1;
-    min-height: calc(100vh - 60px - 80px); /* header + footer aproximado */
+  flex: 1;
+  min-height: calc(100vh - 60px - 80px); /* header + footer aproximado */
 }
 
 /* Asegurar que el footer esté al final - Sticky Footer Pattern */
 .footer,
-[class*="footer"],
-[class*="Footer"] {
-    margin-top: auto !important;
-    flex-shrink: 0 !important;
-    /* Asegurar que el footer tenga una altura mínima */
-    min-height: var(--app-footer-height, 80px) !important;
+[class*='footer'],
+[class*='Footer'] {
+  margin-top: auto !important;
+  flex-shrink: 0 !important;
+  /* Asegurar que el footer tenga una altura mínima */
+  min-height: var(--app-footer-height, 80px) !important;
 }
 
 /* Asegurar que el layout principal use flexbox correctamente */
 body {
-    display: flex !important;
-    flex-direction: column !important;
-    min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100vh !important;
 }
 
 /* Override para containers de páginas */
 .content-container {
-    min-height: calc(100vh - 200px) !important;
-    padding-bottom: 40px !important;
-    /* Asegurar que tome el espacio necesario */
-    flex: 1 0 auto !important;
+  min-height: calc(100vh - 200px) !important;
+  padding-bottom: 40px !important;
+  /* Asegurar que tome el espacio necesario */
+  flex: 1 0 auto !important;
 }
 
 /* Layout específico para SecureLayout con footer sticky */
 .secure-layout,
-[class*="SecureLayout"],
-[class*="secureLayout"] {
-    min-height: 100vh !important;
-    display: flex !important;
-    flex-direction: column !important;
+[class*='SecureLayout'],
+[class*='secureLayout'] {
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
-.secure-layout > *:not(.footer):not([class*="footer"]):not([class*="Footer"]),
-[class*="SecureLayout"] > *:not(.footer):not([class*="footer"]):not([class*="Footer"]),
-[class*="secureLayout"] > *:not(.footer):not([class*="footer"]):not([class*="Footer"]) {
-    flex: 1 0 auto;
+.secure-layout > *:not(.footer):not([class*='footer']):not([class*='Footer']),
+[class*='SecureLayout'] > *:not(.footer):not([class*='footer']):not([class*='Footer']),
+[class*='secureLayout'] > *:not(.footer):not([class*='footer']):not([class*='Footer']) {
+  flex: 1 0 auto;
 }
 
 /* Asegurar que el main content area sea flexible */
 main,
 .main-content,
-[role="main"] {
-    flex: 1 0 auto !important;
-    min-height: var(--app-main-content-min-height, calc(100vh - 140px)) !important;
+[role='main'] {
+  flex: 1 0 auto !important;
+  min-height: var(--app-main-content-min-height, calc(100vh - 140px)) !important;
 }
-
 
 /* Wrapper principal - SIMPLIFICADO para evitar parpadeos */
 .app-layout-wrapper,
@@ -128,16 +128,18 @@ main,
 
 /*Soporte específico para el HomePage del core */
 .homepage-container,
-[class*="homepage"] {
+[class*='homepage'] {
   /* Asegurar que el contenedor del HomePage no interfiera con las animaciones */
   transform: none !important;
   animation: none !important;
 }
 
 .homepage-container .app-card:not(.animate-fade-in-up),
-[class*="homepage"] .app-card:not(.animate-fade-in-up) {
+[class*='homepage'] .app-card:not(.animate-fade-in-up) {
   animation: unset !important;
-  transition: transform 0.2s ease, box-shadow 0.3s ease !important;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.3s ease !important;
 }
 
 .smooth-loading {
@@ -153,8 +155,8 @@ main,
 
 /* Container principal del login */
 .login-container,
-[class*="login"],
-[class*="Login"] {
+[class*='login'],
+[class*='Login'] {
   min-height: 100vh !important;
   background-color: var(--app-login-bg) !important;
   display: flex !important;
@@ -165,8 +167,8 @@ main,
 /* Card/Formulario del login */
 .login-card,
 .login-form,
-[class*="login"] .card,
-[class*="Login"] .card {
+[class*='login'] .card,
+[class*='Login'] .card {
   background-color: var(--app-login-card-bg) !important;
   border-radius: var(--app-border-radius) !important;
   box-shadow: var(--app-box-shadow) !important;
@@ -178,8 +180,8 @@ main,
 /* Botones del login */
 .login-card .button.is-primary,
 .login-form .button.is-primary,
-[class*="login"] .button.is-primary,
-[class*="Login"] .button.is-primary {
+[class*='login'] .button.is-primary,
+[class*='Login'] .button.is-primary {
   background-color: var(--app-primary-color) !important;
   border-color: var(--app-primary-color) !important;
   transition: all 0.3s ease !important;
@@ -187,8 +189,8 @@ main,
 
 .login-card .button.is-primary:hover,
 .login-form .button.is-primary:hover,
-[class*="login"] .button.is-primary:hover,
-[class*="Login"] .button.is-primary:hover {
+[class*='login'] .button.is-primary:hover,
+[class*='Login'] .button.is-primary:hover {
   background-color: var(--app-secondary-color) !important;
   border-color: var(--app-secondary-color) !important;
   transform: translateY(-1px) !important;
@@ -199,10 +201,10 @@ main,
 .login-card .textarea:focus,
 .login-form .input:focus,
 .login-form .textarea:focus,
-[class*="login"] .input:focus,
-[class*="login"] .textarea:focus,
-[class*="Login"] .input:focus,
-[class*="Login"] .textarea:focus {
+[class*='login'] .input:focus,
+[class*='login'] .textarea:focus,
+[class*='Login'] .input:focus,
+[class*='Login'] .textarea:focus {
   border-color: var(--app-primary-color) !important;
   box-shadow: 0 0 0 0.125em rgba(4, 165, 155, 0.25) !important;
 }
@@ -225,7 +227,9 @@ main,
   border-radius: var(--app-border-radius);
 }
 
-.input, .textarea, .select select {
+.input,
+.textarea,
+.select select {
   border-radius: var(--app-border-radius);
 }
 
@@ -234,7 +238,7 @@ main,
   .app-layout-wrapper {
     padding: 0;
   }
-  
+
   .content-container {
     padding: 10px;
   }
@@ -248,10 +252,9 @@ main,
   Este override debe estar en la app, NO en el core, para mantener el core desacoplado de frameworks externos.
   Si dejas de usar Bulma, puedes eliminar este bloque.
 */
-.breadcrumb li+li:before {
+.breadcrumb li + li:before {
   content: none !important;
 }
-
 
 main.sidebar-expanded {
   margin-left: 240px !important;

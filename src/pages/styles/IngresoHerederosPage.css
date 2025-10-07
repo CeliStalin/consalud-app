@@ -16,7 +16,9 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border-radius: 12px;
   border: 1px solid #e5e7eb;
   background: #ffffff;
@@ -63,7 +65,7 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #04A59B 0%, #059669 100%);
+  background: linear-gradient(135deg, #04a59b 0%, #059669 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -151,7 +153,7 @@
 }
 
 .nuevo-ingreso-btn {
-  background: linear-gradient(135deg, #04A59B 0%, #059669 100%);
+  background: linear-gradient(135deg, #04a59b 0%, #059669 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -189,7 +191,7 @@
 
 /* Regla específica para que solo "Inicio" tenga color púrpura */
 .breadcrumb-custom .breadcrumb-list-item:first-child .breadcrumb-item .breadcrumb-label {
-  color: #664EFB !important;
+  color: #664efb !important;
 }
 
 /* Regla específica para que los demás elementos mantengan color gris */
@@ -198,7 +200,7 @@
 }
 
 .breadcrumb-custom .breadcrumb-item:hover {
-  color: #04A59B;
+  color: #04a59b;
   background-color: #f0fdfc;
 }
 
@@ -230,14 +232,14 @@
 }
 
 .back-button:hover {
-  color: #04A59B;
+  color: #04a59b;
   text-decoration: underline;
   background: none !important;
   border: none !important;
 }
 
 .back-button:focus {
-  outline: 2px solid #04A59B;
+  outline: 2px solid #04a59b;
   outline-offset: 2px;
 }
 

@@ -1,8 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 interface TitularProviderProps {
-    children: ReactNode;
+  children: ReactNode;
 }
-export type {
-    TitularProviderProps
-}
+export type { TitularProviderProps };

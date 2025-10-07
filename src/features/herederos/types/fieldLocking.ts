@@ -6,10 +6,10 @@ export const LOCKED_FIELDS = {
   FECHA_NACIMIENTO: 'fechaNacimiento',
   NOMBRES: 'nombres',
   APELLIDO_PATERNO: 'apellidoPaterno',
-  APELLIDO_MATERNO: 'apellidoMaterno'
+  APELLIDO_MATERNO: 'apellidoMaterno',
 } as const;
 
-export type LockedFieldKey = typeof LOCKED_FIELDS[keyof typeof LOCKED_FIELDS];
+export type LockedFieldKey = (typeof LOCKED_FIELDS)[keyof typeof LOCKED_FIELDS];
 
 export interface FieldLockingConfig {
   enableLocking: boolean;

@@ -8,24 +8,28 @@ const CargaDocumentoPageContent: React.FC = () => {
   const navigate = useNavigate();
   const { step } = useStepper();
 
-  const breadcrumbItems = [
-    { label: 'Administración devolución herederos' }
-  ];
+  const breadcrumbItems = [{ label: 'Administración devolución herederos' }];
   const cleanedBreadcrumbItems = breadcrumbItems.map(item => ({
     ...item,
-    label: typeof item.label === 'string' ? item.label.replace(/^\/+/,'') : item.label
+    label: typeof item.label === 'string' ? item.label.replace(/^\/+/, '') : item.label,
   }));
 
   return (
-    <div className="carga-documentos-page-container" style={{
-      width: '100%',
-      maxWidth: '100%'
-    }}>
-      {/* Header Section: Breadcrumb y botón volver */}
-      <div className="carga-documentos-header" style={{
+    <div
+      className="carga-documentos-page-container"
+      style={{
         width: '100%',
-        marginBottom: '1.5rem'
-      }}>
+        maxWidth: '100%',
+      }}
+    >
+      {/* Header Section: Breadcrumb y botón volver */}
+      <div
+        className="carga-documentos-header"
+        style={{
+          width: '100%',
+          marginBottom: '1.5rem',
+        }}
+      >
         <div style={{ marginLeft: '3rem' }}>
           {/* Breadcrumb */}
           <div style={{ marginBottom: '0.5rem' }}>
@@ -48,7 +52,14 @@ const CargaDocumentoPageContent: React.FC = () => {
           </div>
 
           {/* Título arriba del stepper */}
-          <div className="mb-1" style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
+          <div
+            className="mb-1"
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: '1.5rem',
+            }}
+          >
             <ConsaludCore.Typography
               variant="h5"
               component="h1"
@@ -57,7 +68,7 @@ const CargaDocumentoPageContent: React.FC = () => {
                 textAlign: 'center',
                 color: '#222',
                 fontSize: '2rem',
-                marginBottom: '1.5rem'
+                marginBottom: '1.5rem',
               }}
             >
               Carga de documentos
@@ -89,12 +100,15 @@ const CargaDocumentoPageContent: React.FC = () => {
 const CargaDocumentoPage: React.FC = () => {
   return (
     <StepperProvider>
-      <div className="route-container layout-stable instant-stable navigation-stable no-flash" style={{
-        overflowY: 'auto',
-        backgroundColor: '#F8F9FA',
-        padding: '0',
-        height: '100vh'
-      }}>
+      <div
+        className="route-container layout-stable instant-stable navigation-stable no-flash"
+        style={{
+          overflowY: 'auto',
+          backgroundColor: '#F8F9FA',
+          padding: '0',
+          height: '100vh',
+        }}
+      >
         <div style={{ minHeight: '120vh', paddingBottom: '4rem' }}>
           <CargaDocumentoPageContent />
         </div>

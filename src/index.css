@@ -9,7 +9,7 @@ body {
 }
 
 main {
-  background-color: #F8F8FA !important;
+  background-color: #f8f8fa !important;
   flex: 1 0 auto !important;
   min-height: calc(100vh - 140px) !important;
 }

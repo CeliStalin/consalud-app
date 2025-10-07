@@ -14,6 +14,4 @@ interface FormHerederoContextType {
   forceSyncFromStorage: () => void;
 }
 
-export type {
-  FormHerederoContextType
-} 
+export type { FormHerederoContextType };

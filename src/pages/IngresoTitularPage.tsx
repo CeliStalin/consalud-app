@@ -5,9 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const IngresoTitularPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const breadcrumbItems = [
-    { label: 'Administración devolución herederos' }
-  ];
+  const breadcrumbItems = [{ label: 'Administración devolución herederos' }];
 
   return (
     <>

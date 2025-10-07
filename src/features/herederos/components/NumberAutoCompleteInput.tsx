@@ -30,7 +30,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
   error = false,
   disabled = false,
   minCharsToSearch = 1,
-  debounceMs = 200
+  debounceMs = 200,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -40,10 +40,17 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Hook para autocompletado de números
-  const { numeros, loading, error: apiError, searchNumeros, clearNumeros, resetState } = useNumerosCalleAutocomplete({
+  const {
+    numeros,
+    loading,
+    error: apiError,
+    searchNumeros,
+    clearNumeros,
+    resetState,
+  } = useNumerosCalleAutocomplete({
     nombreCalle,
     idComuna,
-    hasExistingValue: Boolean(value && value.length > 0) // Evitar llamadas si ya hay un valor
+    hasExistingValue: Boolean(value && value.length > 0), // Evitar llamadas si ya hay un valor
   });
 
   // Actualizar inputValue cuando cambia el value prop
@@ -118,8 +125,8 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
     const syntheticEvent = {
       target: {
         name,
-        value: numero.numeroCalle.toString()
-      }
+        value: numero.numeroCalle.toString(),
+      },
     } as React.ChangeEvent<HTMLInputElement>;
 
     onChange(syntheticEvent);
@@ -136,15 +143,11 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlightedIndex(prev =>
-          prev < numeros.length - 1 ? prev + 1 : 0
-        );
+        setHighlightedIndex(prev => (prev < numeros.length - 1 ? prev + 1 : 0));
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setHighlightedIndex(prev =>
-          prev > 0 ? prev - 1 : numeros.length - 1
-        );
+        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : numeros.length - 1));
         break;
       case 'Enter':
         e.preventDefault();
@@ -199,9 +202,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
 
   return (
     <div className="autocomplete-container" ref={dropdownRef}>
-      {label && (
-        <label className="label">{label}</label>
-      )}
+      {label && <label className="label">{label}</label>}
 
       <div className="field">
         <div className={`control has-icons-right ${loading ? 'is-loading' : ''}`}>
@@ -215,7 +216,13 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
             onKeyDown={handleKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlur}
-            placeholder={!idComuna ? 'Seleccione comuna primero' : !nombreCalle ? 'Seleccione calle primero' : placeholder}
+            placeholder={
+              !idComuna
+                ? 'Seleccione comuna primero'
+                : !nombreCalle
+                  ? 'Seleccione calle primero'
+                  : placeholder
+            }
             disabled={isDisabled}
             autoComplete="off"
             aria-autocomplete="list"
@@ -261,9 +268,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
       )}
 
       {/* Mostrar error de API si existe */}
-      {apiError && (
-        <p className="help is-danger">{apiError}</p>
-      )}
+      {apiError && <p className="help is-danger">{apiError}</p>}
     </div>
   );
 };

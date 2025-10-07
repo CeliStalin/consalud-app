@@ -74,7 +74,7 @@
 }
 
 .success-button {
-  background-color: #04A59B;
+  background-color: #04a59b;
   color: white;
   border: none;
   border-radius: 8px;
@@ -89,7 +89,7 @@
 }
 
 .success-button:hover {
-  background-color: #038C84;
+  background-color: #038c84;
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(4, 165, 155, 0.3);
 }

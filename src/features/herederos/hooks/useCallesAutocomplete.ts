@@ -14,7 +14,7 @@ interface UseCallesAutocompleteReturn {
 }
 
 export const useCallesAutocomplete = ({
-  idComuna
+  idComuna,
 }: UseCallesAutocompleteProps): UseCallesAutocompleteReturn => {
   const [calles, setCalles] = useState<Calle[]>([]);
   const [allCalles, setAllCalles] = useState<Calle[]>([]);
@@ -51,18 +51,21 @@ export const useCallesAutocomplete = ({
   }, [idComuna]);
 
   // Función para buscar calles
-  const searchCalles = useCallback((searchTerm: string) => {
-    if (!searchTerm || searchTerm.length < 2) {
-      setCalles([]);
-      return;
-    }
+  const searchCalles = useCallback(
+    (searchTerm: string) => {
+      if (!searchTerm || searchTerm.length < 2) {
+        setCalles([]);
+        return;
+      }
 
-    const filteredCalles = allCalles.filter(calle =>
-      calle.nombreCalle.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    
-    setCalles(filteredCalles);
-  }, [allCalles]);
+      const filteredCalles = allCalles.filter(calle =>
+        calle.nombreCalle.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      setCalles(filteredCalles);
+    },
+    [allCalles]
+  );
 
   // Función para limpiar las calles
   const clearCalles = useCallback(() => {
@@ -75,6 +78,6 @@ export const useCallesAutocomplete = ({
     loading,
     error,
     searchCalles,
-    clearCalles
+    clearCalles,
   };
-}; 
+};

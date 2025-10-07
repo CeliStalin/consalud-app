@@ -77,5 +77,10 @@ interface SolicitudPostRequest {
   fechaEstadoRegistro: string;
 }
 
-export type { MejorContactibilidadSolicitante, SolicitanteInMae, SolicitantePostRequest, SolicitanteResponse, SolicitudPostRequest };
-
+export type {
+  MejorContactibilidadSolicitante,
+  SolicitanteInMae,
+  SolicitantePostRequest,
+  SolicitanteResponse,
+  SolicitudPostRequest,
+};

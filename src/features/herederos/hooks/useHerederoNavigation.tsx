@@ -14,14 +14,14 @@ export const HEREDEROS_ROUTES = {
   FORM_INGRESO: '/mnherederos/ingresoher/formingreso',
   CARGA_DOCUMENTOS: '/mnherederos/ingresoher/cargadoc',
   DETALLE_MANDATO: '/mnherederos/ingresoher/detallemandato',
-  SUCCESS: '/mnherederos/ingresoher/success'
+  SUCCESS: '/mnherederos/ingresoher/success',
 } as const;
 
 export const HEREDEROS_STEPS = {
   TITULAR: 1,
   HEREDERO: 2,
   DOCUMENTOS: 3,
-  CUENTA_BANCARIA: 4
+  CUENTA_BANCARIA: 4,
 } as const;
 
 export interface HerederoNavigationOptions {
@@ -36,89 +36,131 @@ export const useHerederoNavigation = () => {
   const navigate = useNavigate();
 
   // Navegación simplificada - el Core se encarga de las transiciones automáticamente
-  const navigateToStep = useCallback((route: string, options?: HerederoNavigationOptions) => {
-    const { replace = false, state } = options || {};
+  const navigateToStep = useCallback(
+    (route: string, options?: HerederoNavigationOptions) => {
+      const { replace = false, state } = options || {};
 
-    // Navegación directa y simple - el PageTransition del Core maneja todo
-    if (replace) {
-      navigate(route, { replace: true, state });
-    } else {
-      navigate(route, { state });
-    }
-  }, [navigate]);
+      // Navegación directa y simple - el PageTransition del Core maneja todo
+      if (replace) {
+        navigate(route, { replace: true, state });
+      } else {
+        navigate(route, { state });
+      }
+    },
+    [navigate]
+  );
 
   // Métodos específicos simplificados - sin configuraciones complejas
-  const startProcess = useCallback((options?: HerederoNavigationOptions) => {
-    navigateToStep(HEREDEROS_ROUTES.INICIO_PROCESO, options);
-  }, [navigateToStep]);
+  const startProcess = useCallback(
+    (options?: HerederoNavigationOptions) => {
+      navigateToStep(HEREDEROS_ROUTES.INICIO_PROCESO, options);
+    },
+    [navigateToStep]
+  );
 
-  const goToIngresoTitular = useCallback((options?: HerederoNavigationOptions) => {
-    navigateToStep(HEREDEROS_ROUTES.INGRESO_TITULAR, options);
-  }, [navigateToStep]);
+  const goToIngresoTitular = useCallback(
+    (options?: HerederoNavigationOptions) => {
+      navigateToStep(HEREDEROS_ROUTES.INGRESO_TITULAR, options);
+    },
+    [navigateToStep]
+  );
 
-  const goToRequisitosTitular = useCallback((options?: HerederoNavigationOptions) => {
-    navigateToStep(HEREDEROS_ROUTES.REQUISITOS_TITULAR, options);
-  }, [navigateToStep]);
+  const goToRequisitosTitular = useCallback(
+    (options?: HerederoNavigationOptions) => {
+      navigateToStep(HEREDEROS_ROUTES.REQUISITOS_TITULAR, options);
+    },
+    [navigateToStep]
+  );
 
-  const goToDatosTitular = useCallback((options?: HerederoNavigationOptions) => {
-    navigateToStep(HEREDEROS_ROUTES.DATOS_TITULAR, options);
-  }, [navigateToStep]);
+  const goToDatosTitular = useCallback(
+    (options?: HerederoNavigationOptions) => {
+      navigateToStep(HEREDEROS_ROUTES.DATOS_TITULAR, options);
+    },
+    [navigateToStep]
+  );
 
-  const goToRegistroTitular = useCallback((options?: HerederoNavigationOptions) => {
-    navigateToStep(HEREDEROS_ROUTES.REGISTRO_TITULAR, options);
-  }, [navigateToStep]);
+  const goToRegistroTitular = useCallback(
+    (options?: HerederoNavigationOptions) => {
+      navigateToStep(HEREDEROS_ROUTES.REGISTRO_TITULAR, options);
+    },
+    [navigateToStep]
+  );
 
   // Nueva función para volver al formulario limpio
-  const goToRegistroTitularClean = useCallback((options?: HerederoNavigationOptions) => {
-    // Usar replace para evitar entradas duplicadas en el historial
-    navigateToStep(HEREDEROS_ROUTES.REGISTRO_TITULAR, {
-      replace: true,
-      ...options
-    });
-  }, [navigateToStep]);
+  const goToRegistroTitularClean = useCallback(
+    (options?: HerederoNavigationOptions) => {
+      // Usar replace para evitar entradas duplicadas en el historial
+      navigateToStep(HEREDEROS_ROUTES.REGISTRO_TITULAR, {
+        replace: true,
+        ...options,
+      });
+    },
+    [navigateToStep]
+  );
 
-  const goToRegistroHeredero = useCallback((options?: HerederoNavigationOptions) => {
-    navigateToStep(HEREDEROS_ROUTES.REGISTRO_HEREDERO, options);
-  }, [navigateToStep]);
+  const goToRegistroHeredero = useCallback(
+    (options?: HerederoNavigationOptions) => {
+      navigateToStep(HEREDEROS_ROUTES.REGISTRO_HEREDERO, options);
+    },
+    [navigateToStep]
+  );
 
-  const goToFormIngreso = useCallback((options?: HerederoNavigationOptions) => {
-    navigateToStep(HEREDEROS_ROUTES.FORM_INGRESO, options);
-  }, [navigateToStep]);
+  const goToFormIngreso = useCallback(
+    (options?: HerederoNavigationOptions) => {
+      navigateToStep(HEREDEROS_ROUTES.FORM_INGRESO, options);
+    },
+    [navigateToStep]
+  );
 
-  const goToCargaDocumentos = useCallback((options?: HerederoNavigationOptions) => {
-    navigateToStep(HEREDEROS_ROUTES.CARGA_DOCUMENTOS, options);
-  }, [navigateToStep]);
+  const goToCargaDocumentos = useCallback(
+    (options?: HerederoNavigationOptions) => {
+      navigateToStep(HEREDEROS_ROUTES.CARGA_DOCUMENTOS, options);
+    },
+    [navigateToStep]
+  );
 
-  const goToDetalleMandato = useCallback((options?: HerederoNavigationOptions) => {
-    navigateToStep(HEREDEROS_ROUTES.DETALLE_MANDATO, options);
-  }, [navigateToStep]);
+  const goToDetalleMandato = useCallback(
+    (options?: HerederoNavigationOptions) => {
+      navigateToStep(HEREDEROS_ROUTES.DETALLE_MANDATO, options);
+    },
+    [navigateToStep]
+  );
 
-  const goToSuccess = useCallback((options?: HerederoNavigationOptions) => {
-    navigateToStep(HEREDEROS_ROUTES.SUCCESS, options);
-  }, [navigateToStep]);
+  const goToSuccess = useCallback(
+    (options?: HerederoNavigationOptions) => {
+      navigateToStep(HEREDEROS_ROUTES.SUCCESS, options);
+    },
+    [navigateToStep]
+  );
 
-  const goToHome = useCallback((options?: HerederoNavigationOptions) => {
-    navigateToStep(HEREDEROS_ROUTES.HOME, options);
-  }, [navigateToStep]);
+  const goToHome = useCallback(
+    (options?: HerederoNavigationOptions) => {
+      navigateToStep(HEREDEROS_ROUTES.HOME, options);
+    },
+    [navigateToStep]
+  );
 
-  const goToStepNumber = useCallback((stepNumber: number, options?: HerederoNavigationOptions) => {
-    switch (stepNumber) {
-      case HEREDEROS_STEPS.TITULAR:
-        goToIngresoTitular(options);
-        break;
-      case HEREDEROS_STEPS.HEREDERO:
-        goToRegistroHeredero(options);
-        break;
-      case HEREDEROS_STEPS.DOCUMENTOS:
-        goToCargaDocumentos(options);
-        break;
-      case HEREDEROS_STEPS.CUENTA_BANCARIA:
-        goToDetalleMandato(options);
-        break;
-      default:
-        console.warn(`Paso no reconocido: ${stepNumber}`);
-    }
-  }, [goToIngresoTitular, goToRegistroHeredero, goToCargaDocumentos, goToDetalleMandato]);
+  const goToStepNumber = useCallback(
+    (stepNumber: number, options?: HerederoNavigationOptions) => {
+      switch (stepNumber) {
+        case HEREDEROS_STEPS.TITULAR:
+          goToIngresoTitular(options);
+          break;
+        case HEREDEROS_STEPS.HEREDERO:
+          goToRegistroHeredero(options);
+          break;
+        case HEREDEROS_STEPS.DOCUMENTOS:
+          goToCargaDocumentos(options);
+          break;
+        case HEREDEROS_STEPS.CUENTA_BANCARIA:
+          goToDetalleMandato(options);
+          break;
+        default:
+          console.warn(`Paso no reconocido: ${stepNumber}`);
+      }
+    },
+    [goToIngresoTitular, goToRegistroHeredero, goToCargaDocumentos, goToDetalleMandato]
+  );
 
   const goBack = useCallback(() => {
     navigate(-1);
@@ -144,6 +186,6 @@ export const useHerederoNavigation = () => {
     goToSuccess,
     goToStepNumber,
     goBack,
-    navigateToStep
+    navigateToStep,
   };
 };

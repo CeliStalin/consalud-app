@@ -1,9 +1,9 @@
 import {
-    AuthProvider,
-    ErrorBoundary,
-    MenuCollapseProvider,
-    MenuConfigProvider,
-    Typography
+  AuthProvider,
+  ErrorBoundary,
+  MenuCollapseProvider,
+  MenuConfigProvider,
+  Typography,
 } from '@consalud/core';
 import { useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -18,7 +18,16 @@ const logo = '/Logo.png';
 const ErrorFallback = () => {
   if (!Typography) {
     return (
-      <div style={{ padding: '20px', textAlign: 'center', color: '#D8000C', backgroundColor: '#FFD2D2', border: '1px solid #D8000C', borderRadius: '4px' }}>
+      <div
+        style={{
+          padding: '20px',
+          textAlign: 'center',
+          color: '#D8000C',
+          backgroundColor: '#FFD2D2',
+          border: '1px solid #D8000C',
+          borderRadius: '4px',
+        }}
+      >
         <h2 style={{ fontSize: '1.5em', marginBottom: '10px' }}>Error Crítico</h2>
         <p>Algunos componentes esenciales no pudieron cargarse.</p>
         <p style={{ marginTop: '10px' }}>Intente recargar la página.</p>
@@ -32,7 +41,7 @@ const ErrorFallback = () => {
             borderRadius: '4px',
             cursor: 'pointer',
             marginTop: '20px',
-            fontSize: '1em'
+            fontSize: '1em',
           }}
         >
           Recargar página
@@ -52,14 +61,18 @@ const App = () => {
     <>
       <ErrorBoundary fallback={<ErrorFallback />}>
         <AuthProvider>
-          <MenuConfigProvider config={{
-            enableDynamicMenu: true,
-            enableBounceEffects: true
-          }}>
-            <Router future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true
-            }}>
+          <MenuConfigProvider
+            config={{
+              enableDynamicMenu: true,
+              enableBounceEffects: true,
+            }}
+          >
+            <Router
+              future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+              }}
+            >
               <MenuCollapseProvider>
                 <AppRoutes logo={logo} />
               </MenuCollapseProvider>

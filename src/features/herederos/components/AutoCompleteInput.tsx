@@ -34,7 +34,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   disabled = false,
   loading = false,
   minCharsToSearch = 2,
-  debounceMs = 300
+  debounceMs = 300,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [filteredOptions, setFilteredOptions] = useState<AutoCompleteOption[]>([]);
@@ -50,17 +50,20 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   }, [value]);
 
   // Filtrar opciones basado en el texto ingresado
-  const filterOptions = useCallback((searchText: string) => {
-    if (searchText.length < minCharsToSearch) {
-      setFilteredOptions([]);
-      return;
-    }
+  const filterOptions = useCallback(
+    (searchText: string) => {
+      if (searchText.length < minCharsToSearch) {
+        setFilteredOptions([]);
+        return;
+      }
 
-    const filtered = options.filter(option =>
-      option.label.toLowerCase().includes(searchText.toLowerCase())
-    );
-    setFilteredOptions(filtered);
-  }, [options, minCharsToSearch]);
+      const filtered = options.filter(option =>
+        option.label.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredOptions(filtered);
+    },
+    [options, minCharsToSearch]
+  );
 
   // Debounce para la búsqueda
   useEffect(() => {
@@ -85,7 +88,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     setInputValue(newValue);
     setIsOpen(true);
     setHighlightedIndex(-1);
-    
+
     // Llamar al onChange del padre
     onChange(e);
   };
@@ -95,17 +98,17 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     setInputValue(option.label);
     setIsOpen(false);
     setHighlightedIndex(-1);
-    
+
     // Crear un evento sintético para el onChange
     const syntheticEvent = {
       target: {
         name,
-        value: option.label
-      }
+        value: option.label,
+      },
     } as React.ChangeEvent<HTMLInputElement>;
-    
+
     onChange(syntheticEvent);
-    
+
     if (onOptionSelect) {
       onOptionSelect(option);
     }
@@ -118,15 +121,11 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlightedIndex(prev => 
-          prev < filteredOptions.length - 1 ? prev + 1 : 0
-        );
+        setHighlightedIndex(prev => (prev < filteredOptions.length - 1 ? prev + 1 : 0));
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setHighlightedIndex(prev => 
-          prev > 0 ? prev - 1 : filteredOptions.length - 1
-        );
+        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : filteredOptions.length - 1));
         break;
       case 'Enter':
         e.preventDefault();
@@ -146,9 +145,9 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        dropdownRef.current && 
+        dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node) &&
-        inputRef.current && 
+        inputRef.current &&
         !inputRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
@@ -178,10 +177,8 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
 
   return (
     <div className="autocomplete-container" ref={dropdownRef}>
-      {label && (
-        <label className="label">{label}</label>
-      )}
-      
+      {label && <label className="label">{label}</label>}
+
       <div className="field">
         <div className={`control has-icons-right ${loading ? 'is-loading' : ''}`}>
           <input
@@ -202,7 +199,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
             aria-haspopup="listbox"
             role="combobox"
           />
-          
+
           {loading && (
             <span className="icon is-small is-right">
               <i className="fas fa-spinner fa-spin"></i>
@@ -231,13 +228,16 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
       )}
 
       {/* Mensaje cuando no hay resultados */}
-      {isOpen && inputValue.length >= minCharsToSearch && filteredOptions.length === 0 && !loading && (
-        <div className="autocomplete-dropdown">
-          <div className="autocomplete-no-results">
-            <p className="has-text-grey">No se encontraron resultados</p>
+      {isOpen &&
+        inputValue.length >= minCharsToSearch &&
+        filteredOptions.length === 0 &&
+        !loading && (
+          <div className="autocomplete-dropdown">
+            <div className="autocomplete-no-results">
+              <p className="has-text-grey">No se encontraron resultados</p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
-}; 
+};

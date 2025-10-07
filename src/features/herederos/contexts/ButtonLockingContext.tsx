@@ -1,4 +1,11 @@
-import React, { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 export interface ButtonLockingContextType {
   // Estados
@@ -35,19 +42,24 @@ export const ButtonLockingProvider: React.FC<ButtonLockingProviderProps> = ({ ch
   /**
    * Bloquea los botones con una razón específica
    */
-  const lockButtons = useCallback((reason: string) => {
-    setIsLocked(true);
-    setLockReason(reason);
-    setLockTimestamp(Date.now());
+  const lockButtons = useCallback(
+    (reason: string) => {
+      setIsLocked(true);
+      setLockReason(reason);
+      setLockTimestamp(Date.now());
 
-    // Agregar clase CSS al body para indicar que la interfaz está bloqueada
-    document.body.classList.add('buttons-locked');
+      // Agregar clase CSS al body para indicar que la interfaz está bloqueada
+      document.body.classList.add('buttons-locked');
 
-    // Emitir evento personalizado para notificar a otros componentes
-    window.dispatchEvent(new CustomEvent('buttons-locked', {
-      detail: { reason, timestamp: Date.now() }
-    }));
-  }, [isLocked, lockReason]);
+      // Emitir evento personalizado para notificar a otros componentes
+      window.dispatchEvent(
+        new CustomEvent('buttons-locked', {
+          detail: { reason, timestamp: Date.now() },
+        })
+      );
+    },
+    [isLocked, lockReason]
+  );
 
   /**
    * Desbloquea los botones
@@ -61,28 +73,36 @@ export const ButtonLockingProvider: React.FC<ButtonLockingProviderProps> = ({ ch
     document.body.classList.remove('buttons-locked');
 
     // Emitir evento personalizado para notificar a otros componentes
-    window.dispatchEvent(new CustomEvent('buttons-unlocked', {
-      detail: { timestamp: Date.now() }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('buttons-unlocked', {
+        detail: { timestamp: Date.now() },
+      })
+    );
   }, [isLocked, lockReason]);
 
   /**
    * Alterna el estado de bloqueo
    */
-  const toggleLock = useCallback((reason?: string) => {
-    if (isLocked) {
-      unlockButtons();
-    } else {
-      lockButtons(reason || 'Operación en progreso');
-    }
-  }, [isLocked, lockButtons, unlockButtons]);
+  const toggleLock = useCallback(
+    (reason?: string) => {
+      if (isLocked) {
+        unlockButtons();
+      } else {
+        lockButtons(reason || 'Operación en progreso');
+      }
+    },
+    [isLocked, lockButtons, unlockButtons]
+  );
 
   /**
    * Verifica si los botones están bloqueados por una razón específica
    */
-  const isLockedByReason = useCallback((reason: string): boolean => {
-    return isLocked && lockReason === reason;
-  }, [isLocked, lockReason]);
+  const isLockedByReason = useCallback(
+    (reason: string): boolean => {
+      return isLocked && lockReason === reason;
+    },
+    [isLocked, lockReason]
+  );
 
   /**
    * Obtiene la duración del bloqueo en milisegundos
@@ -155,14 +175,10 @@ export const ButtonLockingProvider: React.FC<ButtonLockingProviderProps> = ({ ch
 
     // Utilidades
     isLockedByReason,
-    getLockDuration
+    getLockDuration,
   };
 
-  return (
-    <ButtonLockingContext.Provider value={value}>
-      {children}
-    </ButtonLockingContext.Provider>
-  );
+  return <ButtonLockingContext.Provider value={value}>{children}</ButtonLockingContext.Provider>;
 };
 
 /**

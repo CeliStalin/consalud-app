@@ -269,7 +269,9 @@
 
 /* Efectos de hover predefinidos - optimizados */
 .hover-lift {
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
 }
 
 .hover-lift:hover {
@@ -360,21 +362,22 @@
 }
 
 /* Asegurar que los elementos del HomePage del core tengan las propiedades correctas */
-[class*="homepage-container"] .app-card,
-[class*="applications-section"] .app-card {
+[class*='homepage-container'] .app-card,
+[class*='applications-section'] .app-card {
   transform-origin: center center;
   backface-visibility: hidden;
   perspective: 1000px;
 }
 
 /* Soporte para el sistema de bounce del core */
-.app-card[data-bounce="enabled"] {
+.app-card[data-bounce='enabled'] {
   cursor: pointer;
-  transition: transform var(--bounce-duration, 0.2s) var(--bounce-easing, cubic-bezier(0.34, 1.56, 0.64, 1));
+  transition: transform var(--bounce-duration, 0.2s)
+    var(--bounce-easing, cubic-bezier(0.34, 1.56, 0.64, 1));
 }
 
-.app-card[data-bounce="enabled"]:active,
-.app-card[data-bounce="enabled"].bounce-active {
+.app-card[data-bounce='enabled']:active,
+.app-card[data-bounce='enabled'].bounce-active {
   animation: coreBounceClick 0.3s ease-out;
 }
 

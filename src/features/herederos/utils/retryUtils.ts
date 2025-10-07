@@ -15,7 +15,7 @@ export const DEFAULT_RETRY_CONFIG: RetryConfig = {
   baseDelay: 1000, // 1 segundo
   maxDelay: 10000, // 10 segundos
   backoffMultiplier: 2,
-  retryableStatusCodes: [408, 429, 500, 502, 503, 504] // Timeout, Too Many Requests, Server Errors
+  retryableStatusCodes: [408, 429, 500, 502, 503, 504], // Timeout, Too Many Requests, Server Errors
 };
 
 /**
@@ -87,21 +87,20 @@ export const RETRY_CONFIGS = {
   CRITICAL: {
     ...DEFAULT_RETRY_CONFIG,
     maxRetries: 3,
-    baseDelay: 1000
+    baseDelay: 1000,
   },
 
   // Para operaciones de documentos (más tolerante a fallos)
   DOCUMENTS: {
     ...DEFAULT_RETRY_CONFIG,
     maxRetries: 2,
-    baseDelay: 2000
+    baseDelay: 2000,
   },
 
   // Para operaciones rápidas
   FAST: {
     ...DEFAULT_RETRY_CONFIG,
     maxRetries: 2,
-    baseDelay: 500
-  }
+    baseDelay: 500,
+  },
 } as const;
-

@@ -128,7 +128,6 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
           sessionStorage.removeItem(key);
         }
       });
-
     } catch (error) {
       console.error('Error al limpiar datos en navegación hacia atrás:', error);
     }
@@ -137,7 +136,6 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
   // Limpiar todos los documentos del sessionStorage
   const cleanupAllDocuments = useCallback(() => {
     try {
-
       // Limpiar todas las claves que empiecen con 'documentos_'
       Object.keys(sessionStorage).forEach(key => {
         if (key.startsWith('documentos_')) {
@@ -183,7 +181,6 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
           sessionStorage.removeItem(key);
         }
       });
-
     } catch (error) {
       console.error('Error al limpiar todos los documentos:', error);
     }
@@ -195,6 +192,6 @@ export const useStorageCleanup = (): UseStorageCleanupReturn => {
     migrateOldKeys,
     cleanupDocumentsByRut,
     cleanupOnBackNavigation,
-    cleanupAllDocuments
+    cleanupAllDocuments,
   };
 };

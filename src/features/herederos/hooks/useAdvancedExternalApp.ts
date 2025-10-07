@@ -1,33 +1,34 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-    advancedExternalAppManager,
-    ExternalAppCallbacks,
-    ExternalAppState,
-    WindowStatus
+  advancedExternalAppManager,
+  ExternalAppCallbacks,
+  ExternalAppState,
+  WindowStatus,
 } from '../services/advancedExternalAppManager';
 
 export const useAdvancedExternalApp = () => {
-  const [appState, setAppState] = useState<ExternalAppState>(
-    advancedExternalAppManager.getState()
-  );
+  const [appState, setAppState] = useState<ExternalAppState>(advancedExternalAppManager.getState());
   const [isLoading, setIsLoading] = useState(false);
 
   /**
    * Abre una aplicación externa
    */
-  const openExternalApp = useCallback(async (url: string, windowFeatures?: string): Promise<string> => {
-    setIsLoading(true);
+  const openExternalApp = useCallback(
+    async (url: string, windowFeatures?: string): Promise<string> => {
+      setIsLoading(true);
 
-    try {
-      const tabId = await advancedExternalAppManager.openExternalApp(url, windowFeatures);
-      return tabId;
-    } catch (error) {
-      console.error('❌ [useAdvancedExternalApp] Error al abrir aplicación externa:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+      try {
+        const tabId = await advancedExternalAppManager.openExternalApp(url, windowFeatures);
+        return tabId;
+      } catch (error) {
+        console.error('❌ [useAdvancedExternalApp] Error al abrir aplicación externa:', error);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   /**
    * Cierra la aplicación externa
@@ -55,22 +56,19 @@ export const useAdvancedExternalApp = () => {
    */
   useEffect(() => {
     const callbacks: ExternalAppCallbacks = {
-      onOpened: (state) => {
-
+      onOpened: state => {
         setAppState(state);
       },
-      onClosed: (state) => {
-
+      onClosed: state => {
         setAppState(state);
       },
-      onError: (error) => {
+      onError: error => {
         console.error('🌉 [useAdvancedExternalApp] Error:', error);
         setAppState(prev => ({ ...prev, error, status: 'error' }));
       },
-      onStatusChange: (status) => {
-
+      onStatusChange: status => {
         setAppState(prev => ({ ...prev, status }));
-      }
+      },
     };
 
     advancedExternalAppManager.setCallbacks(callbacks);
@@ -92,11 +90,10 @@ export const useAdvancedExternalApp = () => {
       if (!document.hidden && appState.status === 'open') {
         // Cuando vuelves a la pestaña principal, verificar si la ventana sigue abierta
         if (!advancedExternalAppManager.isWindowOpen()) {
-
           setAppState(prev => ({
             ...prev,
             status: 'closed',
-            closedAt: new Date()
+            closedAt: new Date(),
           }));
         }
       }
@@ -132,6 +129,6 @@ export const useAdvancedExternalApp = () => {
     getStatusColor,
 
     // Utilidades
-    getState: () => advancedExternalAppManager.getState()
+    getState: () => advancedExternalAppManager.getState(),
   };
 };

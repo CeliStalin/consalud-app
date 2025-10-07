@@ -2,7 +2,10 @@ import { Stepper, StepperProvider, useStepper } from '@/features/herederos/compo
 import * as ConsaludCore from '@consalud/core';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { MandatoResult, mockMandatoService } from '../features/herederos/services/mockMandatoService';
+import {
+  MandatoResult,
+  mockMandatoService,
+} from '../features/herederos/services/mockMandatoService';
 import './styles/DetalleMandatoPage.css';
 
 const DetalleMandatoPageContent: React.FC = () => {
@@ -24,8 +27,12 @@ const DetalleMandatoPageContent: React.FC = () => {
       setLoading(true);
       try {
         // Intentar obtener datos del estado de navegación
-        const stateData = location.state as { rutCliente?: string, mandatoId?: string } | null;        // Si no hay datos en el estado, buscar en localStorage
-        const rutCliente = stateData?.rutCliente || localStorage.getItem('currentRutCliente') || '17175966';
+        const stateData = location.state as {
+          rutCliente?: string;
+          mandatoId?: string;
+        } | null; // Si no hay datos en el estado, buscar en localStorage
+        const rutCliente =
+          stateData?.rutCliente || localStorage.getItem('currentRutCliente') || '17175966';
         const mandatoId = stateData?.mandatoId || localStorage.getItem('currentMandatoId') || '';
 
         // Llamar al servicio
@@ -49,24 +56,28 @@ const DetalleMandatoPageContent: React.FC = () => {
     navigate('/mnherederos/ingresoher/success');
   };
 
-  const breadcrumbItems = [
-    { label: 'Administración devolución herederos' }
-  ];
+  const breadcrumbItems = [{ label: 'Administración devolución herederos' }];
   const cleanedBreadcrumbItems = breadcrumbItems.map(item => ({
     ...item,
-    label: typeof item.label === 'string' ? item.label.replace(/^\/+/,'') : item.label
+    label: typeof item.label === 'string' ? item.label.replace(/^\/+/, '') : item.label,
   }));
 
   return (
-    <div className="detalle-mandato-page-container" style={{
-      width: '100%',
-      maxWidth: '100%'
-    }}>
-      {/* Header Section: Breadcrumb y botón volver */}
-      <div className="detalle-mandato-header" style={{
+    <div
+      className="detalle-mandato-page-container"
+      style={{
         width: '100%',
-        marginBottom: '1.5rem'
-      }}>
+        maxWidth: '100%',
+      }}
+    >
+      {/* Header Section: Breadcrumb y botón volver */}
+      <div
+        className="detalle-mandato-header"
+        style={{
+          width: '100%',
+          marginBottom: '1.5rem',
+        }}
+      >
         <div style={{ marginLeft: '3rem' }}>
           {/* Breadcrumb */}
           <div style={{ marginBottom: '0.5rem' }}>
@@ -89,7 +100,14 @@ const DetalleMandatoPageContent: React.FC = () => {
           </div>
 
           {/* Título arriba del stepper */}
-          <div className="mb-1" style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
+          <div
+            className="mb-1"
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: '1.5rem',
+            }}
+          >
             <ConsaludCore.Typography
               variant="h5"
               component="h1"
@@ -98,7 +116,7 @@ const DetalleMandatoPageContent: React.FC = () => {
                 textAlign: 'center',
                 color: '#222',
                 fontSize: '2rem',
-                marginBottom: '1.5rem'
+                marginBottom: '1.5rem',
               }}
             >
               Cuenta bancaria
@@ -122,135 +140,151 @@ const DetalleMandatoPageContent: React.FC = () => {
               variant="elevated"
               padding="large"
             >
-        {loading ? (
-          <div className="has-text-centered p-6">
-            <div className="loader-container">
-              <div className="loader"></div>
-            </div>
-            <p className="mt-4">Cargando información...</p>
-          </div>
-        ) : error ? (
-          <div className="notification is-danger">
-            <p>{error}</p>
-            <ConsaludCore.Button
-              variant="primary"
-              onClick={handleVolver}
-              className="mt-4"
-            >
-              Volver al inicio
-            </ConsaludCore.Button>
-          </div>
-        ) : mandatoInfo ? (
-            <div className="mandato-detalle">
-            <div className="columns">
-              <div className="column">
-                <div className="field-group">
-                  <h4 className="subtitle is-6">Información de la cuenta</h4>
-                  <div className="field">
-                    <label className="label">Banco</label>
-                    <p className="field-value">{mandatoInfo.banco}</p>
+              {loading ? (
+                <div className="has-text-centered p-6">
+                  <div className="loader-container">
+                    <div className="loader"></div>
                   </div>
-                  <div className="field">
-                    <label className="label">Tipo de cuenta</label>
-                    <p className="field-value">{mandatoInfo.tipoCuenta}</p>
-                  </div>
-                  <div className="field">
-                    <label className="label">Número de cuenta</label>
-                    <p className="field-value">{mandatoInfo.numeroCuenta}</p>
-                  </div>
-                  <div className="field">
-                    <label className="label">ID de mandato</label>
-                    <p className="field-value">{mandatoInfo.mandatoId}</p>
-                  </div>
-                  {mandatoInfo.indTipo && (
-                    <div className="field">
-                      <label className="label">Tipo</label>
-                      <p className="field-value">{mandatoInfo.indTipo === '1' ? 'Cuenta Corriente' :
-                                                 mandatoInfo.indTipo === '2' ? 'Cuenta Vista' :
-                                                 mandatoInfo.indTipo === '3' ? 'Cuenta de Ahorro' :
-                                                 mandatoInfo.indTipo}</p>
-                    </div>
-                  )}
+                  <p className="mt-4">Cargando información...</p>
                 </div>
-              </div>
-              <div className="column">
-                <div className="field-group">
-                  <h4 className="subtitle is-6">Información del titular</h4>
-                  <div className="field">
-                    <label className="label">Nombre</label>
-                    <p className="field-value">{mandatoInfo.nombreCliente}</p>
-                  </div>
-                  <div className="field">
-                    <label className="label">Apellido Paterno</label>
-                    <p className="field-value">{mandatoInfo.apellidoPaterno || '-'}</p>
-                  </div>
-                  <div className="field">
-                    <label className="label">Apellido Materno</label>
-                    <p className="field-value">{mandatoInfo.apellido}</p>
-                  </div>
-                  <div className="field">
-                    <label className="label">RUT</label>
-                    <p className="field-value">{mandatoInfo.rutCliente}-{mandatoInfo.digitoVerificador}</p>
-                  </div>
+              ) : error ? (
+                <div className="notification is-danger">
+                  <p>{error}</p>
+                  <ConsaludCore.Button variant="primary" onClick={handleVolver} className="mt-4">
+                    Volver al inicio
+                  </ConsaludCore.Button>
                 </div>
-              </div>
-            </div>
-
-            {/* Mostrar campos adicionales del servicio SOAP en un acordeón */}
-            <div className="box mt-4">
-              <details>
-                <summary className="has-text-primary has-text-weight-medium">Información adicional del mandato</summary>
-                <div className="columns is-multiline mt-3">
-                  {Object.entries(mandatoInfo)
-                    .filter(([key]) => !['mandatoId', 'banco', 'tipoCuenta', 'numeroCuenta',
-                                        'nombreCliente', 'apellido', 'apellidoPaterno', 'rutCliente',
-                                        'digitoVerificador', 'mensaje', 'Sindtipo'].includes(key))
-                    .map(([key, value]) => (
-                      <div className="column is-half" key={key}>
+              ) : mandatoInfo ? (
+                <div className="mandato-detalle">
+                  <div className="columns">
+                    <div className="column">
+                      <div className="field-group">
+                        <h4 className="subtitle is-6">Información de la cuenta</h4>
                         <div className="field">
-                          <label className="label is-small">{key}</label>
-                          <p className="field-value">{String(value || '-')}</p>
+                          <label className="label">Banco</label>
+                          <p className="field-value">{mandatoInfo.banco}</p>
+                        </div>
+                        <div className="field">
+                          <label className="label">Tipo de cuenta</label>
+                          <p className="field-value">{mandatoInfo.tipoCuenta}</p>
+                        </div>
+                        <div className="field">
+                          <label className="label">Número de cuenta</label>
+                          <p className="field-value">{mandatoInfo.numeroCuenta}</p>
+                        </div>
+                        <div className="field">
+                          <label className="label">ID de mandato</label>
+                          <p className="field-value">{mandatoInfo.mandatoId}</p>
+                        </div>
+                        {mandatoInfo.indTipo && (
+                          <div className="field">
+                            <label className="label">Tipo</label>
+                            <p className="field-value">
+                              {mandatoInfo.indTipo === '1'
+                                ? 'Cuenta Corriente'
+                                : mandatoInfo.indTipo === '2'
+                                  ? 'Cuenta Vista'
+                                  : mandatoInfo.indTipo === '3'
+                                    ? 'Cuenta de Ahorro'
+                                    : mandatoInfo.indTipo}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="column">
+                      <div className="field-group">
+                        <h4 className="subtitle is-6">Información del titular</h4>
+                        <div className="field">
+                          <label className="label">Nombre</label>
+                          <p className="field-value">{mandatoInfo.nombreCliente}</p>
+                        </div>
+                        <div className="field">
+                          <label className="label">Apellido Paterno</label>
+                          <p className="field-value">{mandatoInfo.apellidoPaterno || '-'}</p>
+                        </div>
+                        <div className="field">
+                          <label className="label">Apellido Materno</label>
+                          <p className="field-value">{mandatoInfo.apellido}</p>
+                        </div>
+                        <div className="field">
+                          <label className="label">RUT</label>
+                          <p className="field-value">
+                            {mandatoInfo.rutCliente}-{mandatoInfo.digitoVerificador}
+                          </p>
                         </div>
                       </div>
-                    ))
-                  }
+                    </div>
+                  </div>
+
+                  {/* Mostrar campos adicionales del servicio SOAP en un acordeón */}
+                  <div className="box mt-4">
+                    <details>
+                      <summary className="has-text-primary has-text-weight-medium">
+                        Información adicional del mandato
+                      </summary>
+                      <div className="columns is-multiline mt-3">
+                        {Object.entries(mandatoInfo)
+                          .filter(
+                            ([key]) =>
+                              ![
+                                'mandatoId',
+                                'banco',
+                                'tipoCuenta',
+                                'numeroCuenta',
+                                'nombreCliente',
+                                'apellido',
+                                'apellidoPaterno',
+                                'rutCliente',
+                                'digitoVerificador',
+                                'mensaje',
+                                'Sindtipo',
+                              ].includes(key)
+                          )
+                          .map(([key, value]) => (
+                            <div className="column is-half" key={key}>
+                              <div className="field">
+                                <label className="label is-small">{key}</label>
+                                <p className="field-value">{String(value || '-')}</p>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </details>
+                  </div>
+
+                  <div className="notification is-info is-light mt-4">
+                    <p>
+                      Esta información bancaria será utilizada para realizar la devolución de los
+                      fondos correspondientes.
+                    </p>
+                    <p className="mt-2 is-size-7">
+                      Si los datos no son correctos, por favor vuelva al paso anterior y modifique
+                      la información.
+                    </p>
+                  </div>
+
+                  <div className="has-text-centered buttons-container mt-5">
+                    <ConsaludCore.Button
+                      variant="secondary"
+                      onClick={handleVolver}
+                      className="mr-3"
+                    >
+                      Volver
+                    </ConsaludCore.Button>
+                    <ConsaludCore.Button variant="primary" onClick={handleSiguiente}>
+                      Continuar
+                    </ConsaludCore.Button>
+                  </div>
                 </div>
-              </details>
-            </div>
-
-            <div className="notification is-info is-light mt-4">
-              <p>Esta información bancaria será utilizada para realizar la devolución de los fondos correspondientes.</p>
-              <p className="mt-2 is-size-7">Si los datos no son correctos, por favor vuelva al paso anterior y modifique la información.</p>
-            </div>
-
-            <div className="has-text-centered buttons-container mt-5">
-              <ConsaludCore.Button
-                variant="secondary"
-                onClick={handleVolver}
-                className="mr-3"
-              >
-                Volver
-              </ConsaludCore.Button>
-              <ConsaludCore.Button
-                variant="primary"
-                onClick={handleSiguiente}
-              >
-                Continuar
-              </ConsaludCore.Button>
-            </div>
-          </div>
-        ) : (
-          <div className="has-text-centered p-5">
-            <p>No se encontró información de la cuenta bancaria</p>
-            <ConsaludCore.Button
-              variant="primary"
-              onClick={handleVolver}
-              className="mt-4"
-            >
-              Volver al inicio
-            </ConsaludCore.Button>
-          </div>
-        )}
+              ) : (
+                <div className="has-text-centered p-5">
+                  <p>No se encontró información de la cuenta bancaria</p>
+                  <ConsaludCore.Button variant="primary" onClick={handleVolver} className="mt-4">
+                    Volver al inicio
+                  </ConsaludCore.Button>
+                </div>
+              )}
             </ConsaludCore.Card>
           </div>
         </div>
@@ -265,12 +299,15 @@ const DetalleMandatoPageContent: React.FC = () => {
 const DetalleMandatoPage: React.FC = () => {
   return (
     <StepperProvider>
-      <div className="route-container layout-stable instant-stable navigation-stable no-flash" style={{
-        overflowY: 'auto',
-        backgroundColor: '#F8F9FA',
-        padding: '0',
-        height: '100vh'
-      }}>
+      <div
+        className="route-container layout-stable instant-stable navigation-stable no-flash"
+        style={{
+          overflowY: 'auto',
+          backgroundColor: '#F8F9FA',
+          padding: '0',
+          height: '100vh',
+        }}
+      >
         <div style={{ minHeight: '120vh', paddingBottom: '4rem' }}>
           <DetalleMandatoPageContent />
         </div>

@@ -1,8 +1,8 @@
 interface Telefono {
-    tipo: string;
-    numero: string;
-    codPais: string;
-    codCiudad: string;
-  }
+  tipo: string;
+  numero: string;
+  codPais: string;
+  codCiudad: string;
+}
 
-    export type { Telefono };
+export type { Telefono };

@@ -12,7 +12,7 @@ export const useAuthWithRedirect = (options: UseAuthWithRedirectOptions = {}) =>
   const {
     defaultRedirectPath = '/home',
     protectedPaths = ['/mnherederos', '/home'],
-    publicPaths = ['/login']
+    publicPaths = ['/login'],
   } = options;
 
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ export const useAuthWithRedirect = (options: UseAuthWithRedirectOptions = {}) =>
   const handleLoginSuccess = useCallback(async () => {
     const params = new URLSearchParams(location.search);
     const returnUrl = params.get('returnUrl');
-    
+
     if (returnUrl) {
       navigate(decodeURIComponent(returnUrl), { replace: true });
     } else {
@@ -59,6 +59,6 @@ export const useAuthWithRedirect = (options: UseAuthWithRedirectOptions = {}) =>
   return {
     isAuthenticated: coreIsAuthenticated,
     isLoading: isLoading || coreIsLoading,
-    handleLoginSuccess
+    handleLoginSuccess,
   };
 };

@@ -19,7 +19,8 @@ setCoreEnvConfig({
   VITE_APP_TIMEOUT: import.meta.env.VITE_APP_TIMEOUT,
   VITE_CLIENT_ID: import.meta.env.VITE_CLIENT_ID,
   VITE_APP_CLIENT_ID: import.meta.env.VITE_APP_CLIENT_ID,
-  VITE_AUTHORITY: import.meta.env.VITE_AUTHORITY,  VITE_APP_AUTHORITY: import.meta.env.VITE_APP_AUTHORITY,
+  VITE_AUTHORITY: import.meta.env.VITE_AUTHORITY,
+  VITE_APP_AUTHORITY: import.meta.env.VITE_APP_AUTHORITY,
 });
 
 // importar el resto del core después de configurar
@@ -65,7 +66,7 @@ if (import.meta.env.MODE === 'development') {
   };
 
   // Suprimir errores no capturados de extensiones
-  window.addEventListener('error', (event) => {
+  window.addEventListener('error', event => {
     const message = event.message || '';
     if (
       message.includes('Could not establish connection') ||
@@ -78,12 +79,9 @@ if (import.meta.env.MODE === 'development') {
   });
 
   // Suprimir promesas rechazadas de extensiones
-  window.addEventListener('unhandledrejection', (event) => {
+  window.addEventListener('unhandledrejection', event => {
     const message = event.reason?.message || event.reason?.toString() || '';
-    if (
-      message.includes('Could not establish connection') ||
-      message.includes('content-all.js')
-    ) {
+    if (message.includes('Could not establish connection') || message.includes('content-all.js')) {
       event.preventDefault();
       return;
     }
@@ -96,5 +94,5 @@ initializeMsalConfig();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-)
+  </React.StrictMode>
+);

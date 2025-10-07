@@ -14,18 +14,24 @@ export const useFormHerederoData = () => {
     validateFormData,
     getFormData,
     reloadFromStorage,
-    forceSyncFromStorage
+    forceSyncFromStorage,
   } = useFormHeredero();
 
   // Hook para manejar cambios en campos específicos
-  const handleFieldChange = useCallback((field: string | number | symbol, value: any) => {
-    updateFormData(field, value);
-  }, [updateFormData]);
+  const handleFieldChange = useCallback(
+    (field: string | number | symbol, value: any) => {
+      updateFormData(field, value);
+    },
+    [updateFormData]
+  );
 
   // Hook para guardar datos completos del formulario
-  const handleSaveForm = useCallback((data: FormData) => {
-    saveFormData(data);
-  }, [saveFormData]);
+  const handleSaveForm = useCallback(
+    (data: FormData) => {
+      saveFormData(data);
+    },
+    [saveFormData]
+  );
 
   // Hook para limpiar formulario
   const handleClearForm = useCallback(() => {
@@ -58,7 +64,7 @@ export const useFormHerederoData = () => {
     loading,
     error,
     isDirty,
-    
+
     // Métodos
     handleFieldChange,
     handleSaveForm,
@@ -67,7 +73,7 @@ export const useFormHerederoData = () => {
     handleGetFormData,
     handleReloadFromStorage,
     handleForceSyncFromStorage,
-    
+
     // Métodos directos del contexto
     saveFormData,
     updateFormData,
@@ -75,6 +81,6 @@ export const useFormHerederoData = () => {
     validateFormData,
     getFormData,
     reloadFromStorage,
-    forceSyncFromStorage
+    forceSyncFromStorage,
   };
-}; 
+};

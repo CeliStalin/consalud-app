@@ -21,4 +21,4 @@ declare global {
     key(index: number): string | null;
     length: number;
   }
-} 
+}

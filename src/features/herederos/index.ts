@@ -9,4 +9,4 @@ export type { FormData } from './interfaces/FormData';
 
 // Component exports
 export { ConfirmacionFinal } from './components/ConfirmacionFinal';
-export { default as FormIngresoHeredero } from './components/FormIngresoHeredero'; 
+export { default as FormIngresoHeredero } from './components/FormIngresoHeredero';

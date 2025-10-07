@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { MENSAJES_ERROR, validarEdadConMensaje } from "../../../utils/ageValidation";
-import { extraerNumerosRut, formatearRut } from "../../../utils/rutValidation";
-import { HerederoContext } from "../contexts/HerederoContext";
-import { useRutChileno } from "../hooks/useRutChileno";
+import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MENSAJES_ERROR, validarEdadConMensaje } from '../../../utils/ageValidation';
+import { extraerNumerosRut, formatearRut } from '../../../utils/rutValidation';
+import { HerederoContext } from '../contexts/HerederoContext';
+import { useRutChileno } from '../hooks/useRutChileno';
 import { FormHerederoData } from '../interfaces/FormData';
-import { Heredero } from "../interfaces/Heredero";
-import { HerederoContextType } from "../interfaces/HerederoContext";
-import { HerederoProviderProps } from "../interfaces/HerederoProviderProps";
+import { Heredero } from '../interfaces/Heredero';
+import { HerederoContextType } from '../interfaces/HerederoContext';
+import { HerederoProviderProps } from '../interfaces/HerederoProviderProps';
 import { fetchSolicitanteMejorContactibilidad } from '../services';
 
 /**
@@ -69,7 +69,9 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       RutCompleto: herederoData.rut,
       RutDigito: herederoData.rut.slice(-1).toUpperCase(),
       CodigoSexo: herederoData.Genero || '',
-      FechaNacimiento: herederoData.fechaNacimiento ? formatDateForAPI(herederoData.fechaNacimiento) : formatDateForAPI(new Date()),
+      FechaNacimiento: herederoData.fechaNacimiento
+        ? formatDateForAPI(herederoData.fechaNacimiento)
+        : formatDateForAPI(new Date()),
       IdParentesco: 0, // Valor por defecto - se establecerá cuando el usuario seleccione
       IdTipoSolicitante: 1, // Valor por defecto para heredero
       EstadoRegistro: 'V', // Activo por defecto
@@ -84,8 +86,10 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       Calle: herederoData.contactabilidad?.direccion?.calle || '',
       NumCalle: herederoData.contactabilidad?.direccion?.numero || 0,
       villa: herederoData.contactabilidad?.direccion?.villa || '',
-      DepBlock: herederoData.contactabilidad?.direccion?.departamento ? parseInt(herederoData.contactabilidad.direccion.departamento) : 0,
-      Usuario: ''
+      DepBlock: herederoData.contactabilidad?.direccion?.departamento
+        ? parseInt(herederoData.contactabilidad.direccion.departamento)
+        : 0,
+      Usuario: '',
     };
   }, []);
 
@@ -112,18 +116,20 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
           ciudadId: formData.IdCiudad,
           ciudadNombre: formData.DesCiudad,
           villa: formData.villa,
-          departamento: formData.DepBlock.toString()
+          departamento: formData.DepBlock.toString(),
         },
         telefono: {
           numero: formData.NumTelef.toString(),
-          tipo: "CELULAR",
-          codPais: "56",
-          codCiudad: "2"
+          tipo: 'CELULAR',
+          codPais: '56',
+          codCiudad: '2',
         },
-        correo: [{
-          mail: formData.Mail,
-          validacion: 1
-        }]
+        correo: [
+          {
+            mail: formData.Mail,
+            validacion: 1,
+          },
+        ],
       },
       codCiudad: formData.IdCiudad,
       codComuna: formData.IdComuna,
@@ -140,223 +146,238 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       numeroCalle: formData.NumCalle,
       numeroCelular: formData.NumTelef,
       numeroFijo: 0,
-      tipoDireccion: ''
+      tipoDireccion: '',
     };
   }, []);
 
-
-
   // Función para buscar heredero por RUT usando BFF
-  const buscarHeredero = useCallback(async (rut: string) => {
-    setLoading(true);
-    setError(null);
-    setFieldsLocked(false); // Resetear el estado de bloqueo al iniciar nueva búsqueda
+  const buscarHeredero = useCallback(
+    async (rut: string) => {
+      setLoading(true);
+      setError(null);
+      setFieldsLocked(false); // Resetear el estado de bloqueo al iniciar nueva búsqueda
 
-    // Limpiar heredero anterior si el RUT cambió
-    if (lastSearchedRut && lastSearchedRut !== rut) {
-      setHeredero(null);
-      // Limpiar sessionStorage del heredero anterior usando la nueva estructura
-      const oldStorageKey = getStorageKey(lastSearchedRut);
-      sessionStorage.removeItem(oldStorageKey);
-    }
+      // Limpiar heredero anterior si el RUT cambió
+      if (lastSearchedRut && lastSearchedRut !== rut) {
+        setHeredero(null);
+        // Limpiar sessionStorage del heredero anterior usando la nueva estructura
+        const oldStorageKey = getStorageKey(lastSearchedRut);
+        sessionStorage.removeItem(oldStorageKey);
+      }
 
-    try {
-      const bffDns = import.meta.env.VITE_BFF_HEREDEROS_DNS;
-      if (bffDns) {
-        // Usar BFF
-        const rutSinDV = extraerNumerosRut(rut);
-        // Obtener userName desde localStorage o sessionStorage si existe
-        const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || '';
+      try {
+        const bffDns = import.meta.env.VITE_BFF_HEREDEROS_DNS;
+        if (bffDns) {
+          // Usar BFF
+          const rutSinDV = extraerNumerosRut(rut);
+          // Obtener userName desde localStorage o sessionStorage si existe
+          const userName =
+            localStorage.getItem('userName') || sessionStorage.getItem('userName') || '';
 
-                  try {
+          try {
             const response = await fetchSolicitanteMejorContactibilidad(Number(rutSinDV), userName);
 
-          // Validar si la persona está fallecida
-          if (response.SolicitanteInMae.IndFallecido === 'S') {
-            throw new Error('El RUT ingresado corresponde a una persona fallecida');
-          }
-
-          // Validar edad mayor de 18 años
-          if (response.SolicitanteInMae.FecNacimiento && response.SolicitanteInMae.FecNacimiento.trim() !== '') {
-            const validacion = validarEdadConMensaje(response.SolicitanteInMae.FecNacimiento, 'La persona heredera debe tener al menos 18 años');
-            if (!validacion.esValido) {
-              throw new Error(validacion.mensaje || 'La persona heredera debe tener al menos 18 años');
+            // Validar si la persona está fallecida
+            if (response.SolicitanteInMae.IndFallecido === 'S') {
+              throw new Error('El RUT ingresado corresponde a una persona fallecida');
             }
-          } else {
-            // Si no hay fecha de nacimiento, también lanzar error
-            throw new Error(MENSAJES_ERROR.FECHA_REQUERIDA);
+
+            // Validar edad mayor de 18 años
+            if (
+              response.SolicitanteInMae.FecNacimiento &&
+              response.SolicitanteInMae.FecNacimiento.trim() !== ''
+            ) {
+              const validacion = validarEdadConMensaje(
+                response.SolicitanteInMae.FecNacimiento,
+                'La persona heredera debe tener al menos 18 años'
+              );
+              if (!validacion.esValido) {
+                throw new Error(
+                  validacion.mensaje || 'La persona heredera debe tener al menos 18 años'
+                );
+              }
+            } else {
+              // Si no hay fecha de nacimiento, también lanzar error
+              throw new Error(MENSAJES_ERROR.FECHA_REQUERIDA);
+            }
+
+            // Mapear la respuesta del BFF al modelo Heredero
+            const herederoData: Heredero = {
+              id: response.SolicitanteInMae.IdPersona,
+              rut: formatearRut(
+                `${response.SolicitanteInMae.RutPersona}${response.SolicitanteInMae.RutDigito}`
+              ),
+              fechaNacimiento: response.SolicitanteInMae.FecNacimiento,
+              nombre: response.SolicitanteInMae.NomPersona,
+              apellidoPat: response.SolicitanteInMae.ApePaterno,
+              apellidoMat: response.SolicitanteInMae.ApeMaterno,
+              parentesco: 0, // Valor por defecto
+              Genero: response.SolicitanteInMae.CodSexo || '',
+              indFallecido: response.SolicitanteInMae.IndFallecido,
+              contactabilidad: {
+                direccion: {
+                  calle: response.MejorContactibilidadSolicitante.nombreCalle,
+                  numero: response.MejorContactibilidadSolicitante.numeroCalle,
+                  comunaId: response.MejorContactibilidadSolicitante.CodComuna,
+                  comunaNombre: response.MejorContactibilidadSolicitante.descripcionComuna,
+                  regionId: response.MejorContactibilidadSolicitante.CodRegion,
+                  regionNombre: response.MejorContactibilidadSolicitante.descripcionRegion,
+                  ciudadId: response.MejorContactibilidadSolicitante.CodCiudad,
+                  ciudadNombre: response.MejorContactibilidadSolicitante.descripcionCiudad,
+                  villa: response.MejorContactibilidadSolicitante.nombreVillaCondominio,
+                  departamento:
+                    response.MejorContactibilidadSolicitante.numeroDepartamento.toString(),
+                },
+                telefono: {
+                  numero: response.MejorContactibilidadSolicitante.numeroCelular.toString(),
+                  tipo: 'CELULAR',
+                  codPais: '56',
+                  codCiudad: '2',
+                },
+                correo: [
+                  {
+                    mail: response.MejorContactibilidadSolicitante.Email,
+                    validacion: 1,
+                  },
+                ],
+              },
+              // Campos adicionales del BFF
+              codCiudad: response.MejorContactibilidadSolicitante.CodCiudad,
+              codComuna: response.MejorContactibilidadSolicitante.CodComuna,
+              codRegion: response.MejorContactibilidadSolicitante.CodRegion,
+              codigoPostal: response.MejorContactibilidadSolicitante.CodigoPostal,
+              email: response.MejorContactibilidadSolicitante.Email,
+              descripcionCiudad: response.MejorContactibilidadSolicitante.descripcionCiudad,
+              descripcionComuna: response.MejorContactibilidadSolicitante.descripcionComuna,
+              descripcionRegion: response.MejorContactibilidadSolicitante.descripcionRegion,
+              numeroBloque: response.MejorContactibilidadSolicitante.numeroBloque,
+              numeroDepartamento: response.MejorContactibilidadSolicitante.numeroDepartamento,
+              nombreVillaCondominio: response.MejorContactibilidadSolicitante.nombreVillaCondominio,
+              nombreCalle: response.MejorContactibilidadSolicitante.nombreCalle,
+              numeroCalle: response.MejorContactibilidadSolicitante.numeroCalle,
+              numeroCelular: response.MejorContactibilidadSolicitante.numeroCelular,
+              numeroFijo: response.MejorContactibilidadSolicitante.numeroFijo,
+              tipoDireccion: response.MejorContactibilidadSolicitante.tipoDireccion,
+            };
+
+            setHeredero(herederoData);
+            setLastSearchedRut(rut);
+
+            // NO guardar en session storage aquí - solo cuando el usuario modifique el formulario
+            // Esto permite que la primera carga muestre "SELECCIONAR" en los campos
+
+            // Bloquear campos cuando la API devuelve 200 exitosamente
+            setFieldsLocked(true);
+          } catch (err: any) {
+            // Manejar específicamente el status 412
+            if (err.message && err.message.includes('412')) {
+              // Para 412, crear un heredero vacío con campos habilitados
+              const mensaje =
+                'No se encontró información del heredero. Puede llenar los datos manualmente.';
+              console.warn(mensaje);
+
+              // Crear un heredero vacío con el RUT ingresado
+              const herederoVacio: Heredero = {
+                id: 0,
+                rut: formatearRut(rut),
+                fechaNacimiento: '',
+                nombre: '',
+                apellidoPat: '',
+                apellidoMat: '',
+                parentesco: 0,
+                Genero: '',
+                indFallecido: 'N',
+                contactabilidad: {
+                  direccion: {
+                    calle: '',
+                    numero: 0,
+                    comunaId: 0,
+                    comunaNombre: '',
+                    regionId: 0,
+                    regionNombre: '',
+                    ciudadId: 0,
+                    ciudadNombre: '',
+                    villa: '',
+                    departamento: '',
+                  },
+                  telefono: {
+                    numero: '',
+                    tipo: 'CELULAR',
+                    codPais: '56',
+                    codCiudad: '2',
+                  },
+                  correo: [
+                    {
+                      mail: '',
+                      validacion: 1,
+                    },
+                  ],
+                },
+                codCiudad: 0,
+                codComuna: 0,
+                codRegion: 0,
+                codigoPostal: 0,
+                email: '',
+                descripcionCiudad: '',
+                descripcionComuna: '',
+                descripcionRegion: '',
+                numeroBloque: 0,
+                numeroDepartamento: 0,
+                nombreVillaCondominio: '',
+                nombreCalle: '',
+                numeroCalle: 0,
+                numeroCelular: 0,
+                numeroFijo: 0,
+                tipoDireccion: '',
+              };
+
+              setHeredero(herederoVacio);
+              setLastSearchedRut(rut);
+              // NO bloquear campos para permitir edición manual
+              setFieldsLocked(false);
+              return; // IMPORTANTE: retornar aquí para evitar el catch general
+            }
+
+            // Para otros errores, propagar el error
+            throw err;
+          }
+        } else {
+          // Usar servicio mock local
+          const { mockDataService } = await import('../services/mockDataService');
+          const data = await mockDataService.getHerederos();
+          const formattedRut = formatSimpleRut(rut);
+
+          const herederoEncontrado = data.find((h: Heredero) => h.rut === formattedRut);
+
+          if (!herederoEncontrado) {
+            throw new Error('Heredero no encontrado');
           }
 
-          // Mapear la respuesta del BFF al modelo Heredero
-          const herederoData: Heredero = {
-            id: response.SolicitanteInMae.IdPersona,
-            rut: formatearRut(`${response.SolicitanteInMae.RutPersona}${response.SolicitanteInMae.RutDigito}`),
-            fechaNacimiento: response.SolicitanteInMae.FecNacimiento,
-            nombre: response.SolicitanteInMae.NomPersona,
-            apellidoPat: response.SolicitanteInMae.ApePaterno,
-            apellidoMat: response.SolicitanteInMae.ApeMaterno,
-            parentesco: 0, // Valor por defecto
-            Genero: response.SolicitanteInMae.CodSexo || '',
-            indFallecido: response.SolicitanteInMae.IndFallecido,
-            contactabilidad: {
-              direccion: {
-                calle: response.MejorContactibilidadSolicitante.nombreCalle,
-                numero: response.MejorContactibilidadSolicitante.numeroCalle,
-                comunaId: response.MejorContactibilidadSolicitante.CodComuna,
-                comunaNombre: response.MejorContactibilidadSolicitante.descripcionComuna,
-                regionId: response.MejorContactibilidadSolicitante.CodRegion,
-                regionNombre: response.MejorContactibilidadSolicitante.descripcionRegion,
-                ciudadId: response.MejorContactibilidadSolicitante.CodCiudad,
-                ciudadNombre: response.MejorContactibilidadSolicitante.descripcionCiudad,
-                villa: response.MejorContactibilidadSolicitante.nombreVillaCondominio,
-                departamento: response.MejorContactibilidadSolicitante.numeroDepartamento.toString()
-              },
-              telefono: {
-                numero: response.MejorContactibilidadSolicitante.numeroCelular.toString(),
-                tipo: "CELULAR",
-                codPais: "56",
-                codCiudad: "2"
-              },
-              correo: [{
-                mail: response.MejorContactibilidadSolicitante.Email,
-                validacion: 1
-              }]
-            },
-            // Campos adicionales del BFF
-            codCiudad: response.MejorContactibilidadSolicitante.CodCiudad,
-            codComuna: response.MejorContactibilidadSolicitante.CodComuna,
-            codRegion: response.MejorContactibilidadSolicitante.CodRegion,
-            codigoPostal: response.MejorContactibilidadSolicitante.CodigoPostal,
-            email: response.MejorContactibilidadSolicitante.Email,
-            descripcionCiudad: response.MejorContactibilidadSolicitante.descripcionCiudad,
-            descripcionComuna: response.MejorContactibilidadSolicitante.descripcionComuna,
-            descripcionRegion: response.MejorContactibilidadSolicitante.descripcionRegion,
-            numeroBloque: response.MejorContactibilidadSolicitante.numeroBloque,
-            numeroDepartamento: response.MejorContactibilidadSolicitante.numeroDepartamento,
-            nombreVillaCondominio: response.MejorContactibilidadSolicitante.nombreVillaCondominio,
-            nombreCalle: response.MejorContactibilidadSolicitante.nombreCalle,
-            numeroCalle: response.MejorContactibilidadSolicitante.numeroCalle,
-            numeroCelular: response.MejorContactibilidadSolicitante.numeroCelular,
-            numeroFijo: response.MejorContactibilidadSolicitante.numeroFijo,
-            tipoDireccion: response.MejorContactibilidadSolicitante.tipoDireccion
-          };
-
-          setHeredero(herederoData);
+          setHeredero(herederoEncontrado);
           setLastSearchedRut(rut);
 
           // NO guardar en session storage aquí - solo cuando el usuario modifique el formulario
           // Esto permite que la primera carga muestre "SELECCIONAR" en los campos
 
-          // Bloquear campos cuando la API devuelve 200 exitosamente
+          // Para desarrollo, también bloquear campos
           setFieldsLocked(true);
-
-        } catch (err: any) {
-          // Manejar específicamente el status 412
-          if (err.message && err.message.includes('412')) {
-            // Para 412, crear un heredero vacío con campos habilitados
-            const mensaje = 'No se encontró información del heredero. Puede llenar los datos manualmente.';
-            console.warn(mensaje);
-
-            // Crear un heredero vacío con el RUT ingresado
-            const herederoVacio: Heredero = {
-              id: 0,
-              rut: formatearRut(rut),
-              fechaNacimiento: '',
-              nombre: '',
-              apellidoPat: '',
-              apellidoMat: '',
-              parentesco: 0,
-              Genero: '',
-              indFallecido: 'N',
-              contactabilidad: {
-                direccion: {
-                  calle: '',
-                  numero: 0,
-                  comunaId: 0,
-                  comunaNombre: '',
-                  regionId: 0,
-                  regionNombre: '',
-                  ciudadId: 0,
-                  ciudadNombre: '',
-                  villa: '',
-                  departamento: ''
-                },
-                telefono: {
-                  numero: '',
-                  tipo: "CELULAR",
-                  codPais: "56",
-                  codCiudad: "2"
-                },
-                correo: [{
-                  mail: '',
-                  validacion: 1
-                }]
-              },
-              codCiudad: 0,
-              codComuna: 0,
-              codRegion: 0,
-              codigoPostal: 0,
-              email: '',
-              descripcionCiudad: '',
-              descripcionComuna: '',
-              descripcionRegion: '',
-              numeroBloque: 0,
-              numeroDepartamento: 0,
-              nombreVillaCondominio: '',
-              nombreCalle: '',
-              numeroCalle: 0,
-              numeroCelular: 0,
-              numeroFijo: 0,
-              tipoDireccion: ''
-            };
-
-            setHeredero(herederoVacio);
-            setLastSearchedRut(rut);
-            // NO bloquear campos para permitir edición manual
-            setFieldsLocked(false);
-            return; // IMPORTANTE: retornar aquí para evitar el catch general
-          }
-
-          // Para otros errores, propagar el error
-          throw err;
         }
-
-      } else {
-        // Usar servicio mock local
-        const { mockDataService } = await import('../services/mockDataService');
-        const data = await mockDataService.getHerederos();
-        const formattedRut = formatSimpleRut(rut);
-
-        const herederoEncontrado = data.find((h: Heredero) => h.rut === formattedRut);
-
-        if (!herederoEncontrado) {
-          throw new Error('Heredero no encontrado');
+      } catch (err: any) {
+        // Solo manejar errores que NO sean 412
+        if (!err.message || !err.message.includes('412')) {
+          const errorMessage = err instanceof Error ? err.message : 'Error al buscar el heredero';
+          setError(errorMessage);
+          setHeredero(null);
+          setFieldsLocked(false); // No bloquear campos si hay error
+          console.error('Error en buscarHeredero:', err);
         }
-
-                setHeredero(herederoEncontrado);
-        setLastSearchedRut(rut);
-
-        // NO guardar en session storage aquí - solo cuando el usuario modifique el formulario
-        // Esto permite que la primera carga muestre "SELECCIONAR" en los campos
-
-        // Para desarrollo, también bloquear campos
-        setFieldsLocked(true);
+        // Si es error 412, no hacer nada (ya se manejó arriba)
+      } finally {
+        setLoading(false);
       }
-
-    } catch (err: any) {
-      // Solo manejar errores que NO sean 412
-      if (!err.message || !err.message.includes('412')) {
-        const errorMessage = err instanceof Error ? err.message : 'Error al buscar el heredero';
-        setError(errorMessage);
-        setHeredero(null);
-        setFieldsLocked(false); // No bloquear campos si hay error
-        console.error('Error en buscarHeredero:', err);
-      }
-      // Si es error 412, no hacer nada (ya se manejó arriba)
-    } finally {
-      setLoading(false);
-    }
-  }, [formatSimpleRut, navigate, lastSearchedRut, getStorageKey, herederoToFormHerederoData]);
+    },
+    [formatSimpleRut, navigate, lastSearchedRut, getStorageKey, herederoToFormHerederoData]
+  );
   const limpiarHeredero = useCallback(() => {
     setHeredero(null);
     setError(null);
@@ -412,14 +433,10 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
     error,
     buscarHeredero,
     limpiarHeredero,
-    fieldsLocked
+    fieldsLocked,
   };
 
-  return (
-    <HerederoContext.Provider value={value}>
-      {children}
-    </HerederoContext.Provider>
-  );
+  return <HerederoContext.Provider value={value}>{children}</HerederoContext.Provider>;
 };
 
 export default HerederoProvider;

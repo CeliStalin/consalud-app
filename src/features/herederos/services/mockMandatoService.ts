@@ -22,12 +22,8 @@ export class MockMandatoService {
    * Obtiene información del mandato (datos mock)
    */
   async getMandatoInfo(rutCliente: string, _nSecMandato: string = ''): Promise<MandatoResult> {
-
-
-    // Simular delay de red
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Datos mock basados en el RUT
     const mockData: MandatoResult = {
       mandatoId: '123456',
       banco: 'BANCO DE CHILE',
@@ -39,9 +35,8 @@ export class MockMandatoService {
       rutCliente: rutCliente || '17175966',
       digitoVerificador: '8',
       mensaje: 'OK',
-      indTipo: '1'
+      indTipo: '1',
     };
-
 
     return mockData;
   }

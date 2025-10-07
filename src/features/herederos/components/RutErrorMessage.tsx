@@ -11,4 +11,4 @@ const RutErrorMessage: React.FC<RutErrorMessageProps> = ({ id = 'rut-error', cla
   </div>
 );
 
-export default RutErrorMessage; 
+export default RutErrorMessage;

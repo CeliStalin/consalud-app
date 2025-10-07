@@ -48,13 +48,16 @@ export const useButtonLocking = (): UseButtonLockingReturn => {
   /**
    * Alterna el estado de bloqueo
    */
-  const toggleLock = useCallback((reason?: string) => {
-    if (isLocked) {
-      unlockButtons();
-    } else {
-      lockButtons(reason || 'Operación en progreso');
-    }
-  }, [isLocked, lockButtons, unlockButtons]);
+  const toggleLock = useCallback(
+    (reason?: string) => {
+      if (isLocked) {
+        unlockButtons();
+      } else {
+        lockButtons(reason || 'Operación en progreso');
+      }
+    },
+    [isLocked, lockButtons, unlockButtons]
+  );
 
   /**
    * Verifica si el bloqueo ha estado activo por demasiado tiempo
@@ -93,6 +96,6 @@ export const useButtonLocking = (): UseButtonLockingReturn => {
     // Acciones
     lockButtons,
     unlockButtons,
-    toggleLock
+    toggleLock,
   };
 };

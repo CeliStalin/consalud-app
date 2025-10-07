@@ -46,7 +46,7 @@ export const validarEdadConMensaje = (
   const esMayorDeEdad = validarEdadMayorDe18(fechaNacimiento);
   return {
     esValido: esMayorDeEdad,
-    mensaje: esMayorDeEdad ? null : mensajeError
+    mensaje: esMayorDeEdad ? null : mensajeError,
   };
 };
 
@@ -57,5 +57,5 @@ export const EDAD_MINIMA = 18;
 export const MENSAJES_ERROR = {
   EDAD_INSUFICIENTE: 'La persona debe tener al menos 18 años',
   FECHA_REQUERIDA: 'La fecha de nacimiento es requerida',
-  FECHA_INVALIDA: 'La fecha de nacimiento no es válida'
+  FECHA_INVALIDA: 'La fecha de nacimiento no es válida',
 } as const;

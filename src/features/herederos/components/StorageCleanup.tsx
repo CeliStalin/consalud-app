@@ -17,7 +17,10 @@ export const StorageCleanup: React.FC<StorageCleanupProps> = ({ rut, onCleanup }
 
       // Si el uso es mayor al 90%, limpiar archivos
       if (stats.percentageUsed > 90) {
-        console.warn('Limpieza automática de archivos iniciada - uso de storage:', stats.percentageUsed.toFixed(1) + '%');
+        console.warn(
+          'Limpieza automática de archivos iniciada - uso de storage:',
+          stats.percentageUsed.toFixed(1) + '%'
+        );
         clearAllFiles(rut);
 
         if (onCleanup) {

@@ -60,8 +60,10 @@
 
 /* Efecto de focus mejorado */
 .custom-select-container:focus-within .custom-select-visual {
-  border-color: #04A59B;
-  box-shadow: 0 2px 8px rgba(4, 165, 155, 0.15), 0 0 0 3px rgba(4, 165, 155, 0.1);
+  border-color: #04a59b;
+  box-shadow:
+    0 2px 8px rgba(4, 165, 155, 0.15),
+    0 0 0 3px rgba(4, 165, 155, 0.1);
 }
 
 /* Estilos para el dropdown - Fondo blanco como estándar */
@@ -84,7 +86,7 @@
   overflow-x: auto;
   animation: dropdownSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(8px);
-  border-color: #04A59B;
+  border-color: #04a59b;
 }
 
 .custom-select-option {
@@ -107,13 +109,13 @@
 
 .custom-select-option:hover {
   background-color: #f8f9fa;
-  color: #04A59B;
+  color: #04a59b;
   transform: translateX(2px);
 }
 
 .custom-select-option.selected {
   background-color: #f0f9ff;
-  color: #04A59B;
+  color: #04a59b;
   font-weight: 500;
 }
 
@@ -182,13 +184,15 @@
 
 /* Estilos para el estado de error - Usando colores del proyecto */
 .custom-select-container.has-error .custom-select-visual {
-  border-color: #E11D48;
+  border-color: #e11d48;
   box-shadow: 0 2px 8px rgba(225, 29, 72, 0.1);
 }
 
 .custom-select-container.has-error:focus-within .custom-select-visual {
-  border-color: #E11D48;
-  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.15), 0 0 0 3px rgba(225, 29, 72, 0.1);
+  border-color: #e11d48;
+  box-shadow:
+    0 2px 8px rgba(225, 29, 72, 0.15),
+    0 0 0 3px rgba(225, 29, 72, 0.1);
 }
 
 /* Estilos para el estado deshabilitado */
@@ -217,11 +221,16 @@
 
 /* Efecto de pulso sutil en focus */
 @keyframes subtlePulse {
-  0%, 100% {
-    box-shadow: 0 2px 8px rgba(4, 165, 155, 0.15), 0 0 0 3px rgba(4, 165, 155, 0.1);
+  0%,
+  100% {
+    box-shadow:
+      0 2px 8px rgba(4, 165, 155, 0.15),
+      0 0 0 3px rgba(4, 165, 155, 0.1);
   }
   50% {
-    box-shadow: 0 2px 8px rgba(4, 165, 155, 0.2), 0 0 0 3px rgba(4, 165, 155, 0.15);
+    box-shadow:
+      0 2px 8px rgba(4, 165, 155, 0.2),
+      0 0 0 3px rgba(4, 165, 155, 0.15);
   }
 }
 
@@ -267,7 +276,7 @@
 }
 
 .custom-select-option:focus {
-  outline: 2px solid #04A59B;
+  outline: 2px solid #04a59b;
   outline-offset: -2px;
 }
 

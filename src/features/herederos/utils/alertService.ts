@@ -41,12 +41,9 @@ export const ALERT_MESSAGES = {
 export const DOCUMENT_INFO = {
   CEDULA: {
     title: 'Cédula de identidad',
-    description: 'Copia legible del documento oficial por ambas caras, que acredita la identidad de la persona heredera.',
-    requirements: [
-      'Nombre completo y RUT',
-      'Fecha de nacimiento',
-      'Número documento',
-    ],
+    description:
+      'Copia legible del documento oficial por ambas caras, que acredita la identidad de la persona heredera.',
+    requirements: ['Nombre completo y RUT', 'Fecha de nacimiento', 'Número documento'],
     images: [
       { src: cedulaFront, alt: 'Anverso', width: 200 },
       { src: cedulaBack, alt: 'Reverso', width: 200 },
@@ -54,7 +51,8 @@ export const DOCUMENT_INFO = {
   },
   PODER: {
     title: 'Poder notarial',
-    description: 'Documento legal que autoriza a la persona heredera para actuar en representación de terceros.',
+    description:
+      'Documento legal que autoriza a la persona heredera para actuar en representación de terceros.',
     requirements: [
       'Datos del poderdante y apoderado',
       'Facultades otorgadas',
@@ -62,13 +60,12 @@ export const DOCUMENT_INFO = {
       'Firma ante notario',
       'Fecha y lugar',
     ],
-    images: [
-      { src: cartaPoder, alt: 'Poder', width: 400 },
-    ],
+    images: [{ src: cartaPoder, alt: 'Poder', width: 400 }],
   },
   POSESION: {
     title: 'Posesión efectiva',
-    description: 'Documento legal que otorga a la persona heredera el derecho de acceder y administrar los bienes y derechos del titular (la persona fallecida).',
+    description:
+      'Documento legal que otorga a la persona heredera el derecho de acceder y administrar los bienes y derechos del titular (la persona fallecida).',
     requirements: [
       'Datos del causante',
       'Lista de herederos',
@@ -77,9 +74,7 @@ export const DOCUMENT_INFO = {
       'Declaración jurada de los herederos',
       'Certificado de defunción',
     ],
-    images: [
-      { src: cartaPosesion, alt: 'Posesión', width: 400 },
-    ],
+    images: [{ src: cartaPosesion, alt: 'Posesión', width: 400 }],
   },
 } as const;
 
@@ -121,9 +116,7 @@ const showSimpleAlert = (config: { title: string; text?: string }): Promise<any>
 const showDocumentAlert = (docType: keyof typeof DOCUMENT_INFO): Promise<any> => {
   const doc = DOCUMENT_INFO[docType];
 
-  const requirementsList = doc.requirements
-    .map(req => `<li>${req}</li>`)
-    .join('');
+  const requirementsList = doc.requirements.map(req => `<li>${req}</li>`).join('');
 
   const imagesHtml = doc.images
     .map(img => `<img src="${img.src}" alt="${img.alt}" width="${img.width}" />`)
@@ -181,7 +174,7 @@ export const mostrarAlertaRutNoEncontrado = (onClose?: () => void): Promise<any>
     text: ALERT_MESSAGES.RUT_NO_ENCONTRADO.text,
     allowOutsideClick: false,
     allowEscapeKey: false,
-  }).then((result) => {
+  }).then(result => {
     if (result.isConfirmed) {
       Swal.close();
       if (onClose) {

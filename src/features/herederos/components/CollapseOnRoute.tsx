@@ -20,4 +20,4 @@ export const CollapseOnRoute: React.FC<{ children: React.ReactNode }> = ({ child
   }, [location.pathname, isMenuCollapsed, collapseMenu]);
 
   return <>{children}</>;
-}; 
+};

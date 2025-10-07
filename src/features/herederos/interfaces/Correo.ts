@@ -1,5 +1,5 @@
 interface Correo {
-    mail: string;
-    validacion: number;
-  }
+  mail: string;
+  validacion: number;
+}
 export type { Correo };
