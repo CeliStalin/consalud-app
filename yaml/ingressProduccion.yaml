@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: $(appname)-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    cert-manager.io/cluster-issuer: letsencrypt
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, DELETE, PATCH"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,X-API-CONSALUD-SEGURIDAD"
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 15m
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - $(appname).$(capacidad).consalud.net
+      secretName: $(appname)-$(capacidad)-tls
+  rules:
+    - host: $(appname).$(capacidad).consalud.net
+      http:
+        paths:
+          - path: /(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: $(appname)-$(capacidad)-service
+                port:
+                  number: 80

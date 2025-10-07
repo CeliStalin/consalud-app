@@ -23,7 +23,7 @@ stages:
         pool:
           name: Default
         steps:
-          - template: sonar-pipeline.yml
+          - template: yaml/Template_Sonar.yaml
   - stage: BuildDev
     displayName: "Build Desarrollo"
     jobs:
@@ -50,8 +50,6 @@ stages:
               context: .
               tags: |
                 $(Build.BuildNumber)
-
-                dev
               includeLatestTag: true
               imageName: $(BuildParameters.AppName)
           - task: Docker@0
@@ -65,16 +63,14 @@ stages:
               imageName: $(BuildParameters.AppName)
               tags: |
                 $(Build.BuildNumber)
-
-                dev
           - task: replacetokens@4
             displayName: Replace tokens
             inputs:
-              rootDirectory: ./
+              rootDirectory: yaml/
               targetFiles: >-
                 deployment.yaml
 
-                Ingress.yaml
+                ingress.yaml
 
                 service.yaml
               tokenPattern: azpipelines
@@ -91,7 +87,7 @@ stages:
             inputs:
               kubernetesServiceConnection: "rke_des-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
               namespace: default
-              manifests: deployment.yaml
+              manifests: yaml/deployment.yaml
           - task: Kubernetes@1
             displayName: kubectl rollout
             inputs:
@@ -104,13 +100,13 @@ stages:
             inputs:
               kubernetesServiceConnection: "rke_des-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
               namespace: default
-              manifests: service.yaml
+              manifests: yaml/service.yaml
           - task: KubernetesManifest@0
             displayName: deploy Ingress
             inputs:
               kubernetesServiceConnection: "rke_des-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
               namespace: default
-              manifests: Ingress.yaml
+              manifests: yaml/ingress.yaml
       - job: Aprobacion
         dependsOn: Job_1
         condition: succeeded()
@@ -163,11 +159,11 @@ stages:
           - task: replacetokens@4
             displayName: Replace tokens
             inputs:
-              rootDirectory: ./
+              rootDirectory: yaml/
               targetFiles: >-
                 deployment.yaml
 
-                Ingress.yaml
+                ingress.yaml
 
                 service.yaml
               tokenPattern: azpipelines
@@ -184,7 +180,7 @@ stages:
             inputs:
               kubernetesServiceConnection: "rke-tes-Utilitarios-Transversales-SolicitudesClientes"
               namespace: default
-              manifests: deployment.yaml
+              manifests: yaml/deployment.yaml
           - task: Kubernetes@1
             displayName: kubectl rollout
             inputs:
@@ -197,13 +193,13 @@ stages:
             inputs:
               kubernetesServiceConnection: "rke-tes-Utilitarios-Transversales-SolicitudesClientes"
               namespace: default
-              manifests: service.yaml
+              manifests: yaml/service.yaml
           - task: KubernetesManifest@0
             displayName: deploy Ingress
             inputs:
               kubernetesServiceConnection: "rke-tes-Utilitarios-Transversales-SolicitudesClientes"
               namespace: default
-              manifests: Ingress.yaml
+              manifests: yaml/ingress.yaml
       - job: Aprobacion
         dependsOn: Job_2
         condition: succeeded()

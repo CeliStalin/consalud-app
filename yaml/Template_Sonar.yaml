@@ -1,0 +1,42 @@
+steps:
+  - task: NodeTool@0
+    displayName: "Instalar Node.js"
+    inputs:
+      versionSpec: "18.x" # Especifica la versión de Node.js que usa tu proyecto
+  - script: npm install
+    displayName: "Instalar dependencias del proyecto"
+  - task: SonarQubePrepare@5
+    displayName: "Preparar Análisis en SonarQube"
+    inputs:
+      SonarQube: "SonarQube-SolicitudesClientes" # Reemplaza con el nombre de tu Service Connection de SonarQube
+      scannerMode: "CLI"
+      configMode: "manual"
+      cliProjectKey: "$(Build.Repository.ID)"
+      cliProjectName: "$(System.TeamProject)-$(Build.Repository.Name)"
+      cliProjectVersion: "$(Build.BuildNumber)"
+      extraProperties: |
+        # Propiedades para un proyecto TypeScript/JavaScript
+        sonar.sources=src
+        sonar.tests=src
+        sonar.test.inclusions=src/**/*.test.tsx,src/**/*.test.ts
+        sonar.javascript.lcov.reportPaths=coverage/lcov.info
+        sonar.sourceEncoding=UTF-8
+  - task: PowerShell@2
+    displayName: SQ Fix
+    inputs:
+      targetType: "inline"
+      script: |
+        $params = "$env:SONARQUBE_SCANNER_PARAMS" -replace '"sonar.branch.name":"[\w,/,-]*"\,?'
+
+        Write-Host "##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]$params"
+  - script: npm test -- --coverage
+    displayName: "Ejecutar pruebas y generar cobertura"
+    continueOnError: false
+  - task: SonarQubeAnalyze@5
+    displayName: "Ejecutar Análisis de Código"
+  - task: SonarQubePublish@5
+    displayName: "Publicar Resultado de Quality Gate"
+    condition: succeededOrFailed()
+    inputs:
+      pollingTimeoutSec: "300"
+  

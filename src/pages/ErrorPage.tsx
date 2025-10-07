@@ -1,9 +1,9 @@
+import WarningIcon from '@/assets/Warning.svg';
 import { Stepper, StepperProvider } from '@/features/herederos/components/Stepper';
 import * as ConsaludCore from '@consalud/core';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './styles/ErrorPage.css';
-import WarningIcon from '/public/Warning.svg';
 
 const ErrorPage: React.FC = () => {
   const navigate = useNavigate();

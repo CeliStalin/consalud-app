@@ -1,0 +1,56 @@
+steps:
+  - task: replacetokens@5
+    displayName: Reemplazar Variables
+    inputs:
+      rootDirectory: ${{ parameters.rutaManifests }}
+      targetFiles: >-
+        deployment.yaml
+
+        ingress.yaml
+
+        ingressProduccion.yaml
+
+        service.yaml
+
+        autoscaling.yaml
+
+      tokenPattern: azpipelines
+      tokenPrefix: ""
+      tokenSuffix: ""
+      writeBOM: false
+      verbosity: detailed
+      actionOnMissing: fail
+      actionOnNoFiles: fail
+  - task: KubectlInstaller@0
+    displayName: Instalar Kubectl latest
+  - task: KubernetesManifest@0
+    displayName: Despliegue Api
+    inputs:
+      kubernetesServiceConnection: ${{ parameters.kubernetesServiceConnection }}
+      namespace: default
+      manifests: ${{ parameters.manifestDeploy }}
+  - task: Kubernetes@1
+    displayName: kubectl rollout
+    inputs:
+      kubernetesServiceEndpoint: ${{ parameters.kubernetesServiceConnection }}
+      namespace: default
+      command: rollout
+      arguments: restart deployment ${{ parameters.appName }}-${{ parameters.capacidad }}
+  - task: KubernetesManifest@0
+    displayName: Despliegue Servicio
+    inputs:
+      kubernetesServiceConnection: ${{ parameters.kubernetesServiceConnection }}
+      namespace: default
+      manifests: ${{ parameters.manifestService }}
+  - task: KubernetesManifest@0
+    displayName: Despliegue Ingress
+    inputs:
+      kubernetesServiceConnection: ${{ parameters.kubernetesServiceConnection }}
+      namespace: default
+      manifests: ${{ parameters.manifestIngress }}
+  - task: KubernetesManifest@0
+    displayName: Despliegue AutoScaling
+    inputs:
+      kubernetesServiceConnection: ${{ parameters.kubernetesServiceConnection }}
+      namespace: default
+      manifests: ${{ parameters.manifestAutoscaler }}

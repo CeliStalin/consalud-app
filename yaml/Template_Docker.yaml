@@ -1,0 +1,29 @@
+steps:
+  - checkout: self
+    clean: True
+  - task: Docker@2
+    displayName: Construir la Imagen Docker
+    inputs:
+      containerRegistry: ${{ parameters.dockerRegistryEndpoint }}
+      command: build
+      Dockerfile: ${{ parameters.dockerfilepath }}
+      buildContext: .
+      arguments: |
+        --tag $(ECR)/${{ parameters.appname }}:$(Build.BuildNumber)
+
+        --build-arg BUILD_CONFIGURATION=$(BUILD_CONFIGURATION)
+
+        --build-arg AMBIENTE=$(ambiente)
+
+        --build-arg MODE=development
+
+        --secret id=nuget_pat,src=/home/debian/azure/azure_pat
+
+      tags: $(Build.BuildNumber)
+  - task: Docker@2
+    displayName: Subir la Imagen
+    inputs:
+      containerRegistry: ${{ parameters.dockerRegistryEndpoint }}
+      repository: ${{ parameters.appname }}
+      command: push
+      tags: $(Build.BuildNumber)

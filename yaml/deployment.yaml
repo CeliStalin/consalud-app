@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $(appname)-$(capacidad)
+  labels:
+    app: $(appname)
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: $(appname)
+  template:
+    metadata:
+      labels:
+        app: $(appname)
+    spec:
+      containers:
+        - name: $(appname)
+          image: $(ECR)/$(appname):$(Build.BuildNumber)
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              protocol: TCP
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "128Mi"
+        limits:
+          cpu: "500m"
+          memory: "256Mi"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - $(appname)
+                topologyKey: "kubernetes.io/hostname"
+      imagePullSecrets:
+        - name: acr-secret

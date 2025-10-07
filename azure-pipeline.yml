@@ -1,0 +1,168 @@
+trigger: none
+variables:
+  - name: BuildParameters.RestoreBuildProjects
+    value: "**/*.csproj"
+  - name: BuildParameters.TestProjects
+    value: "**/*[Tt]ests/*.csproj"
+  - name: Aprobadores
+    value: '[Consalud]\CS_Pandora'
+  - name: Explotacion
+    value: '[Consalud]\CS_Explotacion'
+    #Dev
+  - name: DockerRegistryEndpoint.Devel # Nombre Endpoint Registry con imagen de desarrollo
+    value: "azure-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
+  - name: KubernetesServiceConnection.Devel # Service Connection RKE Des
+    value: "rke_des-Utilitarios-Transversales-PlantillaReact-SolicitudesClientes"
+    #Test
+  - name: DockerRegistryEndpoint.Test # Nombre Endpoint Registry con imagen de Testing y Produccion
+    value: "RegistryProdCSLD-SolicitudesClientes"
+  - name: KubernetesServiceConnection.Test # Service Connection RKE Des
+    value: "rke-tes-Utilitarios-Transversales-SolicitudesClientes"
+    #Prod
+  - name: DockerRegistryEndpoint.Prod # Nombre Endpoint Registry con imagen de Testing y Produccion
+    value: "RegistryProdCSLD-SolicitudesClientes"
+  - name: KubernetesServiceConnection.Prod # Service Connection RKE Des
+    value: "rke-tes-Utilitarios-Transversales-SolicitudesClientes"
+name: $(date:yyyyMMdd)$(rev:.r)
+stages:
+  - stage: SonarQube
+    displayName: "SonarQube"
+    jobs:
+      - job: RunSonarQube
+        displayName: Análisis de Código Estático
+        pool:
+          name: Default
+        steps:
+          - template: yaml/Template_Sonar.yaml
+      - job: Aprobacion
+        dependsOn: RunSonarQube
+        condition: succeeded()
+        displayName: Esperando por aprobaciones
+        pool: server
+        timeoutInMinutes: 4320
+        steps:
+          - task: ManualValidation@0
+            timeoutInMinutes: 1440
+            inputs:
+              notifyUsers: |
+                $(Aprobadores)
+
+                angelo.bernardi@consalud.cl
+              instructions: "Su Aprobación para SonarQube $(System.TeamProject)-$(Build.Repository.Name)-$(Build.BuildNumber)"
+              onTimeout: "reject"
+  - stage: BuildDev
+    displayName: "Build y Deploy Desarrollo"
+    jobs:
+      - job: Job_1
+        displayName: Agent job 1
+        pool:
+          name: DockerAgents
+        variables:
+          - group: ReleaseClusterDev
+        steps:
+          - template: yaml/Template_Docker.yaml
+            parameters:
+              dockerfilepath: Dockerfile
+              dockerRegistryEndpoint: $(DockerRegistryEndpoint.Devel)
+              appname: $(appname)
+          - template: yaml/Template_KubernetesDeployment.yaml
+            parameters:
+              kubernetesServiceConnection: $(KubernetesServiceConnection.Devel)
+              rutaManifests: yaml/
+              manifestDeploy: yaml/deployment.yaml
+              manifestService: yaml/service.yaml
+              manifestIngress: yaml/ingress.yaml
+              manifestAutoscaler: yaml/autoscaling.yaml
+              appName: $(appname)
+              capacidad: $(capacidad)
+      - job: Aprobacion
+        dependsOn: Job_1
+        condition: succeeded()
+        displayName: Esperando por aprobaciones
+        pool: server
+        timeoutInMinutes: 4320
+        steps:
+          - task: ManualValidation@0
+            timeoutInMinutes: 1440
+            inputs:
+              notifyUsers: |
+                $(Aprobadores)
+
+                angelo.bernardi@consalud.cl
+              instructions: "Su Aprobación para Desarrollo $(System.TeamProject)-$(Build.Repository.Name)-$(Build.BuildNumber)"
+              onTimeout: "reject"
+  - stage: BuildDeployTes
+    displayName: "Build y Deploy Testing"
+    jobs:
+      - job: Job_2
+        displayName: Agent job 1
+        pool:
+          name: DockerAgents
+        variables:
+          - group: ReleaseClusterTes
+        steps:
+          - template: yaml/Template_Docker.yaml
+            parameters:
+              dockerRegistryEndpoint: $(DockerRegistryEndpoint.Test)
+          - template: yaml/Template_KubernetesDeployment.yaml
+            parameters:
+              kubernetesServiceConnection: $(KubernetesServiceConnection.Test)
+              rutaManifests: yaml/
+              manifestDeploy: yaml/deployment.yaml
+              manifestService: yaml/service.yaml
+              manifestIngress: yaml/ingress.yaml
+              manifestAutoscaler: yaml/autoscaling.yaml
+              appName: $(appname)
+              capacidad: $(capacidad)
+      - job: Aprobacion
+        dependsOn: Job_2
+        condition: succeeded()
+        displayName: Esperando por aprobaciones
+        pool: server
+        timeoutInMinutes: 4320
+        steps:
+          - task: ManualValidation@0
+            timeoutInMinutes: 1440
+            inputs:
+              notifyUsers: |
+                $(Aprobadores)
+
+                angelo.bernardi@consalud.cl
+              instructions: "Su Aprobación para Testing $(System.TeamProject)-$(Build.Repository.Name)-$(Build.BuildNumber)"
+              onTimeout: "reject"
+  - stage: DeployProd
+    displayName: "Deploy Produccion"
+    jobs:
+      - job: Job_3
+        displayName: Agent job 1
+        pool:
+          name: DockerAgents
+        variables:
+          - group: ReleaseClusterProd
+        steps:
+          - template: Yaml/Template_KubernetesDeployment.yaml
+            parameters:
+              kubernetesServiceConnection: $(KubernetesServiceConnection.Test)
+              rutaManifests: yaml/
+              manifestDeploy: yaml/deployment.yaml
+              manifestService: yaml/service.yaml
+              manifestIngress: yaml/ingress.yaml
+              manifestAutoscaler: yaml/autoscaling.yaml
+              appName: $(appname)
+              capacidad: $(capacidad)
+      - job: Aprobacion
+        dependsOn: Job_3
+        condition: succeeded()
+        displayName: Esperando por aprobaciones
+        pool: server
+        timeoutInMinutes: 4320
+        steps:
+          - task: ManualValidation@0
+            timeoutInMinutes: 1440
+            inputs:
+              notifyUsers: |
+                $(Aprobadores)
+
+                angelo.bernardi@consalud.cl
+              instructions: "Su Aprobación para Produccion $(System.TeamProject)-$(Build.Repository.Name)-$(Build.BuildNumber)"
+              onTimeout: "reject"

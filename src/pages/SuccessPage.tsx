@@ -11,11 +11,9 @@ const SuccessPage: React.FC = () => {
   const handleBackToHome = useCallback(() => {
     navigate('/');
   }, [navigate]);
-
   return (
     <StepperProvider>
       <div className="success-page-container">
-        {/* Título "¡Listo!" */}
         <div className="success-page-title">
           <ConsaludCore.Typography
             variant="h4"
@@ -32,14 +30,11 @@ const SuccessPage: React.FC = () => {
           </ConsaludCore.Typography>
         </div>
 
-        {/* Stepper con todos los pasos completados - mismo tamaño que otras páginas */}
         <div className="success-page-stepper">
           <Stepper step={4} />
         </div>
 
-        {/* Tarjeta de éxito */}
         <div className="success-card">
-          {/* Icono de éxito */}
           <div className="success-icon">
             <img
               src={CheckRequisitosIcon}
@@ -49,20 +44,18 @@ const SuccessPage: React.FC = () => {
             />
           </div>
 
-          {/* Título principal */}
           <h1 className="success-title">
             La solicitud de devolución se ingresó correctamente
           </h1>
 
-          {/* Mensaje descriptivo */}
           <p className="success-message">
-            La persona heredera recibirá a través de su correo electronico registrado una notificacion de ingreso de la solicitud
+            La persona heredera recibirá a través de su correo electrónico registrado una notificación de ingreso de la solicitud
           </p>
 
-          {/* Botón de acción */}
           <button
             className="success-button"
             onClick={handleBackToHome}
+            aria-label="Volver a la página de inicio"
           >
             Volver al Inicio
           </button>

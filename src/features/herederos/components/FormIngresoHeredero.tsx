@@ -1,3 +1,5 @@
+import DatosPersonalesIcon from '@/assets/DatosPersonales.svg';
+import DireccionIcon from '@/assets/Direccion.svg';
 import * as ConsaludCore from '@consalud/core';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -65,9 +67,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       codComuna: undefined
     };
   });
-
-
-
 
   // Estado para manejar errores de validación
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
@@ -343,7 +342,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   useEffect(() => {
     if (localFormData.codRegion && regiones.length > 0) {
 
-
       // Cargar ciudades de la región guardada
       setLoadingCiudades(true);
       fetchCiudades(localFormData.codRegion)
@@ -394,7 +392,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   useEffect(() => {
     if (localFormData.region && regiones.length > 0) {
 
-
       // Buscar la región en la lista cargada para asegurar que existe
       const regionEncontrada = regiones.find(r => r.nombreRegion === localFormData.region);
       if (regionEncontrada) {
@@ -424,16 +421,11 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
   useEffect(() => {
     const hasStorageData = formData && Object.keys(formData).length > 0;
 
-
-
     // SOLO establecer región del heredero si NO hay datos del storage
     if (heredero && heredero.descripcionRegion && regiones.length > 0 && fieldsLocked && !hasStorageData) {
 
-
       // Buscar por código de región (método más confiable)
       const regionEncontradaVariaciones = regiones.find(r => r.idRegion === heredero.codRegion);
-
-
 
       if (regionEncontradaVariaciones) {
         // Siempre usar el nombre de la API, no el del backend
@@ -448,8 +440,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
 
   // Eliminar la sincronización automática que causa el infinite loop
   // Los cambios se guardarán solo cuando se envíe el formulario
-
-
 
   const handleBackClick = useCallback((): void => {
     navigate(-1);
@@ -922,7 +912,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
             <div className="form-section">
               <div className="section-title">
                 <div className="person-icon">
-                  <img src="/DatosPersonales.svg" alt="Datos personales" width="20" height="20" />
+                  <img src={DatosPersonalesIcon} alt="Datos personales" width="20" height="20" />
                 </div>
                 <span>Datos personales</span>
               </div>
@@ -1094,7 +1084,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
             <div className="form-section">
               <div className="section-title">
                 <div className="location-icon">
-                  <img src="/Direccion.svg" alt="Dirección" width="20" height="20" />
+                  <img src={DireccionIcon} alt="Dirección" width="20" height="20" />
                 </div>
                 <span>Dirección</span>
               </div>
