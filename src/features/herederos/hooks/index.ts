@@ -13,6 +13,5 @@ export { useTiposDocumento } from './useTiposDocumento';
 
 // Button locking system
 export { useButtonLocking } from './useButtonLocking';
-export { useExternalTab } from './useExternalTab';
 export { useGlobalButtonLocking } from './useGlobalButtonLocking';
 

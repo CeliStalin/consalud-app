@@ -65,7 +65,6 @@ class Logger {
   error(message: string, error?: any): void {
     console.error(`${this.config.prefix} ${message}`, error || '');
   }
-
   /**
    * Crea un logger con prefijo personalizado
    */
@@ -78,10 +77,5 @@ class Logger {
 
 // Exportar instancia singleton
 export const logger = new Logger();
-
-// Exportar función helper para crear loggers con contexto
-export const createLogger = (context: string): Logger => {
-  return logger.createLogger(context);
-};
 
 export default logger;

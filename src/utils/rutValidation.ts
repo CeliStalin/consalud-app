@@ -10,55 +10,29 @@
  */
 export const validarRut = (rut: string): boolean => {
   if (!rut) return false;
-  
+
   const rutLimpio = rut.replace(/\./g, '').replace('-', '');
-  
+
   if (!/^[0-9]{7,8}[0-9Kk]$/i.test(rutLimpio)) return false;
-  
+
   const rutDigits = rutLimpio.slice(0, -1);
   const dv = rutLimpio.slice(-1).toUpperCase();
-  
+
   let suma = 0;
   let multiplicador = 2;
-  
+
   for (let i = rutDigits.length - 1; i >= 0; i--) {
     suma += parseInt(rutDigits[i]) * multiplicador;
     multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
   }
-  
+
   const dvEsperado = 11 - (suma % 11);
-  
+
   let dvCalculado: string;
   if (dvEsperado === 11) dvCalculado = '0';
   else if (dvEsperado === 10) dvCalculado = 'K';
   else dvCalculado = dvEsperado.toString();
-  
   return dv === dvCalculado;
-};
-
-/**
- * Calcula el dígito verificador para un RUT
- * @param rut - RUT sin dígito verificador (solo números)
- * @returns Dígito verificador calculado
- */
-export const calcularDigitoVerificador = (rut: string): string => {
-  if (!rut || !/^[0-9]{7,8}$/.test(rut)) {
-    throw new Error('RUT debe contener 7 u 8 dígitos numéricos');
-  }
-  
-  let suma = 0;
-  let multiplicador = 2;
-  
-  for (let i = rut.length - 1; i >= 0; i--) {
-    suma += parseInt(rut[i]) * multiplicador;
-    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
-  }
-  
-  const dvEsperado = 11 - (suma % 11);
-  
-  if (dvEsperado === 11) return '0';
-  if (dvEsperado === 10) return 'K';
-  return dvEsperado.toString();
 };
 
 /**
@@ -68,17 +42,17 @@ export const calcularDigitoVerificador = (rut: string): string => {
  */
 export const formatearRut = (rut: string): string => {
   if (!rut) return '';
-  
+
   const valor = rut.replace(/\./g, '').replace('-', '');
-  
+
   if (valor.length < 2) return valor;
 
   const cuerpo = valor.slice(0, -1);
   const dv = valor.slice(-1).toUpperCase();
-  
+
   let rutFormateado = '';
   let j = 0;
-  
+
   for (let i = cuerpo.length - 1; i >= 0; i--) {
     rutFormateado = cuerpo.charAt(i) + rutFormateado;
     j++;
@@ -86,7 +60,7 @@ export const formatearRut = (rut: string): string => {
       rutFormateado = '.' + rutFormateado;
     }
   }
-  
+
   return `${rutFormateado}-${dv}`;
 };
 
@@ -157,4 +131,4 @@ export const MENSAJES_ERROR_RUT = {
   RUT_FORMATO_INVALIDO: 'El formato del RUT no es correcto',
   RUTS_IGUALES: 'El RUT del heredero no puede ser igual al del titular',
   RUT_DIGITO_VERIFICADOR_INVALIDO: 'El dígito verificador no es correcto'
-} as const; 
+} as const;
