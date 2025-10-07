@@ -118,7 +118,7 @@ export class FormDataTransformer {
 
   /**
    * Mapea el ID del parentesco a string
-   * Ahora retornamos el ID como string para mantener compatibilidad
+   *  retornamos el ID como string
    */
   private static mapIdToParentesco(id: number): string {
     // Si el ID es 0, significa que no se ha seleccionado parentesco

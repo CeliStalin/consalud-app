@@ -1,7 +1,6 @@
 // IMPORTANTE: Configurar el ambiente ANTES de importar cualquier componente del core
 import { initializeMsalConfig, setCoreEnvConfig } from '@consalud/core';
 
-// ⚠️ CRÍTICO: setCoreEnvConfig DEBE ejecutarse ANTES de importar otros módulos del core
 // Esto asegura que las URLs dinámicas se generen con el ambiente correcto
 setCoreEnvConfig({
   VITE_AMBIENTE: import.meta.env.VITE_AMBIENTE,
@@ -23,17 +22,16 @@ setCoreEnvConfig({
   VITE_AUTHORITY: import.meta.env.VITE_AUTHORITY,  VITE_APP_AUTHORITY: import.meta.env.VITE_APP_AUTHORITY,
 });
 
-// Ahora sí, importar el resto del core después de configurar
+// importar el resto del core después de configurar
 import '@consalud/core/core.css';
 import '@consalud/core/index.js';
 import 'bulma/css/bulma.min.css';
-import './styles/bulma-overrides.css';
-//import './styles/core-enhancements.css'
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './features/herederos/components/styles/globalStyle.css';
 import './styles/animations.css';
+import './styles/bulma-overrides.css';
 import './styles/navigation-optimizations.css';
 
 // Suprimir mensajes informativos de React en desarrollo

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 interface AnimationConfig {
   duration?: number;
@@ -8,10 +8,10 @@ interface AnimationConfig {
 }
 
 export const useAnimations = () => {
-  // OPTIMIZADO: Crear estilos más simples y rápidos
+
   const createAnimationStyles = useCallback((animationName: string, config: AnimationConfig = {}) => {
     const {
-      duration = 150, // Reducido significativamente
+      duration = 150,
       delay = 0,
       easing = 'ease-out',
       fillMode = 'both'
@@ -22,29 +22,28 @@ export const useAnimations = () => {
     };
   }, []);
 
-  // NUEVO: Animaciones ultra-optimizadas para navegación
+  //Animaciones optimizadas para navegación
   const navigationAnimations = {
     instantFade: (config?: AnimationConfig) => createAnimationStyles('instantFadeIn', { duration: 80, ...config }),
     microSlide: (config?: AnimationConfig) => createAnimationStyles('microSlide', { duration: 100, ...config }),
   };
 
-  // OPTIMIZADO: Animaciones predefinidas más rápidas
+  // Animaciones predefinidas rápidas
   const animations = {
     fadeInUp: (config?: AnimationConfig) => createAnimationStyles('fadeInUp', { duration: 200, ...config }),
     fadeInScale: (config?: AnimationConfig) => createAnimationStyles('fadeInScale', { duration: 150, ...config }),
     slideInLeft: (config?: AnimationConfig) => createAnimationStyles('slideInLeft', { duration: 120, ...config }),
     bounceIn: (config?: AnimationConfig) => createAnimationStyles('bounceIn', { duration: 300, ...config }),
-    // Nuevas animaciones optimizadas
     ...navigationAnimations,
   };
 
-  // NUEVO: Hook para navegación sin parpadeos
+  // Hook para navegación sin parpadeos
   const useInstantAnimation = (element: HTMLElement | null) => {
     useEffect(() => {
       if (element) {
         // Aplicar clases de estabilidad inmediatamente
         element.classList.add('instant-stable', 'navigation-stable', 'no-flash');
-        
+
         // Asegurar que el elemento sea visible inmediatamente
         element.style.opacity = '1';
         element.style.visibility = 'visible';
@@ -77,7 +76,7 @@ export const useAnimations = () => {
     // Remover la animación después de completarse
     const duration = config?.duration || 300;
     const delay = config?.delay || 0;
-    
+
     setTimeout(() => {
       element.style.animation = '';
     }, duration + delay);
@@ -88,7 +87,7 @@ export const useAnimations = () => {
     navigationAnimations,
     createAnimationStyles,
     useAnimateOnMount,
-    useInstantAnimation, // Nueva función
+    useInstantAnimation,
     triggerAnimation
   };
 };
