@@ -151,7 +151,7 @@
 }
 
 /* Control de tamaño de SVG */
-.section-icon svg, 
+.section-icon svg,
 .calendar-icon svg {
   width: 12px;
   height: 12px;
@@ -289,8 +289,8 @@
   border-radius: 8px 8px 0 0;
 }
 
-.react-datepicker__current-month, 
-.react-datepicker-time__header, 
+.react-datepicker__current-month,
+.react-datepicker-time__header,
 .react-datepicker-year-header {
   color: #374151;
   font-weight: 600;
@@ -301,7 +301,7 @@
   border-radius: 4px;
 }
 
-.react-datepicker__day--selected, 
+.react-datepicker__day--selected,
 .react-datepicker__day--keyboard-selected {
   background-color: #10b981;
   border-radius: 4px;
@@ -423,12 +423,12 @@
     flex-direction: column !important;
     gap: 12px !important;
   }
-  
+
   .ingreso-card .form-column {
     width: 100% !important;
     max-width: 100% !important;
   }
-  
+
   .form-container {
     padding: 20px;
     margin: 10px;
@@ -463,7 +463,7 @@
   z-index: 10;
 }
 
-/* Estilos para inputs y selectores - usando los mismos estilos que las páginas anteriores */
+/* Estilos para inputs y selectores*/
 .ingreso-card .form-column input,
 .ingreso-card .form-column select,
 .ingreso-card .form-column .select select,
@@ -549,7 +549,7 @@
   pointer-events: none !important;
 }
 
-/* Estilos de tipografía - usando los mismos estilos que las páginas anteriores */
+/* Estilos de tipografía */
 .ingreso-card .form-column label {
   color: #808080 !important;
   font-family: 'Work Sans', sans-serif !important;
@@ -577,7 +577,7 @@
   font-family: 'Work Sans', sans-serif !important;
 }
 
-/* Botón continuar - usando los mismos estilos que las páginas anteriores */
+/* Botón continuar */
 .ingreso-card .continue-button {
   margin-top: 32px !important;
   text-align: center !important;

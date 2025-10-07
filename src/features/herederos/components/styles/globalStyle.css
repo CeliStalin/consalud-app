@@ -151,8 +151,8 @@
     border: none;
     border-radius: 24px;
     padding: 12px 24px;
-    /* font-weight: 600; */ /* Handled by Typography */
-    /* font-size: 16px; */ /* Handled by Typography */
+    /* font-weight: 600; */
+    /* font-size: 16px; */
     cursor: pointer;
     box-shadow: 0px 2px 14px 4px rgba(208, 208, 208, 0.35);
     opacity: 1;
@@ -222,7 +222,7 @@
     box-shadow: 0px 2px 14px 4px rgba(208, 208, 208, 0.35);
     display: flex;
     align-items: center;
-    justify-content: space-between; 
+    justify-content: space-between;
 }
 
 
@@ -262,7 +262,7 @@
     align-self: stretch;
 }
 .textoCargaDocumento {
-    /* color: var(--Colores-Nueva-SD-Medio-Gris-Medio, #656565); */ /* Use theme text color */
+    /* color: var(--Colores-Nueva-SD-Medio-Gris-Medio, #656565); */
     text-align: center;
     /* Párrafo (transversal)/P.Pequeño Bold */
     /* font-family: "Source Sans Pro"; */
@@ -423,7 +423,7 @@
   animation: fadeInUp 0.6s ease-out;
 }
 
-/* NUEVO: Estilos específicos para mejorar el scroll en la página de carga de documentos */
+/* Estilos específicos para mejorar el scroll en la página de carga de documentos */
 .carga-documentos-container {
   min-height: 100vh;
   overflow-y: auto;
@@ -431,7 +431,7 @@
   padding-bottom: 5rem;
 }
 
-/* CRÍTICO: Sobrescribir las restricciones de altura del navigation-optimizations.css */
+/* Sobrescribir las restricciones de altura del navigation-optimizations.css */
 .route-container.layout-stable.instant-stable.navigation-stable.no-flash {
   min-height: auto !important;
   height: 100vh !important;
@@ -498,27 +498,27 @@
   .carga-documentos-container {
     padding-bottom: 3.75rem;
   }
-  
+
   .carga-documentos-card {
     margin: 0 0.5rem;
   }
-  
+
   .carga-documentos-button-container {
     padding: 0.75rem 0;
   }
-  
+
   .generalContainer {
     padding: 0 0.5rem;
   }
-  
+
   .card-responsive {
     max-width: 100%;
   }
-  
+
   .carga-documentos-header {
     margin-bottom: 1rem;
   }
-  
+
   .carga-documentos-header > div {
     margin-left: 1rem !important;
   }
@@ -533,7 +533,7 @@
   flex-direction: column;
 }
 
-/* Mejoras para el botón */
+
 .carga-documentos-button-container button {
   transition: all 0.3s ease;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
@@ -548,7 +548,7 @@
   transform: translateY(0);
 }
 
-/* Mejoras para el área de upload */
+
 .document-upload-area {
   transition: all 0.3s ease;
   border: 2px dashed #E0E0E0;
@@ -568,15 +568,15 @@
   .carga-documentos-card {
     padding: 1.5rem 1rem !important;
   }
-  
+
   .carga-documentos-card > div:first-child {
     margin-bottom: 1.5rem !important;
   }
-  
+
   .carga-documentos-card > div:nth-child(2) {
     gap: 1.5rem;
   }
-  
+
   .carga-documentos-button-container {
     padding: 0.5rem 0;
   }
@@ -587,7 +587,7 @@
   .carga-documentos-card {
     padding: 2rem 2rem !important;
   }
-  
+
   .card-responsive {
     max-width: 40rem;
   }
@@ -598,7 +598,7 @@
   .carga-documentos-card {
     padding: 2rem 3rem !important;
   }
-  
+
   .card-responsive {
     max-width: 50rem;
   }

@@ -33,13 +33,13 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
   const checkForOpenTabs = async () => {
     setCheckingTabs(true);
     try {
-      console.log('🔍 [ButtonLocking] Verificando estado de pestañas externas...');
+      console.log('[ButtonLocking] Verificando estado de pestañas externas...');
 
       // Usar el nuevo servicio de comunicación que es más confiable
       const tabsAreOpen = hasExternalTabs;
       setHasOpenTabs(tabsAreOpen);
 
-      console.log('🔍 [ButtonLocking] Estado de pestañas desde useTabCommunication:', {
+      console.log('[ButtonLocking] Estado de pestañas desde useTabCommunication:', {
         hasExternalTabs,
         externalTabsCount,
         tabsAreOpen,
@@ -50,7 +50,7 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
 
       return tabsAreOpen;
     } catch (error) {
-      console.error('❌ [ButtonLocking] Error al verificar pestañas:', error);
+      console.error('[ButtonLocking] Error al verificar pestañas:', error);
       setHasOpenTabs(false);
       return false;
     } finally {
@@ -60,17 +60,17 @@ export const ButtonLockingNotification: React.FC<ButtonLockingNotificationProps>
 
   // Función para manejar el desbloqueo con verificación de pestañas
   const handleUnlockWithTabCheck = async () => {
-    console.log('🔓 [Manual] Usuario solicitó desbloqueo manual con verificación de pestañas');
+    console.log('[Manual] Usuario solicitó desbloqueo manual con verificación de pestañas');
 
     const tabsAreOpen = await checkForOpenTabs();
 
     if (tabsAreOpen) {
-      console.log('⚠️ [Manual] No se puede desbloquear - hay pestañas abiertas');
+      console.log(' [Manual] No se puede desbloquear - hay pestañas abiertas');
       // No desbloquear si hay pestañas abiertas
       return;
     }
 
-    console.log('✅ [Manual] No hay pestañas abiertas - procediendo con desbloqueo');
+    console.log(' [Manual] No hay pestañas abiertas - procediendo con desbloqueo');
 
     // Limpiar el estado persistente de pestaña externa
     localStorage.removeItem('consalud_external_tab_active');

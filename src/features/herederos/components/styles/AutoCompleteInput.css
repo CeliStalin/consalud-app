@@ -1,4 +1,4 @@
-/* Estilos para el componente AutoCompleteInput - UX Elegante siguiendo estándares del proyecto */
+/* Estilos para el componente AutoCompleteInput */
 
 .autocomplete-container {
   position: relative;
@@ -53,8 +53,8 @@
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.15), 
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.15),
     0 2px 8px rgba(0, 0, 0, 0.1),
     0 0 0 1px rgba(255, 255, 255, 0.8);
   max-height: 200px;
@@ -211,12 +211,12 @@
   .autocomplete-dropdown {
     max-height: 150px;
   }
-  
+
   .autocomplete-item {
     padding: 14px 16px;
     font-size: 16px;
   }
-  
+
   .autocomplete-container .input {
     height: 44px;
     font-size: 16px;
@@ -267,4 +267,4 @@
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200px 100%;
   animation: shimmer 1.5s infinite;
-} 
+}

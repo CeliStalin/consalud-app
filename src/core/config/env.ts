@@ -49,7 +49,7 @@ class Environment {
     for (const key of required) {
       if (!this.env[key as keyof EnvVariables]) {
         console.error(`Variable de entorno requerida no disponible: ${key}`);
-        // En producción, mejor lanzar un error
+        //
         if (this.isProduction()) {
           throw new Error(`Variable de entorno requerida: ${key}`);
         }

@@ -116,11 +116,7 @@ const HerederosLayout: React.FC = () => (
   <CoreProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
     <TitularProvider>
       <HerederoProvider>
-        <ButtonLockingProviderWrapper
-          showNotification={false}
-          showOverlay={false}
-          showTopBar={false}
-        >
+        <ButtonLockingProviderWrapper>
           <CollapseOnRoute>
             <Outlet />
           </CollapseOnRoute>
