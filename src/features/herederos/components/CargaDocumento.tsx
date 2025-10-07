@@ -2,10 +2,10 @@ import * as ConsaludCore from '@consalud/core';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHeredero } from "../contexts/HerederoContext";
-import { UseAlert } from "../hooks/Alert";
 import { useFileStorage } from "../hooks/useFileStorage";
 import { useTiposDocumento } from "../hooks/useTiposDocumento";
 import { TipoDocumento } from "../interfaces/Pargen";
+import { mostrarEjemploCedula, mostrarEjemploPoder, mostrarEjemploPosesion } from "../utils/alertService";
 import { DocumentUploadArea } from "./DocumentUploadArea";
 import { useStepper } from "./Stepper";
 import { StorageCleanup } from "./StorageCleanup";
@@ -17,7 +17,6 @@ const CargaDocumento: React.FC = () => {
 
   const navigate = useNavigate();
   const { tiposDocumento, loading: loadingTipos, error: errorTipos } = useTiposDocumento();
-  const { ejemploCedula, ejemploPoder, ejemploPosesion } = UseAlert();
   const { setStep } = useStepper();
   const { heredero } = useHeredero();
 
@@ -60,18 +59,17 @@ const CargaDocumento: React.FC = () => {
 
     return () => clearTimeout(timer);
   }, []);
-
   const handleFlow = useCallback(async (tipoDocumento: TipoDocumento) => {
     try {
       switch (tipoDocumento.valValor) {
         case 1: // Cédula de Identidad
-          ejemploCedula();
+          mostrarEjemploCedula();
           break;
         case 2: // Poder Notarial
-          ejemploPoder();
+          mostrarEjemploPoder();
           break;
         case 3: // Posesión Efectiva
-          ejemploPosesion();
+          mostrarEjemploPosesion();
           break;
         default:
           console.warn(`Tipo de documento no reconocido: ${tipoDocumento.valValor}`);
@@ -79,7 +77,7 @@ const CargaDocumento: React.FC = () => {
     } catch (err) {
       console.error('Error en handleFlow:', err);
     }
-  }, [ejemploCedula, ejemploPoder, ejemploPosesion]);
+  }, []);
 
   const handleFileInputChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>, tipoId: number) => {
     const file = e.target.files?.[0];
@@ -376,3 +374,4 @@ const CargaDocumento: React.FC = () => {
 };
 
 export { CargaDocumento };
+

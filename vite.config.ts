@@ -27,8 +27,7 @@ export default defineConfig({
   preview: {
     host: '0.0.0.0',
     port: 4173
-  },
-  build: {
+  },  build: {
     target: 'esnext',
     outDir: 'dist',
     rollupOptions: {
@@ -37,13 +36,13 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           'pages-critical': [
-            './src/pages/IngresoHerederosPage',
             './src/pages/IngresoTitularPage'
           ],
           'pages-secondary': [
             './src/pages/DatosTitularPage',
             './src/pages/RegistroHerederoPage'
-          ],          'pages-forms': [
+          ],
+          'pages-forms': [
             './src/pages/IngresoHerederoFormPage'
           ],
           'pages-final': [

@@ -1,4 +1,4 @@
-import { formatearRut } from '../../../utils/rutValidation';
+import { extraerNumerosRut, formatearRut } from '../../../utils/rutValidation';
 import { Documento, DocumentosResponse } from '../interfaces/Documento';
 import { Calle, Ciudad, Comuna, Genero, NumeroCalle, Region, TipoDocumento, TipoParentesco } from '../interfaces/Pargen';
 import { SolicitantePostRequest, SolicitanteResponse, SolicitudPostRequest } from '../interfaces/Solicitante';
@@ -18,27 +18,6 @@ export interface CuentaBancariaResponse {
 }
 
 /**
- * Función helper para limpiar RUT (sin puntos ni DV)
- */
-const limpiarRut = (rut: string): string => {
-  if (!rut || typeof rut !== 'string') return '';
-  // Remover puntos, guiones y dígito verificador, mantener solo números
-  let rutLimpio = rut.replace(/[^0-9kK]/g, '');
-
-  // Si el RUT tiene dígito verificador (K o k), removerlo
-  if (rutLimpio.length > 0 && (rutLimpio.endsWith('K') || rutLimpio.endsWith('k'))) {
-    rutLimpio = rutLimpio.slice(0, -1);
-  }
-
-  // Si el RUT tiene más de 8 dígitos, tomar solo los primeros 8 (sin DV)
-  if (rutLimpio.length > 8) {
-    rutLimpio = rutLimpio.slice(0, 8);
-  }
-
-  return rutLimpio;
-};
-
-/**
  * Servicio para gestión de herederos
  * Maneja titulares, solicitantes y parámetros generales del sistema
  */
@@ -50,9 +29,10 @@ export class HerederosService {
   /**
    * Obtiene información de cuenta bancaria por RUT
    * @param rut - RUT del heredero (sin puntos ni DV)
-   */  async getCuentaBancaria(rut: string): Promise<CuentaBancariaResponse> {
-    const rutLimpio = limpiarRut(rut);
-    const url = `${this.config.baseUrl}/api/Mandatos/CuentaBancaria?rut=${rutLimpio}`;
+   */
+  async getCuentaBancaria(rut: string): Promise<CuentaBancariaResponse> {
+    const rutSinDV = extraerNumerosRut(rut);
+    const url = `${this.config.baseUrl}/api/Mandatos/CuentaBancaria?rut=${rutSinDV}`;
 
     try {
       const data = await apiGet<CuentaBancariaResponse>(url, this.config, 'obtener cuenta bancaria');

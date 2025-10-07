@@ -5,10 +5,15 @@ import '../../../pages/styles/IngresoHerederosPage.css';
 import '../components/styles/ingresoTitular.css';
 import { useHeredero } from "../contexts/HerederoContext";
 import { useTitular } from "../contexts/TitularContext";
-import { UseAlert } from "../hooks/Alert";
 import { useHerederoNavigation } from "../hooks/useHerederoNavigation";
 import { useRutChileno } from "../hooks/useRutChileno";
 import { useStorageCleanup } from "../hooks/useStorageCleanup";
+import {
+  mostrarAlertaHerederoRegistrado,
+  mostrarAlertaNoFallecido,
+  mostrarAlertaRutNoEncontrado,
+  mostrarAlertaSinDevolucion
+} from "../utils/alertService";
 import RutErrorMessage from './RutErrorMessage';
 
 /**
@@ -26,31 +31,11 @@ const IngresoTitular: React.FC = () => {
     const [showStepperError, setShowStepperError] = useState(false);
     const [hasShown404Alert, setHasShown404Alert] = useState(false);
 
-    // Hook de alertas - se ejecuta solo una vez
-    const alertFunctions = UseAlert();
-
     // Limpiar datos anteriores al iniciar un flujo nuevo
     useEffect(() => {
         cleanupAllHerederoData();
         limpiarHeredero();
     }, [limpiarHeredero, cleanupAllHerederoData]);
-
-    // Memoizar las funciones de alerta para evitar recreaciones
-    const mostrarAlerta = useCallback(() => {
-        alertFunctions.mostrarAlerta();
-    }, [alertFunctions]);
-
-    const mostrarAlerta2 = useCallback(() => {
-        alertFunctions.mostrarAlerta2();
-    }, [alertFunctions]);
-
-    const mostrarAlerta3 = useCallback((onClose?: () => void) => {
-        alertFunctions.mostrarAlerta3(onClose);
-    }, [alertFunctions]);
-
-    const mostrarAlertaHerederoRegistrado = useCallback(() => {
-        alertFunctions.mostrarAlertaHerederoRegistrado();
-    }, [alertFunctions]);
 
     // Resetear navegación y errores al cambiar el RUT
     useEffect(() => {
@@ -85,16 +70,15 @@ const IngresoTitular: React.FC = () => {
         }
         setShowError(false);
         setShowStepperError(false);
-        try {
-            const titularResult = await buscarTitular(rut);
+        try {            const titularResult = await buscarTitular(rut);
             // Bloquear avance si la persona está vigente (no fallecida)
             if (titularResult && titularResult.indFallecido === 'N') {
-                mostrarAlerta();
+                mostrarAlertaNoFallecido();
                 return;
             }
             // Bloquear avance si la persona está fallecida pero no tiene devolución
             if (titularResult && titularResult.indFallecido === 'S' && !titularResult.poseeFondos) {
-                mostrarAlerta2();
+                mostrarAlertaSinDevolucion();
                 return;
             }
             // Validar si el titular posee fondos y solicitudes (nueva validación)
@@ -120,7 +104,7 @@ const IngresoTitular: React.FC = () => {
                 goToRequisitosTitular();
             }
         }, 0);
-    }, [isValidRut, rut, buscarTitular, goToRequisitosTitular, mostrarAlerta, mostrarAlerta2, mostrarAlerta3, mostrarAlertaHerederoRegistrado, error]);
+    }, [isValidRut, rut, buscarTitular, goToRequisitosTitular, error]);
 
     // Feedback visual para error inesperado (modal)
     const renderStepperError = () => (
@@ -153,13 +137,11 @@ const IngresoTitular: React.FC = () => {
                 </div>
             </ConsaludCore.Card>
         </div>
-    );
-
-    // useEffect para manejar errores específicos del contexto
+    );    // useEffect para manejar errores específicos del contexto
     useEffect(() => {
         if (error === '404_NOT_FOUND' && !hasShown404Alert) {
             setHasShown404Alert(true);
-            mostrarAlerta3(() => {
+            mostrarAlertaRutNoEncontrado(() => {
                 // Limpiar el error cuando el usuario cierre la alerta
                 limpiarTitular();
                 setHasShown404Alert(false);

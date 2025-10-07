@@ -1,8 +1,8 @@
 import { useHeredero } from "@/features/herederos/contexts/HerederoContext";
 import { useTitular } from "@/features/herederos/contexts/TitularContext";
-import { UseAlert } from "@/features/herederos/hooks/Alert";
 import { useRutChileno } from "@/features/herederos/hooks/useRutChileno";
 import { useStorageCleanup } from "@/features/herederos/hooks/useStorageCleanup";
+import { mostrarAlertaTitularHerederoIgual } from "@/features/herederos/utils/alertService";
 import * as ConsaludCore from '@consalud/core';
 import React, { useCallback, useEffect, useState } from "react";
 import { validarRutsDiferentes } from '../../../utils/rutValidation';
@@ -27,7 +27,6 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
   const { rut, isValid: isValidRut, handleRutChange, setRut } = useRutChileno();
   const { heredero, limpiarHeredero } = useHeredero();
   const { titular } = useTitular();
-  const { mostrarAlertaTitularHeredero } = UseAlert();
   const { cleanupFormHerederoData, cleanupDocumentsByRut } = useStorageCleanup();
 
   // Estados simplificados
@@ -133,14 +132,13 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
       return;
     }
 
-    if (!isValidRut) {
-      setShowError(true);
+    if (!isValidRut) {    setShowError(true);
       return;
     }
 
     // Validar que el RUT del heredero no sea igual al del titular
     if (titular && titular.rut && !compararRuts(rutLimpio, titular.rut)) {
-      mostrarAlertaTitularHeredero();
+      mostrarAlertaTitularHerederoIgual();
       limpiarEstado();
       return;
     }
@@ -164,12 +162,11 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
       // Manejar error 412 (Precondition Failed) - heredero no encontrado
       if (error.message && error.message.includes('412')) {
         // El provider ya maneja el 412 y crea un heredero vacío con campos habilitados
-        setLastSearchedRut(rutLimpio);
-      }
+        setLastSearchedRut(rutLimpio);    }
     } finally {
       setLoading(false);
     }
-  }, [rut, isValidRut, buscarHeredero, titular, compararRuts, mostrarAlertaTitularHeredero, limpiarEstado, lastSearchedRut, cleanupFormHerederoData, cleanupDocumentsByRut]);
+  }, [rut, isValidRut, buscarHeredero, titular, compararRuts, limpiarEstado, lastSearchedRut, cleanupFormHerederoData, cleanupDocumentsByRut]);
 
   // Manejadores de eventos del input
   const handleBlur = useCallback((): void => {
