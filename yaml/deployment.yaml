@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: $(appname)
-          image: $(ECR)/$(appname):$(Build.BuildNumber)
+          image: $(ECR)/$(appname)-$(capacidad):$(Build.BuildNumber)
           imagePullPolicy: Always
           ports:
             - containerPort: 80

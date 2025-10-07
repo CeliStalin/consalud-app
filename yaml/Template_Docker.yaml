@@ -9,7 +9,7 @@ steps:
       Dockerfile: ${{ parameters.dockerfilepath }}
       buildContext: .
       arguments: |
-        --tag $(ECR)/${{ parameters.appname }}:$(Build.BuildNumber)
+        --tag $(ECR)/$(appname)-$(capacidad):$(Build.BuildNumber)
 
         --build-arg BUILD_CONFIGURATION=$(BUILD_CONFIGURATION)
 
@@ -24,6 +24,6 @@ steps:
     displayName: Subir la Imagen
     inputs:
       containerRegistry: ${{ parameters.dockerRegistryEndpoint }}
-      repository: ${{ parameters.appname }}
+      repository: $(appname)-$(capacidad)
       command: push
       tags: $(Build.BuildNumber)
