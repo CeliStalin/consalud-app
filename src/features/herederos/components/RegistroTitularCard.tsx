@@ -15,7 +15,7 @@ interface RegistroTitularCardProps {
 }
 
 /**
- * Componente para el registro de titular con funcionalidad mejorada:
+ * Componente para el registro de titular :
  * - El input de RUT permanece habilitado después de cargar el formulario
  * - Al cambiar el RUT, se limpian automáticamente los datos del formulario y documentos
  * - Se actualiza el session storage para mantener la consistencia de datos
@@ -164,7 +164,6 @@ export const RegistroTitularCard: React.FC<RegistroTitularCardProps> = ({
       // Manejar error 412 (Precondition Failed) - heredero no encontrado
       if (error.message && error.message.includes('412')) {
         // El provider ya maneja el 412 y crea un heredero vacío con campos habilitados
-        // No necesitamos hacer nada adicional aquí
         setLastSearchedRut(rutLimpio);
       }
     } finally {

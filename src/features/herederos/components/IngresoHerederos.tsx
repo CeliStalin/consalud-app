@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-// import RutSearchForm from './RutSearchForm';
 import * as ConsaludCore from '@consalud/core';
+import React, { useState } from 'react';
 
 interface SearchResult {
   rut: string;
@@ -17,7 +16,7 @@ const IngresoHerederos: React.FC = () => {
         <div className="columns is-centered">
           <div className="column is-narrow">
             {/* <RutSearchForm onSearch={handleSearch} loading={loading} /> */}
-            
+
             {searchResult && (
               <div className="box mt-5" style={{ width: '367px', margin: '20px auto' }}>
                 <h3 className="title is-5">Resultados de la búsqueda</h3>

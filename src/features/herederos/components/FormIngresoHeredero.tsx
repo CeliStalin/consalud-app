@@ -139,21 +139,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       .finally(() => setLoadingParentesco(false));
   }, []);
 
-  // Comentado: Ahora las ciudades se cargan cuando se selecciona una región
-  // React.useEffect(() => {
-  //   setLoadingCiudades(true);
-  //   fetchCiudades()
-  //     .then((data) => {
-  //       setCiudades(data);
-  //       setErrorCiudades(null);
-  //     })
-  //     .catch(() => {
-  //       setErrorCiudades('No se pudieron cargar las ciudades');
-  //       setCiudades([]);
-  //     })
-  //     .finally(() => setLoadingCiudades(false));
-  // }, []);
-
   React.useEffect(() => {
     setLoadingRegiones(true);
     fetchRegiones()
@@ -194,7 +179,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 setComunas(comunasData);
                 setErrorComunas(null);
 
-                // IMPORTANTE: Establecer el valor de comuna DESPUÉS de cargar las opciones
+                // Establecer el valor de comuna DESPUÉS de cargar las opciones
                 if (heredero.descripcionComuna) {
                   // Encontrar la comuna exacta para usar su formato original
                   const comunaExacta = comunasData.find(comuna => {
@@ -211,7 +196,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 }
               })
               .catch((error) => {
-                console.error('❌ Error cargando comunas:', error);
+                console.error('Error cargando comunas:', error);
                 setErrorComunas('No se pudieron cargar las comunas');
                 setComunas([]);
               })
@@ -219,7 +204,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
           }
         })
         .catch((error) => {
-          console.error('❌ Error cargando ciudades:', error);
+          console.error('Error cargando ciudades:', error);
           setErrorCiudades('No se pudieron cargar las ciudades');
           setCiudades([]);
         })
@@ -349,7 +334,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
           setCiudades(data);
           setErrorCiudades(null);
 
-          // IMPORTANTE: Establecer la ciudad del storage DESPUÉS de cargar las opciones
+          //  Establecer la ciudad del storage DESPUÉS de cargar las opciones
           if (formData?.ciudad && formData.ciudad !== localFormData.ciudad) {
             setLocalFormData(prevData => ({
               ...prevData,
@@ -365,7 +350,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
                 setComunas(comunasData);
                 setErrorComunas(null);
 
-                // IMPORTANTE: Establecer la comuna del storage DESPUÉS de cargar las opciones
+                // Establecer la comuna del storage DESPUÉS de cargar las opciones
                 if (formData?.comuna && formData.comuna !== localFormData.comuna) {
                   setLocalFormData(prevData => ({
                     ...prevData,
@@ -437,9 +422,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       }
     }
   }, [heredero, regiones.length, fieldsLocked, formData]);
-
-  // Eliminar la sincronización automática que causa el infinite loop
-  // Los cambios se guardarán solo cuando se envíe el formulario
 
   const handleBackClick = useCallback((): void => {
     navigate(-1);
@@ -524,12 +506,12 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       ...localFormData,
       region: value,
       codRegion: regionObj?.idRegion || undefined,
-      ciudad: '', // Resetear ciudad al cambiar región
-      comuna: '', // Resetear comuna al cambiar región
-      calle: '', // Resetear calle al cambiar región
-      numero: '', // Resetear número al cambiar región
-      codCiudad: undefined, // Resetear código de ciudad
-      codComuna: undefined // Resetear código de comuna
+      ciudad: '',
+      comuna: '',
+      calle: '',
+      numero: '',
+      codCiudad: undefined,
+      codComuna: undefined
     };
 
     setLocalFormData(newFormData);
@@ -578,10 +560,10 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       ...localFormData,
       ciudad: value,
       codCiudad: ciudadObj?.idCiudad || undefined,
-      comuna: '', // Resetear comuna al cambiar ciudad
-      calle: '', // Resetear calle al cambiar ciudad
-      numero: '', // Resetear número al cambiar ciudad
-      codComuna: undefined // Resetear código de comuna
+      comuna: '',
+      calle: '',
+      numero: '',
+      codComuna: undefined
     };
 
     setLocalFormData(newFormData);
@@ -719,17 +701,6 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       isValid = false;
     }
 
-    // Los campos de apellidos ya no son requeridos
-    // if (!localFormData.apellidoPaterno.trim()) {
-    //   newErrors.apellidoPaterno = 'El apellido paterno es requerido';
-    //   isValid = false;
-    // }
-
-    // if (!localFormData.apellidoMaterno.trim()) {
-    //   newErrors.apellidoMaterno = 'El apellido materno es requerido';
-    //   isValid = false;
-    // }
-
     if (!localFormData.telefono.trim()) {
       newErrors.telefono = 'El teléfono es requerido';
       isValid = false;
@@ -839,7 +810,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
         navigate('/mnherederos/ingresoher/cargadoc');
 
       } catch (error) {
-        console.error('❌ Error en validación de correo electrónico o teléfono:', error);
+        console.error('Error en validación de correo electrónico o teléfono:', error);
         setEmailValidationError('Error al validar los datos de contacto. Por favor, inténtelo nuevamente.');
         setPhoneValidationError('Error al validar los datos de contacto. Por favor, inténtelo nuevamente.');
       } finally {

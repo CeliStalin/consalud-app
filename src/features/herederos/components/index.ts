@@ -7,7 +7,6 @@ export { RegistroTitularCard } from './RegistroTitularCard';
 // Componentes de UI
 export { CargaMandatosCard } from './CargaMandatosCard';
 export { CustomSelect } from './CustomSelect';
-// MandatosIframeModal eliminado - sistema usa pestañas externas
 export { default as RutErrorMessage } from './RutErrorMessage';
 export { Stepper } from './Stepper';
 export { StorageCleanup } from './StorageCleanup';

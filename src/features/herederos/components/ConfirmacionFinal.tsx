@@ -1,10 +1,9 @@
-import React, { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import * as ConsaludCore from '@consalud/core';
-import { useFormHerederoData } from '../hooks/useFormHerederoData';
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTitular } from '../contexts/TitularContext';
-import { Stepper } from './Stepper';
-import { useStepper } from './Stepper';
+import { useFormHerederoData } from '../hooks/useFormHerederoData';
+import { Stepper, useStepper } from './Stepper';
 import './styles/ConfirmacionFinal.css';
 
 interface ConfirmacionFinalProps {
@@ -16,7 +15,7 @@ const ConfirmacionFinal: React.FC<ConfirmacionFinalProps> = ({ onSubmitSuccess }
   const { step, setStep } = useStepper();
   const { formData, error, isDirty, handleClearForm } = useFormHerederoData();
   const { titular } = useTitular();
-  
+
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -40,18 +39,13 @@ const ConfirmacionFinal: React.FC<ConfirmacionFinalProps> = ({ onSubmitSuccess }
     setSubmitError(null);
 
     try {
-      // Aquí iría la llamada al endpoint BFF
-      // const response = await saveHerederoData({
-      //   titularId: titular.id,
-      //   herederoData: formData
-      // });
 
       // Simular llamada al endpoint
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Limpiar datos del formulario después del éxito
       handleClearForm();
-      
+
       // Llamar callback de éxito si existe
       if (onSubmitSuccess) {
         onSubmitSuccess();
@@ -110,12 +104,12 @@ const ConfirmacionFinal: React.FC<ConfirmacionFinalProps> = ({ onSubmitSuccess }
             Confirmación final
           </span>
         </div>
-        
+
         {/* Stepper */}
         <div className="mb-5">
           <Stepper step={step} />
         </div>
-        
+
         {/* Card */}
         <ConsaludCore.Card
           title={undefined}
@@ -170,12 +164,12 @@ const ConfirmacionFinal: React.FC<ConfirmacionFinalProps> = ({ onSubmitSuccess }
                   'Sexo': formData.sexo,
                   'Parentesco': formData.parentesco
                 })}
-                
+
                 {renderDataSection('Información de contacto', {
                   'Teléfono': formData.telefono,
                   'Correo electrónico': formData.correoElectronico
                 })}
-                
+
                 {renderDataSection('Dirección', {
                   'Región': formData.region,
                   'Ciudad': formData.ciudad,
@@ -197,13 +191,13 @@ const ConfirmacionFinal: React.FC<ConfirmacionFinalProps> = ({ onSubmitSuccess }
                 >
                   Volver
                 </ConsaludCore.Button>
-                
+
                 <ConsaludCore.Button
                   variant="primary"
                   onClick={handleSubmit}
                   disabled={submitting || !isDirty}
                   loading={submitting}
-                  style={{ 
+                  style={{
                     minWidth: '120px',
                     backgroundColor: '#04A59B',
                     color: 'white'
@@ -224,4 +218,5 @@ const ConfirmacionFinal: React.FC<ConfirmacionFinalProps> = ({ onSubmitSuccess }
   );
 };
 
-export { ConfirmacionFinal }; 
+export { ConfirmacionFinal };
+

@@ -13,8 +13,7 @@ interface CustomSelectProps {
 }
 
 /**
- * Componente personalizado para selectores con UX elegante y sutil
- * Siguiendo los estándares de diseño del proyecto
+ * Componente personalizado para selectores
  */
 export const CustomSelect: React.FC<CustomSelectProps> = ({
   name,
@@ -56,7 +55,6 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
     };
   }, []);
 
-  // Simular el comportamiento del select nativo
   const handleSelectClick = () => {
     if (!disabled) {
       setIsOpen(!isOpen);
@@ -77,7 +75,6 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
       clearTimeout(blurTimeoutRef.current);
     }
 
-    // Usar un timeout más largo para permitir que el clic en las opciones funcione
     blurTimeoutRef.current = setTimeout(() => {
       setIsOpen(false);
       setIsFocused(false);
@@ -181,7 +178,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
         </div>
       </div>
 
-      {/* Dropdown personalizado - Fondo blanco como estándar del proyecto */}
+      {/* Dropdown personalizado - Fondo blanco */}
       {isOpen && !disabled && (
         <div className="custom-select-dropdown">
           {options.map(option => (

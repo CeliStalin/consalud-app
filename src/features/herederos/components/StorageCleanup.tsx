@@ -1,6 +1,6 @@
-import React, { useEffect, useCallback } from 'react';
-import { clearAllFiles, getStorageStats } from '../services/fileStorageService';
+import React, { useCallback, useEffect } from 'react';
 import { useStorageCleanup } from '../hooks/useStorageCleanup';
+import { clearAllFiles, getStorageStats } from '../services/fileStorageService';
 
 interface StorageCleanupProps {
   rut: string;
@@ -14,12 +14,12 @@ export const StorageCleanup: React.FC<StorageCleanupProps> = ({ rut, onCleanup }
   const cleanupOldFiles = useCallback(() => {
     try {
       const stats = getStorageStats(rut);
-      
+
       // Si el uso es mayor al 90%, limpiar archivos
       if (stats.percentageUsed > 90) {
-        console.warn('🔄 Limpieza automática de archivos iniciada - uso de storage:', stats.percentageUsed.toFixed(1) + '%');
+        console.warn('Limpieza automática de archivos iniciada - uso de storage:', stats.percentageUsed.toFixed(1) + '%');
         clearAllFiles(rut);
-        
+
         if (onCleanup) {
           onCleanup();
         }
@@ -65,5 +65,5 @@ export const StorageCleanup: React.FC<StorageCleanupProps> = ({ rut, onCleanup }
     cleanupOtherRuts();
   }, [rut]);
 
-  return null; // Componente invisible
+  return null;
 };

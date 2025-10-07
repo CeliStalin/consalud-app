@@ -12,7 +12,7 @@ import { useStorageCleanup } from "../hooks/useStorageCleanup";
 import RutErrorMessage from './RutErrorMessage';
 
 /**
- * Componente robusto para el ingreso de RUT del titular.
+ * Componente para el ingreso de RUT del titular.
  * Muestra feedback visual para todos los estados y previene estados inconsistentes.
  */
 const IngresoTitular: React.FC = () => {
@@ -105,8 +105,7 @@ const IngresoTitular: React.FC = () => {
         } catch (e) {
             // Si hay un error específico de "no encontrado", mostrar la alerta correspondiente
             if (error === '404_NOT_FOUND') {
-                // No mostrar la alerta aquí, ya se maneja en el useEffect
-                return; // Detener el flujo inmediatamente
+                return;
             } else {
                 setShowStepperError(true);
             }

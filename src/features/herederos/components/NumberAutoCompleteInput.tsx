@@ -85,7 +85,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
   useEffect(() => {
     // Si tenemos un valor inicial y no hay error de API, no mostrar errores
     if (value && value.length > 0 && !apiError) {
-      // El valor ya está presente, no necesitamos hacer nada especial
+      // El valor ya está presente
     }
   }, [value, apiError]);
 
@@ -93,7 +93,7 @@ export const NumberAutoCompleteInput: React.FC<NumberAutoCompleteInputProps> = (
   useEffect(() => {
     // Si tenemos un valor válido y no hay error de API, limpiar cualquier error previo
     if (value && value.length > 0 && !apiError) {
-      // El error se maneja en el hook, no necesitamos hacer nada aquí
+      // El error se maneja en el hook
     }
   }, [value, apiError]);
 
