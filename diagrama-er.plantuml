@@ -1,0 +1,215 @@
+@startuml Diagrama ER - Sistema de Envío de Correos AFIL
+
+!define MASTER_TABLE #E8F5E9
+!define TRANSACTION_TABLE #E3F2FD
+!define CATALOG_TABLE #FFF9C4
+
+skinparam linetype ortho
+skinparam backgroundColor #FFFFFF
+skinparam roundcorner 5
+
+' ===== TABLAS CATÁLOGO =====
+entity "AFIL_ENV_PLANTILLAS" as PLANTILLAS CATALOG_TABLE {
+  * **ID_PLANTILLA** : NUMBER <<PK>>
+  --
+  * NEGOCIO : VARCHAR2(10)
+  * TIPO_PROCESO : VARCHAR2(100)
+  PLANTILLA_HTML : CLOB
+  ID_VALORES : VARCHAR2(1000)
+  ASUNTO : VARCHAR2(1000)
+  RUTA : VARCHAR2(1000)
+  ARCHIVO_ADJ : VARCHAR2(1)
+  NOMBRE_ARCHIVO_ADJ : VARCHAR2(100)
+  NOMBRE_ARCHIVO_EML : VARCHAR2(100)
+  DATOS_CM : VARCHAR2(200)
+  --
+  ESTADO_REG : VARCHAR2(1)
+  FECHA_ESTADO_REG : DATE
+  USUARIO_CREACION : VARCHAR2(50)
+  FECHA_CREACION_REG : DATE
+  FUNCION_MODIFICACION : VARCHAR2(100)
+  USUARIO_MODIFICACION : VARCHAR2(50)
+  FECHA_MODIFICACION : DATE
+}
+
+entity "AFIL_ENV_ESTADOS_MAESTRO" as ESTADOS_MAESTRO MASTER_TABLE {
+  * **ID_ESTADO** : NUMBER <<PK>>
+  --
+  DESCRIPCION : VARCHAR2(100)
+  --
+  ESTADO_REG : VARCHAR2(1)
+  FECHA_ESTADO_REG : DATE
+  USUARIO_CREACION : VARCHAR2(50)
+  FECHA_CREACION_REG : DATE
+  FUNCION_MODIFICACION : VARCHAR2(100)
+  USUARIO_MODIFICACION : VARCHAR2(50)
+  FECHA_MODIFICACION : DATE
+}
+
+entity "AFIL_ENV_ESTADOS_RECEPCION" as ESTADOS_RECEPCION MASTER_TABLE {
+  * **ESTADO_RECEPCION_MAIL** : NUMBER <<PK>>
+  --
+  DESCRIPCION : VARCHAR2(200)
+  --
+  ESTADO_REG : VARCHAR2(1)
+  FECHA_ESTADO_REG : DATE
+  USUARIO_CREACION : VARCHAR2(50)
+  FECHA_CREACION_REG : DATE
+  FUNCION_MODIFICACION : VARCHAR2(100)
+  USUARIO_MODIFICACION : VARCHAR2(50)
+  FECHA_MODIFICACION : DATE
+}
+
+' ===== TABLA HUB =====
+entity "AFIL_ENV_CONF_PROCESO" as CONF_PROCESO CATALOG_TABLE {
+  * **ID_PROCESO** : NUMBER <<PK>>
+  --
+  * ID_PLANTILLA : NUMBER <<FK>>
+  PERIODO : NUMBER
+  ID_ESTADO : NUMBER <<FK>>
+  --
+  ESTADO_REG : VARCHAR2(1)
+  FECHA_ESTADO_REG : DATE
+  USUARIO_CREACION : VARCHAR2(50)
+  FECHA_CREACION_REG : DATE
+  FUNCION_MODIFICACION : VARCHAR2(100)
+  USUARIO_MODIFICACION : VARCHAR2(50)
+  FECHA_MODIFICACION : DATE
+}
+
+' ===== TABLAS TRANSACCIONALES =====
+entity "AFIL_ENV_PROCESO_ENVIADOS" as PROC_ENVIADOS TRANSACTION_TABLE {
+  * **ID_PROCESO** : NUMBER <<PK, FK>>
+  * **ID_SEQ_PROCESO_DET** : NUMBER <<PK>>
+  --
+  * ID_ESTADO : NUMBER <<FK>>
+  RUT : VARCHAR2(20)
+  DV : VARCHAR2(1)
+  NOMBRE : VARCHAR2(100)
+  AP_PATERNO : VARCHAR2(100)
+  AP_MATERNO : VARCHAR2(100)
+  FOLIO : NUMBER
+  CORREOS : VARCHAR2(100)
+  NOMBRE_ARCHIVO : VARCHAR2(100)
+  VALORES_A_REEMPLAZAR : VARCHAR2(2000)
+  ID_MAIL : VARCHAR2(500)
+  FECHA_ENVIO : DATE
+  FECHA_ENTREGA : DATE
+  FECHA_APERTURA : DATE
+  **E_RETRY** : NUMBER
+  **E_SENTS** : NUMBER
+  **E_OPENS** : NUMBER
+  **E_CLICKS** : NUMBER
+  **E_ACEPTEDS** : NUMBER
+  ID_CONTENT_EML : VARCHAR2(400)
+  NUM_BLOQUE : NUMBER
+  RESPUESTA : CLOB
+  --
+  ESTADO_REG : VARCHAR2(1)
+  FECHA_ESTADO_REG : DATE
+  USUARIO_CREACION : VARCHAR2(50)
+  FECHA_CREACION_REG : DATE
+  FUNCION_MODIFICACION : VARCHAR2(100)
+  USUARIO_MODIFICACION : VARCHAR2(50)
+  FECHA_MODIFICACION : DATE
+}
+
+entity "AFIL_ENV_NO_ENVIADOS" as NO_ENVIADOS TRANSACTION_TABLE {
+  * **ID_PROCESO** : NUMBER <<PK, FK>>
+  * **ID_SEQ_PROCESO_DET** : NUMBER <<PK>>
+  --
+  ID_ESTADO : NUMBER <<FK>>
+  RUT : VARCHAR2(20)
+  DV : VARCHAR2(1)
+  NOMBRE : VARCHAR2(100)
+  AP_PATERNO : VARCHAR2(100)
+  AP_MATERNO : VARCHAR2(100)
+  FOLIO : NUMBER
+  CORREO : VARCHAR2(100)
+  NOMBRE_ARCHIVO : VARCHAR2(100)
+  NUM_BLOQUE : NUMBER
+  **ESTADO_RECEPCION_MAIL** : NUMBER <<FK>>
+  **MOTIVO** : VARCHAR2(1500)
+  --
+  ESTADO_REG : VARCHAR2(1)
+  FECHA_ESTADO_REG : DATE
+  USUARIO_CREACION : VARCHAR2(50)
+  FECHA_CREACION_REG : DATE
+  FUNCION_MODIFICACION : VARCHAR2(100)
+  USUARIO_MODIFICACION : VARCHAR2(50)
+  FECHA_MODIFICACION : DATE
+}
+
+' ===== RELACIONES =====
+
+PLANTILLAS ||--o{ CONF_PROCESO : "FK_CONF_PROCESO_PLANTILLA"
+ESTADOS_MAESTRO ||--o{ CONF_PROCESO : "FK_CONF_PROCESO_ESTADO"
+ESTADOS_MAESTRO ||--o{ PROC_ENVIADOS : "FK_PROCESO_ENVIADOS_ESTADO"
+ESTADOS_MAESTRO ||--o{ NO_ENVIADOS : "FK_NO_ENVIADOS_ESTADO"
+CONF_PROCESO ||--o{ PROC_ENVIADOS : "FK_PROCESO_ENVIADOS_CONF"
+CONF_PROCESO ||--o{ NO_ENVIADOS : "FK_NO_ENVIADOS_CONF"
+ESTADOS_RECEPCION ||--o{ NO_ENVIADOS : "FK_NO_ENVIADOS_RECEPCION"
+
+' ===== NOTAS =====
+note right of PLANTILLAS
+  **Catálogo de Plantillas**
+  - Almacena HTML personalizable
+  - Gestión de adjuntos
+  - Integración Content Manager
+  - Variables dinámicas
+end note
+
+note right of CONF_PROCESO
+  **Hub Central**
+  - Configura cada proceso de envío
+  - Vincula plantilla con periodo
+  - Controla estados del proceso
+  - Genera envíos masivos
+end note
+
+note right of PROC_ENVIADOS
+  **Log de Envíos Exitosos**
+  - Tracking detallado
+  - Métricas de engagement
+  - Almacén volumétrico (LDAT01)
+  - Respuesta del servicio (CLOB)
+end note
+
+note right of NO_ENVIADOS
+  **Log de Fallos**
+  - Análisis de errores
+  - Base para reintentos
+  - Clasificación de rechazos
+  - Almacén volumétrico (LDAT01)
+end note
+
+note bottom of ESTADOS_MAESTRO
+  **Tabla Maestra Reutilizable**
+  Estados aplicables a:
+  - Configuración de procesos
+  - Envíos exitosos
+  - Envíos fallidos
+end note
+
+note bottom of ESTADOS_RECEPCION
+  **Catálogo de Errores**
+  Códigos de rechazo/fallo
+  específicos del servicio
+  de correo
+end note
+
+' ===== LEYENDA =====
+legend bottom left
+  |<CATALOG_TABLE>  | Tablas de Catálogo/Configuración |
+  |<TRANSACTION_TABLE>  | Tablas Transaccionales |
+  |<MASTER_TABLE>  | Tablas Maestras |
+  
+  **Patrón Soft Delete:** ESTADO_REG IN ('V', 'E')
+  **Patrón Audit Trail:** Campos de auditoría en todas las tablas
+  **Tablespaces:**
+  - AFIL_MIDX01: Índices
+  - AFIL_MDAT01: Datos maestros
+  - AFIL_LDAT01: Datos transaccionales (LOBs)
+end legend
+
+@enduml
