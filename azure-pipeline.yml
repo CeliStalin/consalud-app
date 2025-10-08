@@ -64,7 +64,6 @@ stages:
             parameters:
               dockerfilepath: Dockerfile
               dockerRegistryEndpoint: $(DockerRegistryEndpoint.Devel)
-              appname: $(appname)
           - template: yaml/Template_KubernetesDeployment.yaml
             parameters:
               kubernetesServiceConnection: $(KubernetesServiceConnection.Devel)
@@ -103,6 +102,7 @@ stages:
         steps:
           - template: yaml/Template_Docker.yaml
             parameters:
+              dockerfilepath: Dockerfile
               dockerRegistryEndpoint: $(DockerRegistryEndpoint.Test)
           - template: yaml/Template_KubernetesDeployment.yaml
             parameters:
@@ -142,7 +142,7 @@ stages:
         steps:
           - template: Yaml/Template_KubernetesDeployment.yaml
             parameters:
-              kubernetesServiceConnection: $(KubernetesServiceConnection.Test)
+              kubernetesServiceConnection: $(KubernetesServiceConnection.Prod)
               rutaManifests: yaml/
               manifestDeploy: yaml/deployment.yaml
               manifestService: yaml/service.yaml
