@@ -23,12 +23,18 @@ setCoreEnvConfig({
   VITE_APP_AUTHORITY: import.meta.env.VITE_APP_AUTHORITY,
 });
 
-// importar el resto del core después de configurar
-import '@consalud/core/core.css';
-import '@consalud/core/index.js';
-import 'bulma/css/bulma.min.css';
+//Orden render React
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+
+// Luego estilos de terceros
+import 'bulma/css/bulma.min.css';
+
+// Luego el core (después de React)
+import '@consalud/core/core.css';
+import '@consalud/core/index.js';
+
+// Finalmente estilos locales y componentes
 import App from './App';
 import './features/herederos/components/styles/globalStyle.css';
 import './styles/animations.css';
