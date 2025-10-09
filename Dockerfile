@@ -19,31 +19,39 @@ RUN npm ci --no-audit --no-fund
 COPY . .
 
 # Determinar el MODE según el AMBIENTE
-# production y testing usan el MISMO modo de compilación (production)
-# Solo difieren en el .env (URLs de APIs)
+# Vite usa --mode para cargar el archivo .env correspondiente
+# - development → .env.development (compilación dev)
+# - testing → .env.test (compilación production)
+# - production → .env.production (compilación production)
 RUN if [ "$AMBIENTE" = "development" ]; then \
-      cp .env.development .env && \
       export BUILD_MODE="development"; \
     elif [ "$AMBIENTE" = "testing" ]; then \
-      cp .env.test .env && \
-      export BUILD_MODE="production"; \
+      export BUILD_MODE="test"; \
     else \
-      cp .env.production .env && \
       export BUILD_MODE="production"; \
     fi && \
     echo "=== BUILD INFO ===" && \
     echo "AMBIENTE: $AMBIENTE" && \
     echo "BUILD_MODE: $BUILD_MODE" && \
-    echo "=== ARCHIVO .env USADO ===" && \
-    head -5 .env
+    echo "=== ARCHIVO .env QUE USARÁ VITE ===" && \
+    echo ".env.$BUILD_MODE" && \
+    if [ -f ".env.$BUILD_MODE" ]; then \
+      head -5 ".env.$BUILD_MODE"; \
+    else \
+      echo "ADVERTENCIA: No se encontró .env.$BUILD_MODE"; \
+      ls -la .env* || echo "No hay archivos .env"; \
+    fi
 
 # Verifica que el paquete está instalado
 RUN ls -l node_modules/@consalud/core || (echo "NO SE INSTALO @consalud/core" && exit 1)
 
 # Genera el build del frontend con el modo correspondiente
-# testing y production compilan IDÉNTICAMENTE (--mode production)
+# testing y production usan compilación optimizada (terser, minify, sin sourcemaps)
+# Solo development usa compilación rápida
 RUN if [ "$AMBIENTE" = "development" ]; then \
       npm run build -- --mode development; \
+    elif [ "$AMBIENTE" = "testing" ]; then \
+      npm run build -- --mode test; \
     else \
       npm run build -- --mode production; \
     fi

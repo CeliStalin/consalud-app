@@ -4,14 +4,16 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(({ mode }) => {
   const isDevelopment = mode === 'development';
+  const isTest = mode === 'test';
   const isProduction = mode === 'production';
 
-  // TEST y PROD compilación Identicas
-  // Solo difieren en el .env que usan (URLs de APIs)
+  // TEST y PROD tienen compilación idéntica (optimizada)
+  // Solo difieren en el .env que cargan (URLs de APIs)
+  const isOptimizedBuild = isTest || isProduction;
 
   console.log(`Building in mode: ${mode}`);
   console.log(`Minification: ${isDevelopment ? 'disabled' : 'terser'}`);
-  console.log(`Sourcemaps: ${isProduction ? 'disabled' : 'enabled'}`);
+  console.log(`Sourcemaps: ${isOptimizedBuild ? 'disabled' : 'enabled'}`);
 
   return {
     plugins: [react()],
@@ -43,7 +45,7 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       rollupOptions: {
         output: {
-          manualChunks: isProduction
+          manualChunks: isOptimizedBuild
             ? {
                 vendor: ['react', 'react-dom'],
                 router: ['react-router-dom'],
@@ -62,7 +64,7 @@ export default defineConfig(({ mode }) => {
         },
       },
       minify: isDevelopment ? false : 'terser',
-      terserOptions: isProduction
+      terserOptions: isOptimizedBuild
         ? {
             compress: {
               drop_console: true, // Elimina console.log en producción / Test
@@ -74,13 +76,13 @@ export default defineConfig(({ mode }) => {
             },
           }
         : undefined,
-      // Sourcemaps: deshabilitados en producción/ Test por seguridad y tamaño
-      sourcemap: isProduction ? false : true,
+      // Sourcemaps: deshabilitados en test/producción por seguridad y tamaño
+      sourcemap: isOptimizedBuild ? false : true,
       chunkSizeWarningLimit: 1000,
       cssCodeSplit: true,
       assetsInlineLimit: 4096,
-      // Reportar tamaño de bundles en producción
-      reportCompressedSize: isProduction,
+      // Reportar tamaño de bundles en builds optimizados
+      reportCompressedSize: isOptimizedBuild,
     },
     optimizeDeps: {
       include: ['react', 'react-dom', 'react-router-dom'],

@@ -71,12 +71,13 @@ La aplicación está configurada para trabajar en múltiples ambientes:
 
 ### 🐳 Docker Builds Optimizados
 
-> Solo necesitas pasar el parámetro `AMBIENTE`. El Dockerfile mapea automáticamente al modo de compilación correcto:
+> Cada ambiente usa su propio modo de Vite para cargar el archivo `.env` correcto.
 >
-> - `development` → Modo `development` (build rápido)
-> - `testing` o `production` → Modo `production` (build optimizado)
+> - `development` → Modo `development` + `.env.development` (build rápido)
+> - `testing` → Modo `test` + `.env.test` (build optimizado)
+> - `production` → Modo `production` + `.env.production` (build optimizado)
 
-**Testing y Production compilan IDÉNTICAMENTE** - solo difieren en las URLs de API configuradas en sus respectivos archivos `.env`.
+**Testing y Production compilan IDÉNTICAMENTE** en optimización - solo difieren en las URLs de API y variables configuradas en sus respectivos archivos `.env`.
 
 #### 📋 Comandos Docker CLI por Ambiente
 
@@ -84,10 +85,10 @@ La aplicación está configurada para trabajar en múltiples ambientes:
 # Build de DESARROLLO (rápido, sin optimización)
 docker build --build-arg AMBIENTE=development -t app-gestor-solicitudes:dev .
 
-# Build de TESTING (IDÉNTICO a producción en compilación)
+# Build de TESTING (optimizado + .env.test)
 docker build --build-arg AMBIENTE=testing -t app-gestor-solicitudes:test .
 
-# Build de PRODUCCIÓN (máxima optimización)
+# Build de PRODUCCIÓN (optimizado + .env.production)
 docker build --build-arg AMBIENTE=production -t app-gestor-solicitudes:prod .
 ```
 
@@ -96,7 +97,7 @@ docker build --build-arg AMBIENTE=production -t app-gestor-solicitudes:prod .
 | Ambiente        | .env usado         | Modo Vite     | Build Time | Bundle Size | Optimizado |
 | --------------- | ------------------ | ------------- | ---------- | ----------- | ---------- |
 | **Development** | `.env.development` | `development` | ~15s       | ~2.5MB      | ❌ No      |
-| **Testing**     | `.env.test`        | `production`  | ~60s       | ~700KB      | ✅ Sí      |
+| **Testing**     | `.env.test`        | `test`        | ~60s       | ~700KB      | ✅ Sí      |
 | **Production**  | `.env.production`  | `production`  | ~60s       | ~700KB      | ✅ Sí      |
 
 **🎯 Testing = Producción:** Ambos usan el mismo modo de compilación (`production`), solo difieren en las URLs de las APIs configuradas en sus archivos `.env`.
