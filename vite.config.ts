@@ -89,9 +89,10 @@ export default defineConfig(({ mode }) => {
       terserOptions: isOptimizedBuild
         ? {
             compress: {
-              drop_console: true, // Elimina console.log en producción / Test
+              // Solo eliminar console en PRODUCCIÓN
+              drop_console: isProduction,
               drop_debugger: true,
-              pure_funcs: ['console.log', 'console.info', 'console.debug'],
+              pure_funcs: isProduction ? ['console.log', 'console.info', 'console.debug'] : [],
             },
             format: {
               comments: false, // Eliminar comentarios

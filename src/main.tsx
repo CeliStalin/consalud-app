@@ -23,6 +23,35 @@ setCoreEnvConfig({
   VITE_APP_AUTHORITY: import.meta.env.VITE_APP_AUTHORITY,
 });
 
+// Manejador global de errores de carga de chunks (para testing/production)
+if (import.meta.env.MODE !== 'development') {
+  window.addEventListener('error', event => {
+    const target = event.target as HTMLElement;
+    const isChunkLoadError =
+      event.message?.includes('Failed to fetch dynamically imported module') ||
+      event.message?.includes('Importing a module script failed') ||
+      (target?.tagName === 'SCRIPT' && target?.getAttribute('type') === 'module');
+
+    if (isChunkLoadError) {
+      console.warn('⚠️ Chunk load error detected. Reloading page...', event.message);
+      // Evitar loop infinito: solo recargar una vez
+      if (!sessionStorage.getItem('chunk-error-reload')) {
+        sessionStorage.setItem('chunk-error-reload', 'true');
+        window.location.reload();
+      } else {
+        console.error('❌ Persistent chunk load error. Please clear cache (Ctrl+F5)');
+        sessionStorage.removeItem('chunk-error-reload');
+      }
+      event.preventDefault();
+    }
+  });
+
+  // Limpiar flag después de carga exitosa
+  window.addEventListener('load', () => {
+    sessionStorage.removeItem('chunk-error-reload');
+  });
+}
+
 //Orden render React
 import React from 'react';
 import ReactDOM from 'react-dom/client';

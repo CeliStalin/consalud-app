@@ -117,6 +117,51 @@ docker run -d -p 80:80 --name consalud-prod app-gestor-solicitudes:prod
 
 > **Nota:** El puerto de la izquierda puede ser cualquier puerto disponible en tu máquina local (ej: `-p 3000:80`, `-p 8080:80`).
 
+### ⚠️ Notas importantes
+
+- El build de Vite **inyecta las variables de entorno en tiempo de build**. Si cambias el archivo `.env`, debes reconstruir la imagen.
+- El contenedor final **solo sirve archivos estáticos** (no ejecuta Node.js en producción).
+- Puedes crear tantos archivos `.env.*` como ambientes necesites y usarlos con el argumento `AMBIENTE`.
+- El puerto expuesto por defecto es el 80 (Nginx). Puedes mapearlo al que quieras en tu máquina con `-p`.
+
+- Regenerar el lockfile compatible con Docker/Linux
+
+**¿Cuándo ejecutar este paso?**
+
+- Solo cuando se agrege, elimine o actualice dependencias en `package.json`.
+- No es necesario si solo cambias código fuente.
+- Se hace **antes de construir la imagen Docker** para evitar errores de instalación.
+
+**¿Qué comando usar?**
+
+- **En PowerShell o CMD (Windows):**
+  ```sh
+  npm run lockfile:linux-win
+  ```
+- **En Bash/WSL/Linux:**
+  ```sh
+  npm run lockfile:linux-bash
+  ```
+
+Esto generará un `package-lock.json` compatible con Linux (el entorno de Docker).
+
+---
+
+Una vez que el lockfile está actualizado, se construye la imagen dev normalmente:
+
+```ps
+docker build --no-cache -f Dockerfile.dev -t app-gestor-solicitudes:dev .
+```
+
+Esto creará la imagen lista para desarrollo en Docker.
+
+---
+
+## 4. Notas
+
+- Si solo cambias código fuente, puedes construir la imagen directamente sin regenerar el lockfile.
+- Si el build falla por el lockfile, repite el paso 1 antes de volver a intentar el build.
+
 ## 🛣️ Rutas
 
 La aplicación implementa un sistema de rutas dinámico basado en los permisos del usuario. Las rutas principales son:
