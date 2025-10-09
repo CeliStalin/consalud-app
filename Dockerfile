@@ -3,9 +3,10 @@ FROM node:22.17.0-alpine AS builder
 
 WORKDIR /app
 
-# Permite elegir el ambiente y el modo de build
-ARG AMBIENTE=produccion
-ARG MODE=production
+# Solo se parametriza AMBIENTE y su compilacion es:
+# - development → MODE=development (build rápido)
+# - testing/production → MODE=production (build optimizado )
+ARG AMBIENTE=production
 
 # Copia dependencias y core tgz
 COPY package*.json ./
@@ -17,22 +18,35 @@ RUN npm ci --no-audit --no-fund
 # Copia el resto del código fuente
 COPY . .
 
-# Selecciona el archivo de entorno según el ambiente
+# Determinar el MODE según el AMBIENTE
+# production y testing usan el MISMO modo de compilación (production)
+# Solo difieren en el .env (URLs de APIs)
 RUN if [ "$AMBIENTE" = "development" ]; then \
-      cp .env.development .env ; \
+      cp .env.development .env && \
+      export BUILD_MODE="development"; \
     elif [ "$AMBIENTE" = "testing" ]; then \
-      cp .env.test .env ; \
+      cp .env.test .env && \
+      export BUILD_MODE="production"; \
     else \
-      cp .env.production .env ; \
-    fi
-
-RUN echo "=== CONTENIDO DE .env ===" && cat .env
+      cp .env.production .env && \
+      export BUILD_MODE="production"; \
+    fi && \
+    echo "=== BUILD INFO ===" && \
+    echo "AMBIENTE: $AMBIENTE" && \
+    echo "BUILD_MODE: $BUILD_MODE" && \
+    echo "=== ARCHIVO .env USADO ===" && \
+    head -5 .env
 
 # Verifica que el paquete está instalado
 RUN ls -l node_modules/@consalud/core || (echo "NO SE INSTALO @consalud/core" && exit 1)
 
-# Genera el build del frontend con el modo seleccionado
-RUN npm run build -- --mode $MODE
+# Genera el build del frontend con el modo correspondiente
+# testing y production compilan IDÉNTICAMENTE (--mode production)
+RUN if [ "$AMBIENTE" = "development" ]; then \
+      npm run build -- --mode development; \
+    else \
+      npm run build -- --mode production; \
+    fi
 
 # Etapa 2: Imagen final solo con archivos estáticos
 FROM nginx:alpine AS production
@@ -43,4 +57,4 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"] 
+CMD ["nginx", "-g", "daemon off;"]

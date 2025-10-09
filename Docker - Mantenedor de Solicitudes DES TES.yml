@@ -44,8 +44,6 @@ stages:
               dockerFile: Dockerfile
               buildArguments: >-
                 AMBIENTE=$(ambiente)
-
-                MODE=development
               defaultContext: false
               context: .
               tags: |
@@ -143,8 +141,6 @@ stages:
               dockerFile: Dockerfile
               buildArguments: >-
                 AMBIENTE=$(ambiente)
-
-                MODE=test
               defaultContext: false
               context: .
               includeLatestTag: true
