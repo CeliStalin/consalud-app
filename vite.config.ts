@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
   console.log(`Sourcemaps: ${isOptimizedBuild ? 'disabled' : 'enabled'}`);
 
   return {
+    base: '/',
     plugins: [react()],
     resolve: {
       alias: {
@@ -43,6 +44,8 @@ export default defineConfig(({ mode }) => {
     build: {
       target: isDevelopment ? 'esnext' : 'es2020',
       outDir: 'dist',
+
+      emptyOutDir: true,
       rollupOptions: {
         output: {
           manualChunks: isOptimizedBuild
@@ -58,10 +61,29 @@ export default defineConfig(({ mode }) => {
                 'pages-final': ['./src/pages/SuccessPage', './src/pages/DetalleMandatoPage'],
               }
             : undefined,
-          chunkFileNames: 'assets/[name]-[hash].js',
-          entryFileNames: 'assets/[name]-[hash].js',
-          assetFileNames: 'assets/[name]-[hash].[ext]',
+          chunkFileNames: 'assets/[name]-[hash:8].js',
+          entryFileNames: 'assets/[name]-[hash:8].js',
+
+          assetFileNames: assetInfo => {
+            const info = assetInfo.name || '';
+            // CSS files con hash de 8 caracteres para consistencia
+            if (info.endsWith('.css')) {
+              return 'assets/[name]-[hash:8].css';
+            }
+            // Fonts
+            if (/\.(woff|woff2|ttf|eot)$/.test(info)) {
+              return 'assets/fonts/[name]-[hash:8][extname]';
+            }
+            // Images
+            if (/\.(png|jpg|jpeg|gif|svg|ico)$/.test(info)) {
+              return 'assets/images/[name]-[hash:8][extname]';
+            }
+            // Default
+            return 'assets/[name]-[hash:8][extname]';
+          },
         },
+        // Opciones para estabilidad
+        maxParallelFileOps: 20,
       },
       minify: isDevelopment ? false : 'terser',
       terserOptions: isOptimizedBuild
