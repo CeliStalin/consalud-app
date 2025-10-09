@@ -26,7 +26,7 @@
     "docker:clean": "bash docker-scripts.sh clean",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "vitest run --passWithNoTests --coverage",
     "clean": "bash script/clean-build-pack.sh",
     "clean:deps": "bash script/clean-build-pack.sh --clean-deps",
     "clean:cache": "rm -rf node_modules/.vite",
