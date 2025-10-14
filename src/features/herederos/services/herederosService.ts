@@ -16,6 +16,7 @@ import {
   SolicitudPostRequest,
 } from '../interfaces/Solicitante';
 import { Titular } from '../interfaces/Titular';
+import { getUserNameFromStorage } from '../utils';
 import { RETRY_CONFIGS, withRetry } from '../utils/retryUtils';
 import { apiGet, buildHeaders, getHerederosApiConfig } from './apiUtils';
 
@@ -62,10 +63,11 @@ export class HerederosService {
   /**
    * Obtiene información de un titular por RUT
    * @param rut - RUT del titular (solo números)
-   * @param userName - Nombre de usuario para auditoría
+   * @param userName - Nombre de usuario para auditoría (opcional, se obtiene del localStorage)
    */
   async getTitularByRut(rut: number, userName: string = ''): Promise<Titular> {
-    const url = `${this.config.baseUrl}/api/Titular/ByRut?IdentificadorUnico=${rut}&userName=${encodeURIComponent(userName)}`;
+    const finalUserName = userName || getUserNameFromStorage();
+    const url = `${this.config.baseUrl}/api/Titular/ByRut?IdentificadorUnico=${rut}&userName=${encodeURIComponent(finalUserName)}`;
 
     try {
       const data = await apiGet<any>(url, this.config, 'obtener titular por RUT');
@@ -96,13 +98,14 @@ export class HerederosService {
   /**
    * Obtiene la mejor información de contactibilidad de un solicitante
    * @param rut - RUT del solicitante (solo números)
-   * @param userName - Nombre de usuario para auditoría
+   * @param userName - Nombre de usuario para auditoría (opcional, se obtiene del localStorage)
    */
   async getSolicitanteMejorContactibilidad(
     rut: number,
     userName: string = ''
   ): Promise<SolicitanteResponse> {
-    const url = `${this.config.baseUrl}/api/Solicitante/mejorContactibilidad?IdentificadorUnico=${rut}&userName=${encodeURIComponent(userName)}`;
+    const finalUserName = userName || getUserNameFromStorage();
+    const url = `${this.config.baseUrl}/api/Solicitante/mejorContactibilidad?IdentificadorUnico=${rut}&userName=${encodeURIComponent(finalUserName)}`;
 
     try {
       return await apiGet<SolicitanteResponse>(
@@ -196,14 +199,15 @@ export class HerederosService {
    * Valida el correo electrónico de un heredero
    * @param rut - RUT del heredero (solo números, sin puntos ni DV)
    * @param email - Correo electrónico a validar
-   * @param userName - Nombre de usuario para auditoría
+   * @param userName - Nombre de usuario para auditoría (opcional, se obtiene del localStorage)
    */
   async validarCorreoElectronico(
     rut: number,
     email: string,
     userName: string = ''
   ): Promise<boolean> {
-    const url = `${this.config.baseUrl}/api/ValidacionContactibilidad/email?rut=${rut}&mail=${encodeURIComponent(email)}&userName=${encodeURIComponent(userName)}`;
+    const finalUserName = userName || getUserNameFromStorage();
+    const url = `${this.config.baseUrl}/api/ValidacionContactibilidad/email?rut=${rut}&mail=${encodeURIComponent(email)}&userName=${encodeURIComponent(finalUserName)}`;
 
     try {
       const response = await fetch(url, {
@@ -231,10 +235,11 @@ export class HerederosService {
    * Valida el teléfono de un heredero
    * @param rut - RUT del heredero (solo números, sin puntos ni DV)
    * @param telefono - Teléfono a validar
-   * @param userName - Nombre de usuario para auditoría
+   * @param userName - Nombre de usuario para auditoría (opcional, se obtiene del localStorage)
    */
   async validarTelefono(rut: number, telefono: string, userName: string = ''): Promise<boolean> {
-    const url = `${this.config.baseUrl}/api/ValidacionContactibilidad/telefono?rut=${rut}&telefono=${encodeURIComponent(telefono)}&userName=${encodeURIComponent(userName)}`;
+    const finalUserName = userName || getUserNameFromStorage();
+    const url = `${this.config.baseUrl}/api/ValidacionContactibilidad/telefono?rut=${rut}&telefono=${encodeURIComponent(telefono)}&userName=${encodeURIComponent(finalUserName)}`;
 
     try {
       const response = await fetch(url, {
@@ -261,7 +266,7 @@ export class HerederosService {
   /**
    * Crea un nuevo solicitante
    * @param solicitanteData - Datos del solicitante a crear
-   * @param userName - Nombre de usuario para auditoría
+   * @param userName - Nombre de usuario para auditoría (opcional, se obtiene del localStorage)
    */
   async createSolicitante(
     solicitanteData: SolicitantePostRequest,
@@ -272,10 +277,15 @@ export class HerederosService {
     // Validar que la URL base esté configurada
     if (!this.config.baseUrl) {
       throw new Error('URL base de la API no configurada');
-    } // Agregar el userName a los datos si no está presente
+    } 
+    
+    // Obtener el userName del localStorage si no se proporciona
+    const finalUserName = userName || getUserNameFromStorage();
+    
+    // Agregar el userName a los datos
     const dataToSend = {
       ...solicitanteData,
-      Usuario: userName || solicitanteData.Usuario,
+      Usuario: finalUserName,
     };
 
     return withRetry(async () => {
@@ -316,7 +326,7 @@ export class HerederosService {
   /**
    * Crea una nueva solicitud
    * @param solicitudData - Datos de la solicitud a crear
-   * @param userName - Nombre de usuario para auditoría
+   * @param userName - Nombre de usuario para auditoría (opcional, se obtiene del localStorage)
    */
   async createSolicitud(solicitudData: SolicitudPostRequest, userName: string = ''): Promise<any> {
     const url = `${this.config.baseUrl}/api/Solicitud`;
@@ -326,10 +336,13 @@ export class HerederosService {
       throw new Error('URL base de la API no configurada');
     }
 
-    // Agregar el userName a los datos si no está presente
+    // Obtener el userName del localStorage si no se proporciona
+    const finalUserName = userName || getUserNameFromStorage();
+
+    // Agregar el userName a los datos
     const dataToSend = {
       ...solicitudData,
-      usuarioCreacion: userName || solicitudData.usuarioCreacion,
+      usuarioCreacion: finalUserName,
     };
 
     return withRetry(async () => {
@@ -372,7 +385,7 @@ export class HerederosService {
   /**
    * Envía múltiples documentos a la API
    * @param idSolicitud - ID de la solicitud creada
-   * @param usuarioCreacion - Usuario que crea los documentos
+   * @param usuarioCreacion - Usuario que crea los documentos (opcional, se obtiene del localStorage)
    * @param rutTitularFallecido - RUT del titular fallecido
    * @param documentos - Array de documentos a enviar (ya obtenidos del storage)
    */
@@ -389,12 +402,15 @@ export class HerederosService {
     }
 
     return withRetry(async () => {
+      // Obtener el userName del localStorage si no se proporciona
+      const finalUsuarioCreacion = usuarioCreacion || getUserNameFromStorage();
+      
       // Crear FormData para enviar archivos
       const formData = new FormData();
 
       // Agregar campos principales
       formData.append('idSolicitud', idSolicitud.toString());
-      formData.append('usuarioCreacion', usuarioCreacion);
+      formData.append('usuarioCreacion', finalUsuarioCreacion);
       formData.append('rutTitularFallecido', rutTitularFallecido.toString());
 
       // Procesar cada documento de forma asíncrona
@@ -475,20 +491,21 @@ export class HerederosService {
 
   /**
    * Encripta parámetros para generar URL de mandatos
-   * @param usuario - Usuario del sistema (por defecto 'SISTEMA')
+   * @param usuario - Usuario del sistema (opcional, se obtiene del localStorage)
    * @param rutAfiliado - RUT del afiliado sin puntos ni guiones
    * @param nombres - Nombres del afiliado
    * @param apellidoPaterno - Apellido paterno del afiliado
    * @param apellidoMaterno - Apellido materno del afiliado
    */
   async encriptarParametrosMandatos(
-    usuario: string = 'SISTEMA',
+    usuario: string = '',
     rutAfiliado: string,
     nombres: string,
     apellidoPaterno: string,
     apellidoMaterno: string
   ): Promise<string> {
-    const url = `${this.config.baseUrl}/api/Pargen/encriptar?usuario=${encodeURIComponent(usuario)}&rutAfiliado=${encodeURIComponent(rutAfiliado)}&nombres=${encodeURIComponent(nombres)}&apellidoPaterno=${encodeURIComponent(apellidoPaterno)}&apellidoMaterno=${encodeURIComponent(apellidoMaterno)}`;
+    const finalUsuario = usuario || getUserNameFromStorage();
+    const url = `${this.config.baseUrl}/api/Pargen/encriptar?usuario=${encodeURIComponent(finalUsuario)}&rutAfiliado=${encodeURIComponent(rutAfiliado)}&nombres=${encodeURIComponent(nombres)}&apellidoPaterno=${encodeURIComponent(apellidoPaterno)}&apellidoMaterno=${encodeURIComponent(apellidoMaterno)}`;
 
     try {
       const response = await fetch(url, {
@@ -572,7 +589,7 @@ export const obtenerDocumentosAlmacenados = (rutTitular: number) =>
   herederosService.obtenerDocumentosAlmacenados(rutTitular);
 
 export const encriptarParametrosMandatos = (
-  usuario: string = 'SISTEMA',
+  usuario: string = '',
   rutAfiliado: string,
   nombres: string,
   apellidoPaterno: string,

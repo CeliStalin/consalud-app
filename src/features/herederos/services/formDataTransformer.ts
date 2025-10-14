@@ -1,4 +1,5 @@
 import { formatDateForAPI } from '../../../utils/dateUtils';
+import { getUserNameFromStorage } from '../utils';
 import { FormData, FormHerederoData } from '../interfaces/FormData';
 
 /**
@@ -18,6 +19,9 @@ export class FormDataTransformer {
     const rutLimpio = rut.replace(/[^0-9kK]/g, '');
     const rutPersona = parseInt(rutLimpio.slice(0, -1));
     const rutDigito = rutLimpio.slice(-1).toUpperCase();
+
+    // Obtener el UserName del localStorage si no se proporciona usuario
+    const finalUsuario = usuario || getUserNameFromStorage();
 
     // Mapear campos con valores por defecto apropiados
     return {
@@ -46,7 +50,7 @@ export class FormDataTransformer {
       NumCalle: parseInt(formData.numero) || 0,
       villa: formData.villaOpcional || '',
       DepBlock: parseInt(formData.deptoBloqueOpcional) || 0,
-      Usuario: usuario,
+      Usuario: finalUsuario,
     };
   }
 

@@ -1,5 +1,6 @@
-// Utils exports
-export * from './retryUtils';
+/**
+ * Utilidades para manejo de información de usuario desde el localStorage
+ */
 
 /**
  * Obtiene el UserName desde el localStorage (usuarioAD)

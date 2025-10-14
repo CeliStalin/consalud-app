@@ -2,6 +2,7 @@ import * as ConsaludCore from '@consalud/core';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { env } from '../../../core/config/env';
+import { getUserNameFromStorage, getUserDataFromStorage } from '../utils';
 import { useDocumentos } from '../hooks/useDocumentos';
 import { useMandatosTransaction } from '../hooks/useMandatosTransaction';
 import {
@@ -67,9 +68,8 @@ const getEmailSolicitante = (): string => {
   if (env.isDevelopment() || env.isTest()) {
     // Desarrollo/Testing: tomar del localStorage usuarioAD -> Email
     try {
-      const usuarioAD = localStorage.getItem('usuarioAD');
-      if (usuarioAD) {
-        const usuarioData = JSON.parse(usuarioAD);
+      const usuarioData = getUserDataFromStorage();
+      if (usuarioData) {
         const email = usuarioData.Email || usuarioData.email;
         if (email) {
           return email;
@@ -449,11 +449,11 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         NumCalle: formData.NumCalle || 0,
         villa: formData.villa || '',
         DepBlock: formData.DepBlock || 0,
-        Usuario: formData.Usuario || 'SISTEMA',
+        Usuario: formData.Usuario || getUserNameFromStorage(),
       };
 
       // Llamar a la API para crear el solicitante
-      const resultSolicitante = await createSolicitante(solicitanteData, 'SISTEMA');
+      const resultSolicitante = await createSolicitante(solicitanteData, getUserNameFromStorage());
 
       if (resultSolicitante.success && resultSolicitante.status === 201) {
         // Ahora crear la solicitud usando los datos del retorno del primer endpoint
@@ -504,7 +504,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
 
               // Si tampoco tenemos idMae, consultar la API
               if (!idMae || idMae === 0) {
-                const titularInfo = await fetchTitularByRut(parseInt(rutTitular), 'SISTEMA');
+                const titularInfo = await fetchTitularByRut(parseInt(rutTitular), getUserNameFromStorage());
                 idMae = titularInfo.id;
               }
             }
@@ -526,12 +526,12 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             tipoSolicitud: 1,
             observaciones: 'Creacion Solicitud Heredero',
             estadoRegistro: 'V',
-            usuarioCreacion: 'SISTEMA', // Usar el usuario logueado
+            usuarioCreacion: getUserNameFromStorage(), // Usar el usuario logueado
             fechaEstadoRegistro: fechaISO,
           };
 
           // Llamar a la API para crear la solicitud
-          const resultSolicitud = await createSolicitud(solicitudData, 'SISTEMA');
+          const resultSolicitud = await createSolicitud(solicitudData, getUserNameFromStorage());
 
           if (resultSolicitud.success && resultSolicitud.status === 201) {
             // Obtener el ID de la solicitud creada
@@ -592,7 +592,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                   // Enviar documentos a la API usando el hook
                   const resultDocumentos = await enviarDocumentos(
                     newIdSolicitud,
-                    'SISTEMA',
+                    getUserNameFromStorage(),
                     rutTitularFallecido,
                     documentos
                   );

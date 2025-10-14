@@ -78,7 +78,7 @@ export class MandatosTransactionService {
 
       // Llamar a la API de encriptación
       const encryptedUrl = await encriptarParametrosMandatos(
-        'SISTEMA',
+        '', // Dejar vacío para que use getUserNameFromStorage automáticamente
         rutAfiliado,
         sessionData.NombrePersona,
         sessionData.ApellidoPaterno,
