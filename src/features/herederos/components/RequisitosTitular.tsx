@@ -28,14 +28,12 @@ const RequisitosTitular: React.FC = () => {
   const renderRequirementItem = (text: string, description?: string) => (
     <li className="requirementItem">
       <img src={CheckIcon} width={20} height={20} alt="Check" className="checkIcon" />
-      <ConsaludCore.Typography variant="body" weight="bold" className="requirementText">
-        {text}
-      </ConsaludCore.Typography>
-      {description && (
-        <ConsaludCore.Typography variant="body" className="requirementDescription">
-          {description}
+      <div className="requirementTextContainer">
+        <ConsaludCore.Typography variant="body" className="requirementFullText">
+          <span className="requirementBold">{text}</span>
+          {description && <span className="requirementNormal"> {description}</span>}
         </ConsaludCore.Typography>
-      )}
+      </div>
     </li>
   );
 
@@ -128,11 +126,11 @@ const RequisitosTitular: React.FC = () => {
                 className={`button is-primary is-rounded proceso-button animate-fade-in-up${loading ? ' is-loading-custom' : ''}`}
                 onClick={() => navigator('/mnherederos/ingresoher/DatosTitular')}
                 type="button"
-                aria-label="Entendido"
+                aria-label="Continuar"
                 disabled={loading}
               >
                 <ConsaludCore.Typography variant="button" color="#fff" className="buttonText">
-                  Entendido
+                  Continuar
                 </ConsaludCore.Typography>
               </button>
             </div>
