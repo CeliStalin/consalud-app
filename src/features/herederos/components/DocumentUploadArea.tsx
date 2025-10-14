@@ -54,7 +54,8 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
     const allowedTypes = ['application/pdf'];
 
     if (file.size > maxSize) {
-      return 'El archivo debe ser menor a 10MB';
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      return `El PDF es mayor a 10 MB (tamaño actual: ${fileSizeMB} MB). Por favor, seleccione un archivo menos de 10 MB.`;
     }
 
     if (!allowedTypes.includes(file.type)) {
@@ -71,7 +72,18 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
       if (file) {
         const error = validateFile(file);
         if (error) {
-          // Si hay error, no llamar a onFileChange
+          // Crear evento sintético con error para propagar la validación
+          const errorEvent = {
+            ...e,
+            target: {
+              ...e.target,
+              validationError: error, // Agregar error personalizado
+            },
+          } as React.ChangeEvent<HTMLInputElement> & {
+            target: HTMLInputElement & { validationError: string };
+          };
+          
+          onFileChange(errorEvent);
           return;
         }
       }

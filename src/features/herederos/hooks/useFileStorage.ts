@@ -22,7 +22,7 @@ interface UseFileStorageReturn {
   };
 
   // Métodos
-  handleFileChange: (file: File, tipoId: number, tipo: string, rut: string) => Promise<void>;
+  handleFileChange: (file: File | null, tipoId: number, tipo: string, rut: string, validationError?: string) => Promise<void>;
   removeFile: (tipoId: number, rut: string) => void;
   clearAllFiles: (rut: string) => void;
   loadFilesFromStorage: (rut: string) => void;
@@ -59,15 +59,48 @@ export const useFileStorage = (): UseFileStorageReturn => {
 
   // Manejar cambio de archivo
   const handleFileChange = useCallback(
-    async (file: File, tipoId: number, tipo: string, rut: string): Promise<void> => {
+    async (file: File | null, tipoId: number, tipo: string, rut: string, validationError?: string): Promise<void> => {
       setLoading(true);
       setError(null);
 
       try {
-        // Validar archivo
-        const validationError = validateFile(file);
+        // Si hay error de validación externa, manejarlo directamente
         if (validationError) {
-          setError(validationError);
+          setDocumentFiles(prev => ({
+            ...prev,
+            [tipoId]: {
+              file: null,
+              error: validationError,
+              documento: undefined,
+            },
+          }));
+          return;
+        }
+
+        // Si no hay archivo, limpiar el estado
+        if (!file) {
+          setDocumentFiles(prev => ({
+            ...prev,
+            [tipoId]: {
+              file: null,
+              error: 'No se seleccionó archivo válido',
+              documento: undefined,
+            },
+          }));
+          return;
+        }
+
+        // Validar archivo
+        const internalValidationError = validateFile(file);
+        if (internalValidationError) {
+          setDocumentFiles(prev => ({
+            ...prev,
+            [tipoId]: {
+              file: null,
+              error: internalValidationError,
+              documento: undefined,
+            },
+          }));
           return;
         }
 

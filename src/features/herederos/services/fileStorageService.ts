@@ -4,7 +4,7 @@ import { Documento, FileStorageConfig } from '../interfaces/Documento';
 const DEFAULT_CONFIG: FileStorageConfig = {
   maxFileSize: 10 * 1024 * 1024, // 10MB
   maxTotalSize: 50 * 1024 * 1024, // 50MB total
-  compressionThreshold: 1024 * 1024, // 1MB
+  compressionThreshold: 1024 * 1024, // 1MB - Umbral para considerar compresión (no afecta URLs)
   allowedTypes: ['application/pdf'],
   storageKeyPrefix: 'documentos_',
 };
@@ -126,9 +126,9 @@ export const saveFileToStorage = async (
   // Comprimir si es necesario
   const { blob, compressed } = await compressFile(file);
 
-  // Crear URL de blob solo para archivos pequeños
-  const useBlobUrl = file.size < finalConfig.compressionThreshold;
-  const url = useBlobUrl ? createBlobUrl(blob) : undefined;
+  // Crear URL de blob para TODOS los archivos
+  // Necesario para envío posterior a la API
+  const url = createBlobUrl(blob);
 
   // Crear documento
   const documento: Documento = {

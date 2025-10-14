@@ -416,7 +416,10 @@ export class HerederosService {
       // Procesar cada documento de forma asíncrona
       const promises = documentos.map(async (documento, index) => {
         if (!documento.url) {
-          throw new Error(`Documento con tipoId ${documento.tipoId} no tiene URL`);
+          throw new Error(
+            `Documento "${documento.nombre}" (tipoId: ${documento.tipoId}) no tiene URL válida. ` +
+            `Esto puede ocurrir si el archivo no se guardó correctamente en el almacenamiento.`
+          );
         }
 
         try {

@@ -84,6 +84,16 @@ const CargaDocumento: React.FC = () => {
   const handleFileInputChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>, tipoId: number) => {
       const file = e.target.files?.[0];
+      const eventWithError = e as React.ChangeEvent<HTMLInputElement> & {
+        target: HTMLInputElement & { validationError?: string };
+      };
+
+      // Si hay error de validación, manejarlo directamente
+      if (eventWithError.target.validationError) {
+        const tipo = tiposDocumento.find(t => t.valValor === tipoId)?.nombre || '';
+        await handleFileChange(null, tipoId, tipo, heredero?.rut || '', eventWithError.target.validationError);
+        return;
+      }
 
       if (file && heredero?.rut) {
         const tipo = tiposDocumento.find(t => t.valValor === tipoId)?.nombre || '';
