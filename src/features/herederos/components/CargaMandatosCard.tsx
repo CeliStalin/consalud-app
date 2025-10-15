@@ -66,23 +66,95 @@ const formatName = (name: string): string => {
  */
 const getEmailSolicitante = (): string => {
   if (env.isDevelopment() || env.isTest()) {
-    // Desarrollo/Testing: tomar del localStorage usuarioAD -> Email
+    // Desarrollo/Testing: buscar directamente en localStorage
     try {
+      // Buscar en todas las claves del localStorage
+      const allLocalStorageKeys = Object.keys(localStorage);
+     
+      for (const key of allLocalStorageKeys) {
+        try {
+          const data = localStorage.getItem(key);
+          if (data) {
+            try {
+              const parsed = JSON.parse(data);
+              
+              // Buscar Email en el objeto parseado
+              if (parsed && typeof parsed === 'object') {
+                const email = parsed.Email || parsed.email || parsed.mail || parsed.Mail;
+                if (email) {
+                  return email;
+                }
+                
+                // Si es un objeto anidado, buscar más profundo
+                if (parsed.usuarioData && typeof parsed.usuarioData === 'object') {
+                  const emailNested = parsed.usuarioData.Email || parsed.usuarioData.email || parsed.usuarioData.mail || parsed.usuarioData.Mail;
+                  if (emailNested) {
+                    return emailNested;
+                  }
+                }
+                
+                // Buscar en todas las propiedades del objeto
+                for (const prop in parsed) {
+                  if (parsed[prop] && typeof parsed[prop] === 'object') {
+                    const emailInProp = parsed[prop].Email || parsed[prop].email || parsed[prop].mail || parsed[prop].Mail;
+                    if (emailInProp) {
+                      return emailInProp;
+                    }
+                  }
+                }
+              }
+            } catch (parseError) {
+              // No es JSON válido, continuar
+              continue;
+            }
+          }
+        } catch (error) {
+          console.error(`Error al leer localStorage clave ${key}:`, error);
+        }
+      }
+      
+      // Intentar getUserDataFromStorage como fallback
       const usuarioData = getUserDataFromStorage();
+      
       if (usuarioData) {
-        const email = usuarioData.Email || usuarioData.email;
+        const email = usuarioData.Email || usuarioData.email || usuarioData.mail || usuarioData.Mail;
         if (email) {
           return email;
         }
       }
+      
     } catch (error) {
       console.error('Error al obtener email del localStorage:', error);
     }
-    return 'stalin.celi@consalud.cl';
+    
+    // En dev/test, si no hay email del usuario, es un error crítico
+    throw new Error('Email del usuario no encontrado en desarrollo/testing');
+    
   } else if (env.isProduction()) {
-    // Producción: tomar del sessionStorage formHerederoData_ -> Mail
+    // Producción: buscar específicamente en sessionStorage formHerederoData_ -> Mail
     try {
       const allKeys = Object.keys(sessionStorage);
+     
+      // Buscar específicamente claves que empiecen con formHerederoData_
+      const formHerederoKeys = allKeys.filter(key => key.startsWith('formHerederoData_'));
+
+      for (const key of formHerederoKeys) {
+        const data = sessionStorage.getItem(key);
+        if (data) {
+          try {
+            const parsed = JSON.parse(data);
+            
+            if (parsed && parsed.Mail) {
+              return parsed.Mail;
+            }
+          } catch (parseError) {
+            console.error(`Error al parsear ${key}:`, parseError);
+            continue;
+          }
+        }
+      }
+      
+      // Fallback: buscar en cualquier clave que contenga 'formHeredero' o 'heredero'
       const formKeys = allKeys.filter(
         key => key.includes('formHeredero') || key.includes('heredero')
       );
@@ -100,13 +172,33 @@ const getEmailSolicitante = (): string => {
           }
         }
       }
+      
+     // Último fallback: buscar Mail en cualquier parte del sessionStorage
+      for (const key of allKeys) {
+        const data = sessionStorage.getItem(key);
+        if (data) {
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed && (parsed.Mail || parsed.email)) {
+              return parsed.Mail || parsed.email;
+            }
+          } catch (parseError) {
+            continue;
+          }
+        }
+      }
+      
     } catch (error) {
       console.error('Error al obtener email del sessionStorage:', error);
     }
-    return 'stalin.celi@consalud.cl';
+    
+    // Si no se encuentra email en producción, es un error crítico
+    throw new Error('Email del heredero no encontrado en producción');
   }
 
-  return 'stalin.celi@consalud.cl';
+  // Si llegamos aquí, algo está mal configurado
+  console.error('Ambiente no identificado');
+  throw new Error('Ambiente no identificado para obtener email');
 };
 
 /**
