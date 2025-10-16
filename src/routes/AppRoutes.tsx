@@ -121,7 +121,7 @@ const HomePageWithCollapse: React.FC<{
 
 // Layout wrapper para las subrutas de herederos
 const HerederosLayout: React.FC = () => (
-  <CoreProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
+  <CoreProtectedRoute>
     <TitularProvider>
       <HerederoProvider>
         <ButtonLockingProviderWrapper>
@@ -130,7 +130,7 @@ const HerederosLayout: React.FC = () => (
           </CollapseOnRoute>
         </ButtonLockingProviderWrapper>
       </HerederoProvider>
-    </TitularProvider>{' '}
+    </TitularProvider>
   </CoreProtectedRoute>
 );
 
@@ -195,7 +195,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ logo }) => {
                 <Route
                   path="/home"
                   element={
-                    <CoreProtectedRoute allowedRoles={['USER', 'ADMIN', 'Developers']}>
+                    <CoreProtectedRoute>
                       <HomePageWithCollapse />
                     </CoreProtectedRoute>
                   }
