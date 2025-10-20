@@ -59,8 +59,8 @@ import ReactDOM from 'react-dom/client';
 // Luego estilos de terceros
 import 'bulma/css/bulma.min.css';
 
-// Luego el core (después de React)
-import '@consalud/core/core.css';
+// Luego el core (después de React) - usando el CSS compilado
+import '@consalud/core/assets/core-BGrnpATq.css';
 import '@consalud/core/index.js';
 
 // Finalmente estilos locales y componentes

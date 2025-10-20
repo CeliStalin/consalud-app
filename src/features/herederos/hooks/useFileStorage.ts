@@ -22,7 +22,13 @@ interface UseFileStorageReturn {
   };
 
   // Métodos
-  handleFileChange: (file: File | null, tipoId: number, tipo: string, rut: string, validationError?: string) => Promise<void>;
+  handleFileChange: (
+    file: File | null,
+    tipoId: number,
+    tipo: string,
+    rut: string,
+    validationError?: string
+  ) => Promise<void>;
   removeFile: (tipoId: number, rut: string) => void;
   clearAllFiles: (rut: string) => void;
   loadFilesFromStorage: (rut: string) => void;
@@ -59,7 +65,13 @@ export const useFileStorage = (): UseFileStorageReturn => {
 
   // Manejar cambio de archivo
   const handleFileChange = useCallback(
-    async (file: File | null, tipoId: number, tipo: string, rut: string, validationError?: string): Promise<void> => {
+    async (
+      file: File | null,
+      tipoId: number,
+      tipo: string,
+      rut: string,
+      validationError?: string
+    ): Promise<void> => {
       setLoading(true);
       setError(null);
 

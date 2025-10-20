@@ -277,11 +277,11 @@ export class HerederosService {
     // Validar que la URL base esté configurada
     if (!this.config.baseUrl) {
       throw new Error('URL base de la API no configurada');
-    } 
-    
+    }
+
     // Obtener el userName del localStorage si no se proporciona
     const finalUserName = userName || getUserNameFromStorage();
-    
+
     // Agregar el userName a los datos
     const dataToSend = {
       ...solicitanteData,
@@ -404,7 +404,7 @@ export class HerederosService {
     return withRetry(async () => {
       // Obtener el userName del localStorage si no se proporciona
       const finalUsuarioCreacion = usuarioCreacion || getUserNameFromStorage();
-      
+
       // Crear FormData para enviar archivos
       const formData = new FormData();
 
@@ -418,7 +418,7 @@ export class HerederosService {
         if (!documento.url) {
           throw new Error(
             `Documento "${documento.nombre}" (tipoId: ${documento.tipoId}) no tiene URL válida. ` +
-            `Esto puede ocurrir si el archivo no se guardó correctamente en el almacenamiento.`
+              `Esto puede ocurrir si el archivo no se guardó correctamente en el almacenamiento.`
           );
         }
 

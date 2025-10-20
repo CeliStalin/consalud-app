@@ -1,0 +1,8 @@
+# Assets copiados automáticamente del @consalud/core
+# Estos archivos se regeneran con: npm run copy:assets
+
+# Ignorar los assets generados
+favicon.ico
+Logo.png
+
+!.gitignore

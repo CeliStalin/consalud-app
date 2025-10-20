@@ -82,7 +82,7 @@ const DocumentUploadArea: React.FC<DocumentUploadAreaProps> = ({
           } as React.ChangeEvent<HTMLInputElement> & {
             target: HTMLInputElement & { validationError: string };
           };
-          
+
           onFileChange(errorEvent);
           return;
         }

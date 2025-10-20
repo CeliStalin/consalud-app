@@ -70,33 +70,41 @@ const getEmailSolicitante = (): string => {
     try {
       // Buscar en todas las claves del localStorage
       const allLocalStorageKeys = Object.keys(localStorage);
-     
+
       for (const key of allLocalStorageKeys) {
         try {
           const data = localStorage.getItem(key);
           if (data) {
             try {
               const parsed = JSON.parse(data);
-              
+
               // Buscar Email en el objeto parseado
               if (parsed && typeof parsed === 'object') {
                 const email = parsed.Email || parsed.email || parsed.mail || parsed.Mail;
                 if (email) {
                   return email;
                 }
-                
+
                 // Si es un objeto anidado, buscar más profundo
                 if (parsed.usuarioData && typeof parsed.usuarioData === 'object') {
-                  const emailNested = parsed.usuarioData.Email || parsed.usuarioData.email || parsed.usuarioData.mail || parsed.usuarioData.Mail;
+                  const emailNested =
+                    parsed.usuarioData.Email ||
+                    parsed.usuarioData.email ||
+                    parsed.usuarioData.mail ||
+                    parsed.usuarioData.Mail;
                   if (emailNested) {
                     return emailNested;
                   }
                 }
-                
+
                 // Buscar en todas las propiedades del objeto
                 for (const prop in parsed) {
                   if (parsed[prop] && typeof parsed[prop] === 'object') {
-                    const emailInProp = parsed[prop].Email || parsed[prop].email || parsed[prop].mail || parsed[prop].Mail;
+                    const emailInProp =
+                      parsed[prop].Email ||
+                      parsed[prop].email ||
+                      parsed[prop].mail ||
+                      parsed[prop].Mail;
                     if (emailInProp) {
                       return emailInProp;
                     }
@@ -112,29 +120,28 @@ const getEmailSolicitante = (): string => {
           console.error(`Error al leer localStorage clave ${key}:`, error);
         }
       }
-      
+
       // Intentar getUserDataFromStorage como fallback
       const usuarioData = getUserDataFromStorage();
-      
+
       if (usuarioData) {
-        const email = usuarioData.Email || usuarioData.email || usuarioData.mail || usuarioData.Mail;
+        const email =
+          usuarioData.Email || usuarioData.email || usuarioData.mail || usuarioData.Mail;
         if (email) {
           return email;
         }
       }
-      
     } catch (error) {
       console.error('Error al obtener email del localStorage:', error);
     }
-    
+
     // En dev/test, si no hay email del usuario, es un error crítico
     throw new Error('Email del usuario no encontrado en desarrollo/testing');
-    
   } else if (env.isProduction()) {
     // Producción: buscar específicamente en sessionStorage formHerederoData_ -> Mail
     try {
       const allKeys = Object.keys(sessionStorage);
-     
+
       // Buscar específicamente claves que empiecen con formHerederoData_
       const formHerederoKeys = allKeys.filter(key => key.startsWith('formHerederoData_'));
 
@@ -143,7 +150,7 @@ const getEmailSolicitante = (): string => {
         if (data) {
           try {
             const parsed = JSON.parse(data);
-            
+
             if (parsed && parsed.Mail) {
               return parsed.Mail;
             }
@@ -153,7 +160,7 @@ const getEmailSolicitante = (): string => {
           }
         }
       }
-      
+
       // Fallback: buscar en cualquier clave que contenga 'formHeredero' o 'heredero'
       const formKeys = allKeys.filter(
         key => key.includes('formHeredero') || key.includes('heredero')
@@ -172,8 +179,8 @@ const getEmailSolicitante = (): string => {
           }
         }
       }
-      
-     // Último fallback: buscar Mail en cualquier parte del sessionStorage
+
+      // Último fallback: buscar Mail en cualquier parte del sessionStorage
       for (const key of allKeys) {
         const data = sessionStorage.getItem(key);
         if (data) {
@@ -187,11 +194,10 @@ const getEmailSolicitante = (): string => {
           }
         }
       }
-      
     } catch (error) {
       console.error('Error al obtener email del sessionStorage:', error);
     }
-    
+
     // Si no se encuentra email en producción, es un error crítico
     throw new Error('Email del heredero no encontrado en producción');
   }
@@ -596,7 +602,10 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
 
               // Si tampoco tenemos idMae, consultar la API
               if (!idMae || idMae === 0) {
-                const titularInfo = await fetchTitularByRut(parseInt(rutTitular), getUserNameFromStorage());
+                const titularInfo = await fetchTitularByRut(
+                  parseInt(rutTitular),
+                  getUserNameFromStorage()
+                );
                 idMae = titularInfo.id;
               }
             }

@@ -91,7 +91,13 @@ const CargaDocumento: React.FC = () => {
       // Si hay error de validación, manejarlo directamente
       if (eventWithError.target.validationError) {
         const tipo = tiposDocumento.find(t => t.valValor === tipoId)?.nombre || '';
-        await handleFileChange(null, tipoId, tipo, heredero?.rut || '', eventWithError.target.validationError);
+        await handleFileChange(
+          null,
+          tipoId,
+          tipo,
+          heredero?.rut || '',
+          eventWithError.target.validationError
+        );
         return;
       }
 

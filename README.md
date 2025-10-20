@@ -181,6 +181,39 @@ Esta aplicación utiliza `@consalud/core`, una librería interna que proporciona
 - Servicios comunes (autenticación, gestión de APIs)
 - Utilidades y funciones helper
 
+## 📁 Gestión de Assets Estáticos
+
+### 🔄 Generación Automática desde @consalud/core
+
+Los assets estáticos como **favicon.ico** y **Logo.png** se generan automáticamente desde el paquete `@consalud/core` durante el proceso de compilación. Estos archivos **NO están versionados en Git** ya que son derivados del core.
+
+### 📂 Directorio `public/`
+
+El directorio `public/` cumple un rol fundamental en la compilación con Vite:
+
+- **Durante desarrollo (`npm run dev`)**: Vite sirve los archivos directamente desde `public/`
+- **Durante compilación (`npm run build`)**: El contenido de `public/` se copia automáticamente a `dist/`
+- **Referencia en el código**: Los archivos se referencian con rutas absolutas (ej: `/favicon.ico`, `/Logo.png`)
+
+### ⚙️ Scripts de Sincronización
+
+Los siguientes scripts automatizan la copia de assets desde el core:
+
+```bash
+npm run copy:favicon  # Copia favicon.ico desde @consalud/core
+npm run copy:logo     # Copia Logo.png desde @consalud/core  
+npm run copy:assets   # Ejecuta ambos scripts
+```
+
+Estos scripts se ejecutan automáticamente al compilar (`npm run build`, `npm run build:test`, `npm run build:dev`).
+
+### 🔍 ¿Por qué este enfoque?
+
+1. **Centralización**: Los assets se mantienen actualizados con el core
+2. **Compatibilidad**: Evita problemas de importación dinámica con Vite/ESM
+3. **Simplicidad**: Vite espera assets en `public/` y los maneja automáticamente
+4. **Sin conflictos**: Los archivos generados no se versionan, evitando merge conflicts
+
 ## 🔐 Variables de entorno
 
 Las variables de entorno se definen en archivos `.env.*` para cada ambiente:
