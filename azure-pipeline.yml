@@ -22,7 +22,7 @@ variables:
   - name: DockerRegistryEndpoint.Prod # Nombre Endpoint Registry con imagen de Testing y Produccion
     value: "RegistryProdCSLD-SolicitudesClientes"
   - name: KubernetesServiceConnection.Prod # Service Connection RKE Des
-    value: "rke-tes-Utilitarios-Transversales-SolicitudesClientes"
+    value: "rke-prod-SolicitudesClientes"
 name: $(date:yyyyMMdd)$(rev:.r)
 stages:
   - stage: SonarQube
