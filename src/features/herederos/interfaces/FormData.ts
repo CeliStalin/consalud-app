@@ -42,8 +42,8 @@ export interface FormHerederoData {
   IdComuna: number;
   DesComuna: string;
   Calle: string;
-  NumCalle: number;
+  NumCalle: string;
   villa: string;
-  DepBlock: number;
+  DepBlock: string;
   Usuario: string;
 }

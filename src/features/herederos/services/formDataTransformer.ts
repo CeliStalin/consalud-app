@@ -47,9 +47,9 @@ export class FormDataTransformer {
       IdComuna: formData.codComuna || 0,
       DesComuna: formData.comuna || '',
       Calle: formData.calle || '',
-      NumCalle: parseInt(formData.numero) || 0,
+      NumCalle: formData.numero || '',
       villa: formData.villaOpcional || '',
-      DepBlock: parseInt(formData.deptoBloqueOpcional) || 0,
+      DepBlock: formData.deptoBloqueOpcional || '',
       Usuario: finalUsuario,
     };
   }
@@ -74,8 +74,8 @@ export class FormDataTransformer {
       ciudad: formHerederoData.DesCiudad || '',
       comuna: formHerederoData.DesComuna || '',
       calle: formHerederoData.Calle || '',
-      numero: formHerederoData.NumCalle ? formHerederoData.NumCalle.toString() : '',
-      deptoBloqueOpcional: formHerederoData.DepBlock ? formHerederoData.DepBlock.toString() : '',
+      numero: formHerederoData.NumCalle || '',
+      deptoBloqueOpcional: formHerederoData.DepBlock || '',
       villaOpcional: formHerederoData.villa || '',
       codCiudad: formHerederoData.IdCiudad || undefined,
       codComuna: formHerederoData.IdComuna || undefined,

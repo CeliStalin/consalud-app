@@ -544,9 +544,9 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
         IdComuna: formData.IdComuna || 0,
         DesComuna: formData.DesComuna || '',
         Calle: formData.Calle || '',
-        NumCalle: formData.NumCalle || 0,
+        NumCalle: formData.NumCalle || '',
         villa: formData.villa || '',
-        DepBlock: formData.DepBlock || 0,
+        DepBlock: formData.DepBlock || '',
         Usuario: formData.Usuario || getUserNameFromStorage(),
       };
 

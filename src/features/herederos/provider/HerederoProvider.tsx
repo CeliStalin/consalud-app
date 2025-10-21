@@ -84,11 +84,9 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       IdComuna: herederoData.codComuna || 0,
       DesComuna: herederoData.descripcionComuna || '',
       Calle: herederoData.contactabilidad?.direccion?.calle || '',
-      NumCalle: herederoData.contactabilidad?.direccion?.numero || 0,
+      NumCalle: herederoData.contactabilidad?.direccion?.numero?.toString() || '',
       villa: herederoData.contactabilidad?.direccion?.villa || '',
-      DepBlock: herederoData.contactabilidad?.direccion?.departamento
-        ? parseInt(herederoData.contactabilidad.direccion.departamento)
-        : 0,
+      DepBlock: herederoData.contactabilidad?.direccion?.departamento || '',
       Usuario: '',
     };
   }, []);
@@ -108,7 +106,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       contactabilidad: {
         direccion: {
           calle: formData.Calle,
-          numero: formData.NumCalle,
+          numero: parseInt(formData.NumCalle) || 0,
           comunaId: formData.IdComuna,
           comunaNombre: formData.DesComuna,
           regionId: formData.IdRegion,
@@ -116,7 +114,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
           ciudadId: formData.IdCiudad,
           ciudadNombre: formData.DesCiudad,
           villa: formData.villa,
-          departamento: formData.DepBlock.toString(),
+          departamento: formData.DepBlock,
         },
         telefono: {
           numero: formData.NumTelef.toString(),
@@ -140,10 +138,10 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
       descripcionComuna: formData.DesComuna,
       descripcionRegion: formData.DesRegion,
       numeroBloque: 0,
-      numeroDepartamento: formData.DepBlock,
+      numeroDepartamento: parseInt(formData.DepBlock) || 0,
       nombreVillaCondominio: formData.villa,
       nombreCalle: formData.Calle,
-      numeroCalle: formData.NumCalle,
+      numeroCalle: parseInt(formData.NumCalle) || 0,
       numeroCelular: formData.NumTelef,
       numeroFijo: 0,
       tipoDireccion: '',
