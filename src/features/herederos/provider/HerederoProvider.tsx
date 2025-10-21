@@ -117,7 +117,7 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
           departamento: formData.DepBlock,
         },
         telefono: {
-          numero: formData.NumTelef.toString(),
+          numero: formData.NumTelef ? formData.NumTelef.toString() : '',
           tipo: 'CELULAR',
           codPais: '56',
           codCiudad: '2',
@@ -214,20 +214,23 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
               indFallecido: response.SolicitanteInMae.IndFallecido,
               contactabilidad: {
                 direccion: {
-                  calle: response.MejorContactibilidadSolicitante.nombreCalle,
-                  numero: response.MejorContactibilidadSolicitante.numeroCalle,
+                  calle: response.MejorContactibilidadSolicitante.nombreCalle || '',
+                  numero: response.MejorContactibilidadSolicitante.numeroCalle || 0,
                   comunaId: response.MejorContactibilidadSolicitante.CodComuna,
                   comunaNombre: response.MejorContactibilidadSolicitante.descripcionComuna,
                   regionId: response.MejorContactibilidadSolicitante.CodRegion,
                   regionNombre: response.MejorContactibilidadSolicitante.descripcionRegion,
                   ciudadId: response.MejorContactibilidadSolicitante.CodCiudad,
                   ciudadNombre: response.MejorContactibilidadSolicitante.descripcionCiudad,
-                  villa: response.MejorContactibilidadSolicitante.nombreVillaCondominio,
-                  departamento:
-                    response.MejorContactibilidadSolicitante.numeroDepartamento.toString(),
+                  villa: response.MejorContactibilidadSolicitante.nombreVillaCondominio || '',
+                  departamento: response.MejorContactibilidadSolicitante.numeroDepartamento
+                    ? response.MejorContactibilidadSolicitante.numeroDepartamento.toString()
+                    : '',
                 },
                 telefono: {
-                  numero: response.MejorContactibilidadSolicitante.numeroCelular.toString(),
+                  numero: response.MejorContactibilidadSolicitante.numeroCelular
+                    ? response.MejorContactibilidadSolicitante.numeroCelular.toString()
+                    : '',
                   tipo: 'CELULAR',
                   codPais: '56',
                   codCiudad: '2',
