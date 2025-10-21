@@ -77,10 +77,10 @@
   background-color: #04a59b;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 24px;
   padding: 14px 32px;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(4, 165, 155, 0.2);

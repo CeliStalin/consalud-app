@@ -189,11 +189,11 @@ export const HerederoProvider: React.FC<HerederoProviderProps> = ({ children }) 
             ) {
               const validacion = validarEdadConMensaje(
                 response.SolicitanteInMae.FecNacimiento,
-                'La persona heredera debe tener al menos 18 años'
+                'La persona heredera debe tener al menos 18 años.'
               );
               if (!validacion.esValido) {
                 throw new Error(
-                  validacion.mensaje || 'La persona heredera debe tener al menos 18 años'
+                  validacion.mensaje || 'La persona heredera debe tener al menos 18 años.'
                 );
               }
             } else {

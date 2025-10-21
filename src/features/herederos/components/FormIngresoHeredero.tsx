@@ -502,7 +502,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     if (date) {
       const validacion = validarEdadConMensaje(
         date,
-        'La persona heredera debe tener al menos 18 años'
+        'La persona heredera debe tener al menos 18 años.'
       );
       if (validacion.esValido) {
         setErrors({
@@ -718,7 +718,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       // Validar edad si se proporciona fecha
       const validacion = validarEdadConMensaje(
         localFormData.fechaNacimiento,
-        'La persona heredera debe tener al menos 18 años'
+        'La persona heredera debe tener al menos 18 años.'
       );
       if (!validacion.esValido) {
         newErrors.fechaNacimiento = validacion.mensaje || '';

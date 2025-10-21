@@ -187,9 +187,11 @@ const IngresoTitular: React.FC = () => {
         {showStepperError && renderStepperError()}
         <ConsaludCore.Typography
           variant="h5"
+          component="h2"
           style={{
-            fontWeight: 700,
+            fontWeight: 600,
             color: '#222',
+            fontSize: '30px',
             marginBottom: 24,
             textAlign: 'center',
           }}

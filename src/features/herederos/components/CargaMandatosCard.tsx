@@ -977,7 +977,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
             display: 'flex',
             alignItems: 'center',
             gap: '0.75rem',
-            marginBottom: '2rem',
+            marginBottom: '0.75rem',
             flexShrink: 0,
           }}
         >
@@ -1038,7 +1038,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
           </ConsaludCore.Typography>
         </div>
         {/* Descripción */}
-        <div style={{ marginBottom: '1.5rem' }}>
+        <div style={{ marginBottom: '0.75rem' }}>
           <ConsaludCore.Typography
             variant="body2"
             style={{
@@ -1095,7 +1095,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                 style={{
                   color: '#505050',
                   fontSize: '0.875rem',
-                  marginBottom: '0.5rem',
+                  marginBottom: '0.375rem',
                 }}
               >
                 Cuenta asociada a
@@ -1169,6 +1169,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                       color: '#505050',
                       fontSize: '0.875rem',
                       marginBottom: '0.25rem',
+                      fontWeight: 700,
                     }}
                   >
                     {cuentaBancariaData.banco}
@@ -1203,6 +1204,7 @@ const CargaMandatosCard: React.FC<CargaMandatosCardProps> = ({ onSave }) => {
                       color: '#505050',
                       fontSize: '0.875rem',
                       marginBottom: '0.25rem',
+                      fontWeight: 700,
                     }}
                   >
                     {mandatoInfo.banco}

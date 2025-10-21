@@ -72,10 +72,10 @@ const DatosTitular: React.FC = () => {
   return (
     <div className="route-container layout-stable">
       {/* Header Section */}
-      <div style={{ width: '100%', marginBottom: 8 }}>
+      <div style={{ width: '100%', marginBottom: 24 }}>
         <div style={{ marginLeft: 48 }}>
           {/* Breadcrumb */}
-          <div style={{ marginBottom: 4 }}>
+          <div style={{ marginBottom: 8 }}>
             <ConsaludCore.Breadcrumb
               items={cleanedBreadcrumbItems}
               separator={<span>{'>'}</span>}
@@ -112,18 +112,16 @@ const DatosTitular: React.FC = () => {
           Datos del titular
         </ConsaludCore.Typography>
       </div>
-      <Stepper step={1} />
+
+      {/* Stepper con espacio estandarizado */}
+      <div className="mb-5">
+        <Stepper step={1} />
+      </div>
+
       {/* Centered Card Container */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          width: '100%',
-          marginTop: 0,
-        }}
-      >
-        <div className="card-responsive">
-          <div className="generalContainer">
+      <div className="container">
+        <div className="card-center-container">
+          <div className="card-responsive">
             <DatosTitularCard
               nombre={titular?.nombre || ''}
               apellidoPat={titular?.apellidoPat || ''}

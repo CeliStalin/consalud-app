@@ -43,7 +43,7 @@ const SuccessPage: React.FC = () => {
 
           <p className="success-message">
             La persona heredera recibirá a través de su correo electrónico registrado una
-            notificación de ingreso de la solicitud
+            notificación de ingreso de la solicitud.
           </p>
 
           <button

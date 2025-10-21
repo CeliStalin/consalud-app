@@ -415,12 +415,12 @@ const CargaDocumento: React.FC = () => {
                   loading ||
                   fileLoading
                     ? '#E0E0E0'
-                    : '#00CBBF',
+                    : '#04a59b',
                 color: '#FFFFFF',
                 border: 'none',
-                borderRadius: '0.5rem',
-                padding: '0.75rem 2rem',
-                fontSize: '1rem',
+                borderRadius: '24px',
+                padding: '14px 32px',
+                fontSize: '16px',
                 fontWeight: '600',
                 cursor:
                   !checked ||
@@ -433,8 +433,8 @@ const CargaDocumento: React.FC = () => {
                     ? 'not-allowed'
                     : 'pointer',
                 transition: 'all 0.3s ease',
-                minWidth: '8.75rem',
-                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                minWidth: '180px',
+                boxShadow: '0 2px 8px rgba(4, 165, 155, 0.2)',
               }}
               onMouseEnter={e => {
                 if (
@@ -449,10 +449,9 @@ const CargaDocumento: React.FC = () => {
                     fileLoading
                   )
                 ) {
-                  e.currentTarget.style.backgroundColor = '#00A59B';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow =
-                    '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                  e.currentTarget.style.backgroundColor = '#038c84';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(4, 165, 155, 0.3)';
                 }
               }}
               onMouseLeave={e => {
@@ -468,10 +467,9 @@ const CargaDocumento: React.FC = () => {
                     fileLoading
                   )
                 ) {
-                  e.currentTarget.style.backgroundColor = '#00CBBF';
+                  e.currentTarget.style.backgroundColor = '#04a59b';
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow =
-                    '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(4, 165, 155, 0.2)';
                 }
               }}
             >
