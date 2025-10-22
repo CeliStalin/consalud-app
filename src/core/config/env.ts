@@ -1,3 +1,5 @@
+import { runtimeEnv } from './runtimeEnv';
+
 interface EnvVariables {
   apiUrl: string;
   apiKey: string;
@@ -15,20 +17,20 @@ class Environment {
   public readonly env: EnvVariables;
 
   private constructor() {
+    // Usa runtimeEnv (simplificado sin variables duplicadas VITE_APP_*)
     this.env = {
-      apiUrl: import.meta.env.VITE_API_ARQUITECTURA_URL || '',
-      apiKey: import.meta.env.VITE_KEY_PASS_API_ARQ || '',
-      clientId: import.meta.env.VITE_CLIENT_ID || '',
-      authority: import.meta.env.VITE_AUTHORITY || '',
-      ambiente: import.meta.env.VITE_AMBIENTE || 'development',
-      sistema: import.meta.env.VITE_SISTEMA || 'ManHerederos',
-      nombreSistema:
-        import.meta.env.VITE_NOMBRE_SISTEMA || 'Administrador de Devolución a Herederos',
-      timeout: Number(import.meta.env.VITE_TIMEOUT) || 10000,
+      apiUrl: runtimeEnv.VITE_API_ARQUITECTURA_URL || '',
+      apiKey: runtimeEnv.VITE_KEY_PASS_API_ARQ || '',
+      clientId: runtimeEnv.VITE_CLIENT_ID || '',
+      authority: runtimeEnv.VITE_AUTHORITY || '',
+      ambiente: runtimeEnv.VITE_AMBIENTE || 'development',
+      sistema: runtimeEnv.VITE_SISTEMA || 'ManHerederos',
+      nombreSistema: runtimeEnv.VITE_NOMBRE_SISTEMA || 'Administrador de Devolución a Herederos',
+      timeout: Number(runtimeEnv.VITE_TIMEOUT) || 10000,
       redirectUri: (() => {
-        const uri = import.meta.env.VITE_REDIRECT_URI || '/login';
-        // Si empieza con http o https, se debe usar tal cual
-        return uri.startsWith('https')
+        const uri = runtimeEnv.VITE_REDIRECT_URI || '/login';
+        // Si empieza con http o https, usar tal cual
+        return uri.startsWith('http')
           ? uri
           : window.location.origin + (uri.startsWith('/') ? uri : '/' + uri);
       })(),

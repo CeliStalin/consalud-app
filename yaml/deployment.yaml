@@ -21,6 +21,39 @@ spec:
           ports:
             - containerPort: 80
               protocol: TCP
+          env:
+            - name: VITE_AMBIENTE
+              value: $(VITE_AMBIENTE)
+            
+            - name: VITE_API_ARQUITECTURA_URL
+              value: $(VITE_API_ARQUITECTURA_URL)
+            
+            - name: VITE_BFF_HEREDEROS_DNS
+              value: $(VITE_BFF_HEREDEROS_DNS)
+            - name: VITE_BFF_HEREDEROS_API_KEY_HEADER
+              value: $(VITE_BFF_HEREDEROS_API_KEY_HEADER)
+            - name: VITE_BFF_HEREDEROS_API_KEY_VALUE
+              value: $(VITE_BFF_HEREDEROS_API_KEY_VALUE)
+            
+            - name: VITE_SISTEMA
+              value: $(VITE_SISTEMA)
+            - name: VITE_NOMBRE_SISTEMA
+              value: $(VITE_NOMBRE_SISTEMA)
+            
+            - name: VITE_NAME_API_KEY
+              value: $(VITE_NAME_API_KEY)
+            - name: VITE_KEY_PASS_API_ARQ
+              value: $(VITE_KEY_PASS_API_ARQ)
+
+            - name: VITE_CLIENT_ID
+              value: $(VITE_CLIENT_ID)
+            - name: VITE_AUTHORITY
+              value: $(VITE_AUTHORITY)
+            - name: VITE_REDIRECT_URI
+              value: $(VITE_REDIRECT_URI)
+            
+            - name: VITE_TIMEOUT
+              value: $(VITE_TIMEOUT)
           resources:
             requests:
               cpu: "100m"

@@ -59,6 +59,7 @@ stages:
           name: DockerAgents
         variables:
           - group: ReleaseClusterDev
+          - group: app-gestor-solicitudes-Dev
         steps:
           - template: yaml/Template_Docker.yaml
             parameters:
@@ -99,6 +100,7 @@ stages:
           name: DockerAgents
         variables:
           - group: ReleaseClusterTes
+          - group: app-gestor-solicitudes-tes
         steps:
           - template: yaml/Template_Docker.yaml
             parameters:
@@ -139,6 +141,7 @@ stages:
           name: DockerAgents
         variables:
           - group: ReleaseClusterProd
+          - group: app-gestor-solicitudes-prod
         steps:
           - template: Yaml/Template_KubernetesDeployment.yaml
             parameters:
@@ -146,7 +149,7 @@ stages:
               rutaManifests: yaml/
               manifestDeploy: yaml/deployment.yaml
               manifestService: yaml/service.yaml
-              manifestIngress: yaml/ingress.yaml
+              manifestIngress: yaml/ingressProduccion.yaml
               manifestAutoscaler: yaml/autoscaling.yaml
               appName: $(appname)
               capacidad: $(capacidad)

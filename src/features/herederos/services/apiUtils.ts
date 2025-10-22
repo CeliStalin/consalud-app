@@ -2,6 +2,8 @@
  * Utilidades centralizadas para servicios de API
  */
 
+import { getEnv } from '@/core/config/runtimeEnv';
+
 export interface ApiConfig {
   baseUrl: string;
   apiKeyHeader: string;
@@ -10,12 +12,13 @@ export interface ApiConfig {
 
 /**
  * Obtiene la configuración de API para herederos
+ * Usa runtimeEnv para leer las variables en runtime
  */
 export function getHerederosApiConfig(): ApiConfig {
   return {
-    baseUrl: import.meta.env.VITE_BFF_HEREDEROS_DNS || '',
-    apiKeyHeader: import.meta.env.VITE_BFF_HEREDEROS_API_KEY_HEADER || '',
-    apiKeyValue: import.meta.env.VITE_BFF_HEREDEROS_API_KEY_VALUE || '',
+    baseUrl: getEnv('VITE_BFF_HEREDEROS_DNS', ''),
+    apiKeyHeader: getEnv('VITE_BFF_HEREDEROS_API_KEY_HEADER', ''),
+    apiKeyValue: getEnv('VITE_BFF_HEREDEROS_API_KEY_VALUE', ''),
   };
 }
 

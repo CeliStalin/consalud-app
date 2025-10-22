@@ -1,26 +1,18 @@
 // IMPORTANTE: Configurar el ambiente ANTES de importar cualquier componente del core
 import { initializeMsalConfig, setCoreEnvConfig } from '@consalud/core';
+import { runtimeEnv } from './core/config/runtimeEnv';
 
-// Esto asegura que las URLs dinámicas se generen con el ambiente correcto
+// Usa runtimeEnv (simplificado - solo variables únicas gestionadas en Azure DevOps)
 setCoreEnvConfig({
-  VITE_AMBIENTE: import.meta.env.VITE_AMBIENTE,
-  VITE_APP_AMBIENTE: import.meta.env.VITE_APP_AMBIENTE,
-  VITE_API_ARQUITECTURA_URL: import.meta.env.VITE_API_ARQUITECTURA_URL,
-  VITE_APP_API_ARQUITECTURA_URL: import.meta.env.VITE_APP_API_ARQUITECTURA_URL,
-  VITE_NAME_API_KEY: import.meta.env.VITE_NAME_API_KEY,
-  VITE_APP_NAME_API_KEY: import.meta.env.VITE_APP_NAME_API_KEY,
-  VITE_KEY_PASS_API_ARQ: import.meta.env.VITE_KEY_PASS_API_ARQ,
-  VITE_APP_KEY_PASS_API_ARQ: import.meta.env.VITE_APP_KEY_PASS_API_ARQ,
-  VITE_SISTEMA: import.meta.env.VITE_SISTEMA,
-  VITE_APP_SISTEMA: import.meta.env.VITE_APP_SISTEMA,
-  VITE_NOMBRE_SISTEMA: import.meta.env.VITE_NOMBRE_SISTEMA,
-  VITE_APP_NOMBRE_SISTEMA: import.meta.env.VITE_APP_NOMBRE_SISTEMA,
-  VITE_TIMEOUT: import.meta.env.VITE_TIMEOUT,
-  VITE_APP_TIMEOUT: import.meta.env.VITE_APP_TIMEOUT,
-  VITE_CLIENT_ID: import.meta.env.VITE_CLIENT_ID,
-  VITE_APP_CLIENT_ID: import.meta.env.VITE_APP_CLIENT_ID,
-  VITE_AUTHORITY: import.meta.env.VITE_AUTHORITY,
-  VITE_APP_AUTHORITY: import.meta.env.VITE_APP_AUTHORITY,
+  VITE_AMBIENTE: runtimeEnv.VITE_AMBIENTE,
+  VITE_API_ARQUITECTURA_URL: runtimeEnv.VITE_API_ARQUITECTURA_URL,
+  VITE_NAME_API_KEY: runtimeEnv.VITE_NAME_API_KEY,
+  VITE_KEY_PASS_API_ARQ: runtimeEnv.VITE_KEY_PASS_API_ARQ,
+  VITE_SISTEMA: runtimeEnv.VITE_SISTEMA,
+  VITE_NOMBRE_SISTEMA: runtimeEnv.VITE_NOMBRE_SISTEMA,
+  VITE_TIMEOUT: runtimeEnv.VITE_TIMEOUT,
+  VITE_CLIENT_ID: runtimeEnv.VITE_CLIENT_ID,
+  VITE_AUTHORITY: runtimeEnv.VITE_AUTHORITY,
 });
 
 // Manejador global de errores de carga de chunks (para testing/production)
@@ -33,13 +25,13 @@ if (import.meta.env.MODE !== 'development') {
       (target?.tagName === 'SCRIPT' && target?.getAttribute('type') === 'module');
 
     if (isChunkLoadError) {
-      console.warn('⚠️ Chunk load error detected. Reloading page...', event.message);
+      console.warn('Chunk, Reloading page...', event.message);
       // Evitar loop infinito: solo recargar una vez
       if (!sessionStorage.getItem('chunk-error-reload')) {
         sessionStorage.setItem('chunk-error-reload', 'true');
         window.location.reload();
       } else {
-        console.error('❌ Persistent chunk load error. Please clear cache (Ctrl+F5)');
+        console.error('Persistent chunk load error. Please clear cache (Ctrl+F5)');
         sessionStorage.removeItem('chunk-error-reload');
       }
       event.preventDefault();
