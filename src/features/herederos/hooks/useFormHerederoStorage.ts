@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { parseDate } from '../../../utils/dateUtils';
 import { FormData, FormHerederoData } from '../interfaces/FormData';
 import { FormDataTransformer } from '../services/formDataTransformer';
 
@@ -29,7 +30,7 @@ export const useFormHerederoStorage = (rut: string) => {
         } else {
           // Estructura antigua FormData
           if (parsed.fechaNacimiento) {
-            parsed.fechaNacimiento = new Date(parsed.fechaNacimiento);
+            parsed.fechaNacimiento = parseDate(parsed.fechaNacimiento);
           }
           setFormData(parsed as FormData);
           return parsed as FormData;
@@ -115,7 +116,7 @@ export const useFormHerederoStorage = (rut: string) => {
 
         // Si está en la estructura antigua, convertir y guardar
         if (parsed.fechaNacimiento) {
-          parsed.fechaNacimiento = new Date(parsed.fechaNacimiento);
+          parsed.fechaNacimiento = parseDate(parsed.fechaNacimiento);
         }
 
         const oldFormData = parsed as FormData;

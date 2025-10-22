@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { parseDate } from '../../../utils/dateUtils';
 import { FormHerederoContext } from '../contexts/FormHerederoContext';
 import { FormData, FormHerederoData } from '../interfaces/FormData';
 import { FormHerederoContextType } from '../interfaces/FormHerederoContext';
@@ -33,7 +34,7 @@ export const FormHerederoProvider: React.FC<FormHerederoProviderProps> = ({
       } else {
         // Estructura antigua FormData
         if (parsed.fechaNacimiento) {
-          parsed.fechaNacimiento = new Date(parsed.fechaNacimiento);
+          parsed.fechaNacimiento = parseDate(parsed.fechaNacimiento);
         }
         return parsed as FormData;
       }

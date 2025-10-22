@@ -1,4 +1,4 @@
-import { formatDateForAPI } from '../../../utils/dateUtils';
+import { formatDateForAPI, parseDate } from '../../../utils/dateUtils';
 import { getUserNameFromStorage } from '../utils';
 import { FormData, FormHerederoData } from '../interfaces/FormData';
 
@@ -60,7 +60,7 @@ export class FormDataTransformer {
   static toFormData(formHerederoData: FormHerederoData): FormData {
     return {
       fechaNacimiento: formHerederoData.FechaNacimiento
-        ? new Date(formHerederoData.FechaNacimiento)
+        ? parseDate(formHerederoData.FechaNacimiento)
         : null,
       nombres: formHerederoData.NombrePersona || '',
       apellidoPaterno: formHerederoData.ApellidoPaterno || '',

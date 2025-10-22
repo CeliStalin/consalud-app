@@ -4,6 +4,7 @@ import * as ConsaludCore from '@consalud/core';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { validarEdadConMensaje } from '../../../utils/ageValidation';
+import { parseDate } from '../../../utils/dateUtils';
 import { useHeredero } from '../contexts/HerederoContext';
 import { useCallesAutocomplete } from '../hooks/useCallesAutocomplete';
 import { useFormHerederoData } from '../hooks/useFormHerederoData';
@@ -54,7 +55,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
     // Inicializar con datos del heredero como fallback
     // Los datos del storage se cargarán después en el useEffect
     return {
-      fechaNacimiento: heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
+      fechaNacimiento: heredero?.fechaNacimiento ? parseDate(heredero.fechaNacimiento) : null,
       nombres: heredero?.nombre || '',
       apellidoPaterno: heredero?.apellidoPat || undefined,
       apellidoMaterno: heredero?.apellidoMat || undefined,
@@ -298,7 +299,7 @@ const FormIngresoHeredero: React.FC<FormIngresoHerederoProps> = ({ showHeader = 
       if (!storedData) {
         // Si no hay datos del storage para este RUT, limpiar el formulario
         setLocalFormData({
-          fechaNacimiento: heredero?.fechaNacimiento ? new Date(heredero.fechaNacimiento) : null,
+          fechaNacimiento: heredero?.fechaNacimiento ? parseDate(heredero.fechaNacimiento) : null,
           nombres: heredero?.nombre || '',
           apellidoPaterno: heredero?.apellidoPat || undefined,
           apellidoMaterno: heredero?.apellidoMat || undefined,

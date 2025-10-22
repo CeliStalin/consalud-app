@@ -86,7 +86,7 @@ const RegistroHeredero: React.FC = () => {
         <div className="mb-5">
           <Stepper step={2} />
         </div>
-        
+
         {/* Centered Card Container */}
         <div className="container">
           <div className="card-center-container">
