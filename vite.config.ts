@@ -15,6 +15,20 @@ export default defineConfig(({ mode }) => {
   console.log(`Minification: ${isDevelopment ? 'disabled' : 'terser'}`);
   console.log(`Sourcemaps: ${isOptimizedBuild ? 'disabled' : 'enabled'}`);
 
+  // Suprimir warnings de source maps faltantes de node_modules
+  const originalWarn = console.warn;
+  console.warn = (...args: any[]) => {
+    const message = args[0]?.toString() || '';
+    // Filtrar warnings de source maps de node_modules
+    if (
+      message.includes('Failed to load source map') &&
+      message.includes('node_modules/@consalud/core')
+    ) {
+      return;
+    }
+    originalWarn.apply(console, args);
+  };
+
   return {
     base: '/',
     plugins: [react()],
@@ -35,6 +49,10 @@ export default defineConfig(({ mode }) => {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         Pragma: 'no-cache',
         Expires: '0',
+      },
+      // Suprimir warnings de source maps faltantes de node_modules
+      hmr: {
+        overlay: true,
       },
     },
     preview: {
